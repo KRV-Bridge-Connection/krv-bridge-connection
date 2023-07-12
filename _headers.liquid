@@ -1,0 +1,38 @@
+---
+layout: null
+permalink: /_headers
+---
+/
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  X-XSS-Protection: 1; mode=block
+  Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
+  Link: <{{ importmap.imports['@shgysk8zer0/kazoo/'] }}harden.js>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
+  Link: </js/index.min.js>; rel=preload; as=script; referrerpolicy=no-referrer;
+  Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
+  Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  X-XSS-Protection: 1; mode=block
+  Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
+  Link: <{{ importmap.imports['@shgysk8zer0/kazoo/'] }}harden.js>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
+  Link: </js/index.min.js>; rel=preload; as=script; referrerpolicy=no-referrer;
+  Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
+  Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
+
+/reset
+  Referrer-Policy: no-referrer
+  Clear-Site-Data: "cache", "cookies", "storage"
+  Content-Security-Policy: default-src 'self'; script-src 'self' cdn.kernvalley.us;
+
+/service-worker.js
+  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' cdn.kernvalley.us/service-worker.js;
+  Link: <//cdn.kernvalley.us/service-worker.js>; rel=preload; as=script
+  Link: </sw-config.js>; rel=preload; as=script
+
+/*
+  X-Content-Type-Options: nosniff

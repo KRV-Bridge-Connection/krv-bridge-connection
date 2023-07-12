@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: bundler
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "13:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - shgysk8zer0
+    assignees:
+      - shgysk8zer0
+    labels:
+      - dependencies
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "13:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - shgysk8zer0
+    assignees:
+      - shgysk8zer0
+    labels:
+      - javascript
+      - dependencies
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "13:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - shgysk8zer0
+    assignees:
+      - shgysk8zer0
+    labels:
+      - github-actions
+      - dependencies
+  - package-ecosystem: gitsubmodule
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "13:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - shgysk8zer0
+    assignees:
+      - shgysk8zer0
+    labels:
+      - dependencies

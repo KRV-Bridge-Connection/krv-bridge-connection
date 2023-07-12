@@ -1,0 +1,72 @@
+---
+Kernville: &Kernville
+  "@context": https://schema.org
+  "@type": City
+  identifier: kernville
+  name: Kernville, CA
+  geo:
+    "@type": GeoCoordinates
+    latitude: 35.752959
+    longitude: -118.425183
+  image:
+    - url: https://cdn.kernvalley.us/img/raster/missing-image.png
+      "@type": ImageObject
+      width: 640
+      height: 480
+      encodingFormat: image/png
+  address:
+    "@type": PostalAddress
+    addressRegion: CA
+    addressCountry: US
+    postalCode:
+      - 93238
+KernValley: &KernValley
+  identifier: f8fe6bc9-1ed1-4ce7-9271-1ce73d81192b
+  '@context': https://schema.org
+  '@type': LocalBusiness
+  name: KernValley.US
+  url: https://kernvalley.us
+  email: admin@kernvalley.us
+  telephone: +1-661-241-0042
+  description: KernValley.US is a publisher, advertiser, web and app developer, and more in the Kern River Valley
+  address:
+    "@type": PostalAddress
+    postOfficeBoxNumber: 1422
+    addressLocality: Kernville
+    addressRegion: CA
+    postalCode: 93238
+    addressCountry: US
+  priceRange: $
+  sameAs:
+    - https://www.facebook.com/KernValley.us/
+    - https://twitter.com/kern_valley
+    - https://instagram.com/kernvalley_us/
+    - https://www.linkedin.com/company/18644791/
+    - https://github.com/kernvalley
+  image:
+  - "@type": ImageObject
+    url: https://cdn.kernvalley.us/img/branding/kernvalley.us.svg
+    encodingFormat: image/svg+xml
+    height: 192
+    width: 192
+  location: *Kernville
+  foundingLocation: *Kernville
+Chris:
+    "@context": https://schema.org
+    "@type": Person
+    name: Chris Zuber
+    givenName: Christopher
+    additionalName: Wayne
+    familyName: Zuber
+    birthDate: 1985-03-26
+    email: admin@kernvalley.us
+    sameAs:
+      - https://www.facebook.com/shgysk8zer0
+      - https://twitter.com/shgysk8zer0
+      - https://www.linkedin.com/in/chris-zuber-455346141/
+      - https://github.com/shgysk8zer0
+    image: https://secure.gravatar.com/avatar/43578597e449298f5488c2407c8a8ae5?s=32&d=mm
+    jobTitle: Owner
+    memberOf: []
+    worksFor: *KernValley
+    homeLocation: *Kernville

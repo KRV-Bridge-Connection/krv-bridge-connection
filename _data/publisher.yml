@@ -1,0 +1,76 @@
+'@context': https://schema.org
+'@type': Organization
+name: KernValley.US
+url: https://kernvalley.us
+email: admin@kernvalley.us
+sameAs:
+  - https://www.facebook.com/KernValley.us/
+  - https://twitter.com/kern_valley
+  - https://instagram.com/kernvalley_us/
+  - https://www.linkedin.com/company/18644791/
+  - https://github.com/kernvalley
+logo:
+  - "@type": ImageObject
+    url: https://kernvalley.us/img/favicon.svg
+    encodingFormat: image/svg+xml
+  - "@type": ImageObject
+    url: https://kernvalley.us/img/icon-512.png
+    height: 512
+    width: 512
+    encodingFormat: image/png
+  - "@type": ImageObject
+    url: https://kernvalley.us/img/icon-192.png
+    height: 192
+    width: 192
+    encodingFormat: image/png
+  - "@type": ImageObject
+    url: https://kernvalley.us/img/icon-32.png
+    height: 32
+    width: 32
+    encodingFormat: image/png
+foundingLocation:
+  "@type": City
+  name: Kernville, CA
+  address:
+    "@type": PostalAddress
+    addressLocality: Kernville
+    addressRegion: CA
+    addressCountry: US
+    postalCode: 93238
+founder:
+  "@type": Person
+  name: Chris Zuber
+  givenName: Christopher
+  additionalName: Wayne
+  familyName: Zuber
+  url: https://shgysk8zer.github.io
+  birthDate: 1985-03-26
+  sameAs:
+    - https://twitter.com/shgysk8zer0
+    - https://www.linkedin.com/in/chris-zuber-455346141/
+    - https://github.com/shgysk8zer0
+  image:
+    - "@type": ImageObject
+      url: https://secure.gravatar.com/avatar/43578597e449298f5488c2407c8a8ae5?s=512&d=mm
+      width: 512
+      height: 512
+      encodingFormat: image/jpeg
+    - "@type": ImageObject
+      url: https://secure.gravatar.com/avatar/43578597e449298f5488c2407c8a8ae5?s=256&d=mm
+      width: 256
+      height: 256
+      encodingFormat: image/jpeg
+    - "@type": ImageObject
+      url: https://secure.gravatar.com/avatar/43578597e449298f5488c2407c8a8ae5?s=192&d=mm
+      width: 192
+      height: 192
+      encodingFormat: image/jpeg
+  homeLocation:
+    "@type": City
+    name: Kernville, CA
+    address:
+      "@type": PostalAddress
+      addressLocality: Kernville
+      addressRegion: CA
+      addressCountry: US
+      postalCode: 93238

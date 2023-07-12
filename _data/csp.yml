@@ -1,0 +1,41 @@
+---
+default:
+  default-src:
+    - "'self'"
+  base-uri:
+    - "'self'"
+  script-src:
+    - "'self'"
+    - unpkg.com/@shgysk8zer0/
+    - www.google-analytics.com
+    - www.googletagmanager.com
+  manifest-src:
+    - "'self'"
+  worker-src:
+    - "'self'"
+    - cdn.kernvalley.us/service-worker.js
+  style-src:
+    - "'self'"
+    - cdn.kernvalley.us/css/
+    - unpkg.com/@shgysk8zer0/
+  frame-src:
+    - www.youtube-nocookie.com
+  img-src:
+    - "*"
+    - "blob:"
+    - "data:"
+  media-src:
+    - "*"
+  font-src:
+    - cdn.kernvalley.us/fonts/
+  connect-src:
+    - "'self'"
+    - unpkg.com/@shgysk8zer0/
+    - apps.kernvalley.us/apps.json
+    - api.github.com/users/
+    - api.openweathermap.org/data/2.5/
+    - www.google-analytics.com/
+    - www.googletagmanager.com/gtag/
+    - baconipsum.com/api/
+  form-action:
+    - "'self'"

@@ -1,0 +1,15 @@
+---
+title: '11ty Test'
+description: 'A test of Eleventy'
+repository:
+  username: 'kernvalley'
+  project: '11ty-template'
+url: 'https://delicate-meringue-5c3db2.netlify.app/'
+viewport: 'width=device-width'
+referrer: 'no-referrer'
+color-scheme: 'light dark'
+og-type: 'website'
+base: '/'
+manifest: '/webapp.webmanifest'
+service_worker: '/service-worker.js'
+keep-kern-clean: true

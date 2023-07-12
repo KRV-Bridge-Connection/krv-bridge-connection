@@ -1,0 +1,6 @@
+{
+  "layout": "11ty-layouts/post.html",
+  "permalink": "posts/{{ page.date | date: '%Y/%m/%d' }}/{{ title | slugify }}/index.html",
+  "author": "chris",
+  "tags": ["posts"]
+}

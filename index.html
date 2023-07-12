@@ -1,0 +1,32 @@
+---
+layout: default
+title: Home
+pinned: true
+description: A GitHub repository for easily creating fast, modern, PWA compatible websites
+prerender:
+- href: /posts/2019/10/29/test/
+---
+<img src="https://secure.gravatar.com/avatar/{{ authors.Chris.email | md5 }}" />
+<section class="pagination">
+	<div class="grid grid-gallery">
+		{% for post in collections.posts %}
+			<div class="article-preview card shadow-dark">
+				{% include "11ty-articles/post-preview.html" post: post %}
+			</div>
+		{% endfor %}
+	</div>
+	{% if paginator.previous_page or paginator.next_page %}
+		<footer class="paginate-nav">
+			{% if paginator.previous_page %}
+				<a href="{{ paginator.previous_page_path  }}" rel="prev" role="button" title="Previous page">
+					{% include "11ty-common/icon.html" icon: 'prev' %}
+				</a>
+			{% endif %}
+			{% if paginator.next_page %}
+				<a href="{{ paginator.next_page_path }}" role="button" rel="next" title="Next page">
+					{% include "11ty-common/icon.html" icon: 'next' %}
+				</a>
+			{% endif %}
+		</footer>
+	{% endif %}
+</section>

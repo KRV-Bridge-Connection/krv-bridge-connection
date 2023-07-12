@@ -1,0 +1,21 @@
+#sidebar {
+	grid-area: sidebar;
+	--ad-block-width: 30vw;
+	--ad-block-stack-width: var(--ad-block-width);
+	--ad-block-text-width: var(--ad-block-width);
+	--ad-block-image-width: var(--ad-block-width);
+}
+
+@media (max-width: 800px) {
+	#sidebar {
+		--ad-block-width: 95vw;
+	}
+}
+
+#sidebar .sidebar-section {
+	margin-bottom: 0.6em;
+}
+
+details.accordion[open] > :not(summary) {
+	animation: slideInDown 200ms ease-in;
+}

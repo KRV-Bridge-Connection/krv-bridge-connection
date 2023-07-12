@@ -1,0 +1,26 @@
+nav:
+  - label: Home
+    icon: home
+    href: /
+footer:
+  - label: KernValley.US
+    href: https://kernvalley.us
+    icon: web-browser
+    rel:
+      - noopener
+      - nofererrer
+      - external
+  - label: Contact
+    href: https://contact.kernvalley.us
+    icon: address-book
+    rel:
+      - noopener
+      - nofererrer
+      - external
+  - label: All Apps
+    href: https://apps.kernvalley.us
+    icon: apps
+    rel:
+      - noopener
+      - nofererrer
+      - external

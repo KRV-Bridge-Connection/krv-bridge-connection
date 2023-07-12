@@ -1,0 +1,33 @@
+---
+home: img/adwaita-icons/places/user-home.svg
+public-share: img/adwaita-icons/places/folder-publicshare.svg
+view-more: img/adwaita-icons/actions/view-more.svg
+web-browser: img/adwaita-icons/apps/web-browser.svg
+avatar-default: img/adwaita-icons/status/avatar-default.svg
+system-software-install: img/adwaita-icons/apps/system-software-install.svg
+call-start: img/adwaita-icons/actions/call-start.svg
+go-next: img/adwaita-icons/actions/go-next.svg
+go-prev: img/adwaita-icons/actions/go-previous.svg
+mark-location: img/adwaita-icons/actions/mark-location.svg
+note: img/octicons/note.svg
+check: img/octicons/check.svg
+facebook: img/logos/facebook.svg
+yelp: img/logos/yelp.svg
+tripadvisor: img/logos/tripadvisor.svg
+twitter: img/logos/twitter.svg
+linkedin: img/logos/linkedin.svg
+youtube: img/logos/youtube.svg
+mail: img/octicons/mail.svg
+mail-unread: img/adwaita-icons/status/mail-unread.svg
+mark-github: img/octicons/mark-github.svg
+repo: img/octicons/repo.svg
+issue-opened: img/octicons/issue-opened.svg
+link: img/octicons/link.svg
+link-external: img/octicons/link-external.svg
+chevron-down: img/octicons/chevron-down.svg
+creative-commons-by-sa: img/logos/creative-commons-by-sa.svg
+x: img/octicons/x.svg
+apps: img/apps.svg
+address-book: img/adwaita-icons/mimetypes/x-office-address-book.svg
+calendar: img/octicons/calendar.svg
+

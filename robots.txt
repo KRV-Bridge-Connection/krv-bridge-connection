@@ -1,0 +1,9 @@
+---
+layout: null
+---
+User-agent: *
+Sitemap: {{ site.sitemap | default: '/sitemap.xml' | absolute_url }}
+{% if site.data.robots.disallow %}{% for path in site.data.robots.disallow %}
+Disallow: {{ path }}
+{% endfor %}{% endif %}
+{% if site.data.robots.crawl-delay %}Crawl-delay: {{ site.data.robots.crawl-delay }}{% endif %}

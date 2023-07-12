@@ -1,0 +1,73 @@
+{
+  "name": "11ty-template",
+  "version": "1.0.0",
+  "description": "A GitHub template repo for projects using Eleventy & Netlify",
+  "private": true,
+  "type": "module",
+  "config": {
+    "icons": "./_data/icons.yml",
+    "serve": {
+      "domain": "localhost",
+      "path": "./",
+      "port": 8000
+    },
+    "dir": {
+      "css": "css/",
+      "js": "js/",
+      "img": "img/",
+      "html": "*.html _includes/*.html _layouts/*.html"
+    }
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint",
+    "start": "npm run netlify",
+    "preinstall": "npm run git:submodules",
+    "postinstall": "npm run build",
+    "preversion": "npm test",
+    "create:lock": "npm i --package-lock-only",
+    "git:fetch": "git fetch --prune --tags",
+    "git:submodules": "git submodule update --init --recursive",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint . --ext .js,.cjs,.mjs",
+    "lint:css": "stylelint ${npm_package_config_dir_css}**.css",
+    "lint:html": "htmlhint ${npm_package_config_dir_html}",
+    "fix:css": "stylelint ${npm_package_config_dir_css}**.css --fix",
+    "fix:js": "eslint. --fix --ext .js,.cjs,.mjs",
+    "build": "npm run build:icons && npm run build:css && npm run build:js",
+    "build:site": "npx @11ty/eleventy",
+    "build:site:dev": "npx @11ty/eleventy --serve",
+    "build:css": "postcss ${npm_package_config_dir_css}index.css -o ${npm_package_config_dir_css}index.min.css",
+    "build:js": "rollup --config rollup.config.js",
+    "build:icons": "svg-use-symbols -c ${npm_package_config_icons} -o 'img/icons.svg'",
+    "serve:production": "npx @11ty/eleventy --serve",
+    "serve:dev": "npx @11ty/eleventy --serve",
+    "netlify": "if [ -f '.netlify/state.json' ]; then npm run netlify:live; else npm run netlify:serve; fi",
+    "netlify:deploy": "netlify deploy",
+    "netlify:serve": "netlify dev",
+    "netlify:live": "netlify dev --live",
+    "netlify:link": "netlify link",
+    "version:bump": "npm run version:bump:patch",
+    "version:bump:patch": "npm version --no-git-tag-version patch",
+    "version:bump:minor": "npm version --no-git-tag-version minor",
+    "version:bump:major": "npm version --no-git-tag-version major"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shgysk8zer0/11ty-template.git"
+  },
+  "keywords": [
+    "11ty",
+    "eleventy",
+    "netlify"
+  ],
+  "author": "Chris Zuber <admin@kernvalley.us>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shgysk8zer0/11ty-template/issues"
+  },
+  "homepage": "https://github.com/shgysk8zer0/11ty-template#readme",
+  "dependencies": {
+    "@shgysk8zer0/11ty-netlify": "^1.1.0"
+  }
+}

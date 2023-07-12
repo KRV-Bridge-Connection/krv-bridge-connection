@@ -1,0 +1,15 @@
+# - src: https://unpkg.com/@shgysk8zer0/polyfills@0.0.7/all.min.js
+- src: '@shgysk8zer0/polyfills'
+  crossOrigin: anonymous
+  referrerPolicy: no-referrer
+  integrity: sha384-6D7++ok/uTOBioRnypzDxJYKgBEgNUmmnNO1ZKJAUyA21GK1vuHmOsoGswvTN157
+  defer: true
+- src: '@shgysk8zer0/kazoo/harden.js'
+  crossOrigin: anonymous
+  referrerPolicy: no-referrer
+  integrity: sha384-55L/wO9o0uIVTeubRIDQB4bewfNqyxrj4OXuxlW24NMEk+ioZwMHVw/tFV78mM+k
+  defer: true
+- src: ./js/index.js
+  type: module
+  referrerPolicy: no-referrer
+  integrity: auto
