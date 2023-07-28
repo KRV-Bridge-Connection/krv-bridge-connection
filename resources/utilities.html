@@ -1,0 +1,14 @@
+---js
+{
+	title: "Utilities",
+	layout: "default",
+	pagination: {
+		data: "organizations",
+		size: 100,
+		alias: "orgs",
+		generatePageOnEmptyData: true,
+		before: data => data.filter(org => org.category === 'utility'),
+	},
+	permalink: "resources/utilities/index.html"
+}
+---

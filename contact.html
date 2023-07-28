@@ -1,0 +1,49 @@
+---
+layout: default
+permalink: /contact/
+title: Contact
+---
+<form id="contact-form">
+	<fieldset class="no-border">
+		<div class="form-group">
+			<label for="contact-name" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "avatar-default" height: 18 width: 18 fill: "currentColor" %}
+				<span class="label-text">Name</span>
+			</label>
+			<input type="text" id="contact-name" class="input" name="name" placeholder="Firstname Lastname" autocomplete="name" required="" />
+		</div>
+		<div class="form-group">
+			<label for="contact-email" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "mail" height: 18 width: 18 fill: "currentColor" %}
+				<span class="label-text">Email</span>
+			</label>
+			<input type="email" id="contact-email" class="input" name="email" placeholder="user@example.com" autocomplete="email" required="" />
+		</div>
+		<div class="form-group">
+			<label for="contact-phone" class="input-label">
+				{% include "11ty-common/icon.html" icon: "call-start" height: 18 width: 18 fill: "currentColor" %}
+				<span class="label-text">Phone</span>
+			</label>
+			<input type="tel" id="contact-phone" class="input" name="telephone" placeholder="555-555-5555" autocomplete="tel" />
+		</div>
+		<div class="form-group">
+			<label for="contact-subject" class="input-label required">
+				<span class="label-text">Subject</span>
+			</label>
+			<input type="text" id="contact-subject" class="input" name="subject" placeholder="A Subject from your Message" autocomplete="off" required="" />
+		</div>
+		<div class="form-group">
+			<label for="contact-body" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "comment" height: 18 width: 18 fill: "currentColor" %}
+				<span class="label-text">Message</span>
+			</label>
+			<textarea id="contact-body" name="message" class="input" rows="5" placeholder="Enter your Message" required=""></textarea>
+		</div>
+	</fieldset>
+	<div class="flex row">
+		<button type="submit" class="btn btn-accept">
+			{% include "11ty-common/icon.html" icon: "check" height: 18 width: 18 fill: "currentColor" %}
+			<span>Send</span>
+		</button>
+	</div>
+</form>

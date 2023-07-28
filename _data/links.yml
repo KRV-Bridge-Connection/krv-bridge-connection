@@ -2,6 +2,18 @@ nav:
   - label: Home
     icon: home
     href: /
+  - label: Resources
+    icon: list-unordered
+    href: /resources/
+  - label: About
+    icon: info
+    href: /about/
+  - label: Contact
+    icon: address-book
+    href: /contact/
+  - label: Account
+    icon: avatar-default
+    href: /account/
 footer:
   - label: KernValley.US
     href: https://kernvalley.us

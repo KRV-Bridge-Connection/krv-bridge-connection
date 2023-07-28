@@ -1,6 +1,16 @@
-main {
+#main {
 	--link-color: #049ccf;
 	--link-decoration: underline;
+}
+
+.grid.card-list {
+	grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 200px);
+	gap: 8px;
+
+	& a {
+		color: inherit;
+		text-decoration: none;
+	}
 }
 
 article p:first-letter {

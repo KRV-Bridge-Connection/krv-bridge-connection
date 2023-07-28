@@ -10,6 +10,10 @@
 	font-size: 18px;
 }
 
+a.btn {
+	text-decoration: none;
+}
+
 @supports (width: clamp(1px, 2em, 1rem)) {
 	:root {
 		font-size: clamp(16px, 1.3vmax, 24px);

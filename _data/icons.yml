@@ -10,6 +10,12 @@ system-software-install: img/adwaita-icons/apps/system-software-install.svg
 call-start: img/adwaita-icons/actions/call-start.svg
 go-next: img/adwaita-icons/actions/go-next.svg
 go-prev: img/adwaita-icons/actions/go-previous.svg
+alert: img/octicons/alert.svg
+clippy: img/octicons/clippy.svg
+sign-in: img/octicons/sign-in.svg
+sign-out: img/octicons/sign-out.svg
+list-unordered: img/octicons/list-unordered.svg
+info: img/octicons/info.svg
 mark-location: img/adwaita-icons/actions/mark-location.svg
 note: img/octicons/note.svg
 clock: img/octicons/clock.svg
@@ -30,6 +36,8 @@ issue-opened: img/octicons/issue-opened.svg
 link: img/octicons/link.svg
 link-external: img/octicons/link-external.svg
 chevron-down: img/octicons/chevron-down.svg
+comment: img/octicons/clippy.svg
+inbox: img/octicons/inbox.svg
 creative-commons-by-sa: img/logos/creative-commons-by-sa.svg
 x: img/octicons/x.svg
 apps: img/apps.svg

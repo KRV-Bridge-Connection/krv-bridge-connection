@@ -1,6 +1,8 @@
 #nav {
 	font-size: 1.2em;
 	gap: 18px;
+	background-color: var(--gnome-dark-4);
+	color: var(--gnome-light-2);
 }
 
 #nav > .nav-btn {
