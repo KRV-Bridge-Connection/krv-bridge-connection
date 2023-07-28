@@ -7,6 +7,8 @@ import { importGa, externalHandler, telHandler, mailtoHandler } from '@shgysk8ze
 import { submitHandler } from './contact-demo.js';
 import { GA } from './consts.js';
 import './components.js';
+import './user.js';
+import './admin.js';
 
 if (! CSS.supports('height', '1dvh')) {
 	css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`});

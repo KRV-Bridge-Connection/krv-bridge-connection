@@ -1,5 +1,6 @@
 ---
 layout: null
+permalink: /sw.js
 ---
 /* eslint-env serviceworker */
 /* eslint no-unused-vars: 0*/
@@ -7,7 +8,7 @@ layout: null
 
 async function updateAssets(assets, {
 	referrerPolicy = 'no-referrer',
-	version = '{{ app.version | default: site.version }}',
+	version = '{{ app.version | default: pkg.version }}',
 } = {}) {
 	if (Array.isArray(assets) && assets.length !== 0) {
 		const cache = await caches.open(version);
@@ -23,14 +24,13 @@ async function updateAssets(assets, {
 }
 
 const config = {
-	version: '{{ app.version | default: site.version }}',
+	version: '{{ app.version | default: pkg.version }}',
 	fresh: [
 		'{{ site.pages | where: "pinned", true | map: "url" | join: "', '" }}',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
 		'https://cdn.kernvalley.us/img/markers.svg',
 		/* Other */
-		'/store/products.json',
 	].map(path => new URL(path, location.origin).href),
 	stale: [
 		/* Scripts */

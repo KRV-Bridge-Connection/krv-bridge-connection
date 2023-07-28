@@ -1,6 +1,9 @@
-@import url("https://cdn.kernvalley.us/css/core-css/theme/default/index.css");
-@import url("https://cdn.kernvalley.us/css/core-css/theme/properties.css");
-
 :root {
 	--map-width: 100%;
+	--accent-color-dark: var(--bs-blue-500);
+	--accent-color-light: var(--bs-blue-500);
+	--button-primary-background-dark: var(--bs-blue-600);
+	--button-primary-color-dark: var(--bs-gray-100);
+	--button-primary-background-light: var(--bs-blue-400);
+	--button-primary-color-light: var(--bs-gray-900);
 }

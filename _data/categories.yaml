@@ -1,0 +1,30 @@
+Clothing: []
+Elder Care: []
+Emergency Services: []
+Employment:
+  - Job Training
+  - Job Opportunities
+Family Support: []
+Food: []
+Health Care:
+  - Doctors
+  - Mental Health Care
+  - Insurance
+Pets: []
+School Supplies: []
+# Shelter (or Housing): []
+Substance Abuse Counseling: []
+Tax Preparation Assistance: []
+Transportation:
+  - Public Transportation
+  - Dial-a-Ride Services
+# Utilities
+Veterans & Military: []
+Utilities:
+  - Electric
+  - Water
+  - Internet
+  - Propane / Gas
+Housing:
+  - Rent Aid
+  - Shelters

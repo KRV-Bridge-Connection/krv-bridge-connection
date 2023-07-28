@@ -1,0 +1,103 @@
+- '@context': 'https://schema.org'
+  '@type': Organization # Could be Church, Government, NGO, etc
+  '@identifier': 'e41aeb87-31a9-4f01-9a4e-1e24542a5739'
+  category: utility
+  name: Example Organization 1
+  logo: https://cdn.kernvalley.us/img/raster/missing-image.png
+  slogan: Something short and catchy
+  keywords:
+    - rent
+  nonprofitStatus: https://schema.org/Nonprofit501c3
+  contactPoints:
+    - '@type': ContactPoint
+      contactType: General Inquiries
+      phone: '+1 123-456-7890'
+      email: 'info@example1.com'
+      availableLanguage: English
+      hoursAvailable:
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Monday
+          opens: '9:00'
+          closes: '17:00'
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Tuesday
+          opens: '9:00'
+          closes: '17:00'
+    - '@type': ContactPoint
+      contactType: Support
+      phone: '+1 987-654-3210'
+      email: 'support@example1.com'
+      availableLanguage: English
+      hoursAvailable:
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Wednesday
+          opens: '10:00'
+          closes: '18:00'
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Thursday
+          opens: '10:00'
+          closes: '18:00'
+  address:
+    '@type': PostalAddress
+    streetAddress: '123 Main St'
+    addressLocality: Cityville
+    addressRegion: Stateville
+    postalCode: '12345'
+  location:
+    - '@type': PostalAddress
+      streetAddress: '123 Main St'
+      addressLocality: Cityville
+      addressRegion: Stateville
+      postalCode: '12345'
+  url: 'https://www.example1.com'
+  sameAs:
+    - 'https://www.facebook.com/example1'
+    - 'https://twitter.com/example1'
+
+- '@context': 'https://schema.org'
+  '@type': Organization
+  '@identifier': '4e9a732f-b8d5-40ad-b998-487a9a2a8f74'
+  category: utility
+  name: Example Organization 2
+  logo: https://cdn.kernvalley.us/img/raster/missing-image.png
+  keyword:
+    - electric
+  contactPoints:
+    - '@type': ContactPoint
+      contactType: General Inquiries
+      phone: '+1 123-456-7890'
+      email: 'info@example2.com'
+      availableLanguage: English
+      hoursAvailable:
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Monday
+          opens: '9:00'
+          closes: '17:00'
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Tuesday
+          opens: '9:00'
+          closes: '17:00'
+    - '@type': ContactPoint
+      contactType: Support
+      phone: '+1 987-654-3210'
+      email: 'support@example2.com'
+      availableLanguage: English
+      hoursAvailable:
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Wednesday
+          opens: '10:00'
+          closes: '18:00'
+        - '@type': OpeningHoursSpecification
+          dayOfWeek: Thursday
+          opens: '10:00'
+          closes: '18:00'
+  address:
+    '@type': PostalAddress
+    streetAddress: '456 Elm St'
+    addressLocality: Townville
+    addressRegion: Stateville
+    postalCode: '54321'
+  url: 'https://www.example2.com'
+  sameAs:
+    - 'https://www.facebook.com/example2'
+    - 'https://twitter.com/example2'

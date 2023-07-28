@@ -1,11 +1,11 @@
-name: Jekyll Template
-shortName: Jekyll Template
-version: 2.0.0
+name: KRV Bridge Connection
+shortName: KRV Brdige
+# version: 2.0.0
 lang: en
 dir: ltr
 display: standalone
 orientation: any
-description: "A GitHub repository for easily creating fast, modern, PWA compatible websites"
+# description: "A GitHub repository for easily creating fast, modern, PWA compatible websites"
 icons-file: /img/icons.svg
 theme:
   color: '#007bff'
@@ -134,3 +134,4 @@ categories:
   - business
   - productivity
   - utilities
+

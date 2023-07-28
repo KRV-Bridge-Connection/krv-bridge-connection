@@ -1,10 +1,11 @@
 ---
 layout: null
+permalink: /service-worker.js
 ---
 'use strict';
 /* eslint-env serviceworker */
 /* global init: readonly, config: readonly */
-/* {{ site.data.app.version | default: site.version }} */
+/* {{ app.version | default: pkg.version }} */
 const CDN = 'https://cdn.kernvalley.us/';
 
 try {

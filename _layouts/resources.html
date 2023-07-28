@@ -1,0 +1,4 @@
+<h1>Resources Directory</h1>
+{% for org in orgs %}
+	<div id="{{ org['@identifier'] }}">{{ org.name }}</div>
+{% endfor %}

@@ -4,12 +4,17 @@ public-share: img/adwaita-icons/places/folder-publicshare.svg
 view-more: img/adwaita-icons/actions/view-more.svg
 web-browser: img/adwaita-icons/apps/web-browser.svg
 avatar-default: img/adwaita-icons/status/avatar-default.svg
+dialog-password: img/adwaita-icons/status/dialog-password.svg
+organization: img/octicons/organization.svg
 system-software-install: img/adwaita-icons/apps/system-software-install.svg
 call-start: img/adwaita-icons/actions/call-start.svg
 go-next: img/adwaita-icons/actions/go-next.svg
 go-prev: img/adwaita-icons/actions/go-previous.svg
 mark-location: img/adwaita-icons/actions/mark-location.svg
 note: img/octicons/note.svg
+clock: img/octicons/clock.svg
+tag: img/octicons/tag.svg
+file-media: img/octicons/file-media.svg
 check: img/octicons/check.svg
 facebook: img/logos/facebook.svg
 yelp: img/logos/yelp.svg
@@ -30,4 +35,3 @@ x: img/octicons/x.svg
 apps: img/apps.svg
 address-book: img/adwaita-icons/mimetypes/x-office-address-book.svg
 calendar: img/octicons/calendar.svg
-

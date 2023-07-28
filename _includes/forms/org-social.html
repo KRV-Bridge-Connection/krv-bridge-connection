@@ -1,0 +1,41 @@
+<fieldset id="org-profile-social" class="form-section no-border">
+	<legend>Social Links</legend>
+	<div class="form-group">
+		<label for="org-facebook" class="input-label">
+			{% include "11ty-common/icon.html" icon: "facebook" height: 18, width: 18, class: "icon" %}
+			<span class="label-text">Facebook</span>
+		</label>
+		<input type="url" id="org-facebook" class="input" name="facebook" placeholder="https://facebook.com/username" />
+	</div>
+	<div class="form-group">
+		<label for="org-twitter" class="input-label">
+			{% include "11ty-common/icon.html" icon: "twitter" height: 18, width: 18, class: "icon" %}
+			<span class="label-text">Twitter</span>
+		</label>
+		<input type="url" id="org-twitter" class="input" name="twitter" placeholder="https://twitter.com/username" />
+	</div>
+	<div class="form-group">
+		<label for="org-linkedin" class="input-label">
+			{% include "11ty-common/icon.html" icon: "linkedin" height: 18, width: 18, class: "icon" %}
+			<span class="label-text">LinkedIn</span>
+		</label>
+		<input type="url" id="org-linkedin" class="input" name="linkedin" placeholder="https://linkedin.com/username" />
+	</div>
+	<div class="form-group">
+		<label for="org-youtube" class="input-label">
+			{% include "11ty-common/icon.html" icon: "youtube" height: 18, width: 18, class: "icon" %}
+			<span class="label-text">YouTube</span>
+		</label>
+		<input type="url" id="org-youtube" class="input" name="linkedin" placeholder="https://youtube.com/username" />
+	</div>
+	<div class="flex row form-nav">
+		<button type="button" class="btn btn-primary" data-nav="prev" title="Previous">
+			{% include "11ty-common/icon.html" icon: "go-prev" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Previous</span>
+		</button>
+		<button type="submit" class="btn btn-accept">
+			{% include "11ty-common/icon.html" icon: "check" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Submit</span>
+		</button>
+	</div>
+</fieldset>

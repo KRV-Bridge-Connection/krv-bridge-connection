@@ -6,20 +6,23 @@ default:
     - "'self'"
   script-src:
     - "'self'"
-    - unpkg.com/@shgysk8zer0/
-    - www.google-analytics.com
-    - www.googletagmanager.com
+    - https://unpkg.com/@shgysk8zer0/
+    - https://unpkg.com/@kernvalley/
+    - https://www.gstatic.com/firebasejs/
+    - https://www.google-analytics.com
+    - https://www.googletagmanager.com
   manifest-src:
     - "'self'"
   worker-src:
     - "'self'"
-    - cdn.kernvalley.us/service-worker.js
+    - https://cdn.kernvalley.us/service-worker.js
   style-src:
     - "'self'"
-    - cdn.kernvalley.us/css/
-    - unpkg.com/@shgysk8zer0/
+    - https://cdn.kernvalley.us/css/
+    - https://unpkg.com/
+    - https://fonts.googleapis.com/
   frame-src:
-    - www.youtube-nocookie.com
+    - https://www.youtube-nocookie.com
   img-src:
     - "*"
     - "blob:"
@@ -27,15 +30,19 @@ default:
   media-src:
     - "*"
   font-src:
-    - cdn.kernvalley.us/fonts/
+    - https://cdn.kernvalley.us/fonts/
+    - https://fonts.gstatic.com/
   connect-src:
     - "'self'"
-    - unpkg.com/@shgysk8zer0/
-    - apps.kernvalley.us/apps.json
-    - api.github.com/users/
-    - api.openweathermap.org/data/2.5/
-    - www.google-analytics.com/
-    - www.googletagmanager.com/gtag/
-    - baconipsum.com/api/
+    - https://unpkg.com/@shgysk8zer0/
+    - https://unpkg.com/@kernvalley/
+    - https://apps.kernvalley.us/apps.json
+    - https://api.github.com/users/
+    - https://firestore.googleapis.com/
+    - https://identitytoolkit.googleapis.com/v1/
+    - https://api.openweathermap.org/data/2.5/
+    - https://www.google-analytics.com/
+    - https://www.googletagmanager.com/gtag/
+    - https://baconipsum.com/api/
   form-action:
     - "'self'"

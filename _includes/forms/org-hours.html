@@ -1,0 +1,76 @@
+<fieldset id="org-profile-hours" class="form-section no-border">
+	<legend>Business Hours</legend>
+	<div class="form-group">
+		<label for="org-hours-mon" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Monday</span>
+		</label>
+		<input type="time" id="org-hours-mon" name="mondayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="mondayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-tues" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Tuesday</span>
+		</label>
+		<input type="time" id="org-hours-tues" name="tuesdayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="tuesdayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-wed" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Wednesday</span>
+		</label>
+		<input type="time" id="org-hours-wed" name="wednesdayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="wednesdayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-thurs" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Thursday</span>
+		</label>
+		<input type="time" id="org-hours-thurs" name="thursDayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="thursdayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-fri" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Friday</span>
+		</label>
+		<input type="time" id="org-hours-fri" name="fridayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="fridayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-sat" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Saturday</span>
+		</label>
+		<input type="time" id="org-hours-sat" name="saturdayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="saturdayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="form-group">
+		<label for="org-hours-sun" class="input-label">
+			{% include "11ty-common/icon.html" icon: "clock" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Sunday</span>
+		</label>
+		<input type="time" id="org-hours-sun" name="sundayHoursOpen" placeholder="HH:mm" step="900" />
+		<span>&mdash;</span>
+		<input type="time" name="sundayHoursClose" placeholder="HH:mm" step="900" />
+	</div>
+	<div class="flex row form-nav">
+		<button type="button" class="btn btn-primary" data-nav="prev" title="Previous">
+			{% include "11ty-common/icon.html" icon: "go-prev" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Previous</span>
+		</button>
+		<button type="button" class="btn btn-primary" data-nav="next" title="Next" disabled="">
+			{% include "11ty-common/icon.html" icon: "go-next" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Next</span>
+		</button>
+	</div>
+</fieldset>

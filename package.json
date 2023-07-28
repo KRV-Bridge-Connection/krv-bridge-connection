@@ -1,11 +1,12 @@
 {
-  "name": "11ty-template",
+  "name": "krv-bridge-conenction",
   "version": "1.0.0",
   "description": "A GitHub template repo for projects using Eleventy & Netlify",
   "private": true,
   "type": "module",
   "config": {
     "icons": "./_data/icons.yml",
+    "iconsOutput": "/img/icons.svg",
     "serve": {
       "domain": "localhost",
       "path": "./",
@@ -18,7 +19,6 @@
       "html": "*.html _includes/*.html _layouts/*.html"
     }
   },
-  "main": "index.js",
   "scripts": {
     "test": "npm run lint",
     "start": "npm run netlify",
@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shgysk8zer0/11ty-template.git"
+    "url": "git+https://github.com/KRV-Bridge-Connection/krv-bridge-connection.git"
   },
   "keywords": [
     "11ty",
@@ -64,10 +64,11 @@
   "author": "Chris Zuber <admin@kernvalley.us>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shgysk8zer0/11ty-template/issues"
+    "url": "https://github.com/KRV-Bridge-Connection/krv-bridge-connection/issues"
   },
-  "homepage": "https://github.com/shgysk8zer0/11ty-template#readme",
+  "homepage": "https://github.com/KRV-Bridge-Connection/krv-bridge-connection#readme",
   "dependencies": {
-    "@shgysk8zer0/11ty-netlify": "^1.1.0"
+    "@shgysk8zer0/11ty-netlify": "^1.1.0",
+    "firebase-admin": "^11.10.0"
   }
 }

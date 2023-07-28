@@ -1,0 +1,49 @@
+<form name="registration" id="registration-form">
+	<fieldset class="no-border">
+		<div class="form-group">
+			<label for="registration-name" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "avatar-default" height: "18" width: "18" fill: "currentColor" %}
+				<span class="label-text">Name</span>
+			</label>
+			<input type="text" name="name" id="registration-name" class="input" placeholder="Firstname Lastname" autocomplete="name" required="" />
+		</div>
+		<div class="form-group">
+			<label for="registration-org" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "organization" height: "18" width: "18" fill: "currentColor" %}
+				<span class="label-text">Organization</span>
+			</label>
+			<input type="text" name="organization" id="registration-org" class="input" placeholder="Acme Inc" autocomplete="organization" required="" />
+		</div>
+		<div class="form-group">
+			<label for="registration-phone" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "call-start" height: "18" width: "18" fill: "currentColor" %}
+				<span class="label-text">Phone Number</span>
+			</label>
+			<input type="tel" name="telephone" id="registration-phone" class="input" placeholder="555-555-5555" autocomplete="tel" required="" />
+		</div>
+		<div class="form-group">
+			<label for="registration-username" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "mail" height: "18" width: "18" fill: "currentColor" %}
+				<span class="label-text">Email</span>
+			</label>
+			<input type="email" name="email" id="registration-email" class="input" placeholder="user@example.com" autocomplete="email" required="" />
+		</div>
+		<div class="form-group">
+			<label for="registration-password" class="input-label required">
+				{% include "11ty-common/icon.html" icon: "dialog-password" height: "18" width: "18" fill: "currentColor" %}
+				<span class="label-text">Password</span>
+			</label>
+			<input type="password" name="password" id="registration-password" class="input" placeholder="********" minlength="8" autocomplete="new-password" required="" />
+		</div>
+	</fieldset>
+	<div class="flex row space-evenly">
+		<button type="submit" class="btn btn-accept btn-big">
+			{% include "11ty-common/icon.html" icon: "check" height: "16" width: "16" fill: "currentColor" %}
+			<span>Register</span>
+		</button>
+		<button type="reset" class="btn btn-reject btn-big">
+			{% include "11ty-common/icon.html" icon: "x" height: "16" width: "16" fill: "currentColor" %}
+			<span>Clear</span>
+		</button>
+	</div>
+</form>

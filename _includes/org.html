@@ -1,0 +1,71 @@
+<div itemscope="" itemtype="https://schema.org/Organization" class="organization" id="{{ organization['@identifier'] }}" data-categories="{{ organization.keywords | join: ' ' }}">
+	<h2 class="organization__name" itemprop="name">{{ organization.name }}</h2>
+	<img class="organization__logo" itemprop="logo" src="{{ organization.logo }}" alt="{{ organization.name }} Logo" />
+
+	<ul class="organization__contact-points">
+		{% for contactPoint in organization.contactPoints %}
+			<li itemprop="contactPoint" itemscope="" itemtype="https://schema.org/ContactPoint">
+				<div class="organization__contact">
+					<strong>Contact Type:</strong> <span itemprop="contactType">{{ contactPoint.contactType }}</span><br />
+					<strong>Phone:</strong> <span itemprop="telephone">{{ contactPoint.phone }}</span><br />
+					<strong>Email:</strong> <a href="mailto:{{ contactPoint.email }}" itemprop="email">{{ contactPoint.email }}</a><br />
+					<strong>Language:</strong> <span itemprop="availableLanguage">{{ contactPoint.availableLanguage }}</span>
+					{% if contactPoint.hoursAvailable %}
+						<div class="organization__opening-hours" role="list">
+							<strong>Opening Hours:</strong>
+							{% for openingHours in contactPoint.hoursAvailable %}
+								<div itemprop="openingHoursSpecification" itemscope="" itemtype="https://schema.org/OpeningHoursSpecification" role="listitem">
+									<span itemprop="dayOfWeek">{{ openingHours.dayOfWeek }}</span>:
+									<span itemprop="opens">{{ openingHours.opens }}</span> -
+									<span itemprop="closes">{{ openingHours.closes }}</span>
+								</div>
+							{% endfor %}
+						</div>
+					{% endif %}
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+
+	<address class="organization__address" itemprop="address" itemscope="" itemtype="https://schema.org/PostalAddress">
+		<strong>Address:</strong><br />
+		<span itemprop="streetAddress">{{ organization.address.streetAddress }}</span><br />
+		<span itemprop="addressLocality">{{ organization.address.addressLocality }}</span>,
+		<span itemprop="addressRegion">{{ organization.address.addressRegion }}</span>
+		<span itemprop="postalCode">{{ organization.address.postalCode }}</span>
+		<span itemprop="addressCountry">Country (if applicable)</span>
+	</address>
+
+	{% if organization.url %}
+		<p class="organization__website">
+			<strong>Website:</strong> <a href="{{ organization.url }}" itemprop="url">{{ organization.url }}</a>
+		</p>
+	{% endif %}
+
+	{% if organization.sameAs %}
+		<div class="organization__social-links" role="navigation">
+			<p><strong>Social Links:</strong></p>
+			<ul>
+				{% for socialLink in organization.sameAs %}
+					<li>
+						<a href="{{ socialLink }}" itemprop="sameAs">
+							{% if socialLink contains 'https://www.facebook.com' %}
+								Facebook
+							{% elsif socialLink contains 'https://www.instagram.com' %}
+								Instagram
+							{% elsif socialLink contains 'https://www.linkedin.com' %}
+								LinkedIn
+							{% elsif socialLink contains 'https://twitter.com' %}
+								Twitter
+							{% else %}
+								Social Media
+							{% endif %}
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
+
+	<p class="organization__description" itemprop="description">{{ organization.description }}</p>
+</div>

@@ -1,0 +1,46 @@
+<fieldset id="org-profile-address" class="form-section no-border">
+	<legend>Organization Address</legend>
+	<div class="form-group">
+		<label for="org-address-street" class="input-label">
+			<span class="label-text">Street Address</span>
+		</label>
+		<input type="text" id="org-address-street" class="input" name="streetAddress" placeholder="123 Some St." />
+	</div>
+	<div class="form-group">
+		<label for="org-address-po-box" class="input-label">
+			<span class="label-text">PO Box</span>
+		</label>
+		<input type="text" id="org-address-po-box" class="input" name="postOfficeBoxNumber" placeholder="123" pattern="\d{1,5}" inputmode="numeric" maxlength="5" />
+	</div>
+	<div class="form-group">
+		<label for="org-address-city" class="input-label required">
+			<span class="label-text">City</span>
+		</label>
+		<input type="text" id="org-address-city" class="input" name="addressLocality" placeholder="City" list="cities-list" required="" />
+		{% include "datalists/cities.html" id: "cities-list" %}
+	</div>
+	<div class="form-group">
+		<label for="org-address-state" class="input-label required">
+			<span class="label-text">State</span>
+		</label>
+		<select id="org-address-state" class="input" required="" readonly="">
+			<option value="CA" label="California" selected=""></option>
+		</select>
+	</div>
+	<div class="form-group">
+		<label for="org-address-postal-code" class="input-label required">
+			<span class="label-text">Postal Code</span>
+		</label>
+		<input type="text" id="org-address-postal-code" class="input" name="postalCode" placeholder="#####" pattern="\d{5}" inputmode="numeric" maxlength="5" required="" />
+	</div>
+	<div class="flex row form-nav">
+		<button type="button" class="btn btn-primary" data-nav="prev" title="Previous">
+			{% include "11ty-common/icon.html" icon: "go-prev" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Previous</span>
+		</button>
+		<button type="button" class="btn btn-primary" data-nav="next" title="Next" disabled="">
+			{% include "11ty-common/icon.html" icon: "go-next" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Next</span>
+		</button>
+	</div>
+</fieldset>
