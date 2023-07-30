@@ -37,7 +37,7 @@ const config = {
 		'/js/index.min.js',
 		'{{ importmap.imports["@shgysk8zer0/polyfills"] }}',
 		'{{ importmap.imports["@shgysk8zer0/kazoo/"] }}harden.js',
-		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/map.min.js',
+		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/bundle.min.js',
 
 		/* Custom Element Templates */
 		'{{ importmap.imports["@shgysk8zer0/components/"] }}/weather/current.html',

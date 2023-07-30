@@ -36,6 +36,7 @@ default:
     - "'self'"
     - https://unpkg.com/@shgysk8zer0/
     - https://unpkg.com/@kernvalley/
+    # - https://cdn.kernvalley.us/
     - https://apps.kernvalley.us/apps.json
     - https://api.github.com/users/
     - https://firestore.googleapis.com/
