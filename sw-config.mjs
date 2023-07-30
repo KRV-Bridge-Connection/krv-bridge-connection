@@ -1,6 +1,6 @@
 ---
 layout: null
-permalink: /sw.js
+permalink: /sw-config.js
 ---
 /* eslint-env serviceworker */
 /* eslint no-unused-vars: 0*/
@@ -60,12 +60,6 @@ const config = {
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
 		'/img/adwaita-icons/status/avatar-default.svg',
-
-		/* Event Images */
-		'/img/raster/rodeo.jpg',
-		'/img/raster/parade.jpg',
-		'/img/raster/encampment.jpg',
-		'/img/raster/coach-320.jpg',
 
 		/* Fonts */
 		'https://cdn.kernvalley.us/fonts/roboto.woff2',
