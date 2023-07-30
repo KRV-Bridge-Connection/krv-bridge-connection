@@ -1,5 +1,9 @@
 <fieldset id="org-profile-basic" class="form-section no-border">
 	<legend>Basic Organization Info</legend>
+	<div class="card form-instructions">
+		<p>Here, you will enter basic info about your organization.</p>
+		<p>Fields with a <kbd>*</kbd> are required.</p>
+	</div>
 	<input type="hidden" name="@identifier" required="" readonly="" />
 	<input type="hidden" name="@context" value="https://schema.org" required="" readonly="" />
 	<input type="hidden" name="@type" value="Organization" required="" readonly="" />
@@ -16,7 +20,7 @@
 			<span class="label-text">Category</span>
 		</label>
 		<input type="hidden" name="category" required="" />
-		{% include "forms/category-select.html" %}
+		{% include "forms/category-select.html" name: 'subcategory' id: 'org-category' %}
 	</div>
 	<div class="form-group">
 		<label for="org-description" class="input-label required">
@@ -38,7 +42,7 @@
 			{% include "11ty-common/icon.html" icon: "go-prev" height: "18" width: "18" fill: "currentColor" %}
 			<span class="nav-btn-text">Previous</span>
 		</button>
-		<button type="button" class="btn btn-primary" data-nav="next" title="Next" disabled="">
+		<button type="button" class="btn btn-primary" data-nav="next" title="Next">
 			{% include "11ty-common/icon.html" icon: "go-next" height: "18" width: "18" fill: "currentColor" %}
 			<span class="nav-btn-text">Next</span>
 		</button>

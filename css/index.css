@@ -4,6 +4,7 @@
 @import url("./core-css.css");
 @import url("./layout.css");
 @import url("./vars.css");
+@import url("./form-extras.css");
 @import url("./admin.css");
 
 :root {
@@ -12,6 +13,11 @@
 
 a.btn {
 	text-decoration: none;
+}
+
+.btn.btn-primary.btn-big {
+	font-size: 1.2em;
+	padding: 0.7rem;
 }
 
 @supports (width: clamp(1px, 2em, 1rem)) {

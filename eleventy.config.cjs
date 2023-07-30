@@ -6,6 +6,7 @@ const filters = require('@shgysk8zer0/11ty-filters');
 const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
 const { importmap } = require('@shgysk8zer0/importmap');
 const firebase = require('firebase-admin');
+const { Liquid } = require("liquidjs");
 
 async function getCollection(name, db) {
 	const snapshot = await db.collection(name).get();
@@ -28,6 +29,18 @@ module.exports = function(eleventyConfig) {
 	}
 
 	const db = firebase.firestore();
+	const liquid = new Liquid();
+
+	eleventyConfig.addTemplateFormats('mjs');
+
+	eleventyConfig.addExtension('mjs', {
+		outputFileExtension: 'js', // optional, default: "html"
+		compile: async (inputContent) => {
+			const parsed = await liquid.parse(inputContent);
+
+			return data => liquid.render(parsed, data);
+		}
+	});
 
 	Object.entries(filters).forEach(([filter, cb]) => eleventyConfig.addFilter(filter, cb));
 	eleventyConfig.addShortcode('firestore', async collection => {
