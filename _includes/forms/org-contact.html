@@ -1,0 +1,34 @@
+<fieldset id="org-profile-contact" class="form-section no-border">
+	<legend>Contact Info</legend>
+	<div class="form-group">
+		<label for="org-email" class="input-label required">
+			{% include "11ty-common/icon.html" icon: "mail" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Email</span>
+		</label>
+		<input type="email" id="org-email" class="input" name="email" placeholder="user@example.com" autocomplete="email" required="" />
+	</div>
+	<div class="form-group">
+		<label for="org-phone" class="input-label">
+			{% include "11ty-common/icon.html" icon: "call-start" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Phone</span>
+		</label>
+		<input type="tel" id="org-phone" class="input" name="telephone" placeholder="555-555-5555" autocomplete="tel" />
+	</div>
+	<div class="form-group">
+		<label for="org-url" class="input-label">
+			{% include "11ty-common/icon.html" icon: "web-browser" height: 18 width: 18 fill: "currentColor" %}
+			<span class="label-text">Website</span>
+		</label>
+		<input type="url" id="org-url" class="input" name="url" placeholder="https://example.com" autocomplete="url" />
+	</div>
+	<div class="flex row form-nav">
+		<button type="button" class="btn btn-primary" data-nav="prev" title="Previous">
+			{% include "11ty-common/icon.html" icon: "go-prev" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Previous</span>
+		</button>
+		<button type="button" class="btn btn-primary" data-nav="next" title="Next">
+			{% include "11ty-common/icon.html" icon: "go-next" height: "18" width: "18" fill: "currentColor" %}
+			<span class="nav-btn-text">Next</span>
+		</button>
+	</div>
+</fieldset>

@@ -1,0 +1,10 @@
+<select id="{{ id | default: 'org-category' }}" class="input" name="{{ name | default: 'subcategory' }}" required="">
+	<option value="" label="Select a Category" />
+	{% for category in categories %}
+		<optgroup label="{{ category[0] | escape }}">
+			{% for subcategory in category[1] %}
+				<option value="{{ subcategory | escape }}" label="{{ subcategory | escape }}"></option>
+			{% endfor %}
+		</optgroup>
+	{% endfor %}
+</select>

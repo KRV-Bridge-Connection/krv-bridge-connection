@@ -1,0 +1,12 @@
+<section class="card shadow">
+	<h2 class="center">Utilities</h2>
+	<div class="grid">
+
+		{% for category in categories.Utilities %}
+			<a href="/resources/utilities/{{ category | slugify }}/" class="card color-inherit center org-card">
+				{% include "11ty-common/icon.html" icon: "organization" height: 96 width: 96 fill: "currentColor" class: "org-icon" %}
+				<div class="name">{{ category }}</div>
+			</a>
+		{% endfor %}
+	</div>
+</section>

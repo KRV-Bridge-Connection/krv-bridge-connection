@@ -1,10 +1,10 @@
 ---
-title: '11ty Test'
+title: 'KRV Bridge Connection'
 description: 'A test of Eleventy'
 repository:
-  username: 'kernvalley'
-  project: '11ty-template'
-url: 'https://delicate-meringue-5c3db2.netlify.app/'
+  username: 'KRV-Bridge-Connection'
+  project: 'krv-bridge-connection'
+url: 'https://krvbridge.org/'
 viewport: 'width=device-width'
 referrer: 'no-referrer'
 color-scheme: 'light dark'

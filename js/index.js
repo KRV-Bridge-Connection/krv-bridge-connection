@@ -4,9 +4,11 @@ import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
 import { importGa, externalHandler, telHandler, mailtoHandler } from '@shgysk8zer0/kazoo/google-analytics.js';
-import { submitHandler } from './contact-demo.js';
+// import { submitHandler } from './contact-demo.js';
 import { GA } from './consts.js';
 import './components.js';
+import './user.js';
+import './admin.js';
 
 if (! CSS.supports('height', '1dvh')) {
 	css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`});
@@ -14,11 +16,6 @@ if (! CSS.supports('height', '1dvh')) {
 	requestIdleCallback(() => {
 		on([window], {
 			resize: debounce(() => css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`})),
-			scroll: () => {
-				requestAnimationFrame(() => {
-					css('#header', { 'background-position-y': `${-0.5 * scrollY}px` });
-				});
-			}
 		}, { passive: true });
 	});
 }
@@ -52,9 +49,9 @@ Promise.all([
 ]).then(([HTMLInstallPromptElement]) => {
 	init();
 
-	if (location.pathname.startsWith('/contact')) {
-		on('#contact-form', ['cubmit'], submitHandler);
-	}
+	// if (location.pathname.startsWith('/contact')) {
+	// 	on('#contact-form', ['submit'], submitHandler);
+	// }
 
 	on('#install-btn', ['click'], () => new HTMLInstallPromptElement().show())
 		.forEach(el => el.hidden = false);

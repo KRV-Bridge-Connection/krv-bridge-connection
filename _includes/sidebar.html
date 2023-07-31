@@ -1,4 +1,7 @@
-<aside id="sidebar" class="card shadow">
+<aside id="sidebar" class="card">
+	<weather-current appid="{{ keys.weather }}" postalcode="93240"></weather-current>
+	<br />
+	<krv-events></krv-events>
 	{% if pinned-posts %}{% include "11ty-articles/pinned-posts.html" count: layout.pinned-posts %}{% endif %}
 	{% if page.ads %}{% for ad in page.ads %}
 		{% include "11ty-common/krv-ad.html" ad: ad content: "sidebar" %}

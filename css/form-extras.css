@@ -1,0 +1,31 @@
+.flex.row.form-nav {
+	gap: 2em;
+	padding: 0.8rem;
+}
+
+.form-nav .btn {
+	font-size: 1.2em;
+	padding: 0.7rem;
+	flex-grow: 1;
+	max-width: 140px;
+}
+
+.split-input, .split-input:required:invalid:placeholder-shown {
+	color: currentColor;
+	border-style: solid;
+	border-color: var(--input-border, #cacaca);
+	border-width: 0 0 1px 0;
+	background: transparent;
+	padding: var(--form-group-padding, 0.5em 0.3em);
+	transition: color 300ms ease-in-out, background-color 300ms ease-in-out;
+}
+
+.split-input:invalid {
+	box-shadow: none;
+}
+
+.split-input:invalid:not(:focus) {
+	color: var(--invalid-color, #871717);
+	border-color: currentColor;
+	background-color: var(--invalid-background, #F7C1C1);
+}

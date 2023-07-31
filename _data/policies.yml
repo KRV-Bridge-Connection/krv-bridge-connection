@@ -5,10 +5,12 @@ trusted:
   - ga#script-url
   - goog#html
   - sanitizer-raw#html
-  - purify-raw#html
-  - purify#html
-  - weather-current#html
+  # - purify-raw#html
+  # - purify#html
+  # - weather-current#html
   - krv-events#html
+  - weather-current#html
   - github-user#html
   - share-to-buttons#html
   - pwa-install
+

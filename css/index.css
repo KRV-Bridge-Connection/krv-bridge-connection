@@ -1,24 +1,35 @@
 @charset "UTF-8";
-@import url("./vars.css");
-@import url("https://cdn.kernvalley.us/css/normalize/normalize.css");
-@import url("https://cdn.kernvalley.us/css/core-css/viewport.css");
-@import url("https://cdn.kernvalley.us/css/core-css/element.css");
-@import url("https://cdn.kernvalley.us/css/core-css/class-rules.css");
-@import url("https://cdn.kernvalley.us/css/core-css/cdn-fonts.css");
-@import url("https://cdn.kernvalley.us/css/core-css/animations.css");
-@import url("https://cdn.kernvalley.us/css/core-css/scrollbar.css");
-@import url("https://cdn.kernvalley.us/css/core-css/accordion.css");
-@import url("https://cdn.kernvalley.us/css/core-css/forms.css");
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://unpkg.com/normalize.css@8.0.1/normalize.css");
+@import url("./core-css.css");
 @import url("./layout.css");
+@import url("./vars.css");
+@import url("./form-extras.css");
+@import url("./admin.css");
 
 :root {
 	font-size: 18px;
 }
 
+a.btn {
+	text-decoration: none;
+}
+
+.btn.btn-primary.btn-big {
+	font-size: 1.2em;
+	padding: 0.7rem;
+}
+
 @supports (width: clamp(1px, 2em, 1rem)) {
 	:root {
-		font-size: clamp(16px, 1.3vmax, 24px);
+		font-size: clamp(18px, 1.5vmax, 24px);
 	}
+}
+
+.logo-sample {
+	padding: 2rem;
+	gap: 0.8rem;
 }
 
 img.avatar {

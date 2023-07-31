@@ -1,13 +1,10 @@
----
-layout: null
----
 /* eslint-env serviceworker */
 /* eslint no-unused-vars: 0*/
 'use strict';
 
 async function updateAssets(assets, {
 	referrerPolicy = 'no-referrer',
-	version = '{{ app.version | default: site.version }}',
+	version = '{{ app.version | default: pkg.version }}',
 } = {}) {
 	if (Array.isArray(assets) && assets.length !== 0) {
 		const cache = await caches.open(version);
@@ -23,21 +20,20 @@ async function updateAssets(assets, {
 }
 
 const config = {
-	version: '{{ app.version | default: site.version }}',
+	version: '{{ app.version | default: pkg.version }}',
 	fresh: [
 		'{{ site.pages | where: "pinned", true | map: "url" | join: "', '" }}',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
 		'https://cdn.kernvalley.us/img/markers.svg',
 		/* Other */
-		'/store/products.json',
 	].map(path => new URL(path, location.origin).href),
 	stale: [
 		/* Scripts */
 		'/js/index.min.js',
 		'{{ importmap.imports["@shgysk8zer0/polyfills"] }}',
 		'{{ importmap.imports["@shgysk8zer0/kazoo/"] }}harden.js',
-		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/map.min.js',
+		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/bundle.min.js',
 
 		/* Custom Element Templates */
 		'{{ importmap.imports["@shgysk8zer0/components/"] }}/weather/current.html',
@@ -60,12 +56,6 @@ const config = {
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
 		'/img/adwaita-icons/status/avatar-default.svg',
-
-		/* Event Images */
-		'/img/raster/rodeo.jpg',
-		'/img/raster/parade.jpg',
-		'/img/raster/encampment.jpg',
-		'/img/raster/coach-320.jpg',
 
 		/* Fonts */
 		'https://cdn.kernvalley.us/fonts/roboto.woff2',
