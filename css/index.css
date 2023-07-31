@@ -1,4 +1,5 @@
 @charset "UTF-8";
+
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import url("https://unpkg.com/normalize.css@8.0.1/normalize.css");
 @import url("./core-css.css");
@@ -22,7 +23,7 @@ a.btn {
 
 @supports (width: clamp(1px, 2em, 1rem)) {
 	:root {
-		font-size: clamp(16px, 1.3vmax, 24px);
+		font-size: clamp(18px, 1.5vmax, 24px);
 	}
 }
 

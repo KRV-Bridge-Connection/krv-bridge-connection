@@ -4,6 +4,23 @@
 @import url("./main.css");
 @import url("./footer.css");
 
+/* Quick and dirty way to change layout... Will do better later */
+#top.grid {
+	grid-template-areas: 'nav nav nav' '. main sidebar' 'footer footer footer';
+	grid-template-rows: var(--nav-height, 4rem) minmax(var(--main-height, 75vh), auto) minmax(var(--footer-height, 300px), auto);
+	grid-template-columns: auto minmax(var(--main-min-width, 320px), var(--main-max-width, 1200px)) minmax(var(--sidebar-min-width, 300px), var(--sidebar-max-width, 400px));
+	grid-column-gap: 1.2em;
+
+	@media (max-width: 800px) {
+		& {
+			grid-template-areas: 'nav' 'main' 'sidebar' 'footer';
+			grid-template-rows: var(--nav-height, 4rem) minmax(75vh, auto) minmax(200px, auto) minmax(300px, auto);
+			grid-template-columns: 100%;
+			grid-column-gap: 0;
+		}
+	}
+}
+
 .content {
 	margin: 1.2em;
 	padding: 0.4em 1.4em;

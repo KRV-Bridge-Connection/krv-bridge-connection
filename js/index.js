@@ -16,11 +16,6 @@ if (! CSS.supports('height', '1dvh')) {
 	requestIdleCallback(() => {
 		on([window], {
 			resize: debounce(() => css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`})),
-			scroll: () => {
-				requestAnimationFrame(() => {
-					css('#header', { 'background-position-y': `${-0.5 * scrollY}px` });
-				});
-			}
 		}, { passive: true });
 	});
 }
@@ -54,9 +49,9 @@ Promise.all([
 ]).then(([HTMLInstallPromptElement]) => {
 	init();
 
-	if (location.pathname.startsWith('/contact')) {
-		on('#contact-form', ['cubmit'], submitHandler);
-	}
+	// if (location.pathname.startsWith('/contact')) {
+	// 	on('#contact-form', ['submit'], submitHandler);
+	// }
 
 	on('#install-btn', ['click'], () => new HTMLInstallPromptElement().show())
 		.forEach(el => el.hidden = false);

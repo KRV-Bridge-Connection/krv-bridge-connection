@@ -39,6 +39,6 @@ KRV Bridge Connection is a registered 501(c)(3) non-profit organization. Your do
 
 Your donation plays a vital role in creating a positive impact on the lives of those in need. Together, we can build a stronger, more compassionate community in the Kern River Valley.
 
-We sincerely thank you for your generosity and support. If you have any questions or need further assistance, please don't hesitate to [contact us](mailto:contact@krvbridgeconnection.org).
+We sincerely thank you for your generosity and support. If you have any questions or need further assistance, please don't hesitate to [contact us](/contact/).
 
 *Join hands. Make a difference.*

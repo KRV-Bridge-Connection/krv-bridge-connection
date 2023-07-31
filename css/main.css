@@ -1,13 +1,20 @@
 #main {
 	--link-color: #049ccf;
 	--link-decoration: underline;
+
+	/* Copy .card rules */
+	border: var(--card-border, 1px solid #ccc);
+	border-radius: var(--card-radius, 2px);
+	background: var(--card-bg, var(--primary-color, white));
+	padding: var(--card-padding, 0.7em);
 }
 
 .ctas.flex {
 	gap: 0.7rem;
 }
 
-.cta {
+.home-ctas .cta, .home-ctas .cta:visited, .home-ctas .cta:visited:hover:not([rel="bookmark"]) {
+	color: var(--default-color);
 	text-decoration: none;
 }
 
