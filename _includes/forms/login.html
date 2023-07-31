@@ -1,4 +1,4 @@
-<form name="login" id="login-form">
+<form name="{{ name | default: 'login' }}" id="{{ id | default: 'login-form' }}">
 	<fieldset class="no-border">
 		<div class="form-group">
 			<label for="login-username" class="input-label required">

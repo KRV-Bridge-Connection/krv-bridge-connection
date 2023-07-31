@@ -32,7 +32,7 @@
 		text-decoration: none;
 	}
 
-	@media (max-width: 416px) {
+	@media (max-width: 440px) {
 		& {
 			grid-template: repeat(auto-fit, 100%) / repeat(auto-fit, 100%);
 		}

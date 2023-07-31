@@ -5,7 +5,16 @@ pinned: true
 description: A GitHub repository for easily creating fast, modern, PWA compatible websites
 ---
 {% include "wip-disclaimer.html" %}
-<div>
-	<p>Please be sure to <a href="/account/sign-in/">Login</a> or <a href="/sign-up/">Register</a> first.</p>
+<br />
+<div class="status-box info">
+	<p>
+		Creating an organization will require login at the end. If you have not
+		created an account, please create one <a href="/account/sign-up/?redirect=%2Forganization%2Fcreate%2F">here</a>.
+	</p>
 </div>
+<br />
 {% include "forms/org-profile.html" %}
+<dialog id="login-dialog">
+	{% include "forms/login.html" id: "login-dialog-form" %}
+	<div class="status-box error"></div>
+</dialog>

@@ -12,6 +12,10 @@
 	font-size: 18px;
 }
 
+.status-box:empty {
+	display: none;
+}
+
 a.btn {
 	text-decoration: none;
 }
