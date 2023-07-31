@@ -3,6 +3,19 @@
 	--link-decoration: underline;
 }
 
+.ctas.flex {
+	gap: 0.7rem;
+}
+
+.cta {
+	text-decoration: none;
+}
+
+.cta-label {
+	display: block;
+	text-decoration: none;
+}
+
 .grid.card-list {
 	grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 200px);
 	gap: 8px;

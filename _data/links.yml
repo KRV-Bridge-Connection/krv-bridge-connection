@@ -9,8 +9,11 @@ nav:
     icon: info
     href: /about/
   - label: Contact
-    icon: address-book
+    icon: inbox
     href: /contact/
+  - label: Donate
+    icon: donate
+    href: /donate/
   - label: Account
     icon: avatar-default
     href: /account/

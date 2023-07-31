@@ -1,5 +1,6 @@
 ---
 krv-bridge: img/krv-bridge.svg
+donate: img/donate.svg
 home: img/adwaita-icons/places/user-home.svg
 public-share: img/adwaita-icons/places/folder-publicshare.svg
 view-more: img/adwaita-icons/actions/view-more.svg
@@ -20,6 +21,7 @@ info: img/octicons/info.svg
 mark-location: img/adwaita-icons/actions/mark-location.svg
 note: img/octicons/note.svg
 clock: img/octicons/clock.svg
+question: img/octicons/question.svg
 tag: img/octicons/tag.svg
 file-media: img/octicons/file-media.svg
 check: img/octicons/check.svg

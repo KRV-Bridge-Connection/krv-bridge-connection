@@ -1,18 +1,19 @@
 import { on } from '@shgysk8zer0/kazoo/dom.js';
-import './stepped-form.js';
+import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
+import { PNG } from '@shgysk8zer0/kazoo/types.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
+import './stepped-form.js';
 
 function validateOrgData(org) {
 	return typeof org === 'object';
 }
 
 async function getOrgDataFromForm(form) {
-	// @TODO: Upload logo and replace with URL
 	const data = new FormData(form);
+	const img = await resizeImageFile(data.get('logo'), { height: 256, type: PNG });
 	const uuid = data.get('@identifier') || crypto.randomUUID();
-	const snapshot = await uploadFile(data.get('logo'), `/logos/${uuid}/${data.get('logo').name}`);
-	console.log(snapshot);
+	const snapshot = await uploadFile(img, `/logos/${uuid}/${img.name}`);
 	const hoursAvailable = [{
 		'@type': 'OpeningHoursSpecification',
 		dayOfWeek: 'Sunday',
@@ -147,13 +148,15 @@ on('[data-copy-hours]', 'click', ({ currentTarget }) => {
 on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
 
-	const org = await getOrgDataFromForm(event.target);
-	if (validateOrgData(org)) {
-		await createOrUpdateDoc('/organizations', org['@identifier'], org);
-		navigator.clipboard.writeText(`<script type="application/ld+json">${JSON.stringify(org, null, 4)}</script>`);
-		console.log(org);
-		// @TODO: Create or Update in Firestore
-	} else {
-		//
+	try {
+		const org = await getOrgDataFromForm(event.target);
+
+		if (validateOrgData(org)) {
+			await createOrUpdateDoc('/organizations', org['@identifier'], org);
+		} else {
+			//
+		}
+	} catch(err) {
+		console.error(err);
 	}
 });

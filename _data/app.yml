@@ -110,13 +110,13 @@ screenshots:
 related_applications:
   - platform: webapp
     url: /webapp.webmanifest
-  # - platform: play
-  #   id: "twa.weather.kernvalley"
-  #   url: "#"
-  # - platform: itunes
-  #   url: "#"
-  # - platform: windows
-  #   url: "#"
+  - platform: play
+    id: "#"
+    url: "#"
+  - platform: itunes
+    url: "#"
+  - platform: windows
+    url: "#"
 features:
   - PWA-ready GitHub template for Jekyll sites
   - Dark mode support, controlled by (prefers-color-scheme) media query
