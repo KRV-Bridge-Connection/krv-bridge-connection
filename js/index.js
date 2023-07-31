@@ -4,7 +4,7 @@ import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
 import { importGa, externalHandler, telHandler, mailtoHandler } from '@shgysk8zer0/kazoo/google-analytics.js';
-import { submitHandler } from './contact-demo.js';
+// import { submitHandler } from './contact-demo.js';
 import { GA } from './consts.js';
 import './components.js';
 import './user.js';

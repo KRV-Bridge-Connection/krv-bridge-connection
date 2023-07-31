@@ -1,7 +1,3 @@
----
-layout: null
-permalink: /sw-config.js
----
 /* eslint-env serviceworker */
 /* eslint no-unused-vars: 0*/
 'use strict';

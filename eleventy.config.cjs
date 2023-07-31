@@ -6,7 +6,7 @@ const filters = require('@shgysk8zer0/11ty-filters');
 const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
 const { importmap } = require('@shgysk8zer0/importmap');
 const firebase = require('firebase-admin');
-const { Liquid } = require("liquidjs");
+const { Liquid } = require('liquidjs');
 
 async function getCollection(name, db) {
 	const snapshot = await db.collection(name).get();

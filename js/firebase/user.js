@@ -1,6 +1,6 @@
 import {
 	updatePassword as uPassword, updateEmail as uEmail, deleteUser as dUser,
-	verifyBeforeUpdateEmail, updateProfile as uProfile,
+	/*verifyBeforeUpdateEmail, */updateProfile as uProfile,
 } from 'firebase/firebase-auth.js';
 
 import { getCurrentUser } from './auth.js';

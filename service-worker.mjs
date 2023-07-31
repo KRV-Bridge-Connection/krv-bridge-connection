@@ -1,7 +1,3 @@
----
-layout: null
-permalink: /service-worker.js
----
 'use strict';
 /* eslint-env serviceworker */
 /* global init: readonly, config: readonly */
