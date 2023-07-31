@@ -14,7 +14,7 @@ const PERSISTENCE = {
 
 export async function getFirebaseAuth(name = 'default', {
 	persistence = 'local',
-}) {
+} = {}) {
 	if (auths.has(name)) {
 		return auths.get(name);
 	} else {
@@ -22,6 +22,7 @@ export async function getFirebaseAuth(name = 'default', {
 		const auth = getAuth(app);
 		setPersistence(auth, PERSISTENCE[persistence]);
 		auths.set(name, auth);
+		onAStateChanged(auth, console.log);
 		return auth;
 	}
 }

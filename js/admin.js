@@ -1,5 +1,7 @@
 import { on } from '@shgysk8zer0/kazoo/dom.js';
 import './stepped-form.js';
+import { createOrUpdateDoc } from './firebase/firestore.js';
+import { uploadFile, getDownloadURL } from './firebase/storage.js';
 
 function validateOrgData(org) {
 	return typeof org === 'object';
@@ -8,6 +10,9 @@ function validateOrgData(org) {
 async function getOrgDataFromForm(form) {
 	// @TODO: Upload logo and replace with URL
 	const data = new FormData(form);
+	const uuid = data.get('@identifier') || crypto.randomUUID();
+	const snapshot = await uploadFile(data.get('logo'), `/logos/${uuid}/${data.get('logo').name}`);
+	console.log(snapshot);
 	const hoursAvailable = [{
 		'@type': 'OpeningHoursSpecification',
 		dayOfWeek: 'Sunday',
@@ -48,10 +53,10 @@ async function getOrgDataFromForm(form) {
 	const org = {
 		'@context': data.get('@context'),
 		'@type': data.get('@type'),
-		'@identifier': data.get('@identifier') || crypto.randomUUID(),
+		'@identifier': uuid,
 		name: data.get('name'),
 		description: data.get('description'),
-		logo: data.get('logo'),
+		logo: await getDownloadURL(snapshot.ref),//data.get('logo'),
 		telephone: data.get('telephone'),
 		email: data.get('email'),
 		url: data.get('url'),
@@ -144,6 +149,7 @@ on('#org-profile-form', 'submit', async event => {
 
 	const org = await getOrgDataFromForm(event.target);
 	if (validateOrgData(org)) {
+		await createOrUpdateDoc('/organizations', org['@identifier'], org);
 		navigator.clipboard.writeText(`<script type="application/ld+json">${JSON.stringify(org, null, 4)}</script>`);
 		console.log(org);
 		// @TODO: Create or Update in Firestore

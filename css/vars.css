@@ -1,9 +1,18 @@
 :root {
 	--map-width: 100%;
+	--viewport-height: 100vh;
+	--header-height: calc(100vh - var(--nav-height, 4rem));
 	--accent-color-dark: var(--bs-blue-500);
 	--accent-color-light: var(--bs-blue-500);
 	--button-primary-background-dark: var(--bs-blue-600);
 	--button-primary-color-dark: var(--bs-gray-100);
 	--button-primary-background-light: var(--bs-blue-400);
 	--button-primary-color-light: var(--bs-gray-100);
+}
+
+@supports (height: 1dvh) {
+	:root {
+		--header-height: calc(var(--100dvh) - var(--nav-height, 4rem));
+		--viewport-height: 100dvh;
+	}
 }

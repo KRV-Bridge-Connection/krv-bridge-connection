@@ -1,14 +1,23 @@
 ---js
 {
 	title: "Utilities",
-	layout: "default",
+	layout: "directory.html",
 	pagination: {
-		data: "organizations",
+		data: "categories.Utilities",
 		size: 100,
-		alias: "orgs",
+		alias: "subcategories",
 		generatePageOnEmptyData: true,
-		before: data => data.filter(org => org.category === 'utility'),
+		//before: data => data.filter(org => org.category === title),
 	},
-	permalink: "resources/utilities/index.html"
+	permalink: "resources/{{ title | slugify }}/index.html"
 }
 ---
+<div class="grid card-list">
+	{% for category in subcategories %}
+		<a class="card inline-block shadow color-inherit center" href="/resources/{{ title | slugify }}/{{ category | slugify }}/">
+			<div class="bold category-label">{{ category }}</div>
+			{% include "11ty-common/icon.html" icon: "organization" height: 96 width: 96 fill: "currentColor" class: "category-icon" %}
+		</a>
+	{% endfor %}
+
+</div>

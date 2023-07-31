@@ -3,6 +3,12 @@
 	gap: 18px;
 	background-color: var(--gnome-dark-4);
 	color: var(--gnome-light-2);
+
+	@media (max-width: 600px) {
+		& .nav-link-label {
+			display: none;
+		}
+	}
 }
 
 #nav > .nav-btn {

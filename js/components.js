@@ -1,5 +1,7 @@
 import '@shgysk8zer0/components/share-button.js';
 import '@shgysk8zer0/components/button/share-to.js';
+import '@shgysk8zer0/components/weather/current.js';
+import '@kernvalley/components/events.js';
 // import '@shgysk8zer0/components/slide-show/slide-show.js';
 import '@shgysk8zer0/components/github/user.js';
 import '@shgysk8zer0/components/current-year.js';

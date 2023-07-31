@@ -41,10 +41,11 @@ default:
     - https://api.github.com/users/
     - https://firestore.googleapis.com/
     - https://identitytoolkit.googleapis.com/v1/
+    - https://firebasestorage.googleapis.com/
     - https://api.openweathermap.org/data/2.5/
+    - https://events.kernvalley.us/events.json
     - https://www.google-analytics.com/
     - https://www.googletagmanager.com/gtag/
     - https://baconipsum.com/api/
   form-action:
     - "'self'"
-
