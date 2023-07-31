@@ -31,7 +31,7 @@ export async function register({
 	email, password, name: displayName, image: photoURL, verify = true,
 }) {
 	const auth = await getFirebaseAuth();
-	const user = await createUserWithEmailAndPassword(auth, email, password);
+	const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
 	if (typeof displayName === 'string' || typeof photoURL === 'string') {
 		await updateProfile(user, { displayName, photoURL });
@@ -48,7 +48,8 @@ export async function login({
 	email, password,
 }) {
 	const auth = await getFirebaseAuth();
-	return signInWithEmailAndPassword(auth, email, password);
+	const { user } = await signInWithEmailAndPassword(auth, email, password);
+	return user;
 }
 
 export async function logout() {

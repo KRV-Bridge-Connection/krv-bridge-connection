@@ -1,15 +1,18 @@
 import { on } from '@shgysk8zer0/kazoo/dom.js';
 import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
 import { PNG } from '@shgysk8zer0/kazoo/types.js';
+import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
+import { login } from './firebase/auth.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
 import './stepped-form.js';
 
 function validateOrgData(org) {
-	return typeof org === 'object';
+	return typeof org === 'object' && ! Object.is(null, org) && typeof org.createdBy === 'string';
 }
 
-async function getOrgDataFromForm(form) {
+async function getOrgDataFromForm(form, user) {
+	console.log(user);
 	const data = new FormData(form);
 	const img = await resizeImageFile(data.get('logo'), { height: 256, type: PNG });
 	const uuid = data.get('@identifier') || crypto.randomUUID();
@@ -55,6 +58,8 @@ async function getOrgDataFromForm(form) {
 		'@context': data.get('@context'),
 		'@type': data.get('@type'),
 		'@identifier': uuid,
+		createdBy: user.uid,
+		updatedAt: new Date().toISOString(),
 		name: data.get('name'),
 		description: data.get('description'),
 		logo: await getDownloadURL(snapshot.ref),//data.get('logo'),
@@ -147,14 +152,55 @@ on('[data-copy-hours]', 'click', ({ currentTarget }) => {
 
 on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
+	const dialog = document.getElementById('login-dialog');
+	const form = document.getElementById('login-dialog-form');
+	const controller = new AbortController();
+	const signal = controller.signal;
+
+	const { resolve, reject, promise } = Promise.withResolvers();
+
+	form.addEventListener('submit', async event => {
+		event.preventDefault();
+		const data = new FormData(event.target);
+
+		try {
+			const user = await login({
+				email: data.get('email'),
+				password: data.get('password'),
+			});
+
+			if (typeof user === 'object' && ! Object.is(user, null)) {
+				resolve(user);
+				dialog.close();
+			}
+		} catch(err) {
+			console.error(err);
+			const errMsg = document.querySelector('dialog[open] .status-box.error');
+			errMsg.textContent = err.message;
+			setTimeout(() => errMsg.textContent = '', 3000);
+		}
+	}, { signal });
+
+	form.addEventListener('reset', ({ target }) => {
+		const err = new Error('User cancelled login');
+		controller.abort(err);
+		reject(err);
+		target.closest('dialog').close();
+	}, { signal });
 
 	try {
-		const org = await getOrgDataFromForm(event.target);
+		dialog.showModal();
+		const user = await promise;
+		dialog.close();
+		const org = await getOrgDataFromForm(event.target, user);
+		console.log(org);
 
 		if (validateOrgData(org)) {
 			await createOrUpdateDoc('/organizations', org['@identifier'], org);
+			await alert(`Created ${org.name}`);
+			location.href = '/';
 		} else {
-			//
+			await alert('Error creating Organization');
 		}
 	} catch(err) {
 		console.error(err);
