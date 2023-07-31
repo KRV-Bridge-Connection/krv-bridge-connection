@@ -1,25 +1,3 @@
-Clothing: []
-Elder Care: []
-Emergency Services: []
-Employment:
-  - Job Training
-  - Job Opportunities
-Family Support: []
-Food: []
-Health Care:
-  - Doctors
-  - Mental Health Care
-  - Insurance
-Pets: []
-School Supplies: []
-# Shelter (or Housing): []
-Substance Abuse Counseling: []
-Tax Preparation Assistance: []
-Transportation:
-  - Public Transportation
-  - Dial-a-Ride Services
-# Utilities
-Veterans & Military: []
 Utilities:
   - Electric
   - Water
@@ -28,3 +6,27 @@ Utilities:
 Housing:
   - Rent Aid
   - Shelters
+Employment:
+  - Job Training
+  - Job Opportunities
+Health Care:
+  - Doctors
+  - Mental Health Care
+  - Insurance
+Family and Household:
+  - Food
+  - Family Support
+  - Pets
+  - Clothing
+  - School Supplies
+# Shelter (or Housing): []
+Financial:
+  - Tax Preparation Assistance
+Transportation:
+  - Public Transportation
+  - Dial-a-Ride Services
+Other:
+  - Elder Care
+  - Emergency Services
+  - Veterans & Military
+  - Substance Abuse Counseling

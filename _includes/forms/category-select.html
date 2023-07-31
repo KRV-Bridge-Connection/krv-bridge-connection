@@ -3,7 +3,7 @@
 	{% for category in categories %}
 		<optgroup label="{{ category[0] | escape }}">
 			{% for subcategory in category[1] %}
-				<option value="{{ subcategory | slugify }}" label="{{ subcategory }}"></option>
+				<option value="{{ subcategory | escape }}" label="{{ subcategory | escape }}"></option>
 			{% endfor %}
 		</optgroup>
 	{% endfor %}
