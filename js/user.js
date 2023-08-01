@@ -2,6 +2,7 @@ import { on } from '@shgysk8zer0/kazoo/dom.js';
 import { createGravatarURL } from '@shgysk8zer0/kazoo/gravatar.js';
 import { login, register } from './firebase/auth.js';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
+import { navigate } from './functions.js';
 
 on('#registration-form', 'submit', async event => {
 	event.preventDefault();
@@ -19,9 +20,9 @@ on('#registration-form', 'submit', async event => {
 		const params = new URLSearchParams(location.search);
 
 		if (params.has('redirect')) {
-			location.href = params.get('redirect');
+			navigate(params.get('redirect'));
 		} else {
-			location.href = '/';
+			navigate('/');
 		}
 	} else {
 		alert('Error creating account');
@@ -43,9 +44,9 @@ on('#login-form', 'submit', async event => {
 		const params = new URLSearchParams(location.search);
 
 		if (params.has('redirect')) {
-			location.href = params.get('redirect');
+			navigate(params.get('redirect'));
 		} else {
-			location.href = '/';
+			navigate('/');
 		}
 	} else {
 		alert('Error creating account');
