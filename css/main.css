@@ -34,7 +34,7 @@
 
 	@media (max-width: 440px) {
 		& {
-			grid-template: repeat(auto-fit, 100%) / repeat(auto-fit, 100%);
+			grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 100%);
 		}
 	}
 }

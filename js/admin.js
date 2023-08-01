@@ -5,6 +5,7 @@ import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
 import { login } from './firebase/auth.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
+import { navigate } from './functions.js';
 import './stepped-form.js';
 
 function validateOrgData(org) {
@@ -193,12 +194,11 @@ on('#org-profile-form', 'submit', async event => {
 		const user = await promise;
 		dialog.close();
 		const org = await getOrgDataFromForm(event.target, user);
-		console.log(org);
 
 		if (validateOrgData(org)) {
 			await createOrUpdateDoc('/organizations', org['@identifier'], org);
 			await alert(`Created ${org.name}`);
-			location.href = '/';
+			navigate('/');
 		} else {
 			await alert('Error creating Organization');
 		}
