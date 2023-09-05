@@ -41,6 +41,7 @@
       "showSaveFilePicker": "readonly",
       "globalThis": "readonly",
       "URLPattern": "readonly",
-      "scheduler": "readonly"
+      "scheduler": "readonly",
+      "PasswordCredential": "readonly"
     }
 }
