@@ -8,6 +8,8 @@ import { uploadFile, getDownloadURL } from './firebase/storage.js';
 import { navigate } from './functions.js';
 import './stepped-form.js';
 
+const FIREBASE_FORMS = 'firebase-sign-in, firebase-sign-up, firebase-verify-email';
+
 function validateOrgData(org) {
 	return typeof org === 'object' && ! Object.is(null, org) && typeof org.createdBy === 'string';
 }
@@ -151,6 +153,27 @@ on('[data-copy-hours]', 'click', ({ currentTarget }) => {
 	});
 });
 
+on(FIREBASE_FORMS, 'success', async ({ detail }) => {
+	console.log(detail);
+	const params = new URLSearchParams(location.search);
+
+	if (params.has('redirect')) {
+		navigate(params.get('redirect'));
+	} else {
+		navigate('/');
+	}
+});
+
+on(FIREBASE_FORMS,'abort', ({ target }) => {
+	if (target.dataset.hasOwnProperty('abortUrl')) {
+		navigate(target.dataset.abortUrl);
+	} else if (history.length > 1) {
+		history.back();
+	} else {
+		navigate('/');
+	}
+});
+
 on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
 	const dialog = document.getElementById('login-dialog');
@@ -206,3 +229,33 @@ on('#org-profile-form', 'submit', async event => {
 		console.error(err);
 	}
 });
+
+if (location.pathname === '/account/' && location.search.includes('mode=')) {
+	const params = new URLSearchParams(location.search);
+
+	switch(params.get('mode')) {
+		case 'resetPassword':
+			navigate('/account/verify-reset/', {
+				oobCode: params.get('oobCode'),
+				redirent: '/account/sign-in/',
+			});
+			break;
+
+		case 'verifyEmail':
+			navigate('/account/verify-email/', {
+				oobCode:  params.get('oobCode'),
+				redirect: '/account/sign-in/',
+			});
+			break;
+
+		case 'signIn':
+			customElements.whenDefined('firebase-email-link').then(async HTMLFirebaseEmailLinkElement => {
+				if (await HTMLFirebaseEmailLinkElement.verify()) {
+					const result = await HTMLFirebaseEmailLinkElement.signIn('shgysk8zer0@gmail.com');
+					console.log(result);
+				}
+			});
+			break;
+	}
+}
+

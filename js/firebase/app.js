@@ -1,13 +1,15 @@
 import { initializeApp } from 'firebase/firebase-app.js';
-import { firebaseConfig } from '../consts.js';
+import { getJSON } from '@shgysk8zer0/kazoo/http.js';
+// import { firebaseConfig } from '../consts.js';
 
 const apps = new Map();
 
-export function getFirebaseApp(name = 'default') {
+export async function getFirebaseApp(name = 'default') {
 	if (apps.has(name)) {
 		return apps.get(name);
 	} else {
-		const app = initializeApp(firebaseConfig);
+		const config = await getJSON('/api/firebase-config', { mode: 'same-origin', referrerPolicy: 'same-origin' });
+		const app = initializeApp(config);
 		apps.set(name, app);
 		return app;
 	}

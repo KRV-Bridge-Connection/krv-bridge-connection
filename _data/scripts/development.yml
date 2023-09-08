@@ -2,7 +2,7 @@
 - src: '@shgysk8zer0/polyfills'
   crossOrigin: anonymous
   referrerPolicy: no-referrer
-  integrity: sha384-8s5Tj7IrKDs3va2EJ3QsRxxApN9vT+thnbA8imc6bwYJA2JaAddVR5b8q5wDkrdv
+  integrity: sha384-mbVsY82zSLXMJro9PwjMxsGwFv+kwypUPBBdtQkkq6/T80dykbJ6669pzHfMMiYV
   defer: true
 - src: '@shgysk8zer0/kazoo/harden.js'
   crossOrigin: anonymous

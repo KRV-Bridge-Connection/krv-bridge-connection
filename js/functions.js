@@ -8,3 +8,9 @@ export function navigate(pathname, params = {}) {
 		location.href = url.href;
 	}
 }
+
+export function redirect(params = {}) {
+	const search = new URLSearchParams(location.search);
+	const pathname = search.get('redirect') || '/';
+	navigate(pathname, params);
+}

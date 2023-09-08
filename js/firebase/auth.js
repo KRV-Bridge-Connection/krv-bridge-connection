@@ -18,11 +18,17 @@ export async function getFirebaseAuth(name = 'default', {
 	if (auths.has(name)) {
 		return auths.get(name);
 	} else {
-		const app = getFirebaseApp(name);
+		const app = await getFirebaseApp(name);
 		const auth = getAuth(app);
-		setPersistence(auth, PERSISTENCE[persistence]);
-		auths.set(name, auth);
-		onAStateChanged(auth, console.log);
+		const { resolve, promise } = Promise.withResolvers();
+		const unsubscribe = onAStateChanged(auth, () => {
+			setPersistence(auth, PERSISTENCE[persistence]);
+			auths.set(name, auth);
+			resolve();
+			unsubscribe();
+		});
+
+		await promise;
 		return auth;
 	}
 }

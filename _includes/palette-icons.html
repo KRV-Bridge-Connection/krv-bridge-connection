@@ -1,16 +1,24 @@
 <div class="flex row wrap space-evenly logo-sample">
-	<div class="card color-default" data-theme="light">
+	<div class="card center color-default" data-theme="light">
 		{% include "11ty-common/icon.html" icon: "krv-bridge" height: 48 width: 48 fill: "currentColor" class: "logo" %}
+		<br />
+		{% include "11ty-common/icon.html" icon: "krv-bridge-text" height: 48 width: 133 fill: "currentColor" class: "logo" %}
 	</div>
-	<div class="card color-default" data-theme="dark">
+	<div class="card color-default center" data-theme="dark">
 		{% include "11ty-common/icon.html" icon: "krv-bridge" height: 48 width: 48 fill: "currentColor" class: "logo" %}
+		<br />
+		{% include "11ty-common/icon.html" icon: "krv-bridge-text" height: 48 width: 133 fill: "currentColor" class: "logo" %}
 	</div>
 	{% for color in palette %}
-		<div class="card" data-theme="light">
+		<div class="card center" data-theme="light">
 			{% include "11ty-common/icon.html" icon: "krv-bridge" height: 48 width: 48 fill: color class: "logo" %}
+			<br />
+			{% include "11ty-common/icon.html" icon: "krv-bridge-text" height: 48 width: 133 fill: color class: "logo" %}
 		</div>
-		<div class="card" data-theme="dark">
+		<div class="card  center" data-theme="dark">
 			{% include "11ty-common/icon.html" icon: "krv-bridge" height: 48 width: 48 fill: color class: "logo" %}
+			<br />
+			{% include "11ty-common/icon.html" icon: "krv-bridge-text" height: 48 width: 133 fill: color class: "logo" %}
 		</div>
 	{% endfor %}
 </div>
