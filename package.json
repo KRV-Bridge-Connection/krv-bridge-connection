@@ -45,10 +45,9 @@
     "netlify": "if [ -f '.netlify/state.json' ]; then npm run netlify:live; else npm run netlify:serve; fi",
     "netlify:deploy": "netlify deploy",
     "netlify:serve": "netlify dev",
-    "netlify:live": "netlify dev --live=dev",
+    "netlify:live": "netlify dev --live",
     "netlify:link": "netlify link",
     "version:bump": "npm run version:bump:patch",
-    "foo": "whoami",
     "version:bump:patch": "npm version --no-git-tag-version patch",
     "version:bump:minor": "npm version --no-git-tag-version minor",
     "version:bump:major": "npm version --no-git-tag-version major"
