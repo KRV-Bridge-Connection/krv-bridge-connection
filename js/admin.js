@@ -3,8 +3,8 @@ import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
 import { PNG } from '@shgysk8zer0/kazoo/types.js';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
-import { login } from './firebase/auth.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
+import { getCurrentUser } from './firebase/auth.js';
 import { navigate } from './functions.js';
 import './stepped-form.js';
 
@@ -176,46 +176,9 @@ on(FIREBASE_FORMS,'abort', ({ target }) => {
 
 on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
-	const dialog = document.getElementById('login-dialog');
-	const form = document.getElementById('login-dialog-form');
-	const controller = new AbortController();
-	const signal = controller.signal;
-
-	const { resolve, reject, promise } = Promise.withResolvers();
-
-	form.addEventListener('submit', async event => {
-		event.preventDefault();
-		const data = new FormData(event.target);
-
-		try {
-			const user = await login({
-				email: data.get('email'),
-				password: data.get('password'),
-			});
-
-			if (typeof user === 'object' && ! Object.is(user, null)) {
-				resolve(user);
-				dialog.close();
-			}
-		} catch(err) {
-			console.error(err);
-			const errMsg = document.querySelector('dialog[open] .status-box.error');
-			errMsg.textContent = err.message;
-			setTimeout(() => errMsg.textContent = '', 3000);
-		}
-	}, { signal });
-
-	form.addEventListener('reset', ({ target }) => {
-		const err = new Error('User cancelled login');
-		controller.abort(err);
-		reject(err);
-		target.closest('dialog').close();
-	}, { signal });
 
 	try {
-		dialog.showModal();
-		const user = await promise;
-		dialog.close();
+		const user = await getCurrentUser();
 		const org = await getOrgDataFromForm(event.target, user);
 
 		if (validateOrgData(org)) {
