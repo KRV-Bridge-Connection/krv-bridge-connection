@@ -31,7 +31,6 @@ const config = {
 	stale: [
 		/* Scripts */
 		'/js/index.min.js',
-		'/api/firebase-config',
 		'{{ importmap.imports["@shgysk8zer0/polyfills"] }}',
 		'{{ importmap.imports["@shgysk8zer0/kazoo/"] }}harden.js',
 		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/bundle.min.js',
