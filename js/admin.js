@@ -9,6 +9,17 @@ import { getCurrentUser } from './firebase/auth.js';
 import { navigate } from './functions.js';
 import './stepped-form.js';
 
+async function signIn() {
+	const user = await getCurrentUser();
+
+	if (typeof user === 'object' && ! Object.is(user, null)) {
+		return user;
+	} else {
+		const HTMLFirebaseSignInElement = await customElements.whenDefined('firebase-sign-in');
+		return await HTMLFirebaseSignInElement.asDialog();
+	}
+}
+
 const FIREBASE_FORMS = 'firebase-sign-in, firebase-sign-up, firebase-verify-email';
 
 function validateOrgData(org) {
@@ -179,7 +190,7 @@ on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
 
 	try {
-		const user = await getCurrentUser();
+		const user = await signIn();
 		const org = await getOrgDataFromForm(event.target, user);
 
 		if (validateOrgData(org)) {

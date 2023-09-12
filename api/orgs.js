@@ -1,5 +1,7 @@
 /* eslint-env node */
 
+const collection = 'organizations';
+
 async function getCollection(name, { limit = 10 } = {}) {
 	const db = getFirestore();
 	const snapshot = await db.collection(name).limit(limit).get();
@@ -63,7 +65,7 @@ exports.handler = async event => {
 	switch(event.httpMethod) {
 		case 'GET':
 			if (event.queryStringParameters.hasOwnProperty('id')) {
-				const result = await getCollectionItem('orgs', event.queryStringParameters.id);
+				const result = await getCollectionItem(collection, event.queryStringParameters.id);
 				if (typeof result === 'object' && ! Object.is(result, null)) {
 					return {
 						statusCode: 200,
@@ -86,7 +88,7 @@ exports.handler = async event => {
 					};
 				}
 			} else {
-				const orgs = await getCollection('orgs');
+				const orgs = await getCollection(collection);
 				return {
 					statusCode: 200,
 					headers: {
@@ -131,7 +133,7 @@ exports.handler = async event => {
 				const idToken = event.headers.authorization.replace('Bearer ', '');
 				try {
 					await firebase.auth().verifyIdToken(idToken);
-					await firebase.firestore().collection('orgs').doc(event.queryStringParameters.id).delete();
+					await firebase.firestore().collection(collection).doc(event.queryStringParameters.id).delete();
 					return { statusCode: 204, headers: { 'Access-Control-Allow-Origin': '*' }};
 				} catch(err) {
 					console.error(err);
