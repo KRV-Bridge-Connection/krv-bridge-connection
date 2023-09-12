@@ -2,6 +2,7 @@ import { on } from '@shgysk8zer0/kazoo/dom.js';
 import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
 import { PNG } from '@shgysk8zer0/kazoo/types.js';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
+import { registerSignOutButton, disableOnSignOut, disableOnSignIn } from '@shgysk8zer0/components/firebase/auth/auth.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
 import { getCurrentUser } from './firebase/auth.js';
@@ -193,6 +194,10 @@ on('#org-profile-form', 'submit', async event => {
 	}
 });
 
+registerSignOutButton('[data-action="sign-out"]');
+document.querySelectorAll('.signed-out').forEach(el => disableOnSignIn(el));
+document.querySelectorAll('.signed-in').forEach(el => disableOnSignOut(el));
+
 if (location.pathname === '/account/' && location.search.includes('mode=')) {
 	const params = new URLSearchParams(location.search);
 
@@ -214,11 +219,10 @@ if (location.pathname === '/account/' && location.search.includes('mode=')) {
 		case 'signIn':
 			customElements.whenDefined('firebase-email-link').then(async HTMLFirebaseEmailLinkElement => {
 				if (await HTMLFirebaseEmailLinkElement.verify()) {
-					const result = await HTMLFirebaseEmailLinkElement.signIn('shgysk8zer0@gmail.com');
+					const result = await HTMLFirebaseEmailLinkElement.signIn();
 					console.log(result);
 				}
 			});
 			break;
 	}
 }
-

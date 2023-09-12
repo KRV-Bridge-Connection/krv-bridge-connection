@@ -35,6 +35,7 @@ exports.handler = async event => {
 				storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 				messagingSenderId: process.env.FIREBASE_MESSAGE_SENDER_ID,
 				appId: process.env.FIREBASE_APP_ID,
+				measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 				// Add other Firebase configuration properties as needed
 			}),
 		};

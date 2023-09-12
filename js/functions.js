@@ -14,3 +14,9 @@ export function redirect(params = {}) {
 	const pathname = search.get('redirect') || '/';
 	navigate(pathname, params);
 }
+
+export async function login() {
+	const HTMLFirebaseSignInElement = await customElements.whenDefined('firebase-sign-in');
+	const user = await HTMLFirebaseSignInElement.asDialog();
+	return user;
+}

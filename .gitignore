@@ -2,6 +2,7 @@ src
 _site/*
 *.min.*
 *.map
+*.bak
 img/icons.svg
 !_site/.gitkeep
 # Logs

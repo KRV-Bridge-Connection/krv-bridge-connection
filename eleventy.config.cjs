@@ -76,7 +76,7 @@ module.exports = function(eleventyConfig) {
 	// Set global data/variables
 	// {{ environment }} -> 'production' | 'development'
 	// eleventyConfig.addGlobalData('importmap', importmap);
-	// eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
+	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
 	eleventyConfig.addGlobalData('environment',
 		process.env.ELEVENTY_RUN_MODE === 'build'
 			? 'production'
