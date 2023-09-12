@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.2] - 2023-09-12
+
+### Changed
+- Switch to using `<firebase-*>` components for auth
+- Switch Firebase accounts
+- Use API & `.env` vars to keep API keys out of source
+- Use custom importmap
+- Update logos
+
+### Added
+- Create `/api/orgs` endpoint
+
 ## [v1.0.1] - 2023-08-01
 
 ### Fixed

@@ -1,4 +1,4 @@
-import { on } from '@shgysk8zer0/kazoo/dom.js';
+import { on, each } from '@shgysk8zer0/kazoo/dom.js';
 import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
 import { PNG } from '@shgysk8zer0/kazoo/types.js';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
@@ -205,7 +205,14 @@ on('#org-profile-form', 'submit', async event => {
 	}
 });
 
-registerSignOutButton('[data-action="sign-out"]');
+each('[data-action]', el => {
+	switch(el.dataset.action) {
+		case 'sign-out':
+			registerSignOutButton('[data-action="sign-out"]');
+			break;
+	}
+});
+
 document.querySelectorAll('.signed-out').forEach(el => disableOnSignIn(el));
 document.querySelectorAll('.signed-in').forEach(el => disableOnSignOut(el));
 
