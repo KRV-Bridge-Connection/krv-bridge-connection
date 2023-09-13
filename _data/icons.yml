@@ -17,6 +17,7 @@ alert: img/octicons/alert.svg
 clippy: img/octicons/clippy.svg
 sign-in: img/octicons/sign-in.svg
 sign-out: img/octicons/sign-out.svg
+sign-up: img/custom/sign-up.svg
 list-unordered: img/octicons/list-unordered.svg
 info: img/octicons/info.svg
 mark-location: img/adwaita-icons/actions/mark-location.svg

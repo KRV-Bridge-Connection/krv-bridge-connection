@@ -26,6 +26,21 @@ permalink: /_headers
   Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
   Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
 
+/.netlify/functions/*
+  Content-Security-Policy: default-src 'none'
+
+/api/*
+  Content-Security-Policy: default-src 'none'
+
+/js/*
+  Content-Security-Policy: default-src 'none'
+
+/css/*
+  Content-Security-Policy: default-src 'none'
+
+/img/*
+  Content-Security-Policy: default-src 'none'
+
 /reset
   Referrer-Policy: no-referrer
   Clear-Site-Data: "cache", "cookies", "storage"

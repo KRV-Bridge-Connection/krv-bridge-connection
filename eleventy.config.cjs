@@ -19,6 +19,10 @@ async function getCollection(name, db) {
 
 
 module.exports = function(eleventyConfig) {
+	const {
+		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
+		DEPLOY_URL,
+	} = process.env;
 	if (typeof process.env.FIREBASE_CERT !== 'string') {
 		throw new Error('Missing FIREBASE_CERT in `process.env');
 	} else if (firebase.apps.length === 0) {
@@ -85,6 +89,10 @@ module.exports = function(eleventyConfig) {
 
 	// {% if dev %}
 	eleventyConfig.addGlobalData('dev', process.env.ELEVENTY_RUN_MODE === 'build');
+	eleventyConfig.addGlobalData('env', {
+		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
+		DEPLOY_URL,
+	});
 
 	return {
 		dir: {
@@ -99,3 +107,4 @@ module.exports = function(eleventyConfig) {
 		}
 	};
 };
+
