@@ -19,7 +19,13 @@ export async function handler(event) {
 	if (! allowedOrigins.includes(origin)) {
 		return {
 			statusCode: 403,
-			body: JSON.stringify({ error: 'Forbidden' }),
+			body: JSON.stringify({
+				error: {
+					status: 403,
+					message: 'Forbidden',
+				}}),
+				NETLIFY_DEV:  process.env.NETLIFY_DEV,
+				PULL_REQUEST: process.env.PULL_REQUEST,
 		};
 	} else {
 		return {
