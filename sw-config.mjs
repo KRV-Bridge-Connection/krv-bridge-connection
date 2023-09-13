@@ -42,15 +42,14 @@ const config = {
 		'/css/index.min.css',
 		'{{ importmap.imports["@shgysk8zer0/components/"] }}weather/current.css',
 		'{{ importmap.imports["@shgysk8zer0/components/"] }}github/user.css',
-		'{{ importmap.imports["@shgysk8zer0/components/"] }}leaflet/map.css',
 
 		/* Images & Icons */
 		'/img/icons.svg',
 		'/img/apple-touch-icon.png',
 		'/img/icon-192.png',
 		'/img/favicon.svg',
-		'https://cdn.kernvalley.us/img/logos/firefox.svg',
-		'https://cdn.kernvalley.us/img/logos/chrome.svg',
+		// 'https://cdn.kernvalley.us/img/logos/firefox.svg',
+		// 'https://cdn.kernvalley.us/img/logos/chrome.svg',
 		'https://cdn.kernvalley.us/img/keep-kern-clean.svg',
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
@@ -58,7 +57,6 @@ const config = {
 
 		/* Fonts */
 		'https://cdn.kernvalley.us/fonts/roboto.woff2',
-		'https://cdn.kernvalley.us/fonts/rye.woff2',
 	].map(path => new URL(path, location.origin).href),
 	allowed: [
 		'https://www.google-analytics.com/analytics.js',
@@ -89,3 +87,4 @@ const config = {
 		'recent-posts': async () => await updateAssets(['{{ site.posts | map: "url" | join: "', '" }}']),
 	}
 };
+
