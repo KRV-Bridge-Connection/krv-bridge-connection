@@ -1,6 +1,5 @@
 /* eslint-env node */
 export async function handler(event) {
-	const isDevMode = process.env.NETLIFY_DEV === 'true' || process.env.PULL_REQUEST !== undefined;
 	const origin = new URL(event.headers.origin || event.headers.referer).origin;
 	const allowedOrigins = [
 		'https://krvbridge.org',
@@ -10,8 +9,7 @@ export async function handler(event) {
 	];
 
 	if (
-		isDevMode
-		&& (origin.endsWith('--beamish-halva-baf90b.netlify.app') || origin.endsWith('--beamish-halva-baf90b.netlify.live'))
+		origin.endsWith('--beamish-halva-baf90b.netlify.app') || origin.endsWith('--beamish-halva-baf90b.netlify.live')
 	) {
 		allowedOrigins.push(origin);
 	}
@@ -23,9 +21,7 @@ export async function handler(event) {
 				error: {
 					status: 403,
 					message: 'Forbidden',
-				}}),
-				NETLIFY_DEV:  process.env.NETLIFY_DEV,
-				PULL_REQUEST: process.env.PULL_REQUEST,
+				}})
 		};
 	} else {
 		return {
