@@ -1,5 +1,5 @@
 /* eslint-env node */
-exports.handler = async event => {
+export const handler = async event => {
 	const isDevMode = process.env.NETLIFY_DEV === 'true' || process.env.PULL_REQUEST !== undefined;
 	const origin = new URL(event.headers.origin || event.headers.referer).origin;
 	const allowedOrigins = [
