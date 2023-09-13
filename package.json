@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A GitHub template repo for projects using Eleventy & Netlify",
   "private": true,
   "type": "module",
@@ -68,7 +68,7 @@
   },
   "homepage": "https://krvbridge.org",
   "dependencies": {
-    "@shgysk8zer0/11ty-netlify": "^1.1.0",
+    "@shgysk8zer0/11ty-netlify": "^1.1.4",
     "firebase-admin": "^11.10.1"
   }
 }

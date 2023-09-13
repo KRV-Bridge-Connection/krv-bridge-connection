@@ -3,8 +3,10 @@
   base = "./"
   publish = "./_site"
   command = "npm run build && npm run build:site"
+  functions = "api"
 [dev]
   base = "./"
   publish = "./_site"
   command = "npm run serve:dev"
+  functions = "api"
   targetPort = 8080

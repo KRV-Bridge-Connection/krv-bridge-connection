@@ -6,6 +6,7 @@ import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
 import { importGa, externalHandler, telHandler, mailtoHandler } from '@shgysk8zer0/kazoo/google-analytics.js';
 // import { submitHandler } from './contact-demo.js';
 import { GA } from './consts.js';
+import { navigate } from './functions.js';
 import './components.js';
 import './user.js';
 import './admin.js';
@@ -48,6 +49,8 @@ Promise.all([
 	ready(),
 ]).then(([HTMLInstallPromptElement]) => {
 	init();
+
+	on('[data-navigate]', 'click', ({ currentTarget }) => navigate(currentTarget.dataset.navigate));
 
 	// if (location.pathname.startsWith('/contact')) {
 	// 	on('#contact-form', ['submit'], submitHandler);

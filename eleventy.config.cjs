@@ -4,7 +4,7 @@ const { load } = require('js-yaml');
 // const { readJSONFile } = require('@shgysk8zer0/npm-utils/json');
 const filters = require('@shgysk8zer0/11ty-filters');
 const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
-const { importmap } = require('@shgysk8zer0/importmap');
+// const { importmap } = require('@shgysk8zer0/importmap');
 const firebase = require('firebase-admin');
 const { Liquid } = require('liquidjs');
 
@@ -75,8 +75,8 @@ module.exports = function(eleventyConfig) {
 
 	// Set global data/variables
 	// {{ environment }} -> 'production' | 'development'
-	eleventyConfig.addGlobalData('importmap', importmap);
-	// eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
+	// eleventyConfig.addGlobalData('importmap', importmap);
+	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
 	eleventyConfig.addGlobalData('environment',
 		process.env.ELEVENTY_RUN_MODE === 'build'
 			? 'production'

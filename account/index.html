@@ -3,12 +3,18 @@ layout: default
 title: Account
 ---
 <div class="flex row wrap space-evenly user-nav">
-	<a href="/account/sign-in/" class="btn btn-primary btn-big">
+	<button data-navigate="/account/sign-in/" class="btn btn-primary btn-big signed-out" disabled="">
 		{% include "11ty-common/icon.html" icon: "sign-in" height: 18 width: 18 fill: "currentColor" %}
 		<span>Sign-In</span>
-	</a>
-	<a href="/account/sign-up/" class="btn btn-primary btn-big">
+	</button>
+	<button data-navigate="/account/sign-up/" class="btn btn-primary btn-big signed-out" disabled="">
 		{% include "11ty-common/icon.html" icon: "sign-in" height: 18 width: 18 fill: "currentColor" %}
 		<span>Sign-Up</span>
-	</a>
+	</button>
+	<button type="button" class="btn btn-reject btn-big sign-out" data-action="sign-out" disabled="">
+		{% include "11ty-common/icon.html" icon: "sign-out" height: 18 width: 18 fill: "currentColor" %}
+		<span class="btn-text">Sign-Out</span>
+	</button>
 </div>
+<!-- <firebase-email-link></firebase-email-link> -->
+<!-- <firebase-change-password></firebase-change-password> -->

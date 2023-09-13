@@ -1,12 +1,26 @@
-import { on } from '@shgysk8zer0/kazoo/dom.js';
+import { on, each } from '@shgysk8zer0/kazoo/dom.js';
 import { resizeImageFile } from '@shgysk8zer0/kazoo/img-utils.js';
 import { PNG } from '@shgysk8zer0/kazoo/types.js';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
+import { registerSignOutButton, disableOnSignOut, disableOnSignIn } from '@shgysk8zer0/components/firebase/auth/auth.js';
 import { createOrUpdateDoc } from './firebase/firestore.js';
-import { login } from './firebase/auth.js';
 import { uploadFile, getDownloadURL } from './firebase/storage.js';
+import { getCurrentUser } from './firebase/auth.js';
 import { navigate } from './functions.js';
 import './stepped-form.js';
+
+async function signIn() {
+	const user = await getCurrentUser();
+
+	if (typeof user === 'object' && ! Object.is(user, null)) {
+		return user;
+	} else {
+		const HTMLFirebaseSignInElement = await customElements.whenDefined('firebase-sign-in');
+		return await HTMLFirebaseSignInElement.asDialog();
+	}
+}
+
+const FIREBASE_FORMS = 'firebase-sign-in, firebase-sign-up, firebase-verify-email';
 
 function validateOrgData(org) {
 	return typeof org === 'object' && ! Object.is(null, org) && typeof org.createdBy === 'string';
@@ -151,48 +165,32 @@ on('[data-copy-hours]', 'click', ({ currentTarget }) => {
 	});
 });
 
+on(FIREBASE_FORMS, 'success', async ({ detail }) => {
+	console.log(detail);
+	const params = new URLSearchParams(location.search);
+
+	if (params.has('redirect')) {
+		navigate(params.get('redirect'));
+	} else {
+		navigate('/');
+	}
+});
+
+on(FIREBASE_FORMS,'abort', ({ target }) => {
+	if (target.dataset.hasOwnProperty('abortUrl')) {
+		navigate(target.dataset.abortUrl);
+	} else if (history.length > 1) {
+		history.back();
+	} else {
+		navigate('/');
+	}
+});
+
 on('#org-profile-form', 'submit', async event => {
 	event.preventDefault();
-	const dialog = document.getElementById('login-dialog');
-	const form = document.getElementById('login-dialog-form');
-	const controller = new AbortController();
-	const signal = controller.signal;
-
-	const { resolve, reject, promise } = Promise.withResolvers();
-
-	form.addEventListener('submit', async event => {
-		event.preventDefault();
-		const data = new FormData(event.target);
-
-		try {
-			const user = await login({
-				email: data.get('email'),
-				password: data.get('password'),
-			});
-
-			if (typeof user === 'object' && ! Object.is(user, null)) {
-				resolve(user);
-				dialog.close();
-			}
-		} catch(err) {
-			console.error(err);
-			const errMsg = document.querySelector('dialog[open] .status-box.error');
-			errMsg.textContent = err.message;
-			setTimeout(() => errMsg.textContent = '', 3000);
-		}
-	}, { signal });
-
-	form.addEventListener('reset', ({ target }) => {
-		const err = new Error('User cancelled login');
-		controller.abort(err);
-		reject(err);
-		target.closest('dialog').close();
-	}, { signal });
 
 	try {
-		dialog.showModal();
-		const user = await promise;
-		dialog.close();
+		const user = await signIn();
 		const org = await getOrgDataFromForm(event.target, user);
 
 		if (validateOrgData(org)) {
@@ -206,3 +204,43 @@ on('#org-profile-form', 'submit', async event => {
 		console.error(err);
 	}
 });
+
+each('[data-action]', el => {
+	switch(el.dataset.action) {
+		case 'sign-out':
+			registerSignOutButton('[data-action="sign-out"]');
+			break;
+	}
+});
+
+document.querySelectorAll('.signed-out').forEach(el => disableOnSignIn(el));
+document.querySelectorAll('.signed-in').forEach(el => disableOnSignOut(el));
+
+if (location.pathname === '/account/' && location.search.includes('mode=')) {
+	const params = new URLSearchParams(location.search);
+
+	switch(params.get('mode')) {
+		case 'resetPassword':
+			navigate('/account/verify-reset/', {
+				oobCode: params.get('oobCode'),
+				redirent: '/account/sign-in/',
+			});
+			break;
+
+		case 'verifyEmail':
+			navigate('/account/verify-email/', {
+				oobCode:  params.get('oobCode'),
+				redirect: '/account/sign-in/',
+			});
+			break;
+
+		case 'signIn':
+			customElements.whenDefined('firebase-email-link').then(async HTMLFirebaseEmailLinkElement => {
+				if (await HTMLFirebaseEmailLinkElement.verify()) {
+					const result = await HTMLFirebaseEmailLinkElement.signIn();
+					console.log(result);
+				}
+			});
+			break;
+	}
+}

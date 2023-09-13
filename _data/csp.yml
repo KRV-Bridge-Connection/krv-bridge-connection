@@ -21,6 +21,7 @@ default:
     - https://cdn.kernvalley.us/css/
     - https://unpkg.com/
     - https://fonts.googleapis.com/
+    - "blob:"
   frame-src:
     - https://www.youtube-nocookie.com
   img-src:
@@ -47,5 +48,6 @@ default:
     - https://www.google-analytics.com/
     - https://www.googletagmanager.com/gtag/
     - https://baconipsum.com/api/
+    - https://securetoken.googleapis.com/v1/
   form-action:
     - "'self'"

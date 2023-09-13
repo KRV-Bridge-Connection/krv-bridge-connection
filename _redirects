@@ -1,1 +1,2 @@
-#/.well-known/change-password	/forgot-password/	301!
+/.well-known/change-password	/account/forgot-password/	301!
+/api/* /.netlify/functions/:splat 200!
