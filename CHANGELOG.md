@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.3] - 2023-09-13
+
+### Added
+- Add shortcuts & icons to PWA
+
+### Fixed
+- Fix icon for sign-up on `/accounts/`
+
 ## [v1.0.2] - 2023-09-12
 
 ### Changed
