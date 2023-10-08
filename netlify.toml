@@ -10,3 +10,6 @@
   command = "npm run serve:dev"
   functions = "api"
   targetPort = 8080
+[functions]
+  external_node_modules = ["@shgysk8zer0/slack", "@shgysk8zer0/consts", "@shgysk8zer0/netlify-func-utils"]
+  node_bundler = "esbuild"
