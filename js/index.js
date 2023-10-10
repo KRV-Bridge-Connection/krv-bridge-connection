@@ -3,6 +3,7 @@ import { getGooglePolicy } from '@shgysk8zer0/kazoo/trust-policies.js';
 import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
+import { send } from '@shgysk8zer0/kazoo/slack.js';
 import { importGa, externalHandler, telHandler, mailtoHandler } from '@shgysk8zer0/kazoo/google-analytics.js';
 // import { submitHandler } from './contact-demo.js';
 import { GA } from './consts.js';
@@ -58,4 +59,27 @@ Promise.all([
 
 	on('#install-btn', ['click'], () => new HTMLInstallPromptElement().show())
 		.forEach(el => el.hidden = false);
+
+	if (location.pathname.startsWith('/contact/')) {
+		on('#contact-form', 'submit', async event => {
+			event.preventDefault();
+			const data = new FormData(event.target);
+
+			try {
+				const resp = await send('/api/slack', {
+					name: data.get('name'),
+					email: data.get('email'),
+					phone: data.get('telephone'),
+					subject: data.get('subject'),
+					body: data.get('body'),
+				});
+
+				if (resp.ok) {
+					//
+				}
+			} catch(err) {
+				console.error(err);
+			}
+		});
+	}
 });
