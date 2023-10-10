@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A GitHub template repo for projects using Eleventy & Netlify",
   "private": true,
   "type": "module",

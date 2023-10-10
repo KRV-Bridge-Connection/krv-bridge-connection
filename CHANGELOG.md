@@ -6,10 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v1.0.4] - 2023-10-07
+## [v1.0.4] - 2023-10-10
 
 ### Added
 - Add Slack for contact form
+
+### Changed
+- Rewrite API to use `@shgysk8zer0/netlify-func-utils`
+- Various updates to dependencies
+
+### Fixed
+- Misc updates to handle changes in Netlify Functions/AWS Lambda
 
 ## [v1.0.3] - 2023-09-13
 
