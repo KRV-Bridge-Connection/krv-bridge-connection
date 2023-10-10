@@ -71,7 +71,7 @@ Promise.all([
 					email: data.get('email'),
 					phone: data.get('telephone'),
 					subject: data.get('subject'),
-					message: data.get('message'),
+					body: data.get('body'),
 				});
 
 				if (resp.ok) {

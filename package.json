@@ -47,6 +47,7 @@
     "netlify:serve": "netlify dev",
     "netlify:live": "netlify dev --live",
     "netlify:link": "netlify link",
+    "netlify:functions": "netlify functions:serve",
     "version:bump": "npm run version:bump:patch",
     "version:bump:patch": "npm version --no-git-tag-version patch",
     "version:bump:minor": "npm version --no-git-tag-version minor",
