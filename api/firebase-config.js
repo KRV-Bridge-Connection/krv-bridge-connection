@@ -27,9 +27,9 @@ function allowedOrigin(url) {
 
 export const handler = createHandler({
 	get: async req => {
-		if (typeof req.referrer !== 'string' || req.headers.has('Referer')) {
+		if (typeof req.referrer !== 'string' || req.headers.has('Origin')) {
 			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
-		} else if (! allowedOrigin(req.headers.get('Origin') || req.referrer)) {
+		} else if (! allowedOrigin(req.referrer || req.headers.get('Origin'))) {
 			throw new HTTPError('Not allowed', { status: FORBIDDEN });
 		} else {
 			return Response.json({
