@@ -1,14 +1,14 @@
 ---
 imports:
+  '@shgysk8zer0/consts/': https://unpkg.com/@shgysk8zer0/consts@1.0.7/
   '@shgysk8zer0/kazoo/': https://unpkg.com/@shgysk8zer0/kazoo@0.2.3/
-  '@shgysk8zer0/konami': https://unpkg.com/@shgysk8zer0/konami@1.1.0/konami.js
+  '@shgysk8zer0/konami': https://unpkg.com/@shgysk8zer0/konami@1.1.1/konami.js
   '@shgysk8zer0/polyfills': https://unpkg.com/@shgysk8zer0/polyfills@0.2.4/all.min.js
   '@shgysk8zer0/polyfills/': https://unpkg.com/@shgysk8zer0/polyfills@0.2.4/
   '@shgysk8zer0/jswaggersheets': https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/swagger.js
   '@shgysk8zer0/jswaggersheets/': https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/
   '@shgysk8zer0/jss/': https://unpkg.com/@shgysk8zer0/jss@1.0.1/
   '@shgysk8zer0/http-status': https://unpkg.com/@shgysk8zer0/http-status@1.1.1/http-status.js
-  '@shgysk8zer0/consts/': https://unpkg.com/@shgysk8zer0/consts@1.0.7/
   '@shgysk8zer0/components/': https://unpkg.com/@shgysk8zer0/components@0.1.4/
   '@kernvalley/components/': https://unpkg.com/@kernvalley/components@1.1.0/
   '@webcomponents/custom-elements': >-
@@ -18,6 +18,6 @@ imports:
   urlpattern-polyfill: https://unpkg.com/urlpattern-polyfill@9.0.0/index.js
   highlight.js: https://unpkg.com/@highlightjs/cdn-assets@11.8.0/es/highlight.min.js
   highlight.js/: https://unpkg.com/@highlightjs/cdn-assets@11.8.0/
-  marked: https://unpkg.com/marked@5.1.0/src/marked.js
-  marked-highlight: https://unpkg.com/marked-highlight@2.0.1/src/index.js
+  marked: https://unpkg.com/marked@9.0.3/lib/marked.esm.js
+  marked-highlight: https://unpkg.com/marked-highlight@2.0.6/src/index.js
 scope: {}
