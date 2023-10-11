@@ -123,25 +123,25 @@ shortcuts:
     - src: /img/shortcuts/about-36.png
       sizes: 36x36
       type: image/png
-# share_target:
-#   name: Contact Page
-#   action: "/contact/"
-#   enctype: application/x-www-form-urlencoded
-#   method: GET
-#   params:
-#     title: subject
-#     text: body
-# iarc_rating_id:
+share_target:
+  name: Contact Page
+  action: "/contact/"
+  enctype: application/x-www-form-urlencoded
+  method: GET
+  params:
+    title: subject
+    text: body
+iarc_rating_id: dd768f7f-8541-4555-a447-f07338b2d4aa
 related_applications:
   - platform: webapp
     url: /webapp.webmanifest
   - platform: play
-    id: "#"
-    url: "#"
-  - platform: itunes
-    url: "#"
-  - platform: windows
-    url: "#"
+    id: "org.krvbridge.twa"
+    url: "https://play.google.com/store/apps/details?id=org.krvbridge.twa"
+  # - platform: itunes
+  #   url: "#"
+  # - platform: windows
+  #   url: "#"
 features:
   - PWA-ready GitHub template for Jekyll sites
   - Dark mode support, controlled by (prefers-color-scheme) media query
