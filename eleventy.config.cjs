@@ -10,11 +10,7 @@ const { Liquid } = require('liquidjs');
 
 async function getCollection(name, db) {
 	const snapshot = await db.collection(name).get();
-	const items = [];
-
-	snapshot.forEach(doc => items.push(doc.data()));
-
-	return items;
+	return snapshot.docs.map(doc => doc.data());
 }
 
 
@@ -68,6 +64,7 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addPassthroughCopy('js');
 	eleventyConfig.addPassthroughCopy('css');
 	eleventyConfig.addPassthroughCopy('img');
+	eleventyConfig.addPassthroughCopy('.well-known');
 	eleventyConfig.addPassthroughCopy('_redirects');
 	eleventyConfig.addPassthroughCopy('robots.txt');
 
