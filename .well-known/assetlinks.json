@@ -1,0 +1,17 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.krvbridge.twa",
+    "sha256_cert_fingerprints": [
+      "62:10:FF:7F:0B:5A:AC:0B:1B:94:68:E5:F8:3E:7D:A8:9B:01:71:D0:FD:06:CD:CF:F5:91:9C:44:6A:42:87:1A",
+      "E3:A4:CB:C2:32:A5:22:D8:38:94:98:4D:EA:25:44:B3:FE:8A:4F:82:49:9B:F0:D9:78:88:7C:4A:5B:B3:AB:39"
+    ]
+  }
+}, {
+  "relation": ["delegate_permission/common.query_webapk"],
+  "target": {
+    "namespace": "web",
+    "site": "https://krvbridge.org/webapp.webmanifest"
+  }
+}]
