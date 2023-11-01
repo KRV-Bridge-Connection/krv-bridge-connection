@@ -5,6 +5,9 @@ nav:
   - label: Resources
     icon: list-unordered
     href: /resources/
+  - label: Posts
+    icon: comment-discussion
+    href: /posts/
   - label: About
     icon: info
     href: /about/

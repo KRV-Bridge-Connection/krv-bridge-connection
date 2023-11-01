@@ -41,7 +41,8 @@ issue-opened: img/octicons/issue-opened.svg
 link: img/octicons/link.svg
 link-external: img/octicons/link-external.svg
 chevron-down: img/octicons/chevron-down.svg
-comment: img/octicons/clippy.svg
+comment: img/octicons/comment.svg
+comment-discussion: img/octicons/comment-discussion.svg
 inbox: img/octicons/inbox.svg
 creative-commons-by-sa: img/logos/creative-commons-by-sa.svg
 x: img/octicons/x.svg
