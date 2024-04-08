@@ -3,11 +3,11 @@
 	<br />
 	<krv-events></krv-events>
 	{% if pinned-posts %}{% include "11ty-articles/pinned-posts.html" count: layout.pinned-posts %}{% endif %}
-	{% if page.ads %}{% for ad in page.ads %}
-		{% include "11ty-common/krv-ad.html" ad: ad content: "sidebar" %}
-	{% endfor %}{% endif %}
-	{% for ad in ads.sidebar %}
-		{% include "11ty-common/krv-ad.html" ad: ad content: "sidebar" %}
-	{% endfor %}
+	<!-- {% if page.ads %}{% for ad in page.ads %} -->
+	<!-- 	{% include "11ty-common/krv-ad.html" ad: ad content: "sidebar" %} -->
+	<!-- {% endfor %}{% endif %} -->
+	<!-- {% for ad in ads.sidebar %} -->
+	<!-- 	{% include "11ty-common/krv-ad.html" ad: ad content: "sidebar" %} -->
+	<!-- {% endfor %} -->
 	{% if recent-posts %}{% include "11ty-articles/recent-posts.html" count: layout.recent-posts %}{% endif %}
 </aside>

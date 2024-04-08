@@ -8,9 +8,11 @@ default:
     - "'self'"
     - https://unpkg.com/@shgysk8zer0/
     - https://unpkg.com/@kernvalley/
+    - https://unpkg.com/@aegisjsproject/
     - https://www.gstatic.com/firebasejs/
     - https://www.google-analytics.com
     - https://www.googletagmanager.com
+    # - 'sha384-EVq1LMVQNMkiiV0Em73daPJL0Y46yGrApmwqwSHLXMf2h351MrAN7XtJ5S1BFM6z'
   manifest-src:
     - "'self'"
   worker-src:

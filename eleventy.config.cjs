@@ -4,15 +4,18 @@ const { load } = require('js-yaml');
 // const { readJSONFile } = require('@shgysk8zer0/npm-utils/json');
 const filters = require('@shgysk8zer0/11ty-filters');
 const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
-// const { importmap } = require('@shgysk8zer0/importmap');
+const { importmap } = require('@shgysk8zer0/importmap');
 const firebase = require('firebase-admin');
 const { Liquid } = require('liquidjs');
+
+if (process.env.ELEVENTY_SOURCE === 'cli'  && ! ('FIREBASE_CERT' in process.env)) {
+	require('dotenv').config();
+}
 
 async function getCollection(name, db) {
 	const snapshot = await db.collection(name).get();
 	return snapshot.docs.map(doc => doc.data());
 }
-
 
 module.exports = function(eleventyConfig) {
 	const {
@@ -68,7 +71,7 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addPassthroughCopy('_redirects');
 	eleventyConfig.addPassthroughCopy('robots.txt');
 
-	// Not including file extensions is slower, so alias theme
+	// Not including file extensions is slower, so alias them
 	eleventyConfig.addLayoutAlias('post', '11ty-layouts/post.html');
 	eleventyConfig.addLayoutAlias('default', '11ty-layouts/default.html');
 
@@ -76,8 +79,8 @@ module.exports = function(eleventyConfig) {
 
 	// Set global data/variables
 	// {{ environment }} -> 'production' | 'development'
-	// eleventyConfig.addGlobalData('importmap', importmap);
 	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
+	eleventyConfig.addGlobalData('importmap', importmap);
 	eleventyConfig.addGlobalData('environment',
 		process.env.ELEVENTY_RUN_MODE === 'build'
 			? 'production'

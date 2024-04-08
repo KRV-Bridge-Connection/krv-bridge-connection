@@ -2,6 +2,7 @@
 layout: directory.html
 title: Resource
 ---
+<script type="application/json" id="list">{{ firebase-orgs | jsonify }}</script>
 <div class="grid card-list">
 	{% for category in categories %}
 		<a class="card inline-block shadow color-inherit center" href="/resources/{{ category[0] | slugify }}/">

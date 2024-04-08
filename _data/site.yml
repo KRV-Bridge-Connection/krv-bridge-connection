@@ -12,4 +12,4 @@ og-type: 'website'
 base: '/'
 manifest: '/webapp.webmanifest'
 service_worker: '/service-worker.js'
-keep-kern-clean: true
+keep-kern-clean: false
