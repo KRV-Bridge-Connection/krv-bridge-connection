@@ -69,7 +69,7 @@
   },
   "homepage": "https://krvbridge.org",
   "dependencies": {
-    "@shgysk8zer0/11ty-netlify": "^1.1.4",
+    "@shgysk8zer0/11ty-netlify": "^1.1.7",
     "@shgysk8zer0/netlify-func-utils": "^1.0.3",
     "@shgysk8zer0/slack": "^0.0.5",
     "firebase-admin": "^12.0.0"
