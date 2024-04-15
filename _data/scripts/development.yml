@@ -2,13 +2,8 @@
 - src: '@shgysk8zer0/polyfills'
   crossOrigin: anonymous
   referrerPolicy: no-referrer
-  integrity: sha384-CjIJ66gyWso3qhYfO5C5XoJ8xGecllSUxI0IrVqzJnDZNT7+IN7fh3xfKnnwgORo
+  # integrity: sha384-CjIJ66gyWso3qhYfO5C5XoJ8xGecllSUxI0IrVqzJnDZNT7+IN7fh3xfKnnwgORo
   defer: true
-# - src: '@shgysk8zer0/kazoo/harden.js'
-#   crossOrigin: anonymous
-#   referrerPolicy: no-referrer
-#   integrity: sha384-55L/wO9o0uIVTeubRIDQB4bewfNqyxrj4OXuxlW24NMEk+ioZwMHVw/tFV78mM+k
-#   defer: true
 - src: ./js/index.js
   type: module
   referrerPolicy: no-referrer
