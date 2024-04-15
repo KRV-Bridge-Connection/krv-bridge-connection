@@ -13,16 +13,18 @@ const rules = {
 	'no-unused-vars': 'error',
 };
 
+const ignores = [
+	'node_modules/',
+	'.netlify/',
+	'_site/',
+	'**/*.min.js',
+	'*.min.js',
+];
+
 export default [
+	{ ignores },
 	{
-		ignores: [
-			'node_modules/',
-			'.netlify/',
-			'_site/',
-			'**/*.min.js',
-			'*.min.js',
-		],
-	}, {
+		ignores: [...ignores, 'api/'],
 		plugins: { frontmatter2: frontmatter },
 		processor: 'frontmatter2/frontmatter',
 		files: ['*.js', '**/*.js', '*.mjs', '**/*.mjs'],
@@ -39,11 +41,11 @@ export default [
 				cookieStore: 'readonly',
 				scheduler: 'readonly',
 				PasswordCredential: 'readonly',
-				process: 'readonly',
 				...globals.browser,
 			}
 		}
 	}, {
+		ignores,
 		files: ['api/*.cjs','api/*.js', 'api/**/*.cjs', 'api/**/*.js'],
 		rules,
 		languageOptions: {
