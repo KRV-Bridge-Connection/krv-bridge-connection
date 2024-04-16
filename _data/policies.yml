@@ -1,6 +1,8 @@
 trusted:
-  - ga#script-url
-  - goog#html
+  # - default
+  # - ga#script-url
+  # - goog#html
+  - goog-cal#script-url
   - aegis-sanitizer#html
   - pwa-install
 
