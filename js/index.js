@@ -63,8 +63,10 @@ Promise.all([
 	if (location.pathname.startsWith('/contact/')) {
 		on('#contact-form', 'submit', async event => {
 			event.preventDefault();
-			const data = new FormData(event.target);
+			const target = event.target;
+			const data = new FormData(target);
 
+			const HTMLNotification = customElements.get('html-notification');
 			try {
 				const resp = await send('/api/slack', {
 					name: data.get('name'),
@@ -74,11 +76,41 @@ Promise.all([
 					body: data.get('body'),
 				});
 
-				if (resp.ok) {
-					//
+				console.log(resp);
+
+				if (resp.success) {
+					const notification = new HTMLNotification('Message Sent!', {
+						body: 'Your message has been sent.',
+						icon: '/img/icon-32.png',
+						requireInteraction: true,
+						actions: [
+							{ title: 'Go to Home Page', action: 'home' },
+							{ title: 'Dismiss', action: 'dismiss' },
+						]
+					});
+
+					notification.addEventListener('notificationclick', event => {
+						switch(event.action) {
+							case 'dismiss':
+								event.target.close();
+								target.reset();
+								break;
+
+							case 'home':
+								location.href = '/';
+								break;
+						}
+					});
+
+					target.reset();
+				} else {
+					throw new Error('Message not sent.');
 				}
 			} catch(err) {
 				console.error(err);
+				new HTMLNotification('Error Sending Message', {
+					body: err.message,
+				});
 			}
 		});
 	}
