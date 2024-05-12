@@ -60,6 +60,7 @@ export async function login({
 
 export async function logout() {
 	const auth = await getFirebaseAuth();
+	await cookieStore.delete({ name: 'token', path:'/api/' });
 	return signOut(auth);
 }
 
