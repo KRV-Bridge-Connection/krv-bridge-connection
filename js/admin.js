@@ -176,7 +176,7 @@ on(FIREBASE_FORMS, 'success', async ({ detail }) => {
 	}
 });
 
-on(FIREBASE_FORMS,'abort', ({ target }) => {
+on(FIREBASE_FORMS, 'abort', ({ target }) => {
 	if (target.dataset.hasOwnProperty('abortUrl')) {
 		navigate(target.dataset.abortUrl);
 	} else if (history.length > 1) {

@@ -55,6 +55,7 @@ module.exports = function(eleventyConfig) {
 		return string.startsWith(prefix);
 	});
 	eleventyConfig.addFilter('time', input => new Date(`2000-01-01T${input}`).toLocaleTimeString());
+	eleventyConfig.addFilter('iso_date', input => input instanceof Date ? input.toISOString() : new Date(input).toISOStrin());
 	eleventyConfig.addFilter('is_icon', list => {
 		return JSON.stringify(list.filter(icon => typeof icon.purpose === 'string'));
 	});
