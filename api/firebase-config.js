@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = [
 const ALLOWED_DOMAIN_SUFFIXES = [
 	'--beamish-halva-baf90b.netlify.app',
 	'--beamish-halva-baf90b.netlify.live',
-	'.krvbridge.org', // Allows from any subdomain
+	'.krvbridge.org', // Allows from any subdomains
 ];
 
 if (typeof process.env.BASE_URL === 'string') {
@@ -29,7 +29,7 @@ export const handler = createHandler({
 	get: async req => {
 		if (typeof req.referrer !== 'string' || req.headers.has('Origin')) {
 			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
-		} else if (! allowedOrigin(req.referrer || req.headers.get('Origin'))) {
+		} else if (!allowedOrigin(req.referrer || req.headers.get('Origin'))) {
 			throw new HTTPError('Not allowed', { status: FORBIDDEN });
 		} else {
 			return Response.json({
