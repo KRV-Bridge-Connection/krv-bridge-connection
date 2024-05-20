@@ -17,7 +17,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
-        cache: npm
+        # `cache: npm` seems to require a `package-lock.json` file
+        cache: none
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
