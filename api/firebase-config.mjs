@@ -1,7 +1,5 @@
 /* eslint-env node */
 
-import { readFile } from 'node:fs/promises';
-
 const ALLOWED_ORIGINS = [
 	'https://krvbridge.org',
 	'https://www.krvbridge.org',
@@ -25,12 +23,11 @@ function allowedOrigin(url) {
 }
 
 /**
- * @param {Request} req
+ * @param {Request} req;
  * @returns {Promise<Response>}
  */
 export default async req => {
 	try {
-		console.log(typeof readFile);
 		if (req.method !== 'GET') {
 			throw new Error(`Method ${req.method} not supported.`, { status: 501 });
 		} else if (! req.headers.has('Referer')) {
