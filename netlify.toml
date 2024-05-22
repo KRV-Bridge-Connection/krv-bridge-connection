@@ -2,7 +2,7 @@
 [build]
   base = "./"
   publish = "./_site"
-  command = "npm run build && npm run build:site"
+  command = "npm run build && npm run build:site && ls node_modules/@shgysk8zer0/http/"
   functions = "api"
 [dev]
   base = "./"
