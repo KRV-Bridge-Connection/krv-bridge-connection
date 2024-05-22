@@ -10,3 +10,5 @@
   command = "npm run serve:dev"
   functions = "api"
   targetPort = 8080
+[functions]
+  node_bundler = "esbuild"
