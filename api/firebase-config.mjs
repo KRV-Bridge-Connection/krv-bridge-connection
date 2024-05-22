@@ -1,5 +1,8 @@
 /* eslint-env node */
 
+import { FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED } from '@shgysk8zer0/consts/status.js';
+import { HTTPError } from '@shgysk8zer0/http/error.js';
+
 const ALLOWED_ORIGINS = [
 	'https://krvbridge.org',
 	'https://www.krvbridge.org',
@@ -29,13 +32,13 @@ function allowedOrigin(url) {
 export default async req => {
 	try {
 		if (req.method !== 'GET') {
-			throw new Error(`Method ${req.method} not supported.`, { status: 501 });
+			throw new HTTPError(`Method ${req.method} not supported.`, { status: NOT_IMPLEMENTED });
 		} else if (! req.headers.has('Referer')) {
-			throw new Error('Not allowed.', { status: 403 });
+			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
 		} else if (! allowedOrigin(req.headers.get('Referer'))) {
-			throw new Error('Not allowed.', { status: 403 });
+			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
 		} else if (! ('process' in globalThis)) {
-			throw new Error('`process` is not defined.');
+			throw new HTTPError('`process` is not defined.');
 		} else {
 			return Response.json({
 				apiKey: globalThis.process.env.FIREBASE_API_KEY,
@@ -49,13 +52,25 @@ export default async req => {
 			});
 		}
 	} catch(err) {
-		return Response.json({
-			error: {
-				message: err.message,
-				status: 500,
-			}
-		}, {
-			status: 500,
-		});
+		if (err instanceof HTTPError) {
+			return Response.json({
+				error: {
+					message: err.message,
+					status: err.status,
+				}
+			}, {
+				status: err.status,
+				headers: err.status === NOT_IMPLEMENTED ? new Headers({ Allow: 'GET' }) :  undefined,
+			});
+		} else {
+			return Response.json({
+				error: {
+					message: 'An unknown error occurred',
+					status: INTERNAL_SERVER_ERROR,
+				}
+			}, {
+				status: INTERNAL_SERVER_ERROR,
+			});
+		}
 	}
 };
