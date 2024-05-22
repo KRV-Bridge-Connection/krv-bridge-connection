@@ -1,7 +1,7 @@
 /* eslint-env node */
 
-import { FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED } from '@shgysk8zer0/consts/status.js';
-import { HTTPError } from '@shgysk8zer0/http/error.js';
+import { FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED } from '@shgysk8zer0/consts/status';
+import { HTTPError } from '@shgysk8zer0/http/error';
 
 const ALLOWED_ORIGINS = [
 	'https://krvbridge.org',
