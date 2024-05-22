@@ -15,8 +15,8 @@ const ALLOWED_DOMAIN_SUFFIXES = [
 	'.krvbridge.org', // Allows from any subdomains
 ];
 
-if (typeof process.env.BASE_URL === 'string') {
-	ALLOWED_ORIGINS.push(new URL(process.env.BASE_URL).origin);
+if (typeof globalThis.process.env.BASE_URL === 'string') {
+	ALLOWED_ORIGINS.push(new URL(globalThis.process.env.BASE_URL).origin);
 }
 
 function allowedOrigin(url) {
@@ -37,15 +37,17 @@ export default async req => {
 			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
 		} else if (! allowedOrigin(req.headers.get('Referer'))) {
 			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
+		} else if (! ('process' in globalThis)) {
+			throw new HTTPError('`process` is not defined.');
 		} else {
 			return Response.json({
-				apiKey: process.env.FIREBASE_API_KEY,
-				authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-				projectId: process.env.FIREBASE_PROJECT_ID,
-				storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-				messagingSenderId: process.env.FIREBASE_MESSAGE_SENDER_ID,
-				appId: process.env.FIREBASE_APP_ID,
-				measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+				apiKey: globalThis.process.env.FIREBASE_API_KEY,
+				authDomain: globalThis.process.env.FIREBASE_AUTH_DOMAIN,
+				projectId: globalThis.process.env.FIREBASE_PROJECT_ID,
+				storageBucket: globalThis.process.env.FIREBASE_STORAGE_BUCKET,
+				messagingSenderId: globalThis.process.env.FIREBASE_MESSAGE_SENDER_ID,
+				appId: globalThis.process.env.FIREBASE_APP_ID,
+				measurementId: globalThis.process.env.FIREBASE_MEASUREMENT_ID,
 				// Add other Firebase configuration properties as needed
 			});
 		}
@@ -68,7 +70,7 @@ export default async req => {
 				}
 			}, {
 				status: INTERNAL_SERVER_ERROR,
-			})
+			});
 		}
 	}
-}
+};
