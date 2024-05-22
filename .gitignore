@@ -1,5 +1,6 @@
 src
 # Avoids cross-platform dependency issues... But still a bad idea (https://github.com/npm/cli/issues/4828)
+package-lock.json
 _site/*
 *.min.*
 *.map
