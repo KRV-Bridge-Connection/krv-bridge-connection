@@ -60,7 +60,7 @@ export default async req => {
 				}
 			}, {
 				status: err.status,
-				headers: new Headers({ Allow: 'GET' }),
+				headers: err.status === NOT_IMPLEMENTED ? new Headers({ Allow: 'GET' }) :  undefined,
 			});
 		} else {
 			return Response.json({
