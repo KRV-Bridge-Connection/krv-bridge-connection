@@ -1,7 +1,7 @@
 /* eslint-env node */
-import { createHandler } from '@shgysk8zer0/netlify-func-utils/crud.js';
+
 import { HTTPError } from '@shgysk8zer0/http/error.js';
-import { FORBIDDEN } from '@shgysk8zer0/consts/status.js';
+import { FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_IMPLEMENTED } from '@shgysk8zer0/consts/status.js';
 
 const ALLOWED_ORIGINS = [
 	'https://krvbridge.org',
@@ -25,12 +25,18 @@ function allowedOrigin(url) {
 		|| ALLOWED_DOMAIN_SUFFIXES.some(suff => origin.endsWith(suff));
 }
 
-export const handler = createHandler({
-	get: async req => {
-		if (typeof req.referrer !== 'string' || req.headers.has('Origin')) {
+/**
+ * @param {Request} req;
+ * @returns {Promise<Response>}
+ */
+export default async req => {
+	try {
+		if (req.method !== 'GET') {
+			throw new HTTPError(`Method ${req.method} not supported.`, { status: NOT_IMPLEMENTED });
+		} else if (! req.headers.has('Referer')) {
 			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
-		} else if (!allowedOrigin(req.referrer || req.headers.get('Origin'))) {
-			throw new HTTPError('Not allowed', { status: FORBIDDEN });
+		} else if (! allowedOrigin(req.headers.get('Referer'))) {
+			throw new HTTPError('Not allowed.', { status: FORBIDDEN });
 		} else {
 			return Response.json({
 				apiKey: process.env.FIREBASE_API_KEY,
@@ -43,5 +49,26 @@ export const handler = createHandler({
 				// Add other Firebase configuration properties as needed
 			});
 		}
+	} catch(err) {
+		if (err instanceof HTTPError) {
+			return Response.json({
+				error: {
+					message: err.message,
+					status: err.status,
+				}
+			}, {
+				status: err.status,
+				headers: new Headers({ Allow: 'GET' }),
+			});
+		} else {
+			return Response.json({
+				error: {
+					message: 'An unknown error occurred',
+					status: INTERNAL_SERVER_ERROR,
+				}
+			}, {
+				status: INTERNAL_SERVER_ERROR,
+			})
+		}
 	}
-});
+}
