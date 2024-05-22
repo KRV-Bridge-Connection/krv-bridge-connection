@@ -2,7 +2,7 @@
 [build]
   base = "./"
   publish = "./_site"
-  command = "npm run build && npm run build:site && ls node_modules/@shgysk8zer0/http/"
+  command = "npm run build && npm run build:site"
   functions = "api"
 [dev]
   base = "./"
@@ -11,5 +11,6 @@
   functions = "api"
   targetPort = 8080
 [functions]
-  external_node_modules = ["@shgysk8zer0/slack", "@shgysk8zer0/consts", "@shgysk8zer0/netlify-func-utils", "@shgysk8zer0/http"]
+  # external_node_modules = ["@shgysk8zer0/slack", "@shgysk8zer0/consts", "@shgysk8zer0/netlify-func-utils", "@shgysk8zer0/http"]
+  external_node_modules = ['*']
   node_bundler = "esbuild"
