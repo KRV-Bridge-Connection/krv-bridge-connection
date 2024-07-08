@@ -1,2 +1,3 @@
 /.well-known/change-password	/account/forgot-password/	301!
 /api/* /.netlify/functions/:splat 200!
+/banner-qr/ https://www.facebook.com/krvbridgeconnection
