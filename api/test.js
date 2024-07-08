@@ -14,7 +14,7 @@ async function getBody(req) {
 				return await req.text();
 
 			default:
-				return new Blob(await req.arrayBuffer(), { type: req.headers.get('Content-Type') });
+				return new Blob([await req.arrayBuffer()], { type: req.headers.get('Content-Type') });
 		}
 	} else {
 		return null;
