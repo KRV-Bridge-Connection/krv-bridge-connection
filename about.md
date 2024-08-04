@@ -36,3 +36,5 @@ The success of KRV Bridge Connection largely depends on the generosity and suppo
 2. **Volunteering:** Join our team of dedicated volunteers and make a tangible difference in the lives of those facing challenges.
 
 3. **Spread the Word:** Help us reach a wider audience by sharing our web app and mission on social media and among friends and family.
+
+<section>{% include "11ty-common/faq.html" %}</section>
