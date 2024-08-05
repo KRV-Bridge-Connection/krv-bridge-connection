@@ -18,23 +18,9 @@ nav:
     icon: avatar-default
     href: /account/
 footer:
-  - label: KernValley.US
-    href: https://kernvalley.us
-    icon: web-browser
-    rel:
-      - noopener
-      - nofererrer
-      - external
   - label: Contact
-    href: https://contact.kernvalley.us
+    href: /contact/
     icon: address-book
-    rel:
-      - noopener
-      - nofererrer
-      - external
-  - label: All Apps
-    href: https://apps.kernvalley.us
-    icon: apps
     rel:
       - noopener
       - nofererrer

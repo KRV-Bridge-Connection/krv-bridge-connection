@@ -1,4 +1,5 @@
 /* eslint-env node */
+
 import { HTTPError } from '@shgysk8zer0/http/error.js';
 import { createHandler } from '@shgysk8zer0/netlify-func-utils/crud.js';
 import { BAD_REQUEST, NOT_FOUND, NOT_IMPLEMENTED, NO_CONTENT, UNAUTHORIZED, OK } from '@shgysk8zer0/consts/status.js';

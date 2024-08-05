@@ -1,0 +1,5 @@
+[{%- for post in collections[category] -%}{
+  "title": {{ post.data.title | jsonify }},
+  "url": "{{ post.page.url }}",
+  "date": "{{ post.page.date | iso_date }}",
+}{% unless forloop.last %}, {% endunless %}{%- endfor -%}]

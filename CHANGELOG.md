@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -6,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.5] - 2024-08-04
+
 ### Added
 - Add IARC Rating and Play Store URL/id
 - Enable `share_target`
 - Create Privacy Policy Page
 - Add `assetlinks.json`
+
+### Changed
+- Update importmap
+- Misc info updates
 
 ## [v1.0.4] - 2023-10-10
 

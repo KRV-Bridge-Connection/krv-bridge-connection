@@ -1,7 +1,7 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.0.4",
-  "description": "A GitHub template repo for projects using Eleventy & Netlify",
+  "version": "1.0.5",
+  "description": "Bringing multiple nonprofit services into the KRV",
   "private": true,
   "type": "module",
   "config": {
@@ -29,11 +29,11 @@
     "git:fetch": "git fetch --prune --tags",
     "git:submodules": "git submodule update --init --recursive",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:js": "eslint . --ext .js,.cjs,.mjs",
+    "lint:js": "eslint .",
     "lint:css": "stylelint ${npm_package_config_dir_css}**.css",
     "lint:html": "htmlhint ${npm_package_config_dir_html}",
     "fix:css": "stylelint ${npm_package_config_dir_css}**.css --fix",
-    "fix:js": "eslint. --fix --ext .js,.cjs,.mjs",
+    "fix:js": "eslint . --fix --ext .js,.cjs,.mjs",
     "build": "npm run build:icons && npm run build:css && npm run build:js",
     "build:site": "npx @11ty/eleventy",
     "build:site:dev": "npx @11ty/eleventy --serve",
@@ -69,9 +69,15 @@
   },
   "homepage": "https://krvbridge.org",
   "dependencies": {
-    "@shgysk8zer0/11ty-netlify": "^1.1.7",
-    "@shgysk8zer0/netlify-func-utils": "^1.0.3",
+    "@shgysk8zer0/11ty-netlify": "^1.1.22",
+    "@shgysk8zer0/importmap": "^1.4.2",
+    "@shgysk8zer0/lambda-http": "^1.0.2",
+    "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.5",
     "firebase-admin": "^12.3.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "eslint-plugin-frontmatter2": "^1.0.0"
   }
 }

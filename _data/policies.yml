@@ -1,16 +1,8 @@
 trusted:
   # - default
-  - empty#html
-  - empty#script
-  - ga#script-url
-  - goog#html
-  - sanitizer-raw#html
-  # - purify-raw#html
-  # - purify#html
-  # - weather-current#html
-  - krv-events#html
-  - weather-current#html
-  - github-user#html
-  - share-to-buttons#html
+  # - ga#script-url
+  # - goog#html
+  - goog-cal#script-url
+  - aegis-sanitizer#html
   - pwa-install
 

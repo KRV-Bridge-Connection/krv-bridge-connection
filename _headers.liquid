@@ -9,7 +9,6 @@ permalink: /_headers
   X-XSS-Protection: 1; mode=block
   Link: <https://fonts.gstatic.com>; rel=preconnect; crossorigin=anonymous;
   Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
-  Link: <{{ importmap.imports['@shgysk8zer0/kazoo/'] }}harden.js>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
   Link: </js/index.min.js>; rel=preload; as=script; referrerpolicy=no-referrer;
   Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
   Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
@@ -21,7 +20,6 @@ permalink: /_headers
   X-XSS-Protection: 1; mode=block
   Link: <https://fonts.gstatic.com>; rel=preconnect; crossorigin=anonymous;
   Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
-  Link: <{{ importmap.imports['@shgysk8zer0/kazoo/'] }}harden.js>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
   Link: </js/index.min.js>; rel=preload; as=script; referrerpolicy=no-referrer;
   Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
   Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
@@ -39,6 +37,7 @@ permalink: /_headers
   Content-Security-Policy: default-src 'none'
 
 /img/*
+  Access-Control-Allow-Origin: *
   Content-Security-Policy: default-src 'none'
 
 /reset

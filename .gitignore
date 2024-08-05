@@ -1,4 +1,5 @@
 src
+# Avoids cross-platform dependency issues... But still a bad idea (https://github.com/npm/cli/issues/4828)
 _site/*
 *.min.*
 *.map
@@ -138,3 +139,4 @@ dist
 
 # Local Netlify folder
 .netlify
+.DS_Store
