@@ -1,7 +1,7 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.0.4",
-  "description": "A GitHub template repo for projects using Eleventy & Netlify",
+  "version": "1.0.5",
+  "description": "Bringing multiple nonprofit services into the KRV",
   "private": true,
   "type": "module",
   "config": {

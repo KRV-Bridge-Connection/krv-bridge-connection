@@ -15,7 +15,7 @@ At KRV Bridge Connection, our mission is to bridge the gap between those who req
 
 Through our user-friendly web app, we strive to connect individuals and families with a wide range of aid programs tailored to their specific needs. Whether you're experiencing financial hardships, seeking medical support, or require assistance with educational supplies, our directory will guide you to the right resources.
 
-### Our Services Include:
+### Our Services Include
 
 - **Rent and Utility Assistance:** Helping individuals and families facing housing and utility crises, ensuring they have a stable and secure living environment.
 
