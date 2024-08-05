@@ -1,4 +1,4 @@
-import '@shgysk8zer0/kazoo/theme-cookie.js';
+// import '@shgysk8zer0/kazoo/theme-cookie.js';
 // import { getGooglePolicy } from '@shgysk8zer0/kazoo/trust-policies.js';
 import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
