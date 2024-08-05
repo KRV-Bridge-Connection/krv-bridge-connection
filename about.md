@@ -3,6 +3,7 @@ layout: default
 title: About
 permalink: /about/
 ---
+<!-- markdownlint-disable -->
 # About KRV Bridge Connection
 
 Welcome to KRV Bridge Connection, a compassionate non-profit organization dedicated to providing vital assistance to the residents in need within the Kern River Valley community. We firmly believe in fostering a supportive environment where everyone can thrive, irrespective of their circumstances. Our web app serves as a comprehensive directory of various aid programs, spanning rent and utility assistance, healthcare, clothing, school supplies, veterans assistance, and much more.
