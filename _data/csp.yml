@@ -10,6 +10,7 @@ default:
     - https://unpkg.com/@kernvalley/
     - https://unpkg.com/@aegisjsproject/
     - https://www.gstatic.com/firebasejs/
+    - https://donorbox.org/widget.js
     # - https://www.google-analytics.com
     # - https://www.googletagmanager.com
   manifest-src:
@@ -26,6 +27,7 @@ default:
     - "blob:"
   frame-src:
     - https://www.youtube-nocookie.com
+    - https://donorbox.org/embed/
     # - https://calendar.google.com/calendar/embed
   img-src:
     - "*"

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.6] - 2024-08-06
+
+### Added
+- Add Donorbox to donation page
+- Allow via `script-src` & `frame-src`
+
 ## [v1.0.5] - 2024-08-04
 
 ### Added
