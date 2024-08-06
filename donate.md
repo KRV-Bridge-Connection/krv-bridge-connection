@@ -3,6 +3,7 @@ layout: default
 title: Donate
 permalink: /donate/
 ---
+<!-- markdownlint-disable -->
 # Donate to Support Our Cause
 
 Thank you for considering a donation to KRV Bridge Connection. Your generous contribution will impact the lives of individuals and families in need within the Kern River Valley community. With your support, we can bridge the gap and provide vital assistance to those facing difficult circumstances.
