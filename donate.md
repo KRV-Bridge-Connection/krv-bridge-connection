@@ -10,7 +10,7 @@ Thank you for considering a donation to KRV Bridge Connection. Your generous con
 The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community.
 We achieve this by providing essential resources and support to the nonprofits that directly serve our residents' needs.
 
-<img src="/img/raster/building-the-bridge.jpg" class="full-width" alt="Building the Bridge to Hope" width="1920" height="1005" loading="eager" referrerrpolicy="no-referrer" />
+<img src="https://i.imgur.com/qOHRte9h.jpg" width="1024" height="536" class="block full-width" alt="Building the Bridge to Hope" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="eager" srcset="https://i.imgur.com/qOHRte9h.jpg 1024w, https://i.imgur.com/qOHRte9l.jpg 640w, https://i.imgur.com/qOHRte9m.jpg 320w" sizes="(min-width: 700px) 75vw, 100vw" />
 
 ## How Your Donation Helps
 
