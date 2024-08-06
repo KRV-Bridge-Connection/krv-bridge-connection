@@ -2,6 +2,7 @@
 layout: default
 title: Donate
 permalink: /donate/
+description: Donate to the KRV Bridge Connection
 ---
 <!-- markdownlint-disable -->
 # Donate to Support Our Cause
