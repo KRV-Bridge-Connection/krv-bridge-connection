@@ -49,8 +49,8 @@ article p:first-letter {
 
 .donorbox-container {
 	background-color: #ffffff;
-	padding: 0.8rem;
 	color: #232323;
+	padding: 0.8rem;
 	border-radius: 4px;
 
 	& .donorbox-embed {
