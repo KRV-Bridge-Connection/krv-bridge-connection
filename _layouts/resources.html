@@ -2,6 +2,7 @@
 layout: default
 ---
 <h1>Resources Directory</h1>
+{% include "wip-disclaimer.html" %}
 {% for org in orgs %}
 	<div id="{{ org['@identifier'] }}">{{ org.name }}</div>
 {% endfor %}

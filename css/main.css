@@ -46,3 +46,36 @@ article p:first-letter {
 .meta-author-links.flex {
 	gap: 12px;
 }
+
+.donorbox-container {
+	background-color: #ffffff;
+	color: #232323;
+	padding: 0.8rem;
+	border-radius: 4px;
+
+	& .donorbox-embed {
+		width: clamp(250px, 100%, 500px);
+		max-height: none;
+		background-color: inherit;
+		border: none;
+	}
+}
+
+@media (min-width: 1400px) {
+	.donorbox-container {
+		&::after {
+			clear: both;
+			display: block;
+			content: "";
+		}
+
+		.donorbox-embed {
+			float: left;
+		}
+
+		.donorbox-details {
+			float: right;
+			max-width: calc(100% - 500px);
+		}
+	}
+}

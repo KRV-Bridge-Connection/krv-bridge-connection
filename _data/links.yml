@@ -2,9 +2,9 @@ nav:
   - label: Home
     icon: home
     href: /
-  - label: Resources
-    icon: list-unordered
-    href: /resources/
+  # - label: Resources
+  #   icon: list-unordered
+  #   href: /resources/
   - label: About
     icon: info
     href: /about/
@@ -18,10 +18,12 @@ nav:
     icon: avatar-default
     href: /account/
 footer:
+  - label: About
+    icon: info
+    href: /about/
   - label: Contact
     href: /contact/
     icon: address-book
-    rel:
-      - noopener
-      - nofererrer
-      - external
+  - label: Donate
+    icon: donate
+    href: /donate/
