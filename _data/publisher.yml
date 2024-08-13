@@ -1,6 +1,6 @@
 '@context': https://schema.org
 '@type': NGO
-nonprofitStatus : Nonprofit501c3
+# nonprofitStatus : Nonprofit501c3
 name: krvbridge.org
 url: https://krvbridge.org
 email: connect@krvbridge.org
