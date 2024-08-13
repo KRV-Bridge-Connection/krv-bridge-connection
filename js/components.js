@@ -23,3 +23,5 @@ import '@shgysk8zer0/components/firebase/auth/confirm-reset.js';
 import '@shgysk8zer0/components/firebase/auth/verify-email.js';
 import '@shgysk8zer0/components/firebase/auth/email-link.js';
 import '@shgysk8zer0/components/firebase/auth/change-password.js';
+import '@shgysk8zer0/components/scroll-snap.js';
+import '@shgysk8zer0/components/youtube/player.js';

@@ -3,6 +3,7 @@ trusted:
   # - ga#script-url
   # - goog#html
   - goog-cal#script-url
+  - youtube#script-url
   - aegis-sanitizer#html
   - pwa-install
 
