@@ -40,3 +40,51 @@ img.avatar {
 	vertical-align: middle;
 	margin-left: 1.2em;
 }
+
+.gallery {
+	width: 100%;
+	height: 35vh;
+
+	&:fullscreen > .gallery-item {
+		display: contents;
+	}
+
+	.gallery-item {
+		margin: 0;
+		overflow: hidden;
+
+		.gallery-img {
+			height: 100%;
+			width: auto;
+			object-fit: cover;
+			object-position: center;
+		}
+
+		.caption {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			width: 100%;
+			z-index: 1;
+			color: #fafafa;
+			padding: 0.3rem;
+			text-align: center;
+			background-color: rgba(0, 0, 0, 0.6);
+			backdrop-filter: blur(3px);
+			font-family: system-ui;
+			text-decoration: none;
+		}
+	}
+}
+
+@media (any-pointer: fine) and (prefers-reduced-motion: no-preference) {
+	.gallery-item .caption {
+		transform: translateY(100%);
+		transition: transform 300ms ease-out;
+	}
+
+	.gallery-item:hover .caption {
+		transform: none;
+	}
+}
