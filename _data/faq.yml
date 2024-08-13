@@ -1,7 +1,7 @@
 - question: What services do you provide to the community
   answer: The KRV Bridge Connection helps nonprofit orgs benefit the community by providing a means for them to offer their services to the KRV, which also means that residents do not have to travel long distances to meet with them.
-- question: Is this a nonprofit
-  answer: Yes, we are a 501 (c) (3) nonprofit,
+# - question: Is this a nonprofit
+#   answer: Yes, we are a 501 (c) (3) nonprofit,
 - question: I see a lot of construction being done on the building - what's that about
   answer: We recently acquired the building and there is a lot of work being done to make it suitable for the needs it must satisfy.
 - question: How can my nonprofit join

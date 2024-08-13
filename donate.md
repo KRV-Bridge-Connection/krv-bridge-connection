@@ -9,7 +9,7 @@ description: Donate to the KRV Bridge Connection
 
 Thank you for considering a donation to KRV Bridge Connection. Your generous contribution will impact the lives of individuals and families in need within the Kern River Valley community. With your support, we can bridge the gap and provide vital assistance to those facing difficult circumstances.
 
-The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community. We achieve this by providing essential resources and support to the nonprofits that directly serve our residents' needs.
+<!-- The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community. We achieve this by providing essential resources and support to the nonprofits that directly serve our residents' needs. -->
 
 <img src="https://i.imgur.com/qOHRte9h.jpg" width="1024" height="536" class="block full-width" alt="Building the Bridge to Hope" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="eager" srcset="https://i.imgur.com/qOHRte9h.jpg 1024w, https://i.imgur.com/qOHRte9l.jpg 640w, https://i.imgur.com/qOHRte9m.jpg 320w" sizes="(min-width: 700px) 75vw, 100vw" />
 
@@ -43,9 +43,9 @@ Apart from monetary donations, you can support our cause in various other ways:
 
 - **Spread the Word:** Help us raise awareness by sharing our mission on social media and among your friends and family.
 
-## Tax Deductible
+<!-- ## Tax Deductible
 
-KRV Bridge Connection is a registered 501(c)(3) non-profit organization. Your donation is tax-deductible to the extent permitted by law. After making your contribution, we will provide you with a receipt for tax purposes.
+KRV Bridge Connection is a registered 501(c)(3) non-profit organization. Your donation is tax-deductible to the extent permitted by law. After making your contribution, we will provide you with a receipt for tax purposes. -->
 
 ## Together, We Make a Difference
 
