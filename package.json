@@ -74,7 +74,7 @@
     "@shgysk8zer0/lambda-http": "^1.0.2",
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.5",
-    "firebase-admin": "^12.3.1"
+    "firebase-admin": "^12.4.0"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
