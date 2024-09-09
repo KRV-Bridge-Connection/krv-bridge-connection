@@ -71,7 +71,7 @@
   "dependencies": {
     "@shgysk8zer0/11ty-netlify": "^1.1.22",
     "@shgysk8zer0/importmap": "^1.4.4",
-    "@shgysk8zer0/lambda-http": "^1.1.1",
+    "@shgysk8zer0/lambda-http": "^1.1.9",
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.5",
     "firebase-admin": "^12.4.0"
