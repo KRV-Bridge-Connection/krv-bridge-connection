@@ -1,6 +1,12 @@
 import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
-import { getPublicKey } from '@shgysk8zer0/jwk-utils/env';
+import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { HTTPInternalServerError } from '@shgysk8zer0/lambda-http/error.js';
+import { readFile } from 'node:fs/promises';
+
+async function getPublicKey() {
+	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
+	return await importJWK(keyData);
+}
 
 export default createHandler({
 	async get() {
