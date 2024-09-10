@@ -10,4 +10,4 @@ export const site = {
 	title: 'KRV Bridge Connection',
 };
 
-export const pubicKey = '{"key_ops":["verify"],"ext":true,"kty":"EC","x":"ABFjmkSnylwGBEi4t-tSw3j-UMTT02-fL_NLNxcK2gY-6W_uilRJPvqM2Wgq71f5nGg2ontbMcpiskFHU45V6z6B","y":"AVBI0voImW_f1_OpF3Q9O4z1KHAddnn6lbJRHOLLw__NjHweBjct8OrJH3LvHZ2PqoFsXdbEyC2uFIr4vKbmROr-","crv":"P-521"}';
+export const pubicKey = '{"key_ops":["verify"],"ext":true,"kty":"EC","x":"TSyH_WceOud8bA_jN4FLnn2Mucn1XuGAdLrPU38NxoQ","y":"QhnIVTKPjIjqbFbLn1K4WM4KdVSvb95zGqpNEyrIRIE","crv":"P-256"}';
