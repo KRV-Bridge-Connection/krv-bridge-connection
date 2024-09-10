@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.8] - 2024-09-10
+
+### Added
+- Add handler for public JWK
+- Add same public JWK defined as `const`
+
+### Changed
+- Lay groundwork for JWTs for orgs, with permissions
+- Switches from `@shgysk8zer0/netlify-func-utils` to `@shgysk8zer0/lambda-http`
+- Various package updates
+
+### Removed
+- Remove testing API/handlers
+
 ## [v1.0.7] - 2024-08-13
 
 ### Changed

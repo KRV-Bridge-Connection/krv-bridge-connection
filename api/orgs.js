@@ -1,8 +1,9 @@
 /* eslint-env node */
-
-import { HTTPError } from '@shgysk8zer0/http/error.js';
-import { createHandler } from '@shgysk8zer0/netlify-func-utils/crud.js';
-import { BAD_REQUEST, NOT_FOUND, NOT_IMPLEMENTED, NO_CONTENT, UNAUTHORIZED, OK } from '@shgysk8zer0/consts/status.js';
+import { createHandler } from '@shgysk8zer0/lambda-http/handler';
+import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
+import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPInternalServerError } from '@shgysk8zer0/lambda-http/error';
+import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
+import { getPublicKey } from '@shgysk8zer0/jwk-utils/env';
 import firebase from 'firebase-admin';
 
 const collection = 'organizations';
@@ -34,11 +35,12 @@ async function getItemsBy(collection, field, value, { limit = 10 } = {}) {
 
 async function getFirebase() {
 	if (! process.env.hasOwnProperty('FIREBASE_CERT')) {
-		throw new HTTPError('Missing Firebase cert in .env', { status: NOT_IMPLEMENTED });
+		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
 	} else if (firebase.apps.length !== 0) {
 		return firebase.apps[0];
 	} else {
 		const cert = JSON.parse(atob(process.env.FIREBASE_CERT));
+
 		firebase.initializeApp({
 			credential: firebase.credential.cert(cert),
 		});
@@ -52,8 +54,8 @@ async function getFirestore() {
 	return firebase.firestore();
 }
 
-export const handler = createHandler({
-	get: async req => {
+export default createHandler({
+	async get(req) {
 		const params = req.searchParams;
 
 		if (params.has('id')) {
@@ -73,18 +75,31 @@ export const handler = createHandler({
 			return Response.json(orgs);
 		}
 	},
-	delete: async req => {
+	async delete(req) {
 		const params = req.searchParams;
+		const token = getRequestToken(req);
 
-		if (! req.cookies.has('token')) {
-			throw new HTTPError('You are not allowed to do that.', { status: UNAUTHORIZED });
+		if (typeof token !== 'string') {
+			throw new HTTPUnauthorizedError('You are not allowed to do that.');
 		} else if (! params.has('id')) {
-			throw new HTTPError('Missing required id in query.', { status: BAD_REQUEST });
+			throw new HTTPBadRequestError('Missing required id in query string.');
 		} else {
-			const firebase = await getFirebase();
-			await firebase.auth().verifyIdToken(req.cookies.get('token'));
-			await firebase.firestore().collection(collection).doc(params.get('id')).delete();
-			return new Response(null, { status: NO_CONTENT });
+			const publicKey = await getPublicKey();
+			const result = await verifyJWT(token, publicKey, { entitlements: ['org:delete'] });
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid token does not have required permissions.', { cause: result });
+			} else if (result === null) {
+				throw new HTTPInternalServerError('Error parsing request token.');
+			} else if (params.get('id') !== result.sub_id) {
+				throw new HTTPForbiddenError('You do not have access to that organization.');
+			} else {
+				const firebase = await getFirebase();
+				await firebase.firestore().collection(collection).doc(params.get('id')).delete();
+				return new Response(null, { status: NO_CONTENT });
+			}
 		}
 	}
+}, {
+	allowCredentials: true,
 });
