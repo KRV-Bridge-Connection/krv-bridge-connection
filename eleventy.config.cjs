@@ -25,7 +25,7 @@ module.exports = function(eleventyConfig) {
 	if (typeof process.env.FIREBASE_CERT !== 'string') {
 		throw new Error('Missing FIREBASE_CERT in `process.env');
 	} else if (firebase.apps.length === 0) {
-		const cert = JSON.parse(atob(process.env.FIREBASE_CERT));
+		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
 		firebase.initializeApp({
 			credential: firebase.credential.cert(cert),
 		});
