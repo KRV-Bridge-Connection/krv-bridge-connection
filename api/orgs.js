@@ -39,7 +39,7 @@ async function getFirebase() {
 	} else if (firebase.apps.length !== 0) {
 		return firebase.apps[0];
 	} else {
-		const cert = JSON.parse(atob(process.env.FIREBASE_CERT));
+		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
 
 		firebase.initializeApp({
 			credential: firebase.credential.cert(cert),

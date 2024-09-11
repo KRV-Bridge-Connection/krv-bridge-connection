@@ -27,6 +27,7 @@ export default createHandler({
 					messagingSenderId: globalThis.process.env.FIREBASE_MESSAGE_SENDER_ID,
 					appId: globalThis.process.env.FIREBASE_APP_ID,
 					measurementId: globalThis.process.env.FIREBASE_MEASUREMENT_ID,
+					privateKey: process.env.PRIVATE_JWK,
 					// Add other Firebase configuration properties as needed
 				});
 			}
