@@ -17,7 +17,7 @@ export default createHandler({
 		if (! ('process' in globalThis)) {
 			throw new HTTPInternalServerError('process is not defined.');
 		} else {
-			return new Response([JSON.stringify({
+			return Response.json({
 				apiKey: globalThis.process.env.FIREBASE_API_KEY,
 				authDomain: globalThis.process.env.FIREBASE_AUTH_DOMAIN,
 				projectId: globalThis.process.env.FIREBASE_PROJECT_ID,
@@ -25,8 +25,6 @@ export default createHandler({
 				messagingSenderId: globalThis.process.env.FIREBASE_MESSAGE_SENDER_ID,
 				appId: globalThis.process.env.FIREBASE_APP_ID,
 				measurementId: globalThis.process.env.FIREBASE_MEASUREMENT_ID,
-			})], {
-				headers: { 'Content-Type': 'application/json' },
 			});
 		}
 	}
