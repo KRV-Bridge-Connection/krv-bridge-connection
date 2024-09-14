@@ -1,105 +1,94 @@
 /* eslint-env node */
-import { HTTPError } from '@shgysk8zer0/http/error.js';
-import { createHandler } from '@shgysk8zer0/netlify-func-utils/crud.js';
-import { BAD_REQUEST, NOT_IMPLEMENTED, NO_CONTENT, FORBIDDEN } from '@shgysk8zer0/consts/status.js';
+import '@shgysk8zer0/polyfills';
+import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http/error.js';
+import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
+import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+import { importJWK } from '@shgysk8zer0/jwk-utils/jwk.js';
+import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt.js';
+import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation.js';
+import { readFile } from 'node:fs/promises';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY,
 } from '@shgysk8zer0/slack/slack.js';
 
-import {
-	isEmail, isString, isUrl, isTel, validateMessageHeaders, formatPhoneNumber,
-} from '@shgysk8zer0/netlify-func-utils/validation.js';
+const REVOKED_TOKENS = [];
 
-const ALLOWED_ORIGINS = [
-	'https://krvbridge.org',
-	'https://www.krvbridge.org',
-	'https://beamish-halva-baf90b.netlify.app'
-];
-
-const ALLOWED_DOMAIN_SUFFIXES = [
-	'--beamish-halva-baf90b.netlify.app',
-	'--beamish-halva-baf90b.netlify.live',
-	'.krvbridge.org', // Allows from any subdomain
-];
-
-if (typeof process.env.BASE_URL === 'string') {
-	ALLOWED_ORIGINS.push(new URL(process.env.BASE_URL).origin);
+async function getPublicKey() {
+	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
+	return await importJWK(keyData);
 }
 
-function allowedOrigin(url) {
-	const origin = new URL(url).origin;
-	return ALLOWED_ORIGINS.includes(origin)
-		|| ALLOWED_DOMAIN_SUFFIXES.some(suff => origin.endsWith(suff));
-}
+export default createHandler({
+	async post(req) {
+		const token = getRequestToken(req);
+		const origin = URL.parse(req.headers.get('Origin') ?? req.referrer)?.origin;
 
-export const handler = createHandler({
-	post: async req => {
-		if (typeof process.env.SLACK_WEBHOOK_URL !== 'string') {
-			throw new HTTPError('Not configured', { status: NOT_IMPLEMENTED });
-		}
+		if (typeof origin !== 'string' || origin === 'null') {
+			throw new HTTPBadRequestError('Missing required origin in request.');
+		} else if (typeof token !== 'string') {
+			throw new HTTPUnauthorizedError('Message is missing required authorization.');
+		} else if (typeof process.env.SLACK_WEBHOOK_URL !== 'string') {
+			throw new HTTPNotImplementedError('Not configured');
+		} else {
+			const publicKey = await getPublicKey();
+			const result = await verifyJWT(token, publicKey, {
+				claims: ['iss', 'exp', 'iat', 'nbf', 'jti', 'entitlements'],
+				entitlements: ['slack:send'],
+			});
 
-		const { subject, body, email, name, phone, origin, check } = await req.json();
+			if (result instanceof Error || result === null) {
+				throw new HTTPForbiddenError('Invalid or expired token', { cause: result });
+			} else if (REVOKED_TOKENS.includes(result.jti)) {
+				throw new HTTPForbiddenError(`Token ${result.jti} has been revoked.`);
+			} else {
+				const { subject, body, email, name, phone } = await req.json();
 
-		if (isString(check, { minLength: 0 })) {
-			throw new HTTPError('Invalid data submitted', { status: BAD_REQUEST });
-		} else if (! validateMessageHeaders({
-			headers: {
-				'x-message-id': req.headers.get('X-Message-Id'),
-				'x-message-time': req.headers.get('X-Message-Time'),
-				'x-message-origin': req.headers.get('X-Message-Origin'),
-				'x-message-sig': req.headers.get('X-Message-Sig'),
-				'x-message-algo': req.headers.get('X-Message-Algo'),
+				if (! isString(subject, { minLength: 4 })) {
+					throw new HTTPBadRequestError('No subject given');
+				} else if (! isString(body, { minLength: 1 })) {
+					throw new HTTPBadRequestError('No body given');
+				} else if (! isString(name, 4)) {
+					throw new HTTPBadRequestError('No name given');
+				} else if (! isEmail(email)) {
+					throw new HTTPBadRequestError('No email address given or email is invalid');
+				} else {
+					const nowId = Date.now().toString(34);
+
+					const message = new SlackMessage(process.env.SLACK_WEBHOOK,
+						new SlackHeaderBlock(new SlackPlainTextElement(`New message on ${origin}`)),
+						new SlackSectionBlock(new SlackPlainTextElement(`Subject: ${subject}`), {
+							fields: [
+								new SlackMarkdownElement(`*From*: ${name}`),
+								new SlackMarkdownElement(`*Phone*: ${isTel(phone) ? formatPhoneNumber(phone) : 'Not given'}`),
+							],
+						}),
+						new SlackDividerBlock(),
+						new SlackContextBlock({ elements: [new SlackPlainTextElement(body)] }),
+						new SlackActionsBlock({
+							elements: [
+								new SlackButtonElement(new SlackPlainTextElement(`Reply to <${email}>`), {
+									url: `mailto:${email}`,
+									action: `email-${nowId}`,
+									style: SLACK_PRIMARY,
+								}),
+							]
+						})
+					);
+
+					await message.send();
+
+					return new Response(null, { status: NO_CONTENT });
+				}
 			}
-		})) {
-			throw new HTTPError('Invalid or missing signature', { status: BAD_REQUEST });
-		} else if (! isString(subject, { minLength: 4 })) {
-			throw new HTTPError('No subject given', { status: BAD_REQUEST });
-		} else if (! isString(body, { minLength: 1 })) {
-			throw new HTTPError('No body given', { status: BAD_REQUEST });
-		} else if (! isString(name, 4)) {
-			throw new HTTPError('No name given', { status: BAD_REQUEST });
-		} else if (! isEmail(email)) {
-			throw new HTTPError('No email address given or email is invalid', { status: BAD_REQUEST });
-		} else if (! isUrl(origin)) {
-			throw new HTTPError('Missing or invalid origin for message', { status: BAD_REQUEST });
-		} else if (! allowedOrigin(origin) || ! allowedOrigin(req.headers.get('Origin'))) {
-			throw new HTTPError('Not allowed', { status: FORBIDDEN });
 		}
-
-		const nowId = Date.now().toString(34);
-
-		const message = new SlackMessage(process.env.SLACK_WEBHOOK,
-			new SlackHeaderBlock(new SlackPlainTextElement(`New message on ${origin}`)),
-			new SlackSectionBlock(new SlackPlainTextElement(`Subject: ${subject}`), {
-				fields: [
-					new SlackMarkdownElement(`*From*: ${name}`),
-					new SlackMarkdownElement(`*Phone*: ${isTel(phone) ? formatPhoneNumber(phone) : 'Not given'}`
-					),
-				],
-			}),
-			new SlackDividerBlock(),
-			new SlackContextBlock({ elements: [new SlackPlainTextElement(body)] }),
-			new SlackActionsBlock({
-				elements: [
-					new SlackButtonElement(new SlackPlainTextElement(`Reply to <${email}>`), {
-						url: `mailto:${email}`,
-						action: `email-${nowId}`,
-						style: SLACK_PRIMARY,
-					}),
-				]
-			})
-		);
-
-		await message.send();
-
-		return new Response(null, { status: NO_CONTENT });
-
 	}
 }, {
-	allowHeaders: [
-		'Content-Type', 'X-MESSAGE-ID', 'X-MESSAGE-TIME', 'X-MESSAGE-ORIGIN',
-		'X-MESSAGE-SIG', 'X-MESSAGE-ALGO',
-	],
+	allowCredentials: true,
+	allowOrigins: /^https:\/\/(krvbridge\.org)|([A-z0-9]+--beamish-halva-baf90b\.netlify\.(live|app))$/,
+	requireHeaders: ['Authorization'],
+	allowHeaders: [ 'Content-Type', 'Authorization'],
+	requireContentLength: true,
+	requireCORS: true,
 });

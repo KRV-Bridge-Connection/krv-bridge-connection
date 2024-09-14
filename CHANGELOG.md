@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.9] - 2024-09-14
+
+### Changed
+- Switch to using JWTs for Slack messages
+
+### Fixed
+- Fix error in Slack implementation
+
 ## [v1.0.8] - 2024-09-10
 
 ### Added

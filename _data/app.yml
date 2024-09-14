@@ -143,20 +143,16 @@ related_applications:
   # - platform: windows
   #   url: "#"
 features:
-  - PWA-ready GitHub template for Jekyll sites
-  - Dark mode support, controlled by (prefers-color-scheme) media query
-  - Includes templates created with SEO via structured data in mind
-  - Initial setup scores 99% on mobile on Page Speed Insights
-  - Responsive design supporting any screen size thanks to CSS grid and use of viewport units
-  - Integtation with system sharing via the Share API (with fallback)
-  - Preset Pull Request and Issue templates, as well as Code of Conduct & Contributing Guidelines
-  - Built-in testing via GitHub Actions, eslint, and stylelint
-  - Always up-to-date thanks to preset Dependabot-v2 config
-  - Setup for quick deployment to Netlify
-  - Version files for NodeJS (.nvmrc)
+  - Easily find the services you're looking for
+  - Find out how to contact numerous nonprofit organizations
+  - Learn about upcoming events to benefit residents of the Kern River Valley
+  - Organization memebers may update org info, make room reservations and manage calendars
 # https://github.com/w3c/manifest/wiki/Categories
 categories:
   - business
   - productivity
   - utilities
+  - health
+  - medical
+  - lifestyle
 
