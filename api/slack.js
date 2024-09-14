@@ -1,11 +1,11 @@
 /* eslint-env node */
 import '@shgysk8zer0/polyfills';
-import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http/error.js';
-import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
+import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http/error';
+import { createHandler } from '@shgysk8zer0/lambda-http/handler';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
-import { importJWK } from '@shgysk8zer0/jwk-utils/jwk.js';
-import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt.js';
-import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation.js';
+import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
+import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
+import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation';
 import { readFile } from 'node:fs/promises';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
@@ -79,7 +79,7 @@ export default createHandler({
 
 					await message.send();
 
-					return new Response('', { status: NO_CONTENT });
+					return new Response(null, { status: NO_CONTENT });
 				}
 			}
 		}
