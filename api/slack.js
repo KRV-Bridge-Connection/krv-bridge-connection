@@ -79,7 +79,7 @@ export default createHandler({
 
 					await message.send();
 
-					return new Response(null, { status: NO_CONTENT });
+					return new Response('', { status: NO_CONTENT });
 				}
 			}
 		}
