@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Update `external_node_modules` in `netlify.toml`
+
 ## [v1.0.9] - 2024-09-14
 
 ### Changed
