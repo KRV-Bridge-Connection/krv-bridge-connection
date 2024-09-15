@@ -1,10 +1,12 @@
 /* eslint-env node */
-import { createHandler } from '@shgysk8zer0/lambda-http/handler';
 import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
-import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPInternalServerError } from '@shgysk8zer0/lambda-http/error';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
 import { getPublicKey } from '@shgysk8zer0/jwk-utils/env';
 import firebase from 'firebase-admin';
+import {
+	createHandler, HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError,
+	HTTPUnauthorizedError, HTTPInternalServerError,
+} from '@shgysk8zer0/lambda-http';
 
 const collection = 'organizations';
 
