@@ -1,6 +1,6 @@
 /* eslint-env node */
 import '@shgysk8zer0/polyfills';
-import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler, HTTPGatewayTimeoutError } from '@shgysk8zer0/lambda-http';
+import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
