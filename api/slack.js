@@ -2,6 +2,7 @@
 import '@shgysk8zer0/polyfills';
 import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+import { FORM_MULTIPART, FORM_URL_ENCODED } from '@shgysk8zer0/consts/mimes.js';
 import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
 import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation';
@@ -10,7 +11,7 @@ import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY,
-} from '@shgysk8zer0/slack/slack.js';
+} from '@shgysk8zer0/slack';
 
 const REVOKED_TOKENS = [];
 
@@ -42,7 +43,8 @@ export default createHandler({
 			} else if (REVOKED_TOKENS.includes(result.jti)) {
 				throw new HTTPForbiddenError(`Token ${result.jti} has been revoked.`);
 			} else {
-				const { subject, body, email, name, phone } = await req.json();
+				const isFormData = [FORM_MULTIPART, FORM_URL_ENCODED].some(type => req.headers.get('Content-Type').startsWith(type));
+				const { subject, body, email, name, phone } = isFormData ? Object.fromEntries(await req.formData()) : await req.json();
 
 				if (! isString(subject, { minLength: 4 })) {
 					throw new HTTPBadRequestError('No subject given');
@@ -78,9 +80,8 @@ export default createHandler({
 
 					try {
 						await message.send({ signal: AbortSignal.timeout(1000) });
-						return new Response(null, { status: NO_CONTENT });
+						return req.mode === 'navigate' ? Response.redirect('/') : new Response(null, { status: NO_CONTENT });
 					} catch(err) {
-						console.error(err);
 						throw new HTTPBadRequestError('Failed sending message', { cause: err });
 					}
 				}
