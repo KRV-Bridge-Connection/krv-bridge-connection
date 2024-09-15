@@ -1,7 +1,6 @@
 /* eslint-env node */
 import '@shgysk8zer0/polyfills';
-import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http/error';
-import { createHandler } from '@shgysk8zer0/lambda-http/handler';
+import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler, HTTPGatewayTimeoutError } from '@shgysk8zer0/lambda-http';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
@@ -77,9 +76,13 @@ export default createHandler({
 						})
 					);
 
-					await message.send();
-
-					return new Response(null, { status: NO_CONTENT });
+					try {
+						await message.send({ signal: AbortSignal.timeout(1000) });
+						return new Response(null, { status: NO_CONTENT });
+					} catch(err) {
+						console.error(err);
+						throw new HTTPBadRequestError('Failed sending message', { cause: err });
+					}
 				}
 			}
 		}

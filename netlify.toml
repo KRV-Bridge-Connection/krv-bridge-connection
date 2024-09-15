@@ -11,14 +11,14 @@
   functions = "api"
   targetPort = 8080
 [functions]
-  # external_node_modules = [
-  #   "@shgysk8zer0/consts", 
-  #   "@shgysk8zer0/jwk-utils",
-  #   "@shgysk8zer0/lambda-http",
-  #   "@shgysk8zer0/netlify-func-utils",
-  #   "@shgysk8zer0/polyfills",
-  #   "@shgysk8zer0/slack",
-  #   "node:fs"
-  # ]
+  external_node_modules = [
+    "@shgysk8zer0/consts", 
+    "@shgysk8zer0/jwk-utils",
+    "@shgysk8zer0/lambda-http",
+    "@shgysk8zer0/netlify-func-utils",
+    "@shgysk8zer0/polyfills",
+    "@shgysk8zer0/slack",
+    "node:fs"
+  ]
   node_bundler = "esbuild"
   included_files = ["_data/jwk.json"]

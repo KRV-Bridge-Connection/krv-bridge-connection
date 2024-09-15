@@ -1,6 +1,5 @@
-import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
+import { createHandler, HTTPInternalServerError } from '@shgysk8zer0/lambda-http';
 import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
-import { HTTPInternalServerError } from '@shgysk8zer0/lambda-http/error.js';
 import { readFile } from 'node:fs/promises';
 
 async function getPublicKey() {

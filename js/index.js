@@ -84,6 +84,8 @@ Promise.all([
 						}
 					});
 
+					requestAnimationFrame(() => notification.hidden = false);
+
 					target.reset();
 				} else if (resp.headers.get('Content-Type').startsWith('application/json')) {
 					const { error } = await resp.json();
@@ -98,9 +100,11 @@ Promise.all([
 				}
 			} catch(err) {
 				console.error(err);
-				new HTMLNotification('Error Sending Message', {
+				const notification = new HTMLNotification('Error Sending Message', {
 					body: err.message,
 				});
+
+				requestAnimationFrame(() => notification.hidden = false);
 			}
 		});
 	}
