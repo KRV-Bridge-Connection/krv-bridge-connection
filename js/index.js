@@ -36,6 +36,13 @@ Promise.all([
 		.forEach(el => el.hidden = false);
 
 	if (location.pathname.startsWith('/contact/')) {
+		const params = new URLSearchParams(location.search);
+
+		if (params.has('subject') || params.has('body')) {
+			document.querySelector('input[name="subject"]').value = params.get('subject');
+			document.querySelector('[name="body"]').value = params.get('body');
+		}
+
 		on('#contact-form', 'submit', async event => {
 			event.preventDefault();
 			const target = event.target;
