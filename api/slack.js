@@ -21,6 +21,10 @@ async function getPublicKey() {
 }
 
 export default createHandler({
+	async get() {
+		const content = await readFile(import.meta.url, { encoding: 'utf-8' });
+		return new Response([content], { headers: { 'Content-Type': 'text/plain' }});
+	},
 	async post(req) {
 		const token = getRequestToken(req);
 		const origin = URL.parse(req.headers.get('Origin') ?? req.referrer)?.origin;
