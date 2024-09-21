@@ -1,9 +1,9 @@
-import '@shgysk8zer0/polyfills';
+// import '@shgysk8zer0/polyfills';
 import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
 import { readFile } from 'node:fs/promises';
 
 export default createHandler({
-	async get(req) {
+	async get() {
 		try {
 			const path = URL.parse(import.meta.url)?.pathname;
 			const content = await readFile(path, { encoding: 'utf-8' });
