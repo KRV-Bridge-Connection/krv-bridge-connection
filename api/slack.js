@@ -93,10 +93,10 @@ export default createHandler({
 		}
 	}
 }, {
-	allowCredentials: true,
-	allowOrigins: /^https:\/\/(krvbridge\.org)|([A-z0-9]+--beamish-halva-baf90b\.netlify\.(live|app))$/,
-	requireHeaders: ['Authorization'],
-	allowHeaders: [ 'Content-Type', 'Authorization'],
-	requireContentLength: true,
-	requireCORS: true,
+	// allowCredentials: true,
+	// allowOrigins: /^https:\/\/(krvbridge\.org)|([A-z0-9]+--beamish-halva-baf90b\.netlify\.(live|app))$/,
+	// requireHeaders: ['Authorization'],
+	// allowHeaders: [ 'Content-Type', 'Authorization'],
+	// requireContentLength: true,
+	// requireCORS: true,
 });
