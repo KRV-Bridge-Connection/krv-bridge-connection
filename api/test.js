@@ -2,6 +2,16 @@
 import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
 import { readFile } from 'node:fs/promises';
 
+if (! (URL.parse instanceof Function)) {
+	URL.parse = function parse(url, base) {
+		try {
+			return new URL(url, base);
+		} catch {
+			return null;
+		}
+	};
+}
+
 export default createHandler({
 	async get() {
 		try {
