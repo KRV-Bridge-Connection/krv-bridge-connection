@@ -1,5 +1,8 @@
 /* eslint-env node */
+import { readFile } from 'node:fs/promises'
 
 export default async () => {
-	return new Response(['Hello, World!'], { headers: { 'Content-Type': 'text/plain' }});
+	const url = new URL(import.meta.url);
+	const content = await readFile(url.pathname, { encoding: 'utf-8' });
+	return new Response([content], { headers: { 'Content-Type': 'text/plain' }});
 };
