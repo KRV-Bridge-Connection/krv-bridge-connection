@@ -18,7 +18,8 @@
     "@shgysk8zer0/netlify-func-utils",
     "@shgysk8zer0/polyfills",
     "@shgysk8zer0/slack",
-    "node:fs"
+    "node:fs",
+    "node:fs/promises"
   ]
   node_bundler = "esbuild"
   included_files = ["_data/jwk.json"]
