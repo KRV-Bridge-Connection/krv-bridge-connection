@@ -1,4 +1,5 @@
 /* eslint-env node */
+import '@shgysk8zer0/polyfills';
 import { readFile } from 'node:fs/promises'
 
 export default async () => {
