@@ -69,8 +69,8 @@
   },
   "homepage": "https://krvbridge.org",
   "dependencies": {
-    "@shgysk8zer0/11ty-netlify": "^1.1.23",
-    "@shgysk8zer0/importmap": "^1.4.8",
+    "@shgysk8zer0/11ty-netlify": "^1.1.25",
+    "@shgysk8zer0/importmap": "^1.4.10",
     "@shgysk8zer0/lambda-http": "^1.1.17",
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.7",
