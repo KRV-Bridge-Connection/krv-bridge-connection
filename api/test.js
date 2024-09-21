@@ -1,5 +1,5 @@
 // import '@shgysk8zer0/polyfills';
-import { createHandler } from '@shgysk8zer0/lambda-http/handler.js';
+import { createHandler } from '@shgysk8zer0/lambda-http';
 import { readFile } from 'node:fs/promises';
 
 if (! (URL.parse instanceof Function)) {
