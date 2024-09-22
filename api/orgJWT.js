@@ -74,7 +74,6 @@ export default createHandler({
 					sameSite: 'strict',
 					secure: true,
 					httpOnly: true,
-					domain: URL.parse(req.url)?.hostname,
 				});
 
 				return Response.json({ expires, jti }, {
