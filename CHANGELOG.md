@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add endpoint to create JWT with org (`sub_id`) and entitlements
+- Add client-side function to `fetch` those tokens
+
 ### Changed
 - Make all `node:*` modules external in `netlify.toml` `[functions]`
+
+### Fixed
+- Fix bad imports/bundling in Netlify Functions
 
 ## [v1.0.10] - 2024-09-19
 
