@@ -35,7 +35,8 @@ export async function getOrgJWT(user, { signal } = {}) {
 		});
 
 		if (resp.ok) {
-			return await resp.text();
+			const { jti, expires } = await resp.json();
+			return { tokenId: jti, expires: new Date(expires) };
 		} else if (resp.headers.get('Content-Type').startsWith('application/json')) {
 			const { error } = await resp.json();
 			throw new Error(error.message);

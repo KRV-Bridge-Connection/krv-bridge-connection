@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, HTTPNotImplementedError, Cookie } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT, getRequestToken } from '@shgysk8zer0/jwk-utils';
 import firebase from 'firebase-admin';
 
@@ -43,14 +43,16 @@ export default createHandler({
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
 				const origin = URL.parse(req.url)?.origin;
+				const jti = crypto.randomUUID();
+				const expires = new Date(Date.now() + 1_800_000).getTime();
 				const token = await createJWT({
 					iss: origin,
 					aud: origin,
 					sub: uid,
 					iat: now,
 					nbf: now,
-					exp: now + 1_800,
-					jti: crypto.randomUUID(),
+					exp: Math.floor(expires / 1000),
+					jti,
 					sub_id,
 					name,
 					picture,
@@ -64,7 +66,20 @@ export default createHandler({
 					entitlements,
 				}, key);
 
-				return new Response([token]);
+				const cookie = new Cookie({
+					name: 'org-jwt',
+					value: token,
+					expires: expires,
+					path: '/api/',
+					sameSite: 'strict',
+					secure: true,
+					httpOnly: true,
+					domain: URL.parse(req.url)?.hostname,
+				});
+
+				return Response.json({ expires, jti }, {
+					headers: new Headers({ 'Set-Cookie': cookie }),
+				});
 			} else {
 				throw new HTTPNotFoundError(`No user record exists for user ${uid}.`);
 			}
