@@ -12,14 +12,19 @@
   targetPort = 8080
 [functions]
   external_node_modules = [
-    "@shgysk8zer0/consts", 
-    "@shgysk8zer0/jwk-utils",
-    "@shgysk8zer0/lambda-http",
-    "@shgysk8zer0/netlify-func-utils",
-    "@shgysk8zer0/polyfills",
-    "@shgysk8zer0/slack",
     "node:fs",
-    "node:fs/promises"
+    "node:path",
+    "node:fs/promises",
+    "node:process",
+    "node:url",
+    "node:perf_hooks",
+    "node:util",
+    "node:test",
+    "node:assert",
+    "node:os",
+    "node:child_process",
+    "node:events",
+    "node:crypto"
   ]
   node_bundler = "esbuild"
   included_files = ["_data/jwk.json"]
