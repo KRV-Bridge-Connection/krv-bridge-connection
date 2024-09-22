@@ -1,13 +1,13 @@
 import { importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
-import { INTERNAL_SERVER_ERROR } from '@shgysk8zer0/consts/status.js';
+// import { INTERNAL_SERVER_ERROR } from '@shgysk8zer0/consts/status.js';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
 	return await importJWK(keyData);
 }
 
-function sendError(message, status = INTERNAL_SERVER_ERROR, details = null) {
+function sendError(message, status = 500, details = null) {
 	return Response.json({
 		error: { message, status, details }
 	}, { status });
@@ -20,8 +20,8 @@ export default async () => {
 		const data = await crypto.subtle.exportKey('jwk', publicKey);
 		return Response.json(data);
 	} else if (publicKey instanceof Error) {
-		return sendError('Could not access public JWK.', INTERNAL_SERVER_ERROR);
+		return sendError('Could not access public JWK.', 500);
 	} else {
-		return sendError('Could not access public JWK.', INTERNAL_SERVER_ERROR);
+		return sendError('Could not access public JWK.', 500);
 	}
 };
