@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT, getRequestToken } from '@shgysk8zer0/jwk-utils';
 import firebase from 'firebase-admin';
 
@@ -30,7 +30,7 @@ export default createHandler({
 		} else if (! (typeof user.email === 'string' && typeof user.uid === 'string')) {
 			throw new HTTPBadGatewayError('Invalid token data');
 		} else if (! user.email_verified) {
-			auth.generateEmailVerificationLink(user.email)
+			auth.generateEmailVerificationLink(user.email);
 			throw new HTTPForbiddenError('You will need to verify your email address and try again. An verification email has been sent.');
 		} else {
 			const { uid, name, picture, email, email_verified, phone_number } = user;
