@@ -1,4 +1,4 @@
-import { importJWK } from '@shgysk8zer0/jwk-utils';
+import { importJWK, MIME_TYPE } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 // import { INTERNAL_SERVER_ERROR } from '@shgysk8zer0/consts/status.js';
 
@@ -18,7 +18,7 @@ export default async () => {
 
 	if (publicKey instanceof CryptoKey) {
 		const data = await crypto.subtle.exportKey('jwk', publicKey);
-		return Response.json(data);
+		return Response.json(data, { headers: { 'Content-Type': MIME_TYPE }});
 	} else if (publicKey instanceof Error) {
 		return sendError('Could not access public JWK.', 500);
 	} else {
