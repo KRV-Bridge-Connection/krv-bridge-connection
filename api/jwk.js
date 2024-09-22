@@ -1,4 +1,4 @@
-import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
+import { importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { INTERNAL_SERVER_ERROR } from '@shgysk8zer0/consts/status.js';
 
