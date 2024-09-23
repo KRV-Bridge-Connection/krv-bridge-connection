@@ -84,7 +84,6 @@ export default createHandler({
 	},
 	async delete(req) {
 		const params = req.searchParams;
-		const token = req.cookies.get('org-jwt');
 
 		if (! req.cookies.has('org-jwt')) {
 			throw new HTTPUnauthorizedError('Missing required token for request.');
