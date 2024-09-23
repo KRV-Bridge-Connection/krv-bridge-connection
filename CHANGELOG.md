@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Add `/api/url` for link management and kinda shortening
 - Add endpoint to create JWT with org (`sub_id`) and `entitlements`
 - Add client-side function to `fetch` those tokens
 
