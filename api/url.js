@@ -1,7 +1,8 @@
-import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
-import { verifyJWT } from '@shgysk8zer0/jwk-utils';
+import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPBadRequestError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
+import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import firebase from 'firebase-admin';
+import { readFile } from 'node:fs/promises';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
@@ -107,15 +108,11 @@ export default createHandler({
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
 			} else {
-				if (! URL.canParse(data.get('url'))) {
-					throw new HTTPBadRequestError('Invalid or missing URL.');
-				} else {
-					// @TODO verify `sub_id` matches record `org`
-					const db = await getFirestore();
-					await db.collection(collection).doc(req.searchParams.get('id')).delete();
+				// @TODO verify `sub_id` matches record `org`
+				const db = await getFirestore();
+				await db.collection(collection).doc(req.searchParams.get('id')).delete();
 
-					return new Response(null, { status: NO_CONTENT });
-				}
+				return new Response(null, { status: NO_CONTENT });
 			}
 		}
 	}
