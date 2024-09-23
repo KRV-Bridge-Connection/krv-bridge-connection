@@ -8,11 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Add endpoint to create JWT with org (`sub_id`) and entitlements
+- Add endpoint to create JWT with org (`sub_id`) and `entitlements`
 - Add client-side function to `fetch` those tokens
 
 ### Changed
 - Make all `node:*` modules external in `netlify.toml` `[functions]`
+- `DELETE /api/orgs` now get JWT from `org-jwt` cookie
 
 ### Fixed
 - Fix bad imports/bundling in Netlify Functions

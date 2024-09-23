@@ -1,7 +1,7 @@
 /* eslint-env node */
 import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
-import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
-import { getPublicKey } from '@shgysk8zer0/jwk-utils/env';
+import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
+import { readFile } from 'node:fs/promises';
 import firebase from 'firebase-admin';
 import {
 	createHandler, HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError,
@@ -9,6 +9,11 @@ import {
 } from '@shgysk8zer0/lambda-http';
 
 const collection = 'organizations';
+
+async function getPublicKey() {
+	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
+	return await importJWK(keyData);
+}
 
 async function getCollection(name, { limit = 10 } = {}) {
 	const db = await getFirestore();
@@ -79,15 +84,17 @@ export default createHandler({
 	},
 	async delete(req) {
 		const params = req.searchParams;
-		const token = getRequestToken(req);
 
-		if (typeof token !== 'string') {
-			throw new HTTPUnauthorizedError('You are not allowed to do that.');
+		if (! req.cookies.has('org-jwt')) {
+			throw new HTTPUnauthorizedError('Missing required token for request.');
 		} else if (! params.has('id')) {
 			throw new HTTPBadRequestError('Missing required id in query string.');
 		} else {
 			const publicKey = await getPublicKey();
-			const result = await verifyJWT(token, publicKey, { entitlements: ['org:delete'] });
+			const result = await verifyJWT(req.cookies.get('org-jwt'), publicKey, {
+				entitlements: ['org:delete'],
+				claims: ['exp', 'sub_id', 'iss', 'sub'],
+			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid token does not have required permissions.', { cause: result });
