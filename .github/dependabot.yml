@@ -1,10 +1,12 @@
 version: 2
 updates:
   - package-ecosystem: bundler
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
-      time: "13:00"
+      day: thursday
+      time: '08:00'
+      timezone: America/Los_Angeles
     open-pull-requests-limit: 10
     reviewers:
       - shgysk8zer0
@@ -13,10 +15,12 @@ updates:
     labels:
       - dependencies
   - package-ecosystem: npm
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
-      time: "13:00"
+      day: thursday
+      time: '08:00'
+      timezone: America/Los_Angeles
     open-pull-requests-limit: 10
     reviewers:
       - shgysk8zer0
@@ -26,10 +30,12 @@ updates:
       - javascript
       - dependencies
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
-      time: "13:00"
+      day: thursday
+      time: '08:00'
+      timezone: America/Los_Angeles
     open-pull-requests-limit: 10
     reviewers:
       - shgysk8zer0
@@ -39,10 +45,12 @@ updates:
       - github-actions
       - dependencies
   - package-ecosystem: gitsubmodule
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
-      time: "13:00"
+      day: thursday
+      time: '08:00'
+      timezone: America/Los_Angeles
     open-pull-requests-limit: 10
     reviewers:
       - shgysk8zer0
