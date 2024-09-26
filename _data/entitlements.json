@@ -1,0 +1,13 @@
+[
+  "perms:update",
+  "firebase:read", "firebase:write",
+  "org:update", "org:create", "org:delete",
+  "users:create", "users:delete", "users:update",
+  "files:create", "files:update", "files:delete",
+  "booking:create", "booking:update", "booking:delete",
+  "event:create", "event:update", "event:delete",
+  "post:create", "post:update", "post:delete",
+  "comment:create", "comment:update", "comment:delete",
+  "link:create", "link:update", "link:delete",
+  "invoice:create", "invoice:update", "invoice:delete"
+]
