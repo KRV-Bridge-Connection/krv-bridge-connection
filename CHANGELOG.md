@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.11] - 2024-10-08
+
 ### Added
 - Add `/api/url` for link management and kinda shortening
 - Add endpoint to create JWT with org (`sub_id`) and `entitlements`
@@ -15,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Make all `node:*` modules external in `netlify.toml` `[functions]`
 - `DELETE /api/orgs` now get JWT from `org-jwt` cookie
+- Revert nonprofit status (now 501(c)3)
+- Update about page content
+- Update screenshots
 
 ### Fixed
 - Fix bad imports/bundling in Netlify Functions
