@@ -43,9 +43,9 @@ Apart from monetary donations, you can support our cause in various other ways:
 
 - **Spread the Word:** Help us raise awareness by sharing our mission on social media and among your friends and family.
 
-<!-- ## Tax Deductible
+## Tax Deductible
 
-KRV Bridge Connection is a registered 501(c)(3) non-profit organization. Your donation is tax-deductible to the extent permitted by law. After making your contribution, we will provide you with a receipt for tax purposes. -->
+KRV Bridge Connection is a registered 501(c)(3) non-profit organization. Your donation is tax-deductible to the extent permitted by law. After making your contribution, we will provide you with a receipt for tax purposes.
 
 ## Together, We Make a Difference
 

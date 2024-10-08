@@ -34,18 +34,18 @@ icons:
     type: image/png
     sizes: 16x16
 screenshots:
-  - src: 'https://i.imgur.com/IjdVouxh.png'
+  - src: 'https://i.imgur.com/E9BEmLkh.jpeg'
     sizes: 1024x502
-    type: image/png
-  - src: 'https://i.imgur.com/IjdVouxl.png'
+    type: image/jpeg
+  - src: 'https://i.imgur.com/E9BEmLkl.jpeg'
     sizes: 640x314
-    type: image/png
-  - src: 'https://i.imgur.com/IjdVouxm.png'
+    type: image/jpeg
+  - src: 'https://i.imgur.com/E9BEmLkm.jpeg'
     sizes: 320x157
-    type: image/png
-  - src: 'https://i.imgur.com/IjdVouxt.png'
+    type: image/jpeg
+  - src: 'https://i.imgur.com/E9BEmLkt.jpeg'
     sizes: 160x78
-    type: image/png
+    type: image/jpeg
 # https://web.dev/app-shortcuts/
 shortcuts:
   - name: Resources
