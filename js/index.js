@@ -12,7 +12,10 @@ setRoot('#main');
 observe(document.body);
 addPopstateListener();
 
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
 document.addEventListener('aegis:navigate', event => {
+	console.log(event);
 	if (event.reason === EVENT_TYPES.load) {
 		const oldLink = document.querySelector('#nav a.active');
 		const newLink = [...document.querySelectorAll('#nav a:not(.active)')].find(a => a.href === location.href);
@@ -29,6 +32,20 @@ document.addEventListener('aegis:navigate', event => {
 		}
 
 		loadHandler();
+
+		const behavior = reducedMotion.matches ? 'instant' : 'smooth';
+
+		if (location.hash.length > 2) {
+			const target = document.getElementById(location.hash.substring(1));
+
+			if (target instanceof HTMLElement) {
+				target.scrollIntoView({ behavior });
+			} else {
+				document.body.scrollIntoView({ behavior });
+			}
+		} else {
+			document.body.scrollIntoView({ behavior });
+		}
 	}
 });
 
