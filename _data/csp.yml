@@ -22,12 +22,14 @@ default:
     - "'self'"
     - https://cdn.kernvalley.us/css/
     - https://unpkg.com/@shgysk8zer0/
+    - https://unpkg.com/@aegisjsproject/styles/css/
     - https://unpkg.com/
     - https://fonts.googleapis.com/
     - "blob:"
   frame-src:
     - https://www.youtube-nocookie.com
     - https://donorbox.org/embed/
+    - https://maps.kernvalley.us/embed
     # - https://calendar.google.com/calendar/embed
   img-src:
     - "*"

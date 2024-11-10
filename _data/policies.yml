@@ -6,4 +6,4 @@ trusted:
   - youtube#script-url
   - aegis-sanitizer#html
   - pwa-install
-
+  - aegis-router#html

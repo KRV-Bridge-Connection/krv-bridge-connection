@@ -24,58 +24,68 @@ async function storeCredentials({ email, password, name, image }) {
 	}
 }
 
-on('#registration-form', 'submit', async event => {
-	event.preventDefault();
-	const data = new FormData(event.target);
-	const creds = {
-		name: data.get('name'),
-		email: data.get('email'),
-		password: data.get('password'),
-		image: await createGravatarURL(data.get('email')).then(url => url.href),
-	};
-	const user = await register(creds)
-		.then(() => storeCredentials(creds))
-		.catch(err => alert(err.message));
+function addListeners() {
+	on('#registration-form', 'submit', async event => {
+		event.preventDefault();
+		const data = new FormData(event.target);
+		const creds = {
+			name: data.get('name'),
+			email: data.get('email'),
+			password: data.get('password'),
+			image: await createGravatarURL(data.get('email')).then(url => url.href),
+		};
+		const user = await register(creds)
+			.then(() => storeCredentials(creds))
+			.catch(err => alert(err.message));
 
-	if (typeof user === 'object' && ! Object.is(user, null)) {
-		const params = new URLSearchParams(location.search);
+		if (typeof user === 'object' && ! Object.is(user, null)) {
+			const params = new URLSearchParams(location.search);
 
-		if (params.has('redirect')) {
-			navigate(params.get('redirect'));
+			if (params.has('redirect')) {
+				navigate(params.get('redirect'));
+			} else {
+				navigate('/');
+			}
 		} else {
-			navigate('/');
+			alert('Error creating account');
 		}
-	} else {
-		alert('Error creating account');
-	}
-});
+	});
 
-on('#login-form', 'submit', async event => {
-	event.preventDefault();
-	const data = new FormData(event.target);
-	const creds = {
-		email: data.get('email'),
-		password: data.get('password'),
-	};
+	on('#login-form', 'submit', async event => {
+		event.preventDefault();
+		const data = new FormData(event.target);
+		const creds = {
+			email: data.get('email'),
+			password: data.get('password'),
+		};
 
-	const user = await login(creds).catch(err => alert(err.message));
+		const user = await login(creds).catch(err => alert(err.message));
 
-	if (typeof user === 'object' && ! Object.is(user, null)) {
-		await storeCredentials({
-			email: creds.email,
-			password: creds.password,
-			image: user.photoURL,
-			name: user.displayName,
-		});
+		if (typeof user === 'object' && ! Object.is(user, null)) {
+			await storeCredentials({
+				email: creds.email,
+				password: creds.password,
+				image: user.photoURL,
+				name: user.displayName,
+			});
 
-		const params = new URLSearchParams(location.search);
+			const params = new URLSearchParams(location.search);
 
-		if (params.has('redirect')) {
-			navigate(params.get('redirect'));
+			if (params.has('redirect')) {
+				navigate(params.get('redirect'));
+			} else {
+				navigate('/');
+			}
 		} else {
-			navigate('/');
+			alert('Error creating account');
 		}
-	} else {
-		alert('Error creating account');
+	});
+}
+
+addListeners();
+
+document.addEventListener('aegis:navigate', event => {
+	if (event.reason === 'aegis:router:load') {
+		addListeners();
 	}
 });

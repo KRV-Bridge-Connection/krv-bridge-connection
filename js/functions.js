@@ -1,3 +1,5 @@
+import { navigate as nav } from '@aegisjsproject/router/router.js';
+
 export function navigate(pathname, params = {}) {
 	const url = new URL(pathname, `${location.origin}${location.pathname}`);
 
@@ -5,7 +7,7 @@ export function navigate(pathname, params = {}) {
 		throw new Error(`Disallowed origin: ${url.origin}`);
 	} else {
 		Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-		location.href = url.href;
+		nav(url);
 	}
 }
 

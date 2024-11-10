@@ -27,7 +27,6 @@ function validateOrgData(org) {
 }
 
 async function getOrgDataFromForm(form, user) {
-	console.log(user);
 	const data = new FormData(form);
 	const img = await resizeImageFile(data.get('logo'), { height: 256, type: PNG });
 	const uuid = data.get('@identifier') || crypto.randomUUID();
@@ -111,136 +110,146 @@ async function getOrgDataFromForm(form, user) {
 	return org;
 }
 
-on('#org-category', 'change', ({ target }) => {
-	const form = target.form;
-	const index = target.selectedIndex;
-	const option = target.options.item(index);
+function addListeners() {
+	on('#org-category', 'change', ({ target }) => {
+		const form = target.form;
+		const index = target.selectedIndex;
+		const option = target.options.item(index);
 
-	if (option.parentElement instanceof HTMLOptGroupElement && option.parentElement.label.length !== 0) {
-		form.querySelector('[name="category"]').value = option.parentElement.label;
-	}
-});
-
-on('#org-profile-hours .hours-open, #org-profile-hours .hours-close', 'change', ({ target }) => {
-	const group = target.closest('.form-group');
-	const pair = target.classList.contains('hours-open')
-		? group.querySelector('.hours-close')
-		: group.querySelector('.hours-open');
-
-	if (target.value === '') {
-		pair.required = false;
-	} else if (target.classList.contains('hours-open')) {
-		pair.required = true;
-		pair.min = target.value;
-	} else if (target.classList.contains('hours-close')) {
-		pair.required = true;
-		pair.max = target.value;
-	} else {
-		throw new DOMException('Missing class to match open and close hours');
-	}
-});
-
-on('input[data-origin]', 'change', ({ target }) => {
-	if (target.value.length === 0) {
-		target.setCustomValidity(target.required ? 'A valid URL is required' : '');
-	} else if (! URL.canParse(target.value)) {
-		target.setCustomValidity('Invalid URL');
-	} else if (new URL(target.value).origin !== target.dataset.origin) {
-		target.setCustomValidity(`URL must begin with ${target.dataset.origin}`);
-	} else {
-		target.setCustomValidity('');
-	}
-});
-
-on('[data-copy-hours]', 'click', ({ currentTarget }) => {
-	const group = currentTarget.closest(`.${currentTarget.dataset.copyHours}`);
-	const open = group.querySelector('.hours-open').value;
-	const close = group.querySelector('.hours-close').value;
-
-	currentTarget.form.querySelectorAll(`.${currentTarget.dataset.copyHours}`).forEach(section => {
-		if (! group.isSameNode(section)) {
-			section.querySelector('.hours-open').value = open;
-			section.querySelector('.hours-close').value = close;
+		if (option.parentElement instanceof HTMLOptGroupElement && option.parentElement.label.length !== 0) {
+			form.querySelector('[name="category"]').value = option.parentElement.label;
 		}
 	});
-});
 
-on(FIREBASE_FORMS, 'success', async ({ detail }) => {
-	console.log(detail);
-	const params = new URLSearchParams(location.search);
+	on('#org-profile-hours .hours-open, #org-profile-hours .hours-close', 'change', ({ target }) => {
+		const group = target.closest('.form-group');
+		const pair = target.classList.contains('hours-open')
+			? group.querySelector('.hours-close')
+			: group.querySelector('.hours-open');
 
-	if (params.has('redirect')) {
-		navigate(params.get('redirect'));
-	} else {
-		navigate('/');
-	}
-});
-
-on(FIREBASE_FORMS, 'abort', ({ target }) => {
-	if (target.dataset.hasOwnProperty('abortUrl')) {
-		navigate(target.dataset.abortUrl);
-	} else if (history.length > 1) {
-		history.back();
-	} else {
-		navigate('/');
-	}
-});
-
-on('#org-profile-form', 'submit', async event => {
-	event.preventDefault();
-
-	try {
-		const user = await signIn();
-		const org = await getOrgDataFromForm(event.target, user);
-
-		if (validateOrgData(org)) {
-			await createOrUpdateDoc('/organizations', org['@identifier'], org);
-			await alert(`Created ${org.name}`);
-			navigate('/');
+		if (target.value === '') {
+			pair.required = false;
+		} else if (target.classList.contains('hours-open')) {
+			pair.required = true;
+			pair.min = target.value;
+		} else if (target.classList.contains('hours-close')) {
+			pair.required = true;
+			pair.max = target.value;
 		} else {
-			await alert('Error creating Organization');
+			throw new DOMException('Missing class to match open and close hours');
 		}
-	} catch(err) {
-		console.error(err);
-	}
-});
+	});
 
-each('[data-action]', el => {
-	switch(el.dataset.action) {
-		case 'sign-out':
-			registerSignOutButton('[data-action="sign-out"]');
-			break;
-	}
-});
+	on('input[data-origin]', 'change', ({ target }) => {
+		if (target.value.length === 0) {
+			target.setCustomValidity(target.required ? 'A valid URL is required' : '');
+		} else if (! URL.canParse(target.value)) {
+			target.setCustomValidity('Invalid URL');
+		} else if (new URL(target.value).origin !== target.dataset.origin) {
+			target.setCustomValidity(`URL must begin with ${target.dataset.origin}`);
+		} else {
+			target.setCustomValidity('');
+		}
+	});
 
-document.querySelectorAll('.signed-out').forEach(el => disableOnSignIn(el));
-document.querySelectorAll('.signed-in').forEach(el => disableOnSignOut(el));
+	on('[data-copy-hours]', 'click', ({ currentTarget }) => {
+		const group = currentTarget.closest(`.${currentTarget.dataset.copyHours}`);
+		const open = group.querySelector('.hours-open').value;
+		const close = group.querySelector('.hours-close').value;
 
-if (location.pathname === '/account/' && location.search.includes('mode=')) {
-	const params = new URLSearchParams(location.search);
+		currentTarget.form.querySelectorAll(`.${currentTarget.dataset.copyHours}`).forEach(section => {
+			if (! group.isSameNode(section)) {
+				section.querySelector('.hours-open').value = open;
+				section.querySelector('.hours-close').value = close;
+			}
+		});
+	});
 
-	switch(params.get('mode')) {
-		case 'resetPassword':
-			navigate('/account/verify-reset/', {
-				oobCode: params.get('oobCode'),
-				redirent: '/account/sign-in/',
-			});
-			break;
+	on(FIREBASE_FORMS, 'success', async ({ detail }) => {
+		console.log(detail);
+		const params = new URLSearchParams(location.search);
 
-		case 'verifyEmail':
-			navigate('/account/verify-email/', {
-				oobCode:  params.get('oobCode'),
-				redirect: '/account/sign-in/',
-			});
-			break;
+		if (params.has('redirect')) {
+			navigate(params.get('redirect'));
+		} else {
+			navigate('/');
+		}
+	});
 
-		case 'signIn':
-			customElements.whenDefined('firebase-email-link').then(async HTMLFirebaseEmailLinkElement => {
-				if (await HTMLFirebaseEmailLinkElement.verify()) {
-					const result = await HTMLFirebaseEmailLinkElement.signIn();
-					console.log(result);
-				}
-			});
-			break;
+	on(FIREBASE_FORMS, 'abort', ({ target }) => {
+		if (target.dataset.hasOwnProperty('abortUrl')) {
+			navigate(target.dataset.abortUrl);
+		} else if (history.length > 1) {
+			history.back();
+		} else {
+			navigate('/');
+		}
+	});
+
+	on('#org-profile-form', 'submit', async event => {
+		event.preventDefault();
+
+		try {
+			const user = await signIn();
+			const org = await getOrgDataFromForm(event.target, user);
+
+			if (validateOrgData(org)) {
+				await createOrUpdateDoc('/organizations', org['@identifier'], org);
+				await alert(`Created ${org.name}`);
+				navigate('/');
+			} else {
+				await alert('Error creating Organization');
+			}
+		} catch(err) {
+			console.error(err);
+		}
+	});
+
+	each('[data-action]', el => {
+		switch(el.dataset.action) {
+			case 'sign-out':
+				registerSignOutButton('[data-action="sign-out"]');
+				break;
+		}
+	});
+
+	document.querySelectorAll('.signed-out').forEach(el => disableOnSignIn(el));
+	document.querySelectorAll('.signed-in').forEach(el => disableOnSignOut(el));
+
+	if (location.pathname === '/account/' && location.search.includes('mode=')) {
+		const params = new URLSearchParams(location.search);
+
+		switch(params.get('mode')) {
+			case 'resetPassword':
+				navigate('/account/verify-reset/', {
+					oobCode: params.get('oobCode'),
+					redirent: '/account/sign-in/',
+				});
+				break;
+
+			case 'verifyEmail':
+				navigate('/account/verify-email/', {
+					oobCode:  params.get('oobCode'),
+					redirect: '/account/sign-in/',
+				});
+				break;
+
+			case 'signIn':
+				customElements.whenDefined('firebase-email-link').then(async HTMLFirebaseEmailLinkElement => {
+					if (await HTMLFirebaseEmailLinkElement.verify()) {
+						const result = await HTMLFirebaseEmailLinkElement.signIn();
+						console.log(result);
+					}
+				});
+				break;
+		}
 	}
 }
+
+addListeners();
+
+document.addEventListener('aegis:navigate', event => {
+	if (event.reason === 'aegis:router:load') {
+		addListeners();
+	}
+});
