@@ -15,7 +15,7 @@ logos:
   - /img/branding/krv-bridge-mark-white.svg
 ---
 
-## KRV Bridge Connectoin Branding Guidelines
+## KRV Bridge Connection Branding Guidelines
 
 ![KRV Bridge Connection Logo](/img/branding/krv-bridge-logo-wide-blue.svg)
 
