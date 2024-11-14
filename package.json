@@ -74,7 +74,7 @@
     "@shgysk8zer0/lambda-http": "^1.1.19",
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.7",
-    "firebase-admin": "^12.7.0"
+    "firebase-admin": "^13.0.0"
   },
   "devDependencies": {
     "@shgysk8zer0/eslint-config": "^1.0.1",
