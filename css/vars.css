@@ -8,6 +8,7 @@
 	--button-primary-color-dark: var(--bs-gray-100);
 	--button-primary-background-light: var(--bs-blue-400);
 	--button-primary-color-light: var(--bs-gray-100);
+	--button-background: var(--button-primary-background);
 }
 
 @supports (height: 1dvh) {

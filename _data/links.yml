@@ -2,6 +2,9 @@ nav:
   - label: Home
     icon: home
     href: /
+  - label: Volunteer
+    icon: info
+    href: '/volunteer/'
   # - label: Resources
   #   icon: list-unordered
   #   href: /resources/

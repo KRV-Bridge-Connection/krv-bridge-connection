@@ -2,6 +2,7 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 @import url("https://unpkg.com/normalize.css@8.0.1/normalize.css");
+@import url("./aegis-styles.css");
 @import url("./core-css.css");
 @import url("./layout.css");
 @import url("./vars.css");
@@ -10,6 +11,11 @@
 
 :root {
 	font-size: 18px;
+}
+
+.btn {
+	border-color: transparent;
+	border-width: 0;
 }
 
 .status-box:empty {

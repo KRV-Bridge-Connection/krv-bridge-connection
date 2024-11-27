@@ -53,6 +53,7 @@ default:
     - https://securetoken.googleapis.com/v1/
     - https://api.openweathermap.org/data/2.5/
     - https://events.kernvalley.us/events.json
+    - https://maps.kernvalley.us/places/
     # - https://www.google-analytics.com/
     # - https://www.googletagmanager.com/gtag/
     # - https://baconipsum.com/api/
