@@ -1,7 +1,6 @@
 import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callbacks.js';
 import { signal as signalAttr, onChange, onSubmit, onReset, onClick } from '@aegisjsproject/callback-registry/events.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
-import { navigate } from '@aegisjsproject/router/router.js';
 import { setState, clearState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 
@@ -37,7 +36,7 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 	dialog.showModal();
 	dialog.addEventListener('close', () => {
 		clearState();
-		navigate('/');
+		location.href = '/';
 	}, { once: true });
 
 	fetch('/api/volunteer', {
