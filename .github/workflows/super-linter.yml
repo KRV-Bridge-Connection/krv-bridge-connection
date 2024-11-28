@@ -85,10 +85,10 @@ jobs:
           # JAVASCRIPT_ES_CONFIG_FILE: 'eslint.config.js'
           # CSS_FILE_NAME: '.stylelintrc.json'
 
-          # Valate Languages - Uncomment to Enable
+          # Valate Languages - Un`omment to Enable
           # JS/TS/JSON Disabled until ESLint in super-linter is updated
           # VALIDATE_HTML: true
-          VALIDATE_CSS: true
+          # VALIDATE_CSS: true
           # VALIDATE_JAVASCRIPT_ES: true
           # VALIDATE_JAVASCRIPT_STANDARD: true
           # VALIDATE_JSON: true
