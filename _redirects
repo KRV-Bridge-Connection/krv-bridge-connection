@@ -2,4 +2,4 @@
 /.well-known/jwks.json  /api/jwk
 /api/* /.netlify/functions/:splat 200!
 /banner-qr/ https://www.facebook.com/krvbridgeconnection
-/* /404.html 404
+/* /404.html 200
