@@ -1,8 +1,9 @@
 import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callbacks.js';
 import { signal as signalAttr, onChange, onSubmit, onReset, onClick } from '@aegisjsproject/callback-registry/events.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
-import { setState, clearState } from '@aegisjsproject/state/state.js';
+import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
+import { navigate } from '@aegisjsproject/router/router.js';
 
 const towns = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
@@ -33,10 +34,9 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 	const data = new FormData(event.target);
 	const dialog = document.getElementById('volunteer-thanks-dialog');
 
-	dialog.showModal();
 	dialog.addEventListener('close', () => {
 		clearState();
-		location.href = '/';
+		navigate('/');
 	}, { once: true });
 
 	fetch('/api/volunteer', {
@@ -45,44 +45,12 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 		keepalive: true,
 	});
 
+	dialog.showModal();
+
 	setTimeout(() => dialog.close(), 10_000);
 });
 
-const changeHandler = registerCallback('volunteer:form:change', ({ target }) => {
-	if (target instanceof HTMLSelectElement) {
-		setState(target.name, target.multiple ? Array.from(target.selectedOptions, opt => opt.value) : target.value);
-	} else if (target instanceof HTMLInputElement) {
-		switch(target.type) {
-			case 'checkbox': {
-					const checkboxes = target.form.querySelectorAll(`input[name="${target.name}"][type="checkbox"]`);
-
-					if (checkboxes.length === 1) {
-						setState(target.name, target.value === 'on' ? target.checked : target.value);
-					} else {
-						setState(target.name, Array.from(checkboxes).filter(item => item.checked).map(item => item.value));
-					}
-				}
-				break;
-
-			case 'number':
-				setState(target.name, target.valueAsNumber);
-				break;
-
-			case 'date':
-				setState(target.name, target.valueAsDate?.toISOString()?.split('T')?.at(0));
-				break;
-
-			case 'datetime-local':
-				setState(target.name, target.valueAsDate?.toISOString());
-				break;
-
-			default:
-				setState(target.name, target.value);
-		}
-	} else if (target instanceof HTMLTextAreaElement) {
-		setState(target.name, target.value);
-	}
-});
+const changeHandler = registerCallback('volunteer:form:change', change);
 
 export default ({
 	state: {

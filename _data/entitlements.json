@@ -9,5 +9,6 @@
   "post:create", "post:update", "post:delete",
   "comment:create", "comment:update", "comment:delete",
   "link:create", "link:update", "link:delete",
-  "invoice:create", "invoice:update", "invoice:delete"
+  "invoice:create", "invoice:update", "invoice:delete",
+  "volunteers:list", "volunteers:delete"
 ]
