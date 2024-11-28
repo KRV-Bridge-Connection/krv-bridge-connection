@@ -77,7 +77,7 @@
     "firebase-admin": "^13.0.1"
   },
   "devDependencies": {
-    "@shgysk8zer0/eslint-config": "^1.0.1",
+    "@shgysk8zer0/eslint-config": "^1.0.3",
     "dotenv": "^16.4.5",
     "eslint-plugin-frontmatter2": "^1.0.0"
   }
