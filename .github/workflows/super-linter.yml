@@ -83,7 +83,7 @@ jobs:
           LINTER_RULES_PATH: './'
           EDITORCONFIG_FILE_NAME: '.editorconfig'
           # JAVASCRIPT_ES_CONFIG_FILE: 'eslint.config.js'
-          CSS_FILE_NAME: '.stylelintrc.json'
+          # CSS_FILE_NAME: '.stylelintrc.json'
 
           # Valate Languages - Uncomment to Enable
           # JS/TS/JSON Disabled until ESLint in super-linter is updated
