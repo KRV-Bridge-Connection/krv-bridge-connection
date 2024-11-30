@@ -24,10 +24,19 @@ const unchecked = `<svg height="18" width="18" fill="currentColor" role="present
 	<use xlink:href="/img/icons.svg#x"></use>
 </svg>`;
 
-const resetHandler = registerCallback('volunteer:form:reset', clearState);
-
 const today = new Date();
 const youngestBday = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate(), 0, 0);
+const resetHandler = registerCallback('volunteer:form:reset', clearState);
+const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
+	if (Number.isSafeInteger(target.valueAsNumber) && target.validity.valid) {
+		const bDay = document.getElementById('volunteer-bday');
+		const currentDate = bDay.valueAsDate ?? new Date();
+		currentDate.setFullYear(target.valueAsNumber);
+		document.getElementById('volunteer-bday').value = currentDate.toISOString().split('T')[0];
+		bDay.dispatchEvent(new Event('change', { cancelable: true }));
+		bDay.focus();
+	}
+});
 
 const submitHandler = registerCallback('volunteer:form:submit:', event => {
 	event.preventDefault();
@@ -190,6 +199,10 @@ export default ({
 		<div class="form-group">
 			<label for="volunteer-bday" class="input-label">Birthday</label>
 			<input type="date" name="bDay" id="volunteer-bday" class="input" placeholder="YYYY-MM-DD" autocomplete="bday" ${attr({ value: bDay, max: youngestBday.toISOString().split('T')[0] })} />
+			<label class="block">
+				<span>Pick birth year</span>
+				<input type="number" class="input" ${onChange}="${yearPicker}" max="${youngestBday.getFullYear()}" min="${youngestBday.getFullYear() - 100}" placeholder="YYYY" />
+			</label>
 		</div>
 		<div class="form-group">
 			<p>Shirts may be required to identify those serving at an event, and we also hope to create custom shirts for our group of volunteers soon.</p>
