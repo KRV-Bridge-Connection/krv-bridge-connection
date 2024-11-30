@@ -11,5 +11,4 @@
   defer: true
 - src: ./js/index.min.js
   referrerPolicy: no-referrer
-  defer: true
-  integrity: auto
+  type: module

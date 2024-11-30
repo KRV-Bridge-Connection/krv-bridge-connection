@@ -1,3 +1,5 @@
 /.well-known/change-password	/account/forgot-password/	301!
+/.well-known/jwks.json  /api/jwk
 /api/* /.netlify/functions/:splat 200!
 /banner-qr/ https://www.facebook.com/krvbridgeconnection
+/* /404.html 200

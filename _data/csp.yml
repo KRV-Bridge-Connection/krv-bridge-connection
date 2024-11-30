@@ -11,6 +11,7 @@ default:
     - https://unpkg.com/@aegisjsproject/
     - https://www.gstatic.com/firebasejs/
     - https://donorbox.org/widget.js
+    - https://cdn.kernvalley.us/js/pwa-reset.js
     # - https://www.google-analytics.com
     # - https://www.googletagmanager.com
   manifest-src:
@@ -53,6 +54,7 @@ default:
     - https://securetoken.googleapis.com/v1/
     - https://api.openweathermap.org/data/2.5/
     - https://events.kernvalley.us/events.json
+    - https://maps.kernvalley.us/places/
     # - https://www.google-analytics.com/
     # - https://www.googletagmanager.com/gtag/
     # - https://baconipsum.com/api/

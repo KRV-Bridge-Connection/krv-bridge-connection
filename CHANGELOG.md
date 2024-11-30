@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.13]
+
+### Added
+- Add `/volunteer/` page via `/js/routes/`
+
+### Changed
+- Mark some libraries as external in rollup
+
+### Fixed
+- Fix `robots.txt`
+- Fix `/reset/` page
+
 ## [v1.0.12] - 2024-11-09
 
 ### Added
