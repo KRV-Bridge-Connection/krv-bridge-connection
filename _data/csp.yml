@@ -11,6 +11,7 @@ default:
     - https://unpkg.com/@aegisjsproject/
     - https://www.gstatic.com/firebasejs/
     - https://donorbox.org/widget.js
+    - https://cdn.kernvalley.us/js/pwa-reset.js
     # - https://www.google-analytics.com
     # - https://www.googletagmanager.com
   manifest-src:
