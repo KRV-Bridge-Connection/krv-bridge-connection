@@ -107,6 +107,7 @@ export default ({
 		agreed = false,
 	},
 	signal,
+	/* eslint-disable indent */
 }) => html`<form id="volunteer-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 	<div class="status-box info">
 		<p>Thank you for your interest in volunteering in the the KRV! Please provide us with the following infomation so we may best utilize your services.</p>
