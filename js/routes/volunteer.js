@@ -34,7 +34,12 @@ const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
 		currentDate.setFullYear(target.valueAsNumber);
 		document.getElementById('volunteer-bday').value = currentDate.toISOString().split('T')[0];
 		bDay.dispatchEvent(new Event('change', { cancelable: true }));
-		bDay.focus();
+
+		if (bDay.showPicker instanceof Function) {
+			bDay.showPicker();
+		} else {
+			bDay.click();
+		}
 	}
 });
 
@@ -196,13 +201,14 @@ export default ({
 	<fieldset id="volunteer-additional" class="no-border">
 		<legend>Additional Info</legend>
 		<p>We ask for your birthday as a form of age verification, and may use it for celebrating with you as well.</p>
+		<p><strong>Note</strong>: There is year-picker to help enter your birthday on mobile.</p>
 		<div class="form-group">
-			<label for="volunteer-bday" class="input-label">Birthday</label>
-			<input type="date" name="bDay" id="volunteer-bday" class="input" placeholder="YYYY-MM-DD" autocomplete="bday" ${attr({ value: bDay, max: youngestBday.toISOString().split('T')[0] })} />
 			<label class="block">
 				<span>Pick birth year</span>
 				<input type="number" class="input" ${onChange}="${yearPicker}" max="${youngestBday.getFullYear()}" min="${youngestBday.getFullYear() - 100}" placeholder="YYYY" />
 			</label>
+			<label for="volunteer-bday" class="input-label">Birthday</label>
+			<input type="date" name="bDay" id="volunteer-bday" class="input" placeholder="YYYY-MM-DD" autocomplete="bday" ${attr({ value: bDay, max: youngestBday.toISOString().split('T')[0] })} />
 		</div>
 		<div class="form-group">
 			<p>Shirts may be required to identify those serving at an event, and we also hope to create custom shirts for our group of volunteers soon.</p>
