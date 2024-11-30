@@ -47,6 +47,14 @@ article p:first-letter {
 	gap: 12px;
 }
 
+.btn-toggle {
+	color: var(--aegis-color-dark, #f8f9fa);
+}
+
+button.btn[is="share-button"], body > share-button.btn:not([hidden]) {
+	line-height: 1;
+}
+
 .donorbox-container {
 	background-color: #ffffff;
 	color: #232323;

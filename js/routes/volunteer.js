@@ -318,3 +318,5 @@ export default ({
 </dialog>`;
 
 export const title = () => 'Volunteer in the KRV';
+
+export const description = () => 'Sign-up to be contacted about multiple volunteer opportunities around the Kern River Valley.';
