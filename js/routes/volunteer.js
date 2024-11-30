@@ -16,11 +16,11 @@ const alergyList = [
 	'Pollen', 'Dust mites', 'Animal dander', 'Insect stings', 'Mold',
 ];
 
-const checked = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-checked">
+const checkedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-checked">
 	<use xlink:href="/img/icons.svg#check"></use>
 </svg>`;
 
-const unchecked = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-unchecked">
+const uncheckedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-unchecked">
 	<use xlink:href="/img/icons.svg#x"></use>
 </svg>`;
 
@@ -54,7 +54,7 @@ const checkedToggle = registerCallback('aegis:label:toggle', ({ target }) => {
 });
 
 const triggerClick = registerCallback('aegis:click:trigger', event => {
-	if (event.key === ' ' || event.key === 'Enter') {
+	if (event.key === ' ') {
 		event.preventDefault();
 		event.target.click();
 	}
@@ -70,7 +70,7 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 		navigate('/');
 	}, { once: true });
 
-	fetch('/api/volunteer', {
+	fetch(new URL('/api/volunteer', import.meta.url), {
 		method: 'POST',
 		body: data,
 		keepalive: true,
@@ -105,10 +105,10 @@ export default ({
 		hours = NaN,
 		newsletter = false,
 		agreed = false,
-	},
+	} = history.state ?? {},
 	signal,
 	/* eslint-disable indent */
-}) => html`<form id="volunteer-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
+} = {}) => html`<form id="volunteer-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 	<div class="status-box info">
 		<p>Thank you for your interest in volunteering in the the KRV! Please provide us with the following infomation so we may best utilize your services.</p>
 		<p>Please be aware that, but submitting this form, you are agreeing to being contacted for any future volunteer opportinities, not for any specific event.</p>
@@ -149,9 +149,9 @@ export default ({
 						checked: days.includes(opt),
 						id: `day-${opt}`,
 					})} ${onChange}="${checkedToggle}" hidden="" />
-					<label class="btn btn-toggle" ${attr({ for: `day-${opt}`, 'aria-label': opt, 'aria-checked': days.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+					<label class="btn btn-toggle" ${attr({ for: `day-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
 						<span>${opt}</span>
-						${checked}${unchecked}
+						${checkedIcon}${uncheckedIcon}
 					</label>
 				</span>`).join('')}
 			</div>
@@ -167,7 +167,7 @@ export default ({
 					})} ${onChange}="${checkedToggle}" hidden="" />
 					<label class="btn btn-toggle" ${attr({ for: `time-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
 						<span>${opt}</span>
-						${checked}${unchecked}
+						${checkedIcon}${uncheckedIcon}
 					</label>
 				</span>`).join('')}
 			</div>
@@ -187,7 +187,7 @@ export default ({
 				})} ${onChange}="${checkedToggle}" hidden="" />
 				<label class="btn btn-toggle" ${attr({ for: `interest-${opt}`, 'aria-label': opt, 'aria-checked': interests.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
 					<span>${opt}</span>
-					${checked}${unchecked}
+					${checkedIcon}${uncheckedIcon}
 				</label>
 			</span>`).join('')}
 			</div>
@@ -203,7 +203,7 @@ export default ({
 					})} ${onChange}="${checkedToggle}" hidden="" />
 					<label class="btn btn-toggle" ${attr({ for: `skill-${opt}`, 'aria-label': opt, 'aria-checked': skills.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
 						<span>${opt}</span>
-						${checked}${unchecked}
+						${checkedIcon}${uncheckedIcon}
 					</label>
 			</span>`).join('')}
 			</div>
@@ -230,7 +230,7 @@ export default ({
 					})} ${onChange}="${checkedToggle}" hidden="" />
 					<label class="btn btn-toggle" ${attr({ for: `allergy-${opt}`, 'aria-label': opt, 'aria-checked': allergies.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
 						<span>${opt}</span>
-						${checked}${unchecked}
+						${checkedIcon}${uncheckedIcon}
 					</label>
 				</span>`).join('')}
 			</div>
@@ -262,14 +262,14 @@ export default ({
 				<input type="checkbox" name="needsTransportation" id="volunteer-need-transportation" ${attr({ checked: needsTransportation })} ${onChange}="${checkedToggle}" hidden="" />
 				<label for="volunteer-need-transportation" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may required transportation" aria-checked="${needsTransportation ? 'true' : 'false'}" ${onKeydown}="${triggerClick}">
 					<span>I may require Transportation</span>
-					${checked}${unchecked}
+					${checkedIcon}${uncheckedIcon}
 				</label>
 			</div>
 			<div class="form-group">
 				<input type="checkbox" name="needsChildcare" id="volunteer-need-childcare" ${attr({ checked: needsChildcare })} ${onChange}="${checkedToggle}" hidden="" />
 				<label for="volunteer-need-childcare" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require childcare" aria-checked="I may require childcare" aria-checked="${needsChildcare ? 'true' : 'false'}" ${onKeydown}="${triggerClick}">
 					<span>I may require Childcare</span>
-					${checked}${unchecked}
+					${checkedIcon}${uncheckedIcon}
 				</label>
 			</div>
 		<div class="form-group">
@@ -281,7 +281,7 @@ export default ({
 			<input type="checkbox" name="newsletter" id="volunteer-newsletter" ${attr({ checked: newsletter })} ${onChange}="${checkedToggle}" hidden="" />
 			<label for="volunteer-newsletter" class="btn btn-toggle" role="checkbox" tabindex="0" aria-label="Subscribe to our newsletter" aria-checked="${newsletter ? 'true' : 'false' }" ${onKeydown}="${triggerClick}">
 				<span>Subscribe to our Newsletter</span>
-				${checked}${unchecked}
+				${checkedIcon}${uncheckedIcon}
 			</label>
 		</div>
 		<div class="form-group">
@@ -292,7 +292,7 @@ export default ({
 			<input type="checkbox" name="agreed" id="volunteer-agreed"  ${attr({ checked: agreed })} ${onChange}="${checkedToggle}" required="" hidden="" />
 			<label for="volunteer-agreed" tabindex="0" class="btn btn-toggle required" ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0" aria-label="Agree to terms" aria-checked="${agreed ? 'true' : 'false' }">
 				<span>Agree to be Contacted for Volunteer Opportunities</span>
-				${checked}${unchecked}
+				${checkedIcon}${uncheckedIcon}
 			</label>
 		</div>
 	</fieldset>
