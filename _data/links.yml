@@ -2,9 +2,6 @@ nav:
   - label: Home
     icon: home
     href: /
-  - label: Volunteer
-    icon: info
-    href: '/volunteer/'
   # - label: Resources
   #   icon: list-unordered
   #   href: /resources/
@@ -17,6 +14,9 @@ nav:
   - label: Donate
     icon: donate
     href: /donate/
+  - label: Volunteer
+    icon: hand
+    href: '/volunteer/'
   - label: Account
     icon: avatar-default
     href: /account/

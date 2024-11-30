@@ -24,8 +24,10 @@ const unchecked = `<svg height="18" width="18" fill="currentColor" role="present
 	<use xlink:href="/img/icons.svg#x"></use>
 </svg>`;
 
+const minAge = 13;
 const today = new Date();
-const youngestBday = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate(), 0, 0);
+const youngestBday = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate(), 0, 0);
+
 const resetHandler = registerCallback('volunteer:form:reset', clearState);
 const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
 	if (Number.isSafeInteger(target.valueAsNumber) && target.validity.valid) {
@@ -103,7 +105,7 @@ export default ({
 			<input type="text" name="name" id="volunteer-name" class="input" autocomplete="name" ${attr({ value: name })} placeholder="First Last" required="" />
 		</div>
 		<div class="form-group">
-			<label class="input-label requried" for="volunteer-email">Email</label>
+			<label class="input-label required" for="volunteer-email">Email</label>
 			<input type="email" name="email" id="volunteer-email" class="input" autocomplete="email" ${attr({ value: email })} placeholder="user@example.com" required="" />
 		</div>
 		<div class="form-group">
@@ -200,7 +202,7 @@ export default ({
 	</fieldset>
 	<fieldset id="volunteer-additional" class="no-border">
 		<legend>Additional Info</legend>
-		<p>We ask for your birthday as a form of age verification, and may use it for celebrating with you as well.</p>
+		<p>We ask for your birthday as a form of age verification, and may use it for celebrating with you as well. Volunteers must be at least ${minAge} years old.</p>
 		<p><strong>Note</strong>: There is year-picker to help enter your birthday on mobile.</p>
 		<div class="form-group">
 			<label class="block">
@@ -212,7 +214,7 @@ export default ({
 		</div>
 		<div class="form-group">
 			<p>Shirts may be required to identify those serving at an event, and we also hope to create custom shirts for our group of volunteers soon.</p>
-			<label class="input-label requried" for="volunteer-size" class="input-label">Shirt Size</label>
+			<label class="input-label required" for="volunteer-size" class="input-label">Shirt Size</label>
 			<select name="size" id="volunteer-size" class="input" required="">
 				<option label="Please select your shirt size" value=""></option>
 				${sizes.map(opt => `<option ${attr({ label: opt, value: opt, selected: size === opt })}></option>`)}
