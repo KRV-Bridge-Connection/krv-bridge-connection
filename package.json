@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@shgysk8zer0/eslint-config": "^1.0.3",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "eslint-plugin-frontmatter2": "^1.0.0"
   }
 }
