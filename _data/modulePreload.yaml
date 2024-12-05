@@ -1,0 +1,19 @@
+---
+- href: '@aegisjsproject/callback-registry/callbacks.js'
+  fetchPriority: high
+- href: '@aegisjsproject/callback-registry/events.js'
+  fetchPriority: high
+- href: '@aegisjsproject/router/router.js'
+  fetchPriority: high
+- href: '@aegisjsproject/state'
+  fetchPriority: high
+- href: '@aegisjsproject/url/url.js'
+  fetchPriority: high
+- href: '@aegisjsproject/url/parser.js'
+  fetchPriority: high
+- href: '@aegisjsproject/url/search.js'
+  fetchPriority: high
+- href: '@aegisjsproject/url/SearchParam.js'
+  fetchPriority: high
+- href: '@aegisjsproject/url/utils.js'
+  fetchPriority: high

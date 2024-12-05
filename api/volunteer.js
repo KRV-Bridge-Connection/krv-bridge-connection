@@ -12,7 +12,6 @@ async function getFirebase() {
 		return firebase.apps[0];
 	} else {
 		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-
 		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
 
 		return firebase;
@@ -68,11 +67,14 @@ export default createHandler({
 	},
 	async post(req) {
 		const data = await req.formData();
+		const missing = ['name', 'phone', 'email', 'phone', 'agreed'].filter(field => ! data.has(field));
 
-		if (['name', 'phone', 'email', 'phone', 'streetAddress', 'addressLocality', 'size', 'agreed'].every(field => data.has(field))) {
+		if (missing.length !== 0) {
+			throw new HTTPBadRequestError('Missing required inputs', { details: { missing }});
+		} else if (data.has('id')) {
 			const collection = await getCollection(COLLECTION);
 
-			await collection.add({
+			const result = await collection.doc(data.get('id')).update({
 				name: data.get('name'),
 				email: data.get('email'),
 				phone: data.get('phone'),
@@ -95,9 +97,44 @@ export default createHandler({
 				agreed: data.has('agreed'),
 			});
 
-			return new Response(null, { status: 202 });
+			if (typeof result.writeTime === 'undefined') {
+				throw new HTTPBadRequestError(`Unable to update document with id of ${data.get('id')}`);
+			} else {
+				return new Response(null, { status: 204 });
+			}
 		} else {
-			throw new HTTPBadRequestError('Missing required inputs');
+			const collection = await getCollection(COLLECTION);
+
+			const doc = await collection.add({
+				name: data.get('name'),
+				email: data.get('email'),
+				phone: data.get('phone'),
+				streetAddress: data.get('streetAddress'),
+				addressRegion: data.get('addressLocality'),
+				registered: new Date(),
+				days: data.getAll('days'),
+				times: data.getAll('times'),
+				hours: parseInt(data.get('hours')),
+				needsTransportation: data.has('needsTransportation'),
+				emergencyName: data.get('emergencyName'),
+				emergencyPhone: data.get('emergencyPhone'),
+				allergies: data.getAll('allergies'),
+				bDay: data.get('bDay'),
+				size: data.get('size'),
+				interests: data.getAll('interests'),
+				skills: data.getAll('skills'),
+				notes: data.get('notes'),
+				newsletter: data.has('newsletter'),
+				agreed: data.has('agreed'),
+			});
+
+			const loc = new URL(req.pathname, req.origin);
+			loc.searchParams.set('id', doc.id);
+
+			return Response.json({ id: doc.id }, {
+				status: 201,
+				headers: { Location: loc.href },
+			});
 		}
 	},
 	async delete(req) {

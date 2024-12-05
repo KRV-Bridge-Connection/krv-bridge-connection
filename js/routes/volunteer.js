@@ -1,6 +1,5 @@
 import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callbacks.js';
 import { signal as signalAttr, onChange, onSubmit, onReset, onClick, onKeydown } from '@aegisjsproject/callback-registry/events.js';
-import { html } from '@aegisjsproject/core/parsers/html.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate } from '@aegisjsproject/router/router.js';
@@ -10,8 +9,8 @@ const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
 const daysList = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const timeList = ['Morning (6AM-11AM)', 'Afternoon (12PM-4PM)', 'Evening (5PM-9PM)'];
 const skillList = ['Construction', 'Food Services', 'CPR', 'Teaching', 'Sound/Music', 'Writing', 'Design/Flyers', 'Social Media'];
-const interestsList = ['Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning'];
-const alergyList = [
+const interestsList = ['Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning', 'Childcare', 'Transportation'];
+const allergyList = [
 	'Peanuts', 'Tree nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish', 'Gluten', 'Latex',
 	'Pollen', 'Dust mites', 'Animal dander', 'Insect stings', 'Mold',
 ];
@@ -42,6 +41,18 @@ const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
 		} else {
 			bDay.click();
 		}
+	}
+});
+
+const toggleAddressVisibility = registerCallback('volunteer:toggle:address:visible', ({ currentTarget }) => {
+	const container = document.getElementById('transportation-details');
+
+	if (currentTarget.previousElementSibling.checked) {
+		container.hidden = true;
+		container.querySelectorAll('input').forEach(input => input.disabled = true);
+	} else {
+		container.hidden = false;
+		container.querySelectorAll('input').forEach(input => input.disabled = false);
 	}
 });
 
@@ -108,10 +119,10 @@ export default ({
 	} = history.state ?? {},
 	signal,
 	/* eslint-disable indent */
-} = {}) => html`<form id="volunteer-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
+} = {}) => `<form id="volunteer-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 	<div class="status-box info">
-		<p>Thank you for your interest in volunteering in the the KRV! Please provide us with the following infomation so we may best utilize your services.</p>
-		<p>Please be aware that, but submitting this form, you are agreeing to being contacted for any future volunteer opportinities, not for any specific event.</p>
+		<p>Thank you for your interest in volunteering in the KRV! Please provide us with the following information so we may best utilize your services.</p>
+		<p>Please be aware that, by submitting this form, you are agreeing to being contacted for any future volunteer opportunities, not for any specific event.</p>
 	</div>
 	<br />
 	<fieldset id="volunteer-contact" class="no-border">
@@ -128,116 +139,6 @@ export default ({
 			<label class="input-label required" for="volunteer-phone">Phone</label>
 			<input type="tel" name="phone" id="volunteer-phone" class="input" autocomplete="tel" ${attr({ value: phone })} placeholder="555-555-5555" required="" />
 		</div>
-		<div class="form-group">
-			<label class="input-label" for="volunteer-street-address">Street Address</label>
-			<input type="text" name="streetAddress" id="volunteer-street-address" class="input" autocomplete="street-address" ${attr({ value: streetAddress })} placeholder="123 Some St" />
-		</div>
-		<div class="form-group">
-			<label class="input-label required" for="volunteer-town">City/Town</label>
-			<input type="text" name="addressLocality" id="volunteer-town" class="input" list="towns-list" autocomplete="address-level2" ${attr({ value: addressLocality })} placeholder="City/Town" required="" />
-		</div>
-		<datalist id="towns-list">${towns.map(town => `<option ${attr({ label: town, value: town })}></option>`)}</datalist>
-	</fieldset>
-	<fieldset id="volunteer-availability" class="no-border">
-		<legend>Availability</legend>
-		<div class="form-group">
-			<p>Please select the days you are likely to be available.</p>
-			<div class="flex row wrap">
-				${daysList.map(opt => `<span class="checkbox-group">
-					<input type="checkbox" name="days" ${attr({
-						value: opt,
-						checked: days.includes(opt),
-						id: `day-${opt}`,
-					})} ${onChange}="${checkedToggle}" hidden="" />
-					<label class="btn btn-toggle" ${attr({ for: `day-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-						<span>${opt}</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
-				</span>`).join('')}
-			</div>
-		</div>
-		<p>Please select the times of day you are likely to be available.</p>
-		<div class="form-group">
-			<div class="flex row wrap">
-				${timeList.map(opt => `<span class="checkbox-group">
-					<input type="checkbox" name="times" ${attr({
-						value: opt,
-						checked: times.includes(opt),
-						id: `time-${opt}`,
-					})} ${onChange}="${checkedToggle}" hidden="" />
-					<label class="btn btn-toggle" ${attr({ for: `time-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-						<span>${opt}</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
-				</span>`).join('')}
-			</div>
-		</div>
-		<div class="form-group">
-			<label for="volunteer-hours" class="input-label">Estimated Hours Available</label>
-			<input type="number" name="hours" id="volunteer-hours" class="input" min="0" max="8" placeholder="##" ${attr({ value: hours })} />
-		</div>
-		<div class="form-group">
-			<p>Please Select anything you are interested in Volunteering for</p>
-			<div class="flex row wrap">
-			${interestsList.map(opt => `<span class="checkbox-group">
-				<input type="checkbox" name="interests" ${attr({
-					value: opt,
-					checked: interests.includes(opt),
-					id: `interest-${opt}`,
-				})} ${onChange}="${checkedToggle}" hidden="" />
-				<label class="btn btn-toggle" ${attr({ for: `interest-${opt}`, 'aria-label': opt, 'aria-checked': interests.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-					<span>${opt}</span>
-					${checkedIcon}${uncheckedIcon}
-				</label>
-			</span>`).join('')}
-			</div>
-		</div>
-		<div class="form-group">
-			<p>Please check any special skills you have to offer</p>
-			<div class="flex row wrap">
-				${skillList.map(opt => `<span class="checkbox-group">
-					<input type="checkbox" name="skills" ${attr({
-						value: opt,
-						checked: skills.includes(opt),
-						id: `skill-${opt}`,
-					})} ${onChange}="${checkedToggle}" hidden="" />
-					<label class="btn btn-toggle" ${attr({ for: `skill-${opt}`, 'aria-label': opt, 'aria-checked': skills.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-						<span>${opt}</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
-			</span>`).join('')}
-			</div>
-		</div>
-	</fieldset>
-	<fieldset id="volunteer-emergency-contact" class="no-border">
-		<legend>Emergency Contact &amp; Health Info</legend>
-		<div class="form-group">
-			<label for="volunteer-emergency-name" class="form-group">Name</label>
-			<input type="text" name="emergencyName" id="volunteer-emergency-name" class="input" autocomplete="off" ${attr({ value: emergencyName })} placeholder="Emergency Contact Name" />
-		</div>
-		<div class="form-group">
-			<label for="volunteer-emergency-phone" class="input-group">Emergency Phone</label>
-			<input type="tel" name="emergencyPhone" id="volunteer-emergency-phone" class="input" autocomplete="off" ${attr({ value: emergencyPhone })} placeholder="555-555-5555" />
-		</div>
-		<div class="form-group">
-			<p>Do you have any allergies? We may need to know about allergies for any food served to volunteers, as well as to not ask you to volunteer at an event that might put you at risk.</p>
-			<div class="flex row wrap">
-				${alergyList.map(opt => `<span class="checkbox-group">
-					<input type="checkbox" name="allergies" ${attr({
-						value: opt,
-						checked: allergies.includes(opt),
-						id: `allergy-${opt}`,
-					})} ${onChange}="${checkedToggle}" hidden="" />
-					<label class="btn btn-toggle" ${attr({ for: `allergy-${opt}`, 'aria-label': opt, 'aria-checked': allergies.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-						<span>${opt}</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
-				</span>`).join('')}
-			</div>
-		</div>
-	</fieldset>
-	<fieldset id="volunteer-additional" class="no-border">
-		<legend>Additional Info</legend>
 		<p>We ask for your birthday as a form of age verification, and may use it for celebrating with you as well. Volunteers must be at least ${minAge} years old.</p>
 		<p><strong>Note</strong>: There is year-picker to help enter your birthday on mobile.</p>
 		<div class="form-group">
@@ -245,33 +146,151 @@ export default ({
 				<span>Pick birth year</span>
 				<input type="number" class="input" ${onChange}="${yearPicker}" max="${youngestBday.getFullYear()}" min="${youngestBday.getFullYear() - 100}" placeholder="YYYY" />
 			</label>
-			<label for="volunteer-bday" class="input-label">Birthday</label>
-			<input type="date" name="bDay" id="volunteer-bday" class="input" placeholder="YYYY-MM-DD" autocomplete="bday" ${attr({ value: bDay, max: youngestBday.toISOString().split('T')[0] })} />
+			<label for="volunteer-bday" class="input-label required">Birthday</label>
+			<input type="date" name="bDay" id="volunteer-bday" class="input" placeholder="YYYY-MM-DD" autocomplete="bday" ${attr({ value: bDay, max: youngestBday.toISOString().split('T')[0] })} required="" />
 		</div>
-		<div class="form-group">
-			<p>Shirts may be required to identify those serving at an event, and we also hope to create custom shirts for our group of volunteers soon.</p>
-			<label class="input-label required" for="volunteer-size" class="input-label">Shirt Size</label>
-			<select name="size" id="volunteer-size" class="input" required="">
-				<option label="Please select your shirt size" value=""></option>
-				${sizes.map(opt => `<option ${attr({ label: opt, value: opt, selected: size === opt })}></option>`)}
-			</select>
-		</div>
+	</fieldset>
+	<details id="volunteer-optional" class="accordion">
+		<summary>Optional Additional Questions</summary>
+		<fieldset id="volunteer-availability" class="no-border">
+			<legend>Availability</legend>
+			<div class="form-group">
+				<p>Please select the days you are likely to be available.</p>
+				<div class="flex row wrap">
+					${daysList.map(opt => `<span class="checkbox-group">
+						<input type="checkbox" name="days" ${attr({
+							value: opt,
+							checked: days.includes(opt),
+							id: `day-${opt}`,
+						})} ${onChange}="${checkedToggle}" hidden="" />
+						<label class="btn btn-toggle" ${attr({ for: `day-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+							<span>${opt}</span>
+							${checkedIcon}${uncheckedIcon}
+						</label>
+					</span>`).join('')}
+				</div>
+			</div>
+			<p>Please select the times of day you are likely to be available.</p>
+			<div class="form-group">
+				<div class="flex row wrap">
+					${timeList.map(opt => `<span class="checkbox-group">
+						<input type="checkbox" name="times" ${attr({
+							value: opt,
+							checked: times.includes(opt),
+							id: `time-${opt}`,
+						})} ${onChange}="${checkedToggle}" hidden="" />
+						<label class="btn btn-toggle" ${attr({ for: `time-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+							<span>${opt}</span>
+							${checkedIcon}${uncheckedIcon}
+						</label>
+					</span>`).join('')}
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="volunteer-hours" class="input-label">Estimated Hours Available</label>
+				<input type="number" name="hours" id="volunteer-hours" class="input" min="0" max="8" placeholder="##" ${attr({ value: hours })} />
+			</div>
+			<div class="form-group">
+				<p>Please Select anything you are interested in Volunteering for</p>
+				<div class="flex row wrap">
+				${interestsList.map(opt => `<span class="checkbox-group">
+					<input type="checkbox" name="interests" ${attr({
+						value: opt,
+						checked: interests.includes(opt),
+						id: `interest-${opt}`,
+					})} ${onChange}="${checkedToggle}" hidden="" />
+					<label class="btn btn-toggle" ${attr({ for: `interest-${opt}`, 'aria-label': opt, 'aria-checked': interests.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+						<span>${opt}</span>
+						${checkedIcon}${uncheckedIcon}
+					</label>
+				</span>`).join('')}
+				</div>
+			</div>
+			<div class="form-group">
+				<p>Please check any special skills you have to offer</p>
+				<div class="flex row wrap">
+					${skillList.map(opt => `<span class="checkbox-group">
+						<input type="checkbox" name="skills" ${attr({
+							value: opt,
+							checked: skills.includes(opt),
+							id: `skill-${opt}`,
+						})} ${onChange}="${checkedToggle}" hidden="" />
+						<label class="btn btn-toggle" ${attr({ for: `skill-${opt}`, 'aria-label': opt, 'aria-checked': skills.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+							<span>${opt}</span>
+							${checkedIcon}${uncheckedIcon}
+						</label>
+				</span>`).join('')}
+				</div>
+			</div>
+		</fieldset>
+		<fieldset id="volunteer-emergency-contact" class="no-border">
+			<legend>Emergency Contact &amp; Health Info</legend>
+			<div class="form-group">
+				<label for="volunteer-emergency-name" class="form-group">Name</label>
+				<input type="text" name="emergencyName" id="volunteer-emergency-name" class="input" autocomplete="off" ${attr({ value: emergencyName })} placeholder="Emergency Contact Name" />
+			</div>
+			<div class="form-group">
+				<label for="volunteer-emergency-phone" class="form-group">Emergency Phone</label>
+				<input type="tel" name="emergencyPhone" id="volunteer-emergency-phone" class="input" autocomplete="off" ${attr({ value: emergencyPhone })} placeholder="555-555-5555" />
+			</div>
+			<div class="form-group">
+				<p>Do you have any allergies? We may need to know about allergies for any food served to volunteers, as well as to not ask you to volunteer at an event that might put you at risk.</p>
+				<div class="flex row wrap">
+					${allergyList.map(opt => `<span class="checkbox-group">
+						<input type="checkbox" name="allergies" ${attr({
+							value: opt,
+							checked: allergies.includes(opt),
+							id: `allergy-${opt}`,
+						})} ${onChange}="${checkedToggle}" hidden="" />
+						<label class="btn btn-toggle" ${attr({ for: `allergy-${opt}`, 'aria-label': opt, 'aria-checked': allergies.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
+							<span>${opt}</span>
+							${checkedIcon}${uncheckedIcon}
+						</label>
+					</span>`).join('')}
+				</div>
+			</div>
+			<div class="form-group">
+				<p>Shirts may be required to identify those serving at an event, and we also hope to create custom shirts for our group of volunteers soon.</p>
+				<label class="input-label" for="volunteer-size" class="input-label">Shirt Size</label>
+				<select name="size" id="volunteer-size" class="input">
+					<option label="Please select your shirt size" value=""></option>
+					${sizes.map(opt => `<option ${attr({ label: opt, value: opt, selected: size === opt })}></option>`)}
+				</select>
+			</div>
+		</fieldset>
+	</details>
+	<br />
+	<fieldset id="volunteer-additional" class="no-border">
+		<legend>Additional Info</legend>
 		<div>
 			<p>Do you have any needs or restrictions? How can we help you serve the community?</p>
 			<div class="form-group">
 				<input type="checkbox" name="needsTransportation" id="volunteer-need-transportation" ${attr({ checked: needsTransportation })} ${onChange}="${checkedToggle}" hidden="" />
-				<label for="volunteer-need-transportation" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may required transportation" aria-checked="${needsTransportation ? 'true' : 'false'}" ${onKeydown}="${triggerClick}">
+				<label for="volunteer-need-transportation" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require transportation" aria-checked="${needsTransportation ? 'true' : 'false'}" ${onKeydown}="${triggerClick}" ${onClick}="${toggleAddressVisibility}">
 					<span>I may require Transportation</span>
 					${checkedIcon}${uncheckedIcon}
 				</label>
 			</div>
+			<div id="transportation-details" ${attr({ hidden: ! needsTransportation })}>
+				<p>If you require transportation, we will need to know your address.</p>
+				<div class="form-group">
+					<label class="input-label" for="volunteer-street-address">Street Address</label>
+					<input type="text" name="streetAddress" id="volunteer-street-address" class="input" autocomplete="street-address" ${attr({ value: streetAddress })} placeholder="123 Some St" ${attr({ disabled: ! needsTransportation })} />
+				</div>
+				<datalist id="towns-list">${towns.map(town => `<option ${attr({ label: town, value: town })}></option>`)}</datalist>
+				<div class="form-group">
+					<label class="input-label" for="volunteer-town">City/Town</label>
+					<input type="text" name="addressLocality" id="volunteer-town" class="input" list="towns-list" autocomplete="address-level2" ${attr({ value: addressLocality })} placeholder="City/Town" ${attr({ disabled: ! needsTransportation })} />
+				</div>
+			</div>
 			<div class="form-group">
 				<input type="checkbox" name="needsChildcare" id="volunteer-need-childcare" ${attr({ checked: needsChildcare })} ${onChange}="${checkedToggle}" hidden="" />
-				<label for="volunteer-need-childcare" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require childcare" aria-checked="I may require childcare" aria-checked="${needsChildcare ? 'true' : 'false'}" ${onKeydown}="${triggerClick}">
+				<label for="volunteer-need-childcare" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require childcare" aria-checked="${needsChildcare ? 'true' : 'false'}" ${onKeydown}="${triggerClick}">
 					<span>I may require Childcare</span>
 					${checkedIcon}${uncheckedIcon}
 				</label>
 			</div>
+		</div>
 		<div class="form-group">
 			<label for="volunteer-notes" class="input-label">Additional Notes/Comments</label>
 			<textarea name="notes" id="volunteer-notes" class="input" placeholder="Anything else you want to tell us?" rows="5">${notes}</textarea>
@@ -290,7 +309,7 @@ export default ({
 			</button>
 			<br />
 			<input type="checkbox" name="agreed" id="volunteer-agreed"  ${attr({ checked: agreed })} ${onChange}="${checkedToggle}" required="" hidden="" />
-			<label for="volunteer-agreed" tabindex="0" class="btn btn-toggle required" ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0" aria-label="Agree to terms" aria-checked="${agreed ? 'true' : 'false' }">
+			<label for="volunteer-agreed" class="btn btn-toggle required" ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0" aria-label="Agree to terms" aria-checked="${agreed ? 'true' : 'false' }">
 				<span>Agree to be Contacted for Volunteer Opportunities</span>
 				${checkedIcon}${uncheckedIcon}
 			</label>

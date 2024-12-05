@@ -5,19 +5,24 @@ description: Helpful design/branding guidelines and resources
 permalink: /branding/
 link: "https://drive.google.com/open?id=1uAcFnTNJZeh4D7Hla3x5vab4jdn7grqI&usp=drive_fs"
 logos:
-  - /img/branding/krv-bridge-logo-blue.svg
-  - /img/branding/krv-bridge-logo-text-blue.svg
-  - /img/branding/krv-bridge-logo-wide-blue.svg
-  - /img/branding/krv-bridge-mark-blue.svg
-  - /img/branding/krv-bridge-logo-white.svg
-  - /img/branding/krv-bridge-logo-text-white.svg
-  - /img/branding/krv-bridge-logo-wide-white.svg
-  - /img/branding/krv-bridge-mark-white.svg
+  - /img/branding/krv-bridge-logo-blue
+  - /img/branding/krv-bridge-logo-text-blue
+  - /img/branding/krv-bridge-logo-wide-blue
+  - /img/branding/krv-bridge-mark-blue
+  - /img/branding/krv-bridge-logo-white
+  - /img/branding/krv-bridge-logo-text-white
+  - /img/branding/krv-bridge-logo-wide-white
+  - /img/branding/krv-bridge-mark-white
 ---
 
 ## KRV Bridge Connection Branding Guidelines
 
-![KRV Bridge Connection Logo](/img/branding/krv-bridge-logo-wide-blue.svg)
+<a href="/img/branding/krv-bridge-logo-wide-blue.png" download="krv-bridge-logo-wide-blue.png" aria-label="Download KRV Bridge Logo" class="no-router inlin-block">
+  <svg width="100%" viewBox="0 0 320 100">
+    <rect x="0" y="0" width="320" height="100" fill="#fafafa"></rect>
+    <use x="0" y="0" height="100" width="320" xlink:href="/img/icons.svg#krv-bridge-full"></use>
+  </svg>
+</a>
 
 ### 1. Logo Integrity
 - Use the KRV Bridge Connection logo **only as provided**. **Do not alter colors, fonts, or aspect ratios**.
@@ -57,4 +62,12 @@ logos:
 - The logo is not to be used for non-event purposes unless for direct references to the KRV Bridge Connection (e.g., as an icon on a map or in an article about the organization).
 
 ### Branding Kit
-- Should you have need of the KRV Bridge Connection logo, you may <a href="{{ link }}" rel="noopener noreferrer external" target="_blank">find it here</a>.
+Should you have need of the KRV Bridge Connection logo, you may <a href="{{ link }}" rel="noopener noreferrer external" target="_blank" class="btn btn-link">find it here.</a>
+{% comment %}
+### Available Downloads
+<div class="logo-gallery flex row wrap">{% for logo in logos %}
+  <a href="{{ logo }}.png" download="{{ logo | split: '/' | last }}" class="no-router inline-block" aria-label="Download {{ logo | split: '/' | last }}">
+    <img src="{{ logo }}.svg" alt="{{ logo | split: '/' | last }}" loading="lazy" width="180" referrerpolicy="no-referrer" />
+  </a>
+{% endfor %}</div>
+{% endcomment %}
