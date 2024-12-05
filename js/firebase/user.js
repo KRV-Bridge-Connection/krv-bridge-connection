@@ -28,3 +28,18 @@ export async function deleteUser() {
 		await dUser(user);
 	}
 }
+
+export async function genOrgToken({ signal } = {}) {
+	const token = await getToken();
+
+	if (typeof token === 'string') {
+		const resp = await fetch('/api/orgJWT', {
+			headers: { Authorization: `Bearer ${token}` },
+			signal,
+		});
+
+		return resp.ok ? await resp.json() : null;
+	} else {
+		return null;
+	}
+}

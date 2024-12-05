@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.14] - 2024-12-05
+
+### Added
+- Add module preloading
+- Add missing white version of logo text
+
+### Changed
+- Update branding page
+- Update volunteer form & handling
+- Misc dependency updates
+
+### Fixed
+- Fix duplicate scripts and stylesheets
+
 ## [v1.0.13]
 
 ### Added

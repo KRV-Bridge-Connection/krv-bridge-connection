@@ -12,6 +12,8 @@ export default {
 		'@aegisjsproject/callback-registry/events.js',
 		'@aegisjsproject/router/router.js',
 		'@aegisjsproject/router',
+		'@aegisjsproject/state/state.js',
+		'@aegisjsproject/state',
 	],
 	output: {
 		file: 'js/index.min.js',
