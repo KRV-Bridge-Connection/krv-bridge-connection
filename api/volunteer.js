@@ -33,6 +33,37 @@ async function getPublicKey() {
 	return await importJWK(keyData);
 }
 
+function getVolunteerInfo(data) {
+	return {
+		name: data.get('name'),
+		email: data.get('email'),
+		phone: data.get('phone'),
+		streetAddress: data.get('streetAddress'),
+		addressRegion: data.get('addressLocality'),
+		registered: new Date(),
+		availability: {
+			sun: [data.get('sun[start]'), data.get('sun[end]')],
+			mon: [data.get('mon[start]'), data.get('mon[end]')],
+			tue: [data.get('tue[start]'), data.get('tue[end]')],
+			wed: [data.get('wed[start]'), data.get('wed[end]')],
+			thu: [data.get('thu[start]'), data.get('thu[end]')],
+			fri: [data.get('fri[start]'), data.get('fri[end]')],
+			sat: [data.get('sat[start]'), data.get('sat[end]')],
+		},
+		needsTransportation: data.has('needsTransportation'),
+		emergencyName: data.get('emergencyName'),
+		emergencyPhone: data.get('emergencyPhone'),
+		allergies: data.getAll('allergies'),
+		bDay: data.get('bDay'),
+		size: data.get('size'),
+		interests: data.getAll('interests'),
+		skills: data.getAll('skills'),
+		notes: data.get('notes'),
+		newsletter: data.has('newsletter'),
+		agreed: data.has('agreed'),
+	};
+}
+
 export default createHandler({
 	async get(req) {
 		const token = req.cookies.get('org-jwt');
@@ -74,28 +105,7 @@ export default createHandler({
 		} else if (data.has('id')) {
 			const collection = await getCollection(COLLECTION);
 
-			const result = await collection.doc(data.get('id')).update({
-				name: data.get('name'),
-				email: data.get('email'),
-				phone: data.get('phone'),
-				streetAddress: data.get('streetAddress'),
-				addressRegion: data.get('addressLocality'),
-				registered: new Date(),
-				days: data.getAll('days'),
-				times: data.getAll('times'),
-				hours: parseInt(data.get('hours')),
-				needsTransportation: data.has('needsTransportation'),
-				emergencyName: data.get('emergencyName'),
-				emergencyPhone: data.get('emergencyPhone'),
-				allergies: data.getAll('allergies'),
-				bDay: data.get('bDay'),
-				size: data.get('size'),
-				interests: data.getAll('interests'),
-				skills: data.getAll('skills'),
-				notes: data.get('notes'),
-				newsletter: data.has('newsletter'),
-				agreed: data.has('agreed'),
-			});
+			const result = await collection.doc(data.get('id')).update(getVolunteerInfo(data));
 
 			if (typeof result.writeTime === 'undefined') {
 				throw new HTTPBadRequestError(`Unable to update document with id of ${data.get('id')}`);
@@ -105,28 +115,7 @@ export default createHandler({
 		} else {
 			const collection = await getCollection(COLLECTION);
 
-			const doc = await collection.add({
-				name: data.get('name'),
-				email: data.get('email'),
-				phone: data.get('phone'),
-				streetAddress: data.get('streetAddress'),
-				addressRegion: data.get('addressLocality'),
-				registered: new Date(),
-				days: data.getAll('days'),
-				times: data.getAll('times'),
-				hours: parseInt(data.get('hours')),
-				needsTransportation: data.has('needsTransportation'),
-				emergencyName: data.get('emergencyName'),
-				emergencyPhone: data.get('emergencyPhone'),
-				allergies: data.getAll('allergies'),
-				bDay: data.get('bDay'),
-				size: data.get('size'),
-				interests: data.getAll('interests'),
-				skills: data.getAll('skills'),
-				notes: data.get('notes'),
-				newsletter: data.has('newsletter'),
-				agreed: data.has('agreed'),
-			});
+			const doc = await collection.add(getVolunteerInfo(data));
 
 			const loc = new URL(req.pathname, req.origin);
 			loc.searchParams.set('id', doc.id);
