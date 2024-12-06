@@ -2,12 +2,11 @@ import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callb
 import { signal as signalAttr, onChange, onSubmit, onReset, onClick, onKeydown, onToggle } from '@aegisjsproject/callback-registry/events.js';
 import { clearState, changeHandler as change, setState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
-import { navigate } from '@aegisjsproject/router/router.js';
+import { navigate, back } from '@aegisjsproject/router/router.js';
 
 const towns = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
+const dowList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
-const daysList = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const timeList = ['Morning (6AM-11AM)', 'Afternoon (12PM-4PM)', 'Evening (5PM-9PM)'];
 const skillList = ['Construction', 'Food Services', 'CPR', 'Teaching', 'Sound/Music', 'Writing', 'Design/Flyers', 'Social Media'];
 const interestsList = ['Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning', 'Childcare', 'Transportation'];
 const allergyList = [
@@ -15,19 +14,15 @@ const allergyList = [
 	'Pollen', 'Dust mites', 'Animal dander', 'Insect stings', 'Mold',
 ];
 
-const checkedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-checked">
-	<use xlink:href="/img/icons.svg#check"></use>
-</svg>`;
-
-const uncheckedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-unchecked">
-	<use xlink:href="/img/icons.svg#x"></use>
-</svg>`;
-
 const minAge = 13;
 const today = new Date();
 const youngestBday = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate(), 0, 0);
 
-const resetHandler = registerCallback('volunteer:form:reset', clearState);
+const resetHandler = registerCallback('volunteer:form:reset', () => {
+	clearState();
+	history.length > 1 ? back() : navigate('/');
+});
+
 const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
 	if (Number.isSafeInteger(target.valueAsNumber) && target.validity.valid) {
 		const bDay = document.getElementById('volunteer-bday');
@@ -95,6 +90,29 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 const changeHandler = registerCallback('volunteer:form:change', change);
 const additionalToggle = registerCallback('volunteer:additional:toggle', ({ currentTarget }) => setState('additionalExpanded', currentTarget.open));
 
+const buttons = `<div class="flex row space-evenly">
+	<button type="submit" class="btn btn-accept">
+		<svg height="18" width="18" fill="currentColor" role="presentation">
+			<use xlink:href="/img/icons.svg#check"></use>
+		</svg>
+		<span>Submit</span>
+	</button>
+	<button type="reset" class="btn btn-reject" ${onClick}="${FUNCS.navigate.back}">
+		<svg height="18" width="18" fill="currentColor">
+			<use xlink:href="/img/icons.svg#x"></use>
+		</svg>
+		<span>Cancel</span>
+	</button>
+</div>`;
+
+const checkedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-checked">
+	<use xlink:href="/img/icons.svg#check"></use>
+</svg>`;
+
+const uncheckedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-unchecked">
+	<use xlink:href="/img/icons.svg#x"></use>
+</svg>`;
+
 export default ({
 	state: {
 		name = '',
@@ -103,8 +121,6 @@ export default ({
 		streetAddress = '',
 		addressLocality = '',
 		size = '',
-		days = [],
-		times = [],
 		emergencyName = '',
 		emergencyPhone = '',
 		allergies = [],
@@ -114,10 +130,10 @@ export default ({
 		interests = [],
 		skills = [],
 		notes = '',
-		hours = NaN,
 		newsletter = false,
 		agreed = false,
 		additionalExpanded = true,
+		...state
 	} = history.state ?? {},
 	signal,
 	/* eslint-disable indent */
@@ -207,61 +223,21 @@ export default ({
 			</label>
 		</div>
 	</fieldset>
-	<div class="flex row space-evenly">
-		<button type="submit" class="btn btn-accept">
-			<svg height="18" width="18" fill="currentColor" role="presentation">
-				<use xlink:href="/img/icons.svg#check"></use>
-			</svg>
-			<span>Submit</span>
-		</button>
-		<button type="reset" class="btn btn-reject" ${onClick}="${FUNCS.navigate.back}">
-			<svg height="18" width="18" fill="currentColor">
-				<use xlink:href="/img/icons.svg#x"></use>
-			</svg>
-			<span>Cancel</span>
-		</button>
-	</div>
+	${buttons}
 	<br />
 	<details id="volunteer-optional" class="accordion" ${attr({ open: additionalExpanded })} ${onToggle}="${additionalToggle}">
 		<summary>Optional Additional Questions</summary>
-		<br />
+		<p>The following questions are optional, but will be helpful in letting us better match you to requests for volunteers.</p>
 		<fieldset id="volunteer-availability" class="no-border">
 			<legend>Availability</legend>
 			<div class="form-group">
-				<p>Please select the days you are likely to be available.</p>
-				<div class="flex row wrap">
-					${daysList.map(opt => `<span class="checkbox-group">
-						<input type="checkbox" name="days" ${attr({
-							value: opt,
-							checked: days.includes(opt),
-							id: `day-${opt}`,
-						})} ${onChange}="${checkedToggle}" hidden="" />
-						<label class="btn btn-toggle" ${attr({ for: `day-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-							<span>${opt}</span>
-							${checkedIcon}${uncheckedIcon}
-						</label>
-					</span>`).join('')}
-				</div>
-			</div>
-			<p>Please select the times of day you are likely to be available.</p>
-			<div class="form-group">
-				<div class="flex row wrap">
-					${timeList.map(opt => `<span class="checkbox-group">
-						<input type="checkbox" name="times" ${attr({
-							value: opt,
-							checked: times.includes(opt),
-							id: `time-${opt}`,
-						})} ${onChange}="${checkedToggle}" hidden="" />
-						<label class="btn btn-toggle" ${attr({ for: `time-${opt}`, 'aria-label': opt, 'aria-checked': times.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" role="checkbox" tabindex="0">
-							<span>${opt}</span>
-							${checkedIcon}${uncheckedIcon}
-						</label>
-					</span>`).join('')}
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="volunteer-hours" class="input-label">Estimated Hours Available</label>
-				<input type="number" name="hours" id="volunteer-hours" class="input" min="0" max="8" placeholder="##" ${attr({ value: hours })} />
+				<p>Please estimate your weekly availability</p>
+				${dowList.map(day => `<div class="day-group">
+						<label for="volunteer-${day}-start">${day[0].toUpperCase() + day.substring(1)} Start</label>
+						<input type="time" id="volunteer-${day}-start" name="${day}[start]" step="60" ${attr({ value: state[day + '[start]' ]})} />
+						<span>&mdash;</span>
+						<input type="time" id="volunteer-${day}-end" name="${day}[end]" step="60" ${attr({ value: state[day + '[end]' ]})} />
+					</div>`).join('\n')}
 			</div>
 			<div class="form-group">
 				<p>Please Select anything you are interested in Volunteering for</p>
@@ -333,17 +309,18 @@ export default ({
 		</fieldset>
 	</details>
 	<br />
-	<dialog id="volunteer-thanks-dialog">
-		<div class="clearfix">
-			<button type="button" class="btn btn-reject float-right" ${onClick}="${FUNCS.ui.closeModal}" data-close-modal-selector="#volunteer-thanks-dialog" title="Close" ${signalAttr}="${signal}">
-				<svg height="18" width="18" fill="currentColor">
-					<use xlink:href="/img/icons.svg#x"></use>
-				</svg>
-			</button>
-		</div>
-		<p>Thank you for signing up to volunteer.</p>
-	</dialog>
+	${buttons}
 </form>
+<dialog id="volunteer-thanks-dialog">
+	<div class="clearfix">
+		<button type="button" class="btn btn-reject float-right" ${onClick}="${FUNCS.ui.closeModal}" data-close-modal-selector="#volunteer-thanks-dialog" title="Close" ${signalAttr}="${signal}">
+			<svg height="18" width="18" fill="currentColor">
+				<use xlink:href="/img/icons.svg#x"></use>
+			</svg>
+		</button>
+	</div>
+	<p>Thank you for signing up to volunteer.</p>
+</dialog>
 <dialog id="volunteer-terms">
 	<div class="clearfix">
 		<button type="button" class="btn btn-reject float-right" ${onClick}="${FUNCS.ui.closeModal}" data-close-modal-selector="#volunteer-terms" aria-label="Close" ${signalAttr}="${signal}">
