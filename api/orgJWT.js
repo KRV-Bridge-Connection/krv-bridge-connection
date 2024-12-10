@@ -17,7 +17,10 @@ async function getFirebase() {
 }
 
 export default createHandler({
-	async get(req) {
+	async get(req, {
+		ip = null,
+		geo: { latitude = NaN, longitude = NaN, timezone = null } = {},
+	} = {}) {
 		const reqToken = getRequestToken(req);
 		const firebase = await getFirebase();
 		const auth = firebase.auth();
@@ -33,13 +36,13 @@ export default createHandler({
 			auth.generateEmailVerificationLink(user.email);
 			throw new HTTPForbiddenError('You will need to verify your email address and try again. An verification email has been sent.');
 		} else {
-			const { uid, name, picture, email, email_verified, phone_number } = user;
+			const { uid, name, email, email_verified } = user;
 
 			const db = firebase.firestore();
 			const doc = await db.collection('users').doc(uid).get();
 
 			if (doc.exists) {
-				const { org: sub_id, entitlements, roles, birthdate, website } = doc.data();
+				const { org: sub_id, entitlements, roles } = doc.data();
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
 				const origin = URL.parse(req.url)?.origin;
@@ -55,15 +58,15 @@ export default createHandler({
 					jti,
 					sub_id,
 					name,
-					picture,
 					email,
 					email_verified,
-					phone_number,
-					website: website,
-					birthdate: birthdate,
 					scope: 'api',
-					roles,
+					roles: Array.isArray(roles) ? roles : [roles],
 					entitlements,
+					location: { latitude, longitude },
+					swname: req.headers.get('User-Agent'),
+					cdniip: ip,
+					zoneinfo: timezone,
 				}, key);
 
 				const cookie = new Cookie({
@@ -74,11 +77,10 @@ export default createHandler({
 					sameSite: 'strict',
 					secure: true,
 					httpOnly: true,
+					partitioned: true,
 				});
 
-				return Response.json({ expires, jti }, {
-					headers: new Headers({ 'Set-Cookie': cookie }),
-				});
+				return Response.json({ expires, jti }, { headers: new Headers({ 'Set-Cookie': cookie }) });
 			} else {
 				throw new HTTPNotFoundError(`No user record exists for user ${uid}.`);
 			}

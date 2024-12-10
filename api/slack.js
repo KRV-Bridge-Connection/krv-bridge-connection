@@ -1,7 +1,7 @@
 /* eslint-env node */
 import '@shgysk8zer0/polyfills';
 import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
-import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+import { NO_CONTENT, SEE_OTHER } from '@shgysk8zer0/consts/status.js';
 import { FORM_MULTIPART, FORM_URL_ENCODED } from '@shgysk8zer0/consts/mimes.js';
 import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
@@ -80,7 +80,10 @@ export default createHandler({
 
 					try {
 						await message.send({ signal: AbortSignal.timeout(1000) });
-						return req.mode === 'navigate' ? Response.redirect('/') : new Response(null, { status: NO_CONTENT });
+
+						return req.mode === 'navigate'
+							? Response.redirect(URL.parse(req.protocol + '//' + req.hostname), SEE_OTHER)
+							: new Response(null, { status: NO_CONTENT });
 					} catch(err) {
 						throw new HTTPBadRequestError('Failed sending message', { cause: err });
 					}
