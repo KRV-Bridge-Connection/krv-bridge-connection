@@ -1,6 +1,7 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPNotImplementedError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
+import { SEE_OTHER, CREATED, NOT_FOUND, OK, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import firebase from 'firebase-admin';
 
 const COLLECTION = 'volunteers_list';
@@ -65,13 +66,20 @@ function getVolunteerInfo(data) {
 }
 
 export default createHandler({
-	async get(req) {
+	async get(req, { ip, geo }) {
 		const token = req.cookies.get('org-jwt');
 
 		if (typeof token !== 'string' || token.length === 0) {
 			throw new HTTPUnauthorizedError('Missing required credentials/token.');
 		} else {
-			const result = await verifyJWT(token, await getPublicKey(), { entitlements: ['volunteers:list'], claims: ['exp'] });
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['volunteers:list'],
+				claims: ['exp'],
+				roles: ['admin'],
+				cdniip: ip,
+				swname: req.headers.get('User-Agent'),
+				location: { longitude: geo.longitude, latitude: geo.latitude }
+			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('You do not have permission to access this data.', { cause: result });
@@ -91,7 +99,7 @@ export default createHandler({
 					const snapshot = await collection.get();
 					const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-					return Response.json(docs, { status: docs.length === 0 ? 404 : 200 });
+					return Response.json(docs, { status: docs.length === 0 ? NOT_FOUND : OK });
 				}
 			}
 		}
@@ -110,7 +118,7 @@ export default createHandler({
 			if (typeof result.writeTime === 'undefined') {
 				throw new HTTPBadRequestError(`Unable to update document with id of ${data.get('id')}`);
 			} else {
-				return new Response(null, { status: 204 });
+				return new Response(null, { status: NO_CONTENT });
 			}
 		} else {
 			const collection = await getCollection(COLLECTION);
@@ -120,10 +128,14 @@ export default createHandler({
 			const loc = new URL(req.pathname, req.origin);
 			loc.searchParams.set('id', doc.id);
 
-			return Response.json({ id: doc.id }, {
-				status: 201,
-				headers: { Location: loc.href },
-			});
+			if (req.mode === 'navigate') {
+				return Response.redirect(URL.parse(req.protocol + '//' + req.hostname), SEE_OTHER);
+			} else {
+				return Response.json({ id: doc.id }, {
+					status: CREATED,
+					headers: { Location: loc.href },
+				});
+			}
 		}
 	},
 	async delete(req) {
@@ -135,7 +147,14 @@ export default createHandler({
 		} else if (typeof token !== 'string' || token.length === 0) {
 			throw new HTTPUnauthorizedError('Missing required credentials/token.');
 		} else {
-			const result = await verifyJWT(token, await getPublicKey(), { entitlements: ['volunteers:delete'], claims: ['exp'] });
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['volunteers:delete'],
+				claims: ['exp'],
+				roles: ['admin'],
+				cdniip: ip,
+				swname: req.headers.get('User-Agent'),
+				location: { longitude: geo.longitude, latitude: geo.latitude }
+			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('You do not have permission to access this data.', { cause: result });
@@ -146,7 +165,7 @@ export default createHandler({
 				if (result.writeTime === undefined) {
 					throw new HTTPNotFoundError(`It seems that a registration with id ${params.get('id')} could not be found.`);
 				} else {
-					return new Response(null, { status: 204 });
+					return new Response(null, { status: NO_CONTENT });
 				}
 			}
 		}
