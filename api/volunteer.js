@@ -138,7 +138,7 @@ export default createHandler({
 			}
 		}
 	},
-	async delete(req) {
+	async delete(req, { ip, geo } = {}) {
 		const token = req.cookies.get('org-jwt');
 		const params = req.searchParams;
 

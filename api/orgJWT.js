@@ -43,7 +43,6 @@ export default createHandler({
 
 			if (doc.exists) {
 				const { org: sub_id, entitlements, roles } = doc.data();
-				console.log(roles);
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
 				const origin = URL.parse(req.url)?.origin;
@@ -63,7 +62,7 @@ export default createHandler({
 					email_verified,
 					scope: 'api',
 					roles: Array.isArray(roles) ? roles : [roles],
-					entitlements: [],
+					entitlements,
 					location: { latitude, longitude },
 					swname: req.headers.get('User-Agent'),
 					cdniip: ip,
