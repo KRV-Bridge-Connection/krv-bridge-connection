@@ -29,9 +29,16 @@ export async function hash(data, algo = 'SHA-256') {
 	return `${btoa(algo)}:${new Uint8Array(hash).toHex()}`;
 }
 
-export default async () => {
+export default async req => {
 	const [key] = await Promise.all([getSecretKey()]);
-	const [data, sig] = await Promise.all([ encrypt(key, process.env.FIREBASE_CERT), hash(process.env.FIREBASE_CERT)]);
 
-	return Response.json({ data, sig });
+	if (req.method === 'GET') {
+		const [data, sig] = await Promise.all([ encrypt(key, process.env.PRIVATE_JWK), hash(process.env.PRIVATE_JWK)]);
+
+		return Response.json({ data, sig });
+	} else {
+		return new Response(null, { status: 201 });
+		//const decrypted = await decrypt(key, await req.text());
+		//return new Response([decrypted], { headers: { 'Content-Type': 'text/plain' }});
+	}
 };
