@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Implement AES encryption
+
 ## [v1.0.14] - 2024-12-05
 
 ### Added
