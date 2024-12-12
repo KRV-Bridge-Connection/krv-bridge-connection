@@ -2,6 +2,7 @@ import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorize
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { SEE_OTHER, CREATED, NOT_FOUND, OK, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+import { getSecretKey, encrypt, decrypt, BASE64, TEXT } from '@shgysk8zer0/aes-gcm';
 import firebase from 'firebase-admin';
 
 const COLLECTION = 'volunteers_list';
@@ -34,12 +35,21 @@ async function getPublicKey() {
 	return await importJWK(keyData);
 }
 
-function getVolunteerInfo(data) {
+async function getVolunteerInfo(data) {
+	const key = await getSecretKey();
+
+	const [phone, email, streetAddress, emergencyPhone] = await Promise.all([
+		data.get('email'),
+		data.get('phone'),
+		data.get('streetAddress'),
+		data.get('emergencyPhone'),
+	].map(val => typeof val === 'string' && val.length !== 0 ? encrypt(key, val, { output: BASE64 }) : ''));
+
 	return {
 		name: data.get('name'),
-		email: data.get('email'),
-		phone: data.get('phone'),
-		streetAddress: data.get('streetAddress'),
+		email,
+		phone,
+		streetAddress,
 		addressRegion: data.get('addressLocality'),
 		registered: new Date(),
 		availability: {
@@ -53,7 +63,7 @@ function getVolunteerInfo(data) {
 		},
 		needsTransportation: data.has('needsTransportation'),
 		emergencyName: data.get('emergencyName'),
-		emergencyPhone: data.get('emergencyPhone'),
+		emergencyPhone,
 		allergies: data.getAll('allergies'),
 		bDay: data.get('bDay'),
 		size: data.get('size'),
@@ -91,7 +101,20 @@ export default createHandler({
 					const doc = await collection.doc(params.get('id')).get();
 
 					if (doc.exists) {
-						return Response.json(doc.data());
+						const { email, phone, streetAddress, emergencyPhone, ...rest } = doc.data();
+						const key = await getSecretKey();
+
+						return Response.json({
+							email: await decrypt(key, email, { input: BASE64, output: TEXT }),
+							phone: await decrypt(key, phone, { input: BASE64, output: TEXT }),
+							streetAddress: typeof streetAddress === 'string' && streetAddress.length !== 0
+								? await decrypt(key, streetAddress, { input: BASE64, output: TEXT  })
+								: null,
+							emergencyPhone: typeof emergencyPhone === 'string' && emergencyPhone.length !== 0
+								? await decrypt(key, emergencyPhone, { input: BASE64, output: TEXT })
+								: null,
+							...rest
+						});
 					} else {
 						throw new HTTPNotFoundError(`Could not find registration with id ${params.get('id')}`);
 					}
@@ -106,14 +129,13 @@ export default createHandler({
 	},
 	async post(req) {
 		const data = await req.formData();
-		const missing = ['name', 'phone', 'email', 'phone', 'agreed'].filter(field => ! data.has(field));
+		const missing = ['name', 'phone', 'email', 'agreed'].filter(field => ! data.has(field));
 
 		if (missing.length !== 0) {
 			throw new HTTPBadRequestError('Missing required inputs', { details: { missing }});
 		} else if (data.has('id')) {
 			const collection = await getCollection(COLLECTION);
-
-			const result = await collection.doc(data.get('id')).update(getVolunteerInfo(data));
+			const result = await collection.doc(data.get('id')).update(await getVolunteerInfo(data));
 
 			if (typeof result.writeTime === 'undefined') {
 				throw new HTTPBadRequestError(`Unable to update document with id of ${data.get('id')}`);
@@ -123,7 +145,7 @@ export default createHandler({
 		} else {
 			const collection = await getCollection(COLLECTION);
 
-			const doc = await collection.add(getVolunteerInfo(data));
+			const doc = await collection.add(await getVolunteerInfo(data));
 
 			const loc = new URL(req.pathname, req.origin);
 			loc.searchParams.set('id', doc.id);
