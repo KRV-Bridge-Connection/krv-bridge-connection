@@ -1,0 +1,14 @@
+---
+permalink: /.well-known/jwks.json
+---
+{
+	"keys": [{
+		"kty": "{{ jwk.kty }}",
+		"kid": "e1d1a03a799e908d97bea19575399835735f84a70d64995dcdab63c898a9a4fb",
+		"use": "sig",
+		"crv": "{{ jwk.crv }}",
+		"x": "{{ jwk.x }}",
+		"y": "{{ jwk.y }}",
+		"alg": "ES256"
+	}]
+}
