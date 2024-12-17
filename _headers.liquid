@@ -45,6 +45,10 @@ permalink: /_headers
   Clear-Site-Data: "cache", "cookies", "storage"
   Content-Security-Policy: default-src 'self'; script-src 'self' cdn.kernvalley.us;
 
+/.well-known/*
+  Access-Control-Allow-Origin: *
+  Content-Security-Policy: default-src 'none'
+
 /service-worker.js
   Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' cdn.kernvalley.us/service-worker.js;
   Link: <//cdn.kernvalley.us/service-worker.js>; rel=preload; as=script
