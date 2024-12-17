@@ -45,7 +45,7 @@ export default createHandler({
 				const { org: sub_id, entitlements, roles } = doc.data();
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
-				const origin = URL.parse(req.url)?.origin;
+				const origin = URL.parse(`${req.protocol}//${req.hostname}`)?.origin;
 				const jti = crypto.randomUUID();
 				const expires = new Date(Date.now() + 1_800_000).getTime();
 				const token = await createJWT({

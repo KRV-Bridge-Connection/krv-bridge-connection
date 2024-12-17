@@ -1,0 +1,10 @@
+{
+	"issuer": "https://krvbridge.org",
+	"jwks_uri": "https://krvbridge.org/.well-known/jwks.json",
+	"token_endpoint": "https://krvbridge.org/api/orgJWT",
+	"response_types_supported": ["code"],
+	"subject_types_supported": ["public"],
+	"id_token_signing_alg_values_supported": ["ES256"],
+	"scopes_supported": ["api"],
+	"claims_supported": ["iss", "aud", "sub", "iat", "nbf", "exp", "jti", "sub_id", "name", "email", "email_verified", "roles", "entitlements", "location", "swname", "cdniip", "zoneinfo"]
+}
