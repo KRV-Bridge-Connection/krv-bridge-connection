@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Implement AES encryption
+- Generate `jwks.json` using `@shgysk8zer0/jwk-utils`
+- Add and use `@shgysk8zer0/geoutils`
 
 ## [v1.0.14] - 2024-12-05
 

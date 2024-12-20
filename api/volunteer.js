@@ -3,6 +3,7 @@ import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { SEE_OTHER, CREATED, NOT_FOUND, OK, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { getSecretKey, encrypt, decrypt, BASE64, TEXT } from '@shgysk8zer0/aes-gcm';
+import { checkGeohash } from '@shgysk8zer0/geoutils';
 import firebase from 'firebase-admin';
 
 const COLLECTION = 'volunteers_list';
@@ -88,7 +89,9 @@ export default createHandler({
 				roles: ['admin'],
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
-				location: { longitude: geo.longitude, latitude: geo.latitude }
+				geohash(hash) {
+					return checkGeohash(hash, geo);
+				}
 			});
 
 			if (result instanceof Error) {
@@ -175,7 +178,9 @@ export default createHandler({
 				roles: ['admin'],
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
-				location: { longitude: geo.longitude, latitude: geo.latitude }
+				geohash(hash) {
+					return checkGeohash(hash, geo);
+				}
 			});
 
 			if (result instanceof Error) {
@@ -192,4 +197,6 @@ export default createHandler({
 			}
 		}
 	}
+}, {
+	logger: err => console.error(err)
 });

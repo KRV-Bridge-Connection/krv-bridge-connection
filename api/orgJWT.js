@@ -1,5 +1,6 @@
 import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, HTTPNotImplementedError, Cookie } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT, getRequestToken } from '@shgysk8zer0/jwk-utils';
+import { encodeGeohash } from '@shgysk8zer0/geoutils';
 import firebase from 'firebase-admin';
 
 async function getFirebase() {
@@ -63,7 +64,7 @@ export default createHandler({
 					scope: 'api',
 					roles: Array.isArray(roles) ? roles : [roles],
 					entitlements,
-					location: { latitude, longitude },
+					geohash: encodeGeohash({ latitude, longitude }),
 					swname: req.headers.get('User-Agent'),
 					cdniip: ip,
 					zoneinfo: timezone,
