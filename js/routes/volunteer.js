@@ -135,7 +135,10 @@ export default ({
 	/* eslint-disable indent */
 	const signal = registerSignal(sig);
 
-	return `<form id="volunteer-form" action="/api/volunteer" method="POST" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
+	return `<krv-events tags="volunteer" source="krv-bridge-volunteers" target="_blank">
+			<span slot="title">Upcoming Volunteer Opportunities in the KRV</span>
+		</krv-events>
+		<form id="volunteer-form" action="/api/volunteer" method="POST" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 		<div class="status-box info">
 			<p>Thank you for your interest in volunteering in the KRV! Please provide us with the following information so we may best utilize your services.</p>
 			<p>Please be aware that, by submitting this form, you are agreeing to being contacted for any future volunteer opportunities, not for any specific event.</p>
