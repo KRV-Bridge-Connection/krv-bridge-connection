@@ -136,7 +136,7 @@ export default ({
 	const signal = registerSignal(sig);
 
 	return `<krv-events tags="volunteer" source="krv-bridge-volunteers" target="_blank">
-			<span slot="title">Upcoming Volunteer Opportunities</span>
+			<span slot="title">Upcoming Volunteer Opportunities in the KRV</span>
 		</krv-events>
 		<form id="volunteer-form" action="/api/volunteer" method="POST" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 		<div class="status-box info">
