@@ -1,5 +1,5 @@
 import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callbacks.js';
-import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onClick, onKeydown, onToggle } from '@aegisjsproject/callback-registry/events.js';
+import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onClick, onToggle } from '@aegisjsproject/callback-registry/events.js';
 import { clearState, changeHandler as change, setState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
