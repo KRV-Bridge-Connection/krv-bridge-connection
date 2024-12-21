@@ -1,5 +1,5 @@
 import { registerCallback, FUNCS } from '@aegisjsproject/callback-registry/callbacks.js';
-import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onClick, onKeydown, onToggle } from '@aegisjsproject/callback-registry/events.js';
+import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onClick, onToggle } from '@aegisjsproject/callback-registry/events.js';
 import { clearState, changeHandler as change, setState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
@@ -42,27 +42,12 @@ const yearPicker = registerCallback('volunteer:year:picker', ({ target }) => {
 const toggleAddressVisibility = registerCallback('volunteer:toggle:address:visible', ({ currentTarget }) => {
 	const container = document.getElementById('transportation-details');
 
-	if (currentTarget.previousElementSibling.checked) {
-		container.hidden = true;
-		container.querySelectorAll('input').forEach(input => input.disabled = true);
-	} else {
+	if (currentTarget.checked) {
 		container.hidden = false;
 		container.querySelectorAll('input').forEach(input => input.disabled = false);
-	}
-});
-
-const checkedToggle = registerCallback('aegis:label:toggle', ({ target }) => {
-	if (target.checked) {
-		target.labels.forEach(label => label.setAttribute('aria-checked', 'true'));
 	} else {
-		target.labels.forEach(label => label.setAttribute('aria-checked', 'false'));
-	}
-});
-
-const triggerClick = registerCallback('aegis:click:trigger', event => {
-	if (event.key === ' ') {
-		event.preventDefault();
-		event.target.click();
+		container.hidden = true;
+		container.querySelectorAll('input').forEach(input => input.disabled = true);
 	}
 });
 
@@ -87,7 +72,16 @@ const submitHandler = registerCallback('volunteer:form:submit:', event => {
 	setTimeout(() => dialog.close(), 10_000);
 });
 
-const changeHandler = registerCallback('volunteer:form:change', change);
+const changeHandler = registerCallback('volunteer:form:change', event => {
+	change(event);
+
+	if (event.target.type === 'checkbox' && event.target.matches('.btn input')) {
+		const btn = event.target.closest('.btn');
+		btn.classList.toggle('btn-primary', event.target.checked);
+		btn.classList.toggle('btn-secondary', !event.target.checked);
+	}
+});
+
 const additionalToggle = registerCallback('volunteer:additional:toggle', ({ currentTarget }) => setState('additionalExpanded', currentTarget.open));
 
 const buttons = `<div class="flex row space-evenly">
@@ -105,13 +99,14 @@ const buttons = `<div class="flex row space-evenly">
 	</button>
 </div>`;
 
-const checkedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-checked">
-	<use xlink:href="/img/icons.svg#check"></use>
-</svg>`;
-
-const uncheckedIcon = `<svg height="18" width="18" fill="currentColor" role="presentation" class="when-unchecked">
-	<use xlink:href="/img/icons.svg#x"></use>
-</svg>`;
+function createCheckbox({ label, name, value = 'on', checked = false, id, ...attrs }) {
+	return `<span class="checkbox-group btn btn-checkbox ${checked ? 'btn-primary' : 'btn-secondary' }">
+		<input type="checkbox" ${attr({ name, value, checked, id, ...attrs })}  />
+		<label ${attr({ for: id })}>
+			<span>${label}</span>
+		</label>
+	</span>`;
+}
 
 export default ({
 	state: {
@@ -174,13 +169,12 @@ export default ({
 		<fieldset id="volunteer-additional" class="no-border">
 			<legend>Additional Info</legend>
 			<div>
+				<div class="form-group">
+					${createCheckbox({ label: 'I may require childcare', name: 'needsChildcare', checked: needsChildcare, id: 'volunteer-need-childcare' })}
+				</div>
 				<p>Do you have any needs or restrictions? How can we help you serve the community?</p>
 				<div class="form-group">
-					<input type="checkbox" name="needsTransportation" id="volunteer-need-transportation" ${attr({ checked: needsTransportation })} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-					<label for="volunteer-need-transportation" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require transportation" aria-checked="${needsTransportation ? 'true' : 'false'}" ${onKeydown}="${triggerClick}" ${onClick}="${toggleAddressVisibility}" ${signalAttr}="${signal}">
-						<span>I may require Transportation</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
+					${createCheckbox({ label: 'I may require transportation', name: 'needsTransportation', checked: needsTransportation, id: 'volunteer-need-transportation', [onChange]: toggleAddressVisibility, [signalAttr]: signal })}
 				</div>
 				<div id="transportation-details" ${attr({ hidden: ! needsTransportation })}>
 					<p>If you require transportation, we will need to know your address.</p>
@@ -194,13 +188,6 @@ export default ({
 						<input type="text" name="addressLocality" id="volunteer-town" class="input" list="towns-list" autocomplete="address-level2" ${attr({ value: addressLocality })} placeholder="City/Town" ${attr({ disabled: ! needsTransportation })} />
 					</div>
 				</div>
-				<div class="form-group">
-					<input type="checkbox" name="needsChildcare" id="volunteer-need-childcare" ${attr({ checked: needsChildcare })} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-					<label for="volunteer-need-childcare" class="btn btn-toggle" tabindex="0" role="checkbox" aria-label="I may require childcare" aria-checked="${needsChildcare ? 'true' : 'false'}" ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}">
-						<span>I may require Childcare</span>
-						${checkedIcon}${uncheckedIcon}
-					</label>
-				</div>
 			</div>
 			<div class="form-group">
 				<label for="volunteer-notes" class="input-label">Additional Notes/Comments</label>
@@ -208,22 +195,11 @@ export default ({
 			</div>
 			<div class="form-group">
 				<p>You may optionally subscribe to an upcoming newsletter so that you may be informed of any upcoming volunteer opportunities in the KRV, including those we do not specifically contact you for.</p>
-				<input type="checkbox" name="newsletter" id="volunteer-newsletter" ${attr({ checked: newsletter })} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-				<label for="volunteer-newsletter" class="btn btn-toggle" role="checkbox" tabindex="0" aria-label="Subscribe to our newsletter" aria-checked="${newsletter ? 'true' : 'false' }" ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}">
-					<span>Subscribe to our Newsletter</span>
-					${checkedIcon}${uncheckedIcon}
-				</label>
-			</div>
-			<div class="form-group">
+				${createCheckbox({ label: 'Subscribe to our newsletter', name: 'newsletter', checked: newsletter, id: 'volunteer-newsletter' })}
 				<button type="button" class="btn btn-info" aria-label="Show Volunteer Agreement" ${onClick}="${FUNCS.ui.showModal}" data-show-modal-selector="#volunteer-terms" ${signalAttr}="${signal}">
 					<span>View Volunteer Agreement</span>
 				</button>
-				<br />
-				<input type="checkbox" name="agreed" id="volunteer-agreed"  ${attr({ checked: agreed })} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" required="" hidden="" />
-				<label for="volunteer-agreed" class="btn btn-toggle required" ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}" role="checkbox" tabindex="0" aria-label="Agree to terms" aria-checked="${agreed ? 'true' : 'false' }">
-					<span>Agree to be Contacted for Volunteer Opportunities</span>
-					${checkedIcon}${uncheckedIcon}
-				</label>
+				${createCheckbox({ label: 'I agree to the terms', name: 'agreed', checked: agreed, required: true, id: 'volunteer-agreed' })}
 			</div>
 		</fieldset>
 		${buttons}
@@ -245,33 +221,13 @@ export default ({
 				<div class="form-group">
 					<p>Please Select anything you are interested in Volunteering for</p>
 					<div class="flex row wrap">
-					${interestsList.map(opt => `<span class="checkbox-group">
-						<input type="checkbox" name="interests" ${attr({
-							value: opt,
-							checked: interests.includes(opt),
-							id: `interest-${opt}`,
-						})} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-						<label class="btn btn-toggle" ${attr({ for: `interest-${opt}`, 'aria-label': opt, 'aria-checked': interests.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}" role="checkbox" tabindex="0">
-							<span>${opt}</span>
-							${checkedIcon}${uncheckedIcon}
-						</label>
-					</span>`).join('')}
+						${interestsList.map(opt => createCheckbox({ label: opt, name: 'interests', value: opt, checked: interests.includes(opt), id: `interest-${opt}` })).join('')}
 					</div>
 				</div>
 				<div class="form-group">
 					<p>Please check any special skills you have to offer</p>
 					<div class="flex row wrap">
-						${skillList.map(opt => `<span class="checkbox-group">
-							<input type="checkbox" name="skills" ${attr({
-								value: opt,
-								checked: skills.includes(opt),
-								id: `skill-${opt}`,
-							})} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-							<label class="btn btn-toggle" ${attr({ for: `skill-${opt}`, 'aria-label': opt, 'aria-checked': skills.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}" role="checkbox" tabindex="0">
-								<span>${opt}</span>
-								${checkedIcon}${uncheckedIcon}
-							</label>
-					</span>`).join('')}
+						${skillList.map(opt => createCheckbox({ label: opt, name: 'skills', value: opt, checked: skills.includes(opt), id: `skill-${opt}` })).join('')}
 					</div>
 				</div>
 			</fieldset>
@@ -288,17 +244,7 @@ export default ({
 				<div class="form-group">
 					<p>Do you have any allergies? We may need to know about allergies for any food served to volunteers, as well as to not ask you to volunteer at an event that might put you at risk.</p>
 					<div class="flex row wrap">
-						${allergyList.map(opt => `<span class="checkbox-group">
-							<input type="checkbox" name="allergies" ${attr({
-								value: opt,
-								checked: allergies.includes(opt),
-								id: `allergy-${opt}`,
-							})} ${onChange}="${checkedToggle}" ${signalAttr}="${signal}" hidden="" />
-							<label class="btn btn-toggle" ${attr({ for: `allergy-${opt}`, 'aria-label': opt, 'aria-checked': allergies.includes(opt) ? 'true' : 'false' })} ${onKeydown}="${triggerClick}" ${signalAttr}="${signal}" role="checkbox" tabindex="0">
-								<span>${opt}</span>
-								${checkedIcon}${uncheckedIcon}
-							</label>
-						</span>`).join('')}
+						${allergyList.map(opt => createCheckbox({ label: opt, name: 'allergies', value: opt, checked: allergies.includes(opt), id: `allergy-${opt}` })).join('')}
 					</div>
 				</div>
 				<div class="form-group">
