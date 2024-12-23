@@ -43,7 +43,7 @@ export default createHandler({
 			const doc = await db.collection('users').doc(uid).get();
 
 			if (doc.exists) {
-				const { org: sub_id, entitlements, roles } = doc.data();
+				const { org: sub_id = null, entitlements = [], roles = [] } = doc.data();
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
 				const origin = URL.parse(`${req.protocol}//${req.hostname}`)?.origin;
@@ -64,7 +64,7 @@ export default createHandler({
 					scope: 'api',
 					roles: Array.isArray(roles) ? roles : [roles],
 					entitlements,
-					geohash: encodeGeohash({ latitude, longitude }),
+					geohash: encodeGeohash({ latitude, longitude }, 6),
 					swname: req.headers.get('User-Agent'),
 					cdniip: ip,
 					zoneinfo: timezone,
