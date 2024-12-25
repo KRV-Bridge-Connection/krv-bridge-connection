@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.15] - 2024-12-25
+
 ### Added
 - Implement AES encryption
 - Generate `jwks.json` using `@shgysk8zer0/jwk-utils`
 - Add and use `@shgysk8zer0/geoutils`
+- Add `.well-known/openid-configuration` and `.well-known/jwks.json`
+
+### Changed
+- Update claims and verification in JWTs
+- Use static generated files instead of API for Firebase creds and JWK public key
+- Misc dependency updates
 
 ## [v1.0.14] - 2024-12-05
 

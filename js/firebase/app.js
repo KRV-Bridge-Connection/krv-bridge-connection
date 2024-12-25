@@ -7,7 +7,7 @@ export async function getFirebaseApp(name = 'default') {
 	if (apps.has(name)) {
 		return apps.get(name);
 	} else {
-		const config = await getJSON('/api/firebase-config', { referrerPolicy: 'origin' });
+		const config = await getJSON('/firebase.json', { referrerPolicy: 'origin' });
 		const app = initializeApp(config);
 		apps.set(name, app);
 		return app;

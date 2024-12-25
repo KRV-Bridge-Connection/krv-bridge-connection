@@ -3,6 +3,7 @@ import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import firebase from 'firebase-admin';
 import { readFile } from 'node:fs/promises';
+import { checkGeohash } from '@shgysk8zer0/geoutils';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
@@ -55,15 +56,20 @@ export default createHandler({
 			}
 		}
 	},
-	async post(req) {
+	async post(req, { ip, geo }) {
 		if (! req.cookies.has('org-jwt')) {
 			throw new HTTPUnauthorizedError('This request requires a token for authorization.');
 		} else {
-			const key = await getPublicKey();
-			const result = await verifyJWT(req.cookies.get('org-jwt', key, {
-				claims: ['exp', 'iss', 'sub_id', 'entitlments'],
+			const result = await verifyJWT(req.cookies.get('org-jwt'), await getPublicKey(), {
 				entitlements: ['link:create'],
-			}));
+				claims: ['exp'],
+				roles: ['admin'],
+				cdniip: ip,
+				swname: req.headers.get('User-Agent'),
+				geohash(hash) {
+					return checkGeohash(hash, geo);
+				}
+			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
@@ -93,17 +99,22 @@ export default createHandler({
 			}
 		}
 	},
-	async delete(req) {
+	async delete(req, { ip, geo }) {
 		if (! req.cookies.has('org-jwt')) {
 			throw new HTTPUnauthorizedError('This request requires a token for authorization.');
 		} else if (! req.searchParams.has('id')) {
 			throw new HTTPBadRequestError('Missing required id');
 		} else {
-			const key = await getPublicKey();
-			const result = await verifyJWT(req.cookies.get('org-jwt', key, {
-				claims: ['exp', 'iss', 'sub_id', 'entitlments'],
+			const result = await verifyJWT(req.cookies.get('org-jwt'), await getPublicKey(), {
 				entitlements: ['link:delete'],
-			}));
+				claims: ['exp'],
+				roles: ['admin'],
+				cdniip: ip,
+				swname: req.headers.get('User-Agent'),
+				geohash(hash) {
+					return checkGeohash(hash, geo);
+				}
+			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
