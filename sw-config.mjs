@@ -32,12 +32,12 @@ const config = {
 		/* Scripts */
 		'/js/index.min.js',
 		'{{ importmap.imports["@shgysk8zer0/polyfills"] }}',
-
 		/* Images & Icons */
 		'/img/icons.svg',
 		'/img/apple-touch-icon.png',
 		'/img/icon-192.png',
 		'/img/favicon.svg',
+		'/firebase.json',
 		// 'https://cdn.kernvalley.us/img/logos/firefox.svg',
 		// 'https://cdn.kernvalley.us/img/logos/chrome.svg',
 		'https://cdn.kernvalley.us/img/keep-kern-clean.svg',
@@ -54,6 +54,9 @@ const config = {
 		'https://i.imgur.com/',
 		'https://maps.wikimedia.org/osm-intl/',
 		'https://cdn.kernvalley.us/img/',
+		'https://unpkg.com/@shgysk8zer0/',
+		'https://unpkg.com/@aegisjsproject/',
+		'https://unpkg.com/@kernvalley/',
 		/https:\/\/\w+\.githubusercontent\.com\/u\/*/,
 		new URL('/img/raster/', location.origin).href,
 		/\.(jpg|png|webp|svg|gif)$/,
