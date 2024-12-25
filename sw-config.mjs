@@ -22,7 +22,14 @@ async function updateAssets(assets, {
 const config = {
 	version: '{{ app.version | default: pkg.version }}',
 	fresh: [
-		'{{ site.pages | where: "pinned", true | map: "url" | join: "', '" }}',
+		/* Pages */
+		'/',
+		'/contact/',
+		'/about/',
+		'/donate/',
+		'/volunteer/',
+		'/account/',
+		'/branding/',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
 		'https://cdn.kernvalley.us/img/markers.svg',
@@ -38,12 +45,14 @@ const config = {
 		'/img/icon-192.png',
 		'/img/favicon.svg',
 		'/firebase.json',
+		'/.well-known/jwks.json',
 		// 'https://cdn.kernvalley.us/img/logos/firefox.svg',
 		// 'https://cdn.kernvalley.us/img/logos/chrome.svg',
 		'https://cdn.kernvalley.us/img/keep-kern-clean.svg',
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
 		'/img/adwaita-icons/status/avatar-default.svg',
+		'/js/routes/404.js',
 
 		/* Fonts */
 		'https://cdn.kernvalley.us/fonts/roboto.woff2',
@@ -57,6 +66,7 @@ const config = {
 		'https://unpkg.com/@shgysk8zer0/',
 		'https://unpkg.com/@aegisjsproject/',
 		'https://unpkg.com/@kernvalley/',
+		new URL('/js/routes/', location.origin).href,
 		/https:\/\/\w+\.githubusercontent\.com\/u\/*/,
 		new URL('/img/raster/', location.origin).href,
 		/\.(jpg|png|webp|svg|gif)$/,
