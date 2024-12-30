@@ -34,8 +34,11 @@ export default createHandler({
 		} else {
 			const publicKey = await getPublicKey();
 			const result = await verifyJWT(token, publicKey, {
-				claims: ['iss', 'exp', 'iat', 'nbf', 'jti', 'entitlements'],
+				claims: ['iss', 'iat', 'nbf', 'jti', 'entitlements'],
 				entitlements: ['slack:send'],
+				aud: 'https://krvbridge.org',
+				iss: 'https://krvbridge.org',
+				scope: 'slack',
 			});
 
 			if (result instanceof Error || result === null) {
