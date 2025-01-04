@@ -36,15 +36,20 @@ async function getPublicKey() {
 	return await importJWK(keyData);
 }
 
+const encryptAll = async (key, ...vals) => await Promise.all(
+	vals.map(val => typeof val === 'string' && val.length !== 0 ? encrypt(key, val, { output: BASE64 }) : '')
+);
+
+const decryptAll = async (key, ...vals) => await Promise.all(
+	vals.map(val => typeof val === 'string' && val.length !== 0 ? decrypt(key, val, { input: BASE64, output: TEXT }) : null)
+);
+
 async function getVolunteerInfo(data) {
 	const key = await getSecretKey();
 
-	const [phone, email, streetAddress, emergencyPhone] = await Promise.all([
-		data.get('email'),
-		data.get('phone'),
-		data.get('streetAddress'),
-		data.get('emergencyPhone'),
-	].map(val => typeof val === 'string' && val.length !== 0 ? encrypt(key, val, { output: BASE64 }) : ''));
+	const [phone, email, streetAddress, emergencyPhone] = encryptAll(
+		key, data.get('phone'), data.get('email'), data.get('streetAddress'), data.get('emergencyPhone')
+	);
 
 	return {
 		name: data.get('name'),
@@ -90,7 +95,7 @@ export default createHandler({
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
 				geohash(hash) {
-					return checkGeohash(hash, geo);
+					return checkGeohash(hash, geo, { radius: 10_000 });
 				}
 			});
 
@@ -106,16 +111,13 @@ export default createHandler({
 					if (doc.exists) {
 						const { email, phone, streetAddress, emergencyPhone, ...rest } = doc.data();
 						const key = await getSecretKey();
+						const [clearEmail, clearPhone, clearStreetAddress, clearEmergencyPhone] = await decryptAll(key, email, phone, streetAddress, emergencyPhone);
 
 						return Response.json({
-							email: await decrypt(key, email, { input: BASE64, output: TEXT }),
-							phone: await decrypt(key, phone, { input: BASE64, output: TEXT }),
-							streetAddress: typeof streetAddress === 'string' && streetAddress.length !== 0
-								? await decrypt(key, streetAddress, { input: BASE64, output: TEXT  })
-								: null,
-							emergencyPhone: typeof emergencyPhone === 'string' && emergencyPhone.length !== 0
-								? await decrypt(key, emergencyPhone, { input: BASE64, output: TEXT })
-								: null,
+							email: clearEmail,
+							phone: clearPhone,
+							streetAddress: clearStreetAddress,
+							emergencyPhone: clearEmergencyPhone,
 							...rest
 						});
 					} else {
