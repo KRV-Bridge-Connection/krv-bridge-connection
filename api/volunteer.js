@@ -40,8 +40,8 @@ async function getVolunteerInfo(data) {
 	const key = await getSecretKey();
 
 	const [phone, email, streetAddress, emergencyPhone] = await Promise.all([
-		data.get('email'),
 		data.get('phone'),
+		data.get('email'),
 		data.get('streetAddress'),
 		data.get('emergencyPhone'),
 	].map(val => typeof val === 'string' && val.length !== 0 ? encrypt(key, val, { output: BASE64 }) : ''));
