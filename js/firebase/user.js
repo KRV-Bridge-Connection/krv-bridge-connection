@@ -36,6 +36,7 @@ export async function genOrgToken({ signal } = {}) {
 		const resp = await fetch('/api/orgJWT', {
 			headers: { Authorization: `Bearer ${token}` },
 			signal,
+			credentials: 'omit',
 		});
 
 		return resp.ok ? await resp.json() : null;

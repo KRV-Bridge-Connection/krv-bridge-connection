@@ -90,7 +90,7 @@ export default createHandler({
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
 				geohash(hash) {
-					return checkGeohash(hash, geo);
+					return checkGeohash(hash, geo, { radius: 10_000 });
 				}
 			});
 
