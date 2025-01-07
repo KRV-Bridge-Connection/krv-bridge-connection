@@ -2,6 +2,7 @@
 import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
+import { checkGeohash } from '@shgysk8zer0/geoutils/hash.js';
 import firebase from 'firebase-admin';
 import {
 	createHandler, HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError,
@@ -82,7 +83,7 @@ export default createHandler({
 			return Response.json(orgs);
 		}
 	},
-	async delete(req) {
+	async delete(req, { ip, geo } = {}) {
 		const params = req.searchParams;
 
 		if (! req.cookies.has('org-jwt')) {
@@ -91,9 +92,17 @@ export default createHandler({
 			throw new HTTPBadRequestError('Missing required id in query string.');
 		} else {
 			const publicKey = await getPublicKey();
+
 			const result = await verifyJWT(req.cookies.get('org-jwt'), publicKey, {
+				roles: ['admin'],
 				entitlements: ['org:delete'],
 				claims: ['exp', 'sub_id', 'iss', 'sub'],
+				cdniip: ip,
+				swname: req.headers.get('User-Agent'),
+				sub_id: params.get('id'),
+				geohash(hash) {
+					return checkGeohash(hash, geo, { radius: 10_000 });
+				}
 			});
 
 			if (result instanceof Error) {
