@@ -83,7 +83,7 @@ export default createHandler({
 			return Response.json(orgs);
 		}
 	},
-	async delete(req) {
+	async delete(req, { ip, geo } = {}) {
 		const params = req.searchParams;
 
 		if (! req.cookies.has('org-jwt')) {
