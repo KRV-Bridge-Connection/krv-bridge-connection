@@ -99,6 +99,7 @@ export default createHandler({
 				claims: ['exp', 'sub_id', 'iss', 'sub'],
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
+				sub_id: params.get('id'),
 				geohash(hash) {
 					return checkGeohash(hash, geo, { radius: 10_000 });
 				}
