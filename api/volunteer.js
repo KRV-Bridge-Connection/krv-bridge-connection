@@ -47,7 +47,7 @@ const decryptAll = async (key, ...vals) => await Promise.all(
 async function getVolunteerInfo(data) {
 	const key = await getSecretKey();
 
-	const [phone, email, streetAddress, emergencyPhone] = encryptAll(
+	const [phone, email, streetAddress, emergencyPhone] = await encryptAll(
 		key, data.get('phone'), data.get('email'), data.get('streetAddress'), data.get('emergencyPhone')
 	);
 
