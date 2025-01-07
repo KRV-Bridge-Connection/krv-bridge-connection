@@ -31,7 +31,7 @@ default:
     - https://www.youtube-nocookie.com
     - https://donorbox.org/embed/
     - https://maps.kernvalley.us/embed
-    # - https://calendar.google.com/calendar/embed
+    - https://calendar.google.com/calendar/embed
   img-src:
     - "*"
     - "blob:"
