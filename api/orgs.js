@@ -83,7 +83,7 @@ export default createHandler({
 			return Response.json(orgs);
 		}
 	},
-	async delete(req) {
+	async delete(req, { ip, geo } = {}) {
 		const params = req.searchParams;
 
 		if (! req.cookies.has('org-jwt')) {
@@ -99,6 +99,7 @@ export default createHandler({
 				claims: ['exp', 'sub_id', 'iss', 'sub'],
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
+				sub_id: params.get('id'),
 				geohash(hash) {
 					return checkGeohash(hash, geo, { radius: 10_000 });
 				}
