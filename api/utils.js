@@ -41,13 +41,21 @@ export async function getCollection(collection, { envName = ENV_CERT_NAME } = {}
 
 export async function getCollectionItems(name, {
 	limit = 10,
-	page = 0,
+	page = 1,
 	envName = ENV_CERT_NAME,
+	filters,
 } = {}) {
-	const collection = await getCollection(name, { envName });
-	const snapshot = await collection(name).offset(page * limit).limit(limit).get();
+	let query = await getCollection(name, { envName });
 
-	return snapshot.docs.map(doc => doc.data());
+	if (Array.isArray(filters) && filters.length !== 0) {
+		filters.forEach(filter => {
+			query = query.where(...filter); // Spread operator for dynamic filters
+		  });
+	}
+
+	const snapshot = await query.offset((page - 1) * limit).limit(limit).get();
+
+	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME } = {}) {

@@ -37,7 +37,7 @@ export default createHandler({
 			auth.generateEmailVerificationLink(user.email);
 			throw new HTTPForbiddenError('You will need to verify your email address and try again. An verification email has been sent.');
 		} else {
-			const { uid, name, email, email_verified } = user;
+			const { uid, name, email, picture, email_verified } = user;
 
 			const db = firebase.firestore();
 			const doc = await db.collection('users').doc(uid).get();
@@ -61,6 +61,7 @@ export default createHandler({
 					name,
 					email,
 					email_verified,
+					picture,
 					scope: 'api',
 					roles: Array.isArray(roles) ? roles : [roles],
 					entitlements,
