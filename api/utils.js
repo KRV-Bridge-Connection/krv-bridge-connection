@@ -5,6 +5,12 @@ import { readFile } from 'node:fs/promises';
 
 const ENV_CERT_NAME = 'FIREBASE_CERT';
 
+export const sluggify = str => str.trim()
+	.replaceAll(/[^A-Za-z0-9\-\s]/g, '')
+	.replaceAll(/\s+/g, ' ')
+	.toLowerCase()
+	.replaceAll(' ', '-');
+
 export async function getPublicKey(file = '_data/jwk.json') {
 	const keyData = JSON.parse(await readFile(file, { encoding: 'utf-8' }));
 	return await importJWK(keyData);
@@ -41,13 +47,21 @@ export async function getCollection(collection, { envName = ENV_CERT_NAME } = {}
 
 export async function getCollectionItems(name, {
 	limit = 10,
-	page = 0,
+	page = 1,
 	envName = ENV_CERT_NAME,
+	filters,
 } = {}) {
-	const collection = await getCollection(name, { envName });
-	const snapshot = await collection(name).offset(page * limit).limit(limit).get();
+	let query = await getCollection(name, { envName });
 
-	return snapshot.docs.map(doc => doc.data());
+	if (Array.isArray(filters) && filters.length !== 0) {
+		filters.forEach(filter => {
+			query = query.where(...filter); // Spread operator for dynamic filters
+		  });
+	}
+
+	const snapshot = await query.offset((page - 1) * limit).limit(limit).get();
+
+	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME } = {}) {
