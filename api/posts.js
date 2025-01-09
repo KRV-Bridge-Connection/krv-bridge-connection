@@ -65,7 +65,7 @@ export default createHandler({
 			} else {
 				const data = await req.formData();
 
-				if (! (data.has('content') && data.has('title'))) {
+				if (! (data.has('content') && data.has('title') && data.has('description'))) {
 					throw new HTTPBadRequestError('Missing required content or title fields.');
 				} else {
 					const { sub, sub_id, name, email, picture } = result;

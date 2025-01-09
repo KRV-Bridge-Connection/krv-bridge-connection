@@ -1,4 +1,5 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { attr } from '@aegisjsproject/core/stringify.js';
 import { site } from '../consts.js';
 
 const cache = new Map();
@@ -45,27 +46,44 @@ async function getPost({
 	}
 }
 
-
-export default async ({ matches, signal }) => {
+export default async ({ url, matches, signal }) => {
 	try {
-		const { title, content, author, createdAt, image = 'https://cdn.kernvalley.us/img/raster/missing-image.png' } = await getPost(matches, signal);
+		const {
+			title, description, content, createdAt,
+			author: {
+				name = 'Missing Author',
+				picture = 'https://secure.gravatar.com/avatar/958bb1ce39fb68df75895c76b9ed5011?s=64&d=mm',
+				sub = '',
+			} = {},
+			image: {
+				src = 'https://cdn.kernvalley.us/img/raster/missing-image.png',
+				width = 640,
+				height = 480,
+				alt = '',
+			} = {}
+		 } = await getPost(matches, signal);
 
 		return html`<article itemtype="https://schema.org/Article" itemscope="">
 			<header>
+		 		<meta itemprop="url" content="${url}" />
 				<h2 itemprop="headline">${title}</h2>
+				<meta itemprop="description" ${attr({ content: description })} />
 				<div itemprop="author" itemtype="https://schema.org/Person" itemscope="">
-					<img src="${author.picture}" itemprop="image" crossorigin="anonymous" referrerpolicy="no-referrer" alt="${author.name} Profile Image" width="64" height="64" />
-					<b itemprop="name">${author.name}</b>
-					<meta itemprop="url" content="/orgs/user/${author.sub}" />
+					<img src="${picture}" itemprop="image" crossorigin="anonymous" referrerpolicy="no-referrer" alt="${name} Profile Image" width="64" height="64" />
+					<b itemprop="name">${name}</b>
+					<meta itemprop="url" content="/orgs/user/${sub}" />
 				</div>
 			</header>
-			<div><img src="${image}" itemprop="image" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" alt="" /></div>
+			<figure itemprop="image" itemtype="https://schema.org/ImageObject" itemscope="">
+				<img itemprop="url" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" ${attr({ src, alt, height, width })} />
+				<meta itemprop="height" ${attr({ content: height })} />
+				<meta itemprop="width" ${attr({ content: width })} />
+				<figcaption itemprop="description">${alt}</figcaption>
+			</figure>
 			<section itemprop="articleBody">${content}</section>
 			<footer>
-				<p>
-					<span>First posted on</span>
-					<time itemprop="dateCreated" datetime="${createdAt.toISOString()}">${createdAt.toLocaleDateString(navigator.language, dateOptions)}</time>
-				</p>
+				<span>First posted on</span>
+				<time itemprop="dateCreated" datetime="${createdAt.toISOString()}">${createdAt.toLocaleDateString(navigator.language, dateOptions)}</time>
 			</footer>
 		</article>`;
 	} catch(err) {
