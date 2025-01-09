@@ -1,6 +1,6 @@
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
-import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getCollection } from './utils.js';
+import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getFirestore, sluggify } from './utils.js';
 
 const JWT = 'org-jwt';
 const COLLECTION = 'posts';
@@ -70,16 +70,30 @@ export default createHandler({
 				} else {
 					const { sub, sub_id, name, email, picture } = result;
 
-					const collection = await getCollection(COLLECTION);
+					const db = await getFirestore();
+					const date = new Date();
+					const path = '/posts/' + [
+						[
+							date.getFullYear(),
+							(date.getMonth() + 1).toString().padStart(2, '0'),
+							date.getDate().toString().padStart(2, '0')
+						].join('-'),
+						sluggify(data.get('title')),
+					].join(':');
 
-					const newPost = await collection.add({
+					const docRef = db.doc(path);
+
+					await docRef.set({
 						author: { sub, sub_id, name, email, picture },
 						title: data.get('title'),
 						content: data.get('content'),
-						createdAt: new Date()
+						createdAt: date,
 					});
 
-					return Response.json({ id: newPost.id });
+					return new Response(null, {
+						status: 201,
+						headers: { Location: path },
+					});
 				}
 			}
 		} else {

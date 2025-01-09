@@ -5,6 +5,12 @@ import { readFile } from 'node:fs/promises';
 
 const ENV_CERT_NAME = 'FIREBASE_CERT';
 
+export const sluggify = str => str.trim()
+	.replaceAll(/[^A-Za-z0-9\-\s]/g, '')
+	.replaceAll(/\s+/g, ' ')
+	.toLowerCase()
+	.replaceAll(' ', '-');
+
 export async function getPublicKey(file = '_data/jwk.json') {
 	const keyData = JSON.parse(await readFile(file, { encoding: 'utf-8' }));
 	return await importJWK(keyData);
