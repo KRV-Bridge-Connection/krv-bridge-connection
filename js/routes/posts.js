@@ -17,7 +17,7 @@ async function getPost({ year, month, day, post }, signal) {
 		cache.set(id, promise);
 		console.log(`Caching & fetching ${id}`);
 
-		const url = new URL(`/api/posts`, location.origin);
+		const url = new URL('/api/posts', location.origin);
 		url.searchParams.set('id', `${year}-${month}-${day}:${post}`);
 
 		const resp = await fetch(url, {
@@ -28,7 +28,7 @@ async function getPost({ year, month, day, post }, signal) {
 		}).catch(err => err);
 
 		if (resp instanceof Error) {
-			reject(err);
+			reject(resp);
 		} else if (! resp.ok) {
 			reject(new DOMException(`${resp.url} [${resp.status} ${resp.statusText}]`, 'NetworkError'));
 		} else {
