@@ -5,11 +5,7 @@ import { site } from '../consts.js';
 const cache = new Map();
 const dateOptions = { weekday: 'short', month: 'short', year: 'numeric', day: 'numeric' };
 
-async function getPost({
-	pathname: {
-		groups: { year, month, day, post }
-	},
-}, signal) {
+async function getPost({ year, month, day, post }, signal) {
 	const id = `${year}-${month}-${day}:${post}`;
 
 	if (signal instanceof AbortSignal && signal.aborted) {
@@ -46,7 +42,15 @@ async function getPost({
 	}
 }
 
-export default async ({ url, matches, signal }) => {
+export default async ({
+	matches: {
+		pathname: {
+			groups: { year, month, day, post }
+		},
+	},
+	url,
+	signal,
+}) => {
 	try {
 		const {
 			title, description, content, createdAt,
@@ -61,7 +65,7 @@ export default async ({ url, matches, signal }) => {
 				height = 480,
 				alt = '',
 			} = {}
-		 } = await getPost(matches, signal);
+		 } = await getPost({ year, month, day, post }, signal);
 
 		return html`<article itemtype="https://schema.org/Article" itemscope="">
 			<header>
