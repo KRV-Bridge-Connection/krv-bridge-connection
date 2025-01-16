@@ -3,6 +3,7 @@ import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onCl
 import { clearState, changeHandler as change, setState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
+import { site } from '../consts.js';
 
 const towns = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const dowList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -99,6 +100,8 @@ const buttons = `<div class="flex row space-evenly">
 	</button>
 </div>`;
 
+const openOptional = registerCallback('volunteer:form:optional-open', () => document.getElementById('volunteer-optional').open = true);
+
 function createCheckbox({ label, name, value = 'on', checked = false, id, ...attrs }) {
 	return `<span class="checkbox-group btn btn-checkbox ${checked ? 'btn-primary' : 'btn-secondary' }">
 		<input type="checkbox" ${attr({ name, value, checked, id, ...attrs })}  />
@@ -109,6 +112,7 @@ function createCheckbox({ label, name, value = 'on', checked = false, id, ...att
 }
 
 export default ({
+	url,
 	state: {
 		name = '',
 		email = '',
@@ -135,14 +139,12 @@ export default ({
 	/* eslint-disable indent */
 	const signal = registerSignal(sig);
 
-	return `<krv-events tags="volunteer" source="krv-bridge-volunteers" target="_blank">
+	return `
+		<p>Thanks for your interest in volunteering to benefit the KRV community. The following form will register you to be contacted for any volunteer opportunities in the Valley, as indicated by your answers to the questions. Please note that many questions are optional, and that required questions are indicated by a <q>*</q></p>
+		<krv-events tags="volunteer" source="krv-bridge-volunteers" target="_blank">
 			<span slot="title">Upcoming Volunteer Opportunities in the KRV</span>
 		</krv-events>
 		<form id="volunteer-form" action="/api/volunteer" method="POST" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
-		<div class="status-box info">
-			<p>Thank you for your interest in volunteering in the KRV! Please provide us with the following information so we may best utilize your services.</p>
-			<p>Please be aware that, by submitting this form, you are agreeing to being contacted for any future volunteer opportunities, not for any specific event.</p>
-		</div>
 		<br />
 		<fieldset id="volunteer-contact" class="no-border">
 			<legend>Volunteer Sign-Up to help the KRV</legend>
@@ -205,7 +207,17 @@ export default ({
 				${createCheckbox({ label: 'I agree to the terms', name: 'agreed', checked: agreed, required: true, id: 'volunteer-agreed' })}
 			</div>
 		</fieldset>
-		${buttons}
+		<p class="status-box info">Got a few more minutes? The details below help us find your perfect volunteer matches. Tell us about your interests, skills, and availability.</p>
+		<a class="btn btn-primary" href="${url.pathname}#volunteer-optional" ${onClick}="${openOptional}">
+			<svg class="icon" height="18" width="18" fill="currentColor" role="presentation" aria-hidden="true">
+				<use xlink:href="/img/icons.svg#info"></use>
+			</svg>
+			<span>Help us Match you Better</span>
+		</a>
+		<div>
+			<br />
+			${buttons}
+		</div>
 		<br />
 		<details id="volunteer-optional" class="accordion" ${attr({ open: additionalExpanded })} ${onToggle}="${additionalToggle}" ${signalAttr}="${signal}">
 			<summary>Optional Additional Questions</summary>
@@ -306,6 +318,6 @@ export default ({
 	</dialog>`;
 };
 
-export const title = () => 'Volunteer in the KRV';
+export const title = () => 'Volunteer in the KRV | ' + site.title;
 
 export const description = () => 'Sign-up to be contacted about multiple volunteer opportunities around the Kern River Valley.';
