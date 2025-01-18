@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Bringing multiple nonprofit services into the KRV",
   "private": true,
   "type": "module",
@@ -33,7 +33,7 @@
     "lint:css": "stylelint ${npm_package_config_dir_css}**.css",
     "lint:html": "htmlhint ${npm_package_config_dir_html}",
     "fix:css": "stylelint ${npm_package_config_dir_css}**.css --fix",
-    "fix:js": "eslint . --fix --ext .js,.cjs,.mjs",
+    "fix:js": "eslint --fix .",
     "build": "npm run build:icons && npm run build:css && npm run build:js",
     "build:site": "npx @11ty/eleventy",
     "build:site:dev": "npx @11ty/eleventy --serve",
