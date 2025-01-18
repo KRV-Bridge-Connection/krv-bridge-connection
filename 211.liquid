@@ -1,0 +1,42 @@
+---
+title: Search 2-1-1
+description: '2-1-1 is a free and confidential service that helps people across North America find the local resources they need. We\’re here for you 24 hours a day, 7 days a week.'
+permalink: /211/
+layout: default
+zip: 93240
+suggestions:
+  - 'Utility assistance'
+  - 'Rent assistance'
+  - 'Food'
+  - 'Healthcare'
+  - 'Housing'
+  - 'Transportation'
+  - 'Mental health'
+  - 'Disaster Relief and Recovery'
+---
+<form action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
+	<fieldset class="no-border">
+		<legend>Search 2-1-1</legend>
+		<div>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</div>
+		<div class="form-group">
+			<label for="211-search" class="input-label required">How can we help?</label>
+			<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" autocomplete="off" required="" />
+			<datalist id="211-suggestions">{% for suggesion in suggestions %}
+				<option label="{{ suggesion }}" value="{{ suggesion }}"></option>
+			{% endfor %}</datalist>
+			<input type="hidden" name="location" value="{{zip}}" />
+		</div>
+	</fieldset>
+	<button type="submit" class="btn btn-big btn-success">
+		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+			<use xlink:href="/img/icons.svg#search"></use>
+		</svg>
+		<span>Find Help</span>
+	</button>
+	<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link btn-big" rel="noopener noreferrer external" target="_blank">
+		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+			<use xlink:href="/img/icons.svg#link-external"></use>
+		</svg>
+		<span>More information</span>
+	</a>
+</form>

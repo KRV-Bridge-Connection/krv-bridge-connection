@@ -60,3 +60,4 @@ default:
     # - https://baconipsum.com/api/
   form-action:
     - "'self'"
+    - https://www.211ca.org/search
