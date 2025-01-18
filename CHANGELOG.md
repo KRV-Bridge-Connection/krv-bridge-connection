@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.16] - 2025-01-17
+
 ### Added
 - Add 211 search page
+- Add handlers & endpoints for posts and partner profiles
+- Add Google Calendar embed
 
 ## [v1.0.15] - 2024-12-25
 

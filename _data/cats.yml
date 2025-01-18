@@ -1,0 +1,18 @@
+- slug: food
+  label: Food
+- slug: housing
+  label: Housing
+- slug: healthcare
+  label: Healthcare
+- slug: disaster-relief-and-recovery
+  label: Disaster Relief and Recovery
+- slug: rent-assistance
+  label: Rent assistance
+- slug: utility-assistance
+  label: Utility assistance
+- slug: transportation
+  label: Transportation
+- slug: drugs-and-addition
+  label: Drugs and addiction
+- slug: mental-health
+  label: Mental health
