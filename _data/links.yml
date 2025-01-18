@@ -2,6 +2,14 @@ nav:
   - label: Home
     icon: home
     href: /
+  # - label: Be Finallay Free
+  #   href: /partners/be-finally-free
+  # - label: Us
+  #   href: /partners/krv-bridge-connection
+  # - label: News
+  #   href: /posts/2025/01/08/hello-world
+  # - label: News 2
+  #   href: /posts/2025/01/08/hello-world-x
   # - label: Resources
   #   icon: list-unordered
   #   href: /resources/
@@ -11,12 +19,19 @@ nav:
   - label: Contact
     icon: inbox
     href: /contact/
+  # - label: Calendar
+  #   href: /calendar/
+  #   icon: calendar
   - label: Donate
     icon: donate
     href: /donate/
   - label: Volunteer
     icon: hand
     href: '/volunteer/'
+  - label: Search 211
+    href: '/211/'
+    icon: search
+    accessKey: f
   - label: Account
     icon: avatar-default
     href: /account/
