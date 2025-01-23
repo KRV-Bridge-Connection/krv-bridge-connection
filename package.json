@@ -73,7 +73,7 @@
     "@shgysk8zer0/11ty-netlify": "^1.1.25",
     "@shgysk8zer0/aes-gcm": "^1.0.8",
     "@shgysk8zer0/geoutils": "^1.0.6",
-    "@shgysk8zer0/importmap": "^1.4.43",
+    "@shgysk8zer0/importmap": "^1.4.45",
     "@shgysk8zer0/lambda-http": "^1.1.22",
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.7",
