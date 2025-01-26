@@ -4,7 +4,7 @@ import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } fro
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
-import { attr } from '@aegisjsproject/core/stringify.js';
+import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
 
 const cache = new Map();
@@ -78,7 +78,10 @@ export async function getMetadata({ matches, signal } = {}) {
 		const {
 			name: title = 'Not Found',
 			description = `No results for ${matches.pathname.groups.partner}`,
-		} = await getPartnerInfo(matches, { signal }).catch(() => {});
+		} = await getPartnerInfo(matches, { signal }).catch(({ message }) => ({
+			name: `Not results for ${matches.pathname.groups.partner.replaceAll('-', ' ')}`,
+			description: message,
+		}));
 
 		return { title, description };
 	} else {
@@ -126,7 +129,7 @@ export default async function ({ matches, signal } = {}) {
 		if (result instanceof Error) {
 			return html`<div class="status-box error">${result.message}</div>`;
 		} else if (typeof result === 'object') {
-			return html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" data-org-name="${result.name}" itemscope="">
+			return html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 				<h2>
 					<span itemprop="name">${result.name}</span>
 				</h2>
@@ -198,9 +201,9 @@ export default async function ({ matches, signal } = {}) {
 			</form>
 		</search>
 		<div>
-			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" data-org-name="${name}"  ${attr({ hidden: hide(name, search)})}>
+			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" ${data({ orgName: name })}  ${attr({ hidden: hide(name, search)})}>
 				<b class="block">${name}</b>
-				<img src="${image.src}" class="block" height="${image.height}" width="${image.width}" loading="lazy" crossoprigin="anonymous" referrerpolicy="no-referrer" alt="" />
+				<img src="${image.src}" class="block" height="${image.height}" width="${image.width}" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" />
 				<p>${description}</p>
 				<a href="/partners/${id}" class="btn btn-link">
 					<svg height="18" width="18" fill="currentColor" aria-hidden="true">
