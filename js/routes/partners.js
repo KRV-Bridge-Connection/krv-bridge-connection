@@ -1,15 +1,59 @@
-/* eslint-disable */
-import { site, DB_VERSION } from '../consts.js';
-import { getAllItems, getItem, openDB } from '@aegisjsproject/idb';
+import { site, SCHEMA } from '../consts.js';
+import { EVENT_TYPES } from '@aegisjsproject/router/router.js';
+import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onReset, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { attr } from '@aegisjsproject/core/stringify.js';
+import { manageSearch } from '@aegisjsproject/url/search.js';
 
 const cache = new Map();
-const DB_NAME = 'krv-bridge';
 const STORE_NAME = 'partners';
+// const DB_TTL = 604800000; // 1 week
+const DB_TTL = 86400000; // 1 Day
 
-const searchPartners = registerCallback('partner:search', event => {
+const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty('_lastSync')
+	? Date.now() - (parseInt(localStorage.getItem('_lastSync')) || 0) > ttl
+	: true;
+
+async function syncDB(db, { signal } = {}) {
+	if (needsSync(DB_TTL)) {
+		try {
+			const url = new URL('/api/partners', location.origin);
+			url.searchParams.set('lastSync', localStorage.getItem('_lastSync'));
+
+			const resp = await fetch(url, {
+				headers: { Accept: 'application/json' },
+				referrerPolicy: 'no-referrer',
+				credentials: 'omit',
+				signal,
+			});
+
+			if (resp.ok) {
+				const partners = await resp.json();
+				const store = await getStoreReadWrite(db, STORE_NAME, {});
+				const lastUpdated = new Date();
+
+				await Promise.all(partners.map(partner => {
+					partner.lastUpdated = lastUpdated;
+					return handleIDBRequest(store.put(partner), { signal });
+				}));
+
+				localStorage.setItem('_lastSync', Date.now());
+			} else {
+				throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
+			}
+		} catch(err) {
+			reportError(err);
+		}
+	}
+}
+
+const [search, setSearch] = manageSearch('search', '');
+const updateSearch = ('partner:search:change', ({ target }) => setSearch(target.value));
+const hide = (val, param) => ! val.toLowerCase().includes(param.toString().toLowerCase());
+
+const searchPartners = registerCallback('partner:search:submit', event => {
 	event.preventDefault();
 	const data = new FormData(event.target);
 	const search = data.get('search').toLowerCase();
@@ -24,106 +68,26 @@ const searchPartners = registerCallback('partner:search', event => {
 });
 
 const resetPartnerSearch = registerCallback('partner:reset', () => {
+	document.getElementById('search-orgs').removeAttribute('value');
+	setSearch();
 	document.querySelectorAll('[data-org-name]').forEach(el => el.hidden = false);
 });
 
-function onUpgrade({ target }) {
-	/**
-	 * @type {IDBDatabase}
-	 */
-	const db = target.result;
+export async function getMetadata({ matches, signal } = {}) {
+	if (typeof matches.pathname.groups.partner === 'string' && matches.pathname.groups.partner.length !== 0) {
+		const {
+			name: title = 'Not Found',
+			description = `No results for ${matches.pathname.groups.partner}`,
+		} = await getPartnerInfo(matches, { signal }).catch(() => {});
 
-	if (! db.objectStoreNames.contains(STORE_NAME)) {
-		const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-		store.createIndex('name', 'name', { unique: false });
-		store.createIndex('categories', 'categories', { multiEntry: true });
-
-		// Seed initial data
-		for (const partner of initialData) {
-			store.put(partner);
-		}
-  	}
+		return { title, description };
+	} else {
+		return {
+			title: 'Partner Directory',
+			description: 'A directory of KRV Bridge Connection partner organizations serving the Kern River Valley.',
+		};
+	}
 }
-
-const lastUpdated = new Date();
-
-const categories = {
-	'food': crypto.randomUUID(),
-	'housing': crypto.randomUUID(),
-	'rent': crypto.randomUUID(),
-	'utilities': crypto.randomUUID(),
-	'addiction': crypto.randomUUID(),
-	'homelessness': crypto.randomUUID(),
-	'financial': crypto.randomUUID(),
-	'abuse': crypto.randomUUID(),
-	'employment': crypto.randomUUID(),
-};
-
-const initialData = [{
-	id: 'krv-bridge-connection',
-	name: 'KRV Bridge Connection',
-	url: 'https://krvbridge.org/',
-	email: 'contact@krvbridge.org',
-	telephone: '+1-661-491-5873',
-	description: 'The KRV Bridge Connection bridges the gap between the KRV Community and organizations that offer assistance.',
-	lastUpdated,
-	categories: [],
-	image: {
-		src: 'https://krvbridge.org/img/branding/krv-bridge-logo-wide.svg',
-		width: 640,
-		height: 385,
-	}
-}, {
-	id: 'be-finally-free',
-	name: 'Be Finally Free',
-	url: 'https://befinallyfree.org/',
-	description: 'Need this still',
-	lastUpdated,
-	categories: [categories.addiction, categories.homelessness, categories.abuse],
-	image: {
-		src: 'https://cdn.kernvalley.us/img/raster/missing-image.png',
-		width: 640,
-		height: 480,
-	}
-}, {
-	id: 'open-door-network',
-	name: 'The Open Door Network',
-	url: 'https://opendoorhelps.org/',
-	description: 'Helping those who enter our door to reimagine their lives',
-	lastUpdated,
-	categories: [categories.homelessness, categories.abuse, categories.employment],
-	image: {
-		src: 'https://opendoorhelps.org/wp-content/uploads/2023/02/cropped-cropped-ODNFWLOGO-4.png',
-		width: 1164,
-		height: 593,
-	}
-}, {
-	id: 'flood-ministries',
-	name: 'Flood Ministries',
-	url: 'https://www.floodbako.com/',
-	description: 'Flood exists to reach out and engage those in our community struggling in homelessness, linking them to resources and services through the supportive housing process.',
-	lastUpdated,
-	categories: [categories.homelessness],
-	image: {
-		src: 'https://cdn.kernvalley.us/img/raster/missing-image.png',
-		width: 640,
-		height: 480,
-	}
-}, {
-	id: 'capk',
-	name: 'capk',
-	url: 'https://www.capk.org/',
-	email: 'info@capk.org',
-	telephone: '+1-661-336-5236',
-	description: 'Established in 1965, Community Action Partnership of Kern (CAPK) administers more than a dozen programs aimed at meeting children, families and individuals at their point of need.',
-	lastUpdated,
-	categories: [categories.utilities, categories.food, categories.housing, categories.rent],
-	image: {
-		src: 'https://cdn.kernvalley.us/img/raster/missing-image.png',
-		width: 640,
-		height: 480,
-	}
-}];
 
 async function getPartnerInfo({
 	pathname: {
@@ -138,7 +102,7 @@ async function getPartnerInfo({
 		resolve(cache.get(partner));
 	} else {
 		cache.set(partner, promise);
-		const db = await openDB(DB_NAME, { version: DB_VERSION, onUpgrade });
+		const db = await openDB(SCHEMA.name, { version: SCHEMA.version });
 
 		getItem(db, STORE_NAME, partner, { signal })
 			.then(result => typeof result === 'undefined'
@@ -154,6 +118,9 @@ async function getPartnerInfo({
 
 export default async function ({ matches, signal } = {}) {
 	if (typeof matches?.pathname?.groups?.partner === 'string' && matches.pathname.groups.partner.length !== 0) {
+		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+		await syncDB(db, { signal });
+		db.close();
 		const result = await getPartnerInfo(matches, { signal }).catch(err => err);
 
 		if (result instanceof Error) {
@@ -188,14 +155,30 @@ export default async function ({ matches, signal } = {}) {
 			return html`<h2>Not Found</h2>`;
 		}
 	} else {
-		const db = await openDB(DB_NAME, { version: DB_VERSION, onUpgrade });
+		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+		await syncDB(db, { signal });
 		const results = await getAllItems(db, STORE_NAME, null, { signal });
+		const sig = registerSignal(signal);
+
+		if (HTMLFormElement.prototype.requestSubmit instanceof Function) {
+			search.addEventListener('change', ({ target }) => {
+				if (target.toString().length === 0) {
+					document.forms['org-search'].reset();
+				} else {
+					document.forms['org-search'].requestSubmit();
+				}
+			}, { passive: true, signal });
+
+			if (search.toString().length !== 0) {
+				document.addEventListener(EVENT_TYPES.load, () => document.forms['org-search'].requestSubmit(), { once: true, signal });
+			}
+		}
 
 		return html`<search>
-			<form id="org-search" ${onSubmit}="${searchPartners}" ${onReset}="${resetPartnerSearch}" ${signalAttr}="${registerSignal(signal)}">
+			<form id="org-search" ${onSubmit}="${searchPartners}" ${onReset}="${resetPartnerSearch}" ${signalAttr}="${sig}">
 				<div class="form-group">
 					<label for="search-orgs" class="visually-hidden">Search Organizations</label>
-					<input type="search" name="search" id="search-orgs" class="input" placeholder="Search form..." autocomplete="off" list="org-names" required="" />
+					<input type="search" name="search" id="search-orgs" class="input" placeholder="Search form..." autocomplete="off" ${attr({ value: search })} ${onChange}="${updateSearch}" ${signalAttr}=${sig} list="org-names" required="" />
 					<datalist id="org-names">
 						${results.map(({ name }) => `<option value="${name}" label="${name}"></option>`).join('\n')}
 					</datalist>
@@ -215,7 +198,7 @@ export default async function ({ matches, signal } = {}) {
 			</form>
 		</search>
 		<div>
-			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" data-org-name="${name}">
+			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" data-org-name="${name}"  ${attr({ hidden: hide(name, search)})}>
 				<b class="block">${name}</b>
 				<img src="${image.src}" class="block" height="${image.height}" width="${image.width}" loading="lazy" crossoprigin="anonymous" referrerpolicy="no-referrer" alt="" />
 				<p>${description}</p>
@@ -230,10 +213,8 @@ export default async function ({ matches, signal } = {}) {
 	}
 }
 
-export const title = async ({ matches, signal } = {}) => `${await getPartnerInfo(matches, { signal })
-	.then(result => result.name)
-	.catch(() => 'Not Found')} | ${site.title}`;
+export const title = async ({ matches, signal }) => await getMetadata({ matches, signal })
+	.then(({ title }) => `${title} | ${site.title}`);
 
-export const description = async ({ matches, signal } = {}) => await getPartnerInfo(matches, { signal })
-	.then(result => result.description)
-	.catch(err => err.message);
+export const description = async ({ matches, signal }) => await getMetadata({ matches, signal })
+	.then(({ description }) => description);
