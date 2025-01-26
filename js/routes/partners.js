@@ -133,21 +133,21 @@ export default async function ({ matches, signal } = {}) {
 				<h2>
 					<span itemprop="name">${result.name}</span>
 				</h2>
-				<img src="${result.image.src}" itemprop="image" height="${result.image.height}" width="${result.image.width}" alt="${result.name}" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+				<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.name})} itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 				<p itemprop="description">${result.description}</p>
-				${typeof result.email !== 'string' ? '' : `<a href="mailto:${result.email}" itemprop="email" class="btn btn-link btn-lg">
+				${typeof result.email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + result.email })} itemprop="email" class="btn btn-link btn-lg">
 					<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
 						<use xlink:href="/img/icons.svg#mail"></use>
 					</svg>
 					<span>${result.email}</span>
 				</a>`}
-				${typeof result.telephone !== 'string' ? '' : `<a href="tel:${result.telephone}" itemprop="telephone" class="btn btn-link btn-lg">
+				${typeof result.telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + result.telephone })} itemprop="telephone" class="btn btn-link btn-lg">
 					<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Call">
 						<use xlink:href="/img/icons.svg#call-start"></use>
 					</svg>
 					<span>${result.telephone.replace('+1-', '')}</span>
 				</a>`}
-				${typeof result.url !== 'string' && URL.canParse(result.url) ? '' : `<a href="${result.url}" target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
+				${typeof result.url !== 'string' && URL.canParse(result.url) ? '' : `<a ${attr({ href: result.url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
 					<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 						<use xlink:href="/img/icons.svg#link-external"></use>
 					</svg>
@@ -183,7 +183,7 @@ export default async function ({ matches, signal } = {}) {
 					<label for="search-orgs" class="visually-hidden">Search Organizations</label>
 					<input type="search" name="search" id="search-orgs" class="input" placeholder="Search form..." autocomplete="off" ${attr({ value: search })} ${onChange}="${updateSearch}" ${signalAttr}=${sig} list="org-names" required="" />
 					<datalist id="org-names">
-						${results.map(({ name }) => `<option value="${name}" label="${name}"></option>`).join('\n')}
+						${results.map(({ name }) => `<option ${attr({ label: name, value: name })}></option>`).join('\n')}
 					</datalist>
 					<button type="submit" class="btn btn-success">
 						<svg clas="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
@@ -203,7 +203,7 @@ export default async function ({ matches, signal } = {}) {
 		<div>
 			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" ${data({ orgName: name })}  ${attr({ hidden: hide(name, search)})}>
 				<b class="block">${name}</b>
-				<img src="${image.src}" class="block" height="${image.height}" width="${image.width}" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" />
+				<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 				<p>${description}</p>
 				<a href="/partners/${id}" class="btn btn-link">
 					<svg height="18" width="18" fill="currentColor" aria-hidden="true">
