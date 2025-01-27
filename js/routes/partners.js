@@ -12,6 +12,7 @@ const style = css`.partner-image {
 	max-width: 100%;
 	height: auto;
 	background-color: #fafafa;
+	background-color: light-dark(transparent, #fafafa);
 	padding: 0.3em;
 	border-radius: 4px;
 }`;
