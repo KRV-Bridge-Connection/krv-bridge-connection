@@ -6,6 +6,24 @@ import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js
 import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
+
+const style = css`.partner-image {
+	max-width: 100%;
+	height: auto;
+	background-color: #fafafa;
+	background-color: light-dark(transparent, #fafafa);
+	padding: 0.3em;
+	border-radius: 4px;
+	}
+
+.card.org-card {
+	border-color: #dadada;
+	border-color: light-dark(#dadada, rgb(73, 80, 87));
+	margin-bottom: 0.5em;
+}`;
+
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
 const cache = new Map();
 const STORE_NAME = 'partners';
@@ -133,7 +151,7 @@ export default async function ({ matches, signal } = {}) {
 				<h2>
 					<span itemprop="name">${result.name}</span>
 				</h2>
-				<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.name})} itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+				<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.name})} class="block partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 				<p itemprop="description">${result.description}</p>
 				${typeof result.email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + result.email })} itemprop="email" class="btn btn-link btn-lg">
 					<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
@@ -201,9 +219,9 @@ export default async function ({ matches, signal } = {}) {
 			</form>
 		</search>
 		<div>
-			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card" ${data({ orgName: name })}  ${attr({ hidden: hide(name, search)})}>
+			${results.map(({ name, description, image, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}  ${attr({ hidden: hide(name, search)})}>
 				<b class="block">${name}</b>
-				<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+				<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 				<p>${description}</p>
 				<a href="/partners/${id}" class="btn btn-link">
 					<svg height="18" width="18" fill="currentColor" aria-hidden="true">
