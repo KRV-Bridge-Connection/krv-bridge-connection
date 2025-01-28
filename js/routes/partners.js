@@ -49,7 +49,7 @@ async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
 		try {
 			const url = new URL('/api/partners', location.origin);
-			url.searchParams.set('lastSync', new Date(localStorage.getItem('_lastSync') ?? '0').toISOString());
+			url.searchParams.set('lastUpdated', new Date(localStorage.getItem('_lastSync') ?? '0').toISOString());
 
 			const resp = await fetch(url, {
 				headers: { Accept: 'application/json' },
@@ -62,10 +62,9 @@ async function syncDB(db, { signal } = {}) {
 			if (resp.ok) {
 				const partners = await resp.json();
 				const store = await getStoreReadWrite(db, STORE_NAME, {});
-				const lastUpdated = new Date();
 
 				await Promise.all(partners.map(partner => {
-					partner.lastUpdated = lastUpdated;
+					partner.lastUpdated = new Date(partner.lastUpdated);
 					return handleIDBRequest(store.put(partner), { signal });
 				}));
 
