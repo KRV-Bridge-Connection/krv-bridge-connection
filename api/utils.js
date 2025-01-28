@@ -70,18 +70,28 @@ export async function getCollectionItems(name, {
  * @param {object[]} documents
  * @param {object} options
  * @param {string} [options.envName]
+ * @param {string} [options.idField]
  */
-export async function addCollectionItems(collectionName, documents, { envName = ENV_CERT_NAME } = {}) {
+export async function addCollectionItems(collectionName, documents, { envName = ENV_CERT_NAME, idField } = {}) {
 	const store = await getFirestore(envName);
 	const collection = store.collection(collectionName);
 
-	await store.runTransaction(async (transaction) => {
-		for (const document of documents) {
-			const docRef = collection.doc();
-      		transaction.set(docRef, document);
-		}
-	});
-  }
+	if (typeof idField === 'string') {
+		await store.runTransaction(async (transaction) => {
+			for (const document of documents) {
+				const docRef = collection.doc(document[idField]);
+				  transaction.set(docRef, document);
+			}
+		});
+	} else {
+		await store.runTransaction(async (transaction) => {
+			for (const document of documents) {
+				const docRef = collection.doc();
+				  transaction.set(docRef, document);
+			}
+		});
+	}
+}
 
 export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME } = {}) {
 	const collection = await getCollection(name, { envName });
