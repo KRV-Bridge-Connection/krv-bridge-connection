@@ -3,23 +3,32 @@ import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from '
 
 const STORE = 'partners';
 
+function transformPartner({ lastUpdated, ...data }) {
+	return { ...data, lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString() };
+}
+
 export default createHandler({
 	async get(req) {
 		const params = new URL(req.url).searchParams;
 
 		if (params.has('id')) {
 			const result = await getCollectionItem(STORE, params.get('id'));
+
 			if (typeof result?.id === 'string') {
-				return Response.json(result);
+				return Response.json(transformPartner(result));
 			} else {
 				throw new HTTPNotFoundError(`No results for ${params.get('id')}.`);
 			}
-		} if (params.has('category')) {
+		} else if (params.has('category')) {
 			const results = await getCollectionItemsWhere(STORE, 'categories', 'array-contains', params.get('category'));
-			return Response.json(results, { status: results.length === 0 ? 404 : 200 });
+			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200 });
+		} else if (params.has('lastUpdated')) {
+			const lastUpdated = new Date(params.get('lastUpdated'));
+			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
+			return Response.json(results.map(transformPartner));
 		} else {
 			const partners = await getCollectionItems(STORE);
-			return Response.json(partners);
+			return Response.json(partners.map(transformPartner));
 		}
 	},
 });
