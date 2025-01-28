@@ -1,6 +1,6 @@
 <section id="founders">
 	<h3>Founders</h3>
-	{% for person in personnel.leaders %}<div class="card person-card" itemtype="https://schema.org/Person">
+	{% for person in personnel.leaders %}<div class="card person-card" itemtype="https://schema.org/Person" itemscope="">
 		<div class="clearfix">
 			<div class="float-left">
 				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
@@ -24,7 +24,7 @@
 </section>
 <section id="board">
 	<h3>Board Members</h3>
-	{% for person in personnel.board %}<div class="card person-card" itemtype="https://schema.org/Person">
+	{% for person in personnel.board %}<div class="card person-card" itemtype="https://schema.org/Person" itemscope="">
 		<div class="clearfix">
 			<div class="float-left">
 				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
@@ -48,7 +48,7 @@
 </section>
 <section id="staff">
 	<h3>Staff</h3>
-	{% for person in personnel.staff %}<div class="card person-card" itemtype="https://schema.org/Person">
+	{% for person in personnel.staff %}<div class="card person-card" itemtype="https://schema.org/Person" itemscope="">
 		<div class="clearfix">
 			<div class="float-left">
 				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
