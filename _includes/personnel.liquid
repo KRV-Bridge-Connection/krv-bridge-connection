@@ -1,0 +1,72 @@
+<section id="founders">
+	<h3>Founders</h3>
+	{% for person in personnel.leaders %}<div class="card person-card" itemtype="https://schema.org/Person">
+		<div class="clearfix">
+			<div class="float-left">
+				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
+				<span>&mdash;</span>
+				<span itemprop="jobTItle" class="personnel-position">{{ person.jobTitle }}</span>
+			</div>
+			<img src="{{ person.image | default: 'https://secure.gravatar.com/avatar/958bb1ce39fb68df75895c76b9ed5011?s=64&d=mm' }}" class="personnel-image float-right round" height="64" width="64" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" alt="{{ person.name |  escape }}" />
+			<meta itemprop="worksFor" content="KRV Bridge Connection" />
+		</div>
+		<div>
+			<p itemprop="description" class="personnel-bio">{{ person.description | default: 'Need this still' }}</p>
+			<div class="flex">{% if person.email %}<a href="mailto:{{ person.email }}" class="btn btn-link personnel-email">
+				{%  include "11ty-common/icon.html" icon: "mail" fill: "currentColor" %}
+				<span itemprop="email">{{ person.email }}</span>
+			</a>{% endif %}{% if person.telephone %}<a href="tel:{{ person.telephone | replace: '+1-', '' }}" class="btn btn-link personnel-phone">
+				{%  include "11ty-common/icon.html" icon: "call-start" fill: "currentColor" %}
+				<span itemprop="telephone">{{ person.telephone | replace: '+1-', '' }}</span>
+			</a>{% endif %}</div>
+		</div>
+	</div>{% endfor %}
+</section>
+<section id="board">
+	<h3>Board Members</h3>
+	{% for person in personnel.board %}<div class="card person-card" itemtype="https://schema.org/Person">
+		<div class="clearfix">
+			<div class="float-left">
+				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
+				<span>&mdash;</span>
+				<span itemprop="jobTItle" class="personnel-position">{{ person.jobTitle }}</span>
+			</div>
+			<img src="{{ person.image | default: 'https://secure.gravatar.com/avatar/958bb1ce39fb68df75895c76b9ed5011?s=64&d=mm' }}" class="personnel-image float-right round" height="64" width="64" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" alt="{{ person.name |  escape }}" />
+			<meta itemprop="worksFor" content="KRV Bridge Connection" />
+		</div>
+		<div>
+			<p itemprop="description" class="personnel-bio">{{ person.description | default: 'Need this still' }}</p>
+			<div class="flex">{% if person.email %}<a href="mailto:{{ person.email }}" class="btn btn-link personnel-email">
+				{%  include "11ty-common/icon.html" icon: "mail" fill: "currentColor" %}
+				<span itemprop="email">{{ person.email }}</span>
+			</a>{% endif %}{% if person.telephone %}<a href="tel:{{ person.telephone | replace: '+1-', '' }}" class="btn btn-link personnel-phone">
+				{%  include "11ty-common/icon.html" icon: "call-start" fill: "currentColor" %}
+				<span itemprop="telephone">{{ person.telephone | replace: '+1-', '' }}</span>
+			</a>{% endif %}</div>
+		</div>
+	</div>{% endfor %}
+</section>
+<section id="staff">
+	<h3>Staff</h3>
+	{% for person in personnel.staff %}<div class="card person-card" itemtype="https://schema.org/Person">
+		<div class="clearfix">
+			<div class="float-left">
+				<b class="personnel-name" itemprop="name">{{ person.name }}</b>
+				<span>&mdash;</span>
+				<span itemprop="jobTItle" class="personnel-position">{{ person.jobTitle }}</span>
+			</div>
+			<img src="{{ person.image | default: 'https://secure.gravatar.com/avatar/958bb1ce39fb68df75895c76b9ed5011?s=64&d=mm' }}" class="personnel-image float-right round" height="64" width="64" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" alt="{{ person.name |  escape }}" />
+			<meta itemprop="worksFor" content="KRV Bridge Connection" />
+		</div>
+		<div>
+			<p itemprop="description" class="personnel-bio">{{ person.description | default: 'Need this still' }}</p>
+			<div class="flex">{% if person.email %}<a href="mailto:{{ person.email }}" class="btn btn-link personnel-email">
+				{%  include "11ty-common/icon.html" icon: "mail" fill: "currentColor" %}
+				<span itemprop="email">{{ person.email }}</span>
+			</a>{% endif %}{% if person.telephone %}<a href="tel:{{ person.telephone | replace: '+1-', '' }}" class="btn btn-link personnel-phone">
+				{%  include "11ty-common/icon.html" icon: "call-start" fill: "currentColor" %}
+				<span itemprop="telephone">{{ person.telephone | replace: '+1-', '' }}</span>
+			</a>{% endif %}</div>
+		</div>
+	</div>{% endfor %}
+</section>

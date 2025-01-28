@@ -9,7 +9,7 @@ async function updateAssets(assets, {
 	if (Array.isArray(assets) && assets.length !== 0) {
 		const cache = await caches.open(version);
 		await Promise.allSettled(assets.filter(url => url.length !== 0).map(async url => {
-			const req = new Request(new URL(url, location.origin), { referrerPolicy: 'no-referrer' });
+			const req = new Request(new URL(url, location.origin), { referrerPolicy });
 			const resp = await fetch(req);
 
 			if (resp.ok) {

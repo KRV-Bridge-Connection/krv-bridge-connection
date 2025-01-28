@@ -1,0 +1,21 @@
+leadership:
+  - name: Karen Zuber
+    jobTitle: President
+  - name: Gary Zuber
+    jobTitle: Co-Founder
+board:
+  - name: Karen Zuber
+    jobTitle: President
+  - name: Julie Simpson
+    jobTitle: Vice President
+  - name: John Blythe
+    jobTitle: Treasurer
+  - name: Karole Nelson
+    jobTitle: Secretary
+staff:
+  - name: Chris Zuber
+    jobTitle: Director of Programs and Operations
+    email: admin@krvbridge.org
+    telephone: +1-661-491-5873
+    description: Chris Zuber is a beetle.
+    image: https://secure.gravatar.com/avatar/43578597e449298f5488c2407c8a8ae5?s=256&d=mm
