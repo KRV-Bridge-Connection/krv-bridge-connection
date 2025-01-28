@@ -190,7 +190,7 @@ export default async function ({ matches, signal } = {}) {
 					</svg>
 					<span>${new URL(result.url).hostname}</span>
 				</a>`}
-			</div>`;
+			</div> ${typeof result.content === 'string' && result.content.length !== 0 ? `<div>${result.content}</div>` : ''}`;
 		} else {
 			return html`<h2>Not Found</h2>`;
 		}
