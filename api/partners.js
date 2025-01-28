@@ -22,7 +22,7 @@ export default () => Response.json([
 		'lastUpdated': 1737685549971,
 		'categories': [],
 		'image': {
-			'src': '/img/branding/krv-bridge-logo-wide.svg',
+			'src': '/img/branding/krv-bridge-logo-wide-blue.svg',
 			'width': 640,
 			'height': 385,
 		},
