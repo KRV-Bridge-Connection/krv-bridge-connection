@@ -2,17 +2,11 @@ nav:
   - label: Home
     icon: home
     href: /
-  # - label: Be Finallay Free
-  #   href: /partners/be-finally-free
-  # - label: Us
-  #   href: /partners/krv-bridge-connection
+  - label: Partners
+    href: /partners/
+    icon: organization
   # - label: News
   #   href: /posts/2025/01/08/hello-world
-  # - label: News 2
-  #   href: /posts/2025/01/08/hello-world-x
-  # - label: Resources
-  #   icon: list-unordered
-  #   href: /resources/
   - label: About
     icon: info
     href: /about/
