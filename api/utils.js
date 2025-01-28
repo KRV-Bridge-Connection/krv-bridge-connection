@@ -64,11 +64,61 @@ export async function getCollectionItems(name, {
 	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+/**
+ *
+ * @param {string} collectionName
+ * @param {object[]} documents
+ * @param {object} options
+ * @param {string} [options.envName]
+ * @param {string} [options.idField]
+ */
+export async function addCollectionItems(collectionName, documents, { envName = ENV_CERT_NAME, idField } = {}) {
+	const store = await getFirestore(envName);
+	const collection = store.collection(collectionName);
+
+	if (typeof idField === 'string') {
+		await store.runTransaction(async (transaction) => {
+			for (const document of documents) {
+				const docRef = collection.doc(document[idField]);
+				  transaction.set(docRef, document);
+			}
+		});
+	} else {
+		await store.runTransaction(async (transaction) => {
+			for (const document of documents) {
+				const docRef = collection.doc();
+				  transaction.set(docRef, document);
+			}
+		});
+	}
+}
+
 export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME } = {}) {
 	const collection = await getCollection(name, { envName });
 	const snapshot = await collection.where(field, '==', value).limit(limit).get();
 
 	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+/**
+ *
+ * @param {string} name
+ * @param {string} field
+ * @param {firebase.firestore.WhereFilterOp} operator
+ * @param {any} value
+ * @returns {Promise<Object[]>}
+ */
+export async function getCollectionItemsWhere(name, field, operator, value) {
+	const collection = await getCollection(name);
+	const snapshot = await collection.where(field, operator, value).get();
+
+	if (snapshot.empty) {
+		return [];
+	} else {
+		const results = [];
+		snapshot.forEach(result => results.push({ id: result.id, ...result.data() }));
+		return results;
+	}
 }
 
 export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
