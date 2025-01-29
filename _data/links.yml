@@ -5,8 +5,8 @@ nav:
   - label: Partners
     href: /partners/
     icon: organization
-  # - label: News
-  #   href: /posts/2025/01/08/hello-world
+  - label: News
+    href: /posts/2025/01/08/hello-world
   - label: About
     icon: info
     href: /about/

@@ -12,7 +12,7 @@ import './admin.js';
 initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
 	'/partners/:partner([\\w\\-]*)': '/js/routes/partners.js',
-	// '/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\-]+[a-z0-9])': '/js/routes/posts.js',
+	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\-]+[a-z0-9])': '/js/routes/posts.js',
 }, {
 	rootEl: document.getElementById('main'),
 	notFound: '/js/routes/404.js',
