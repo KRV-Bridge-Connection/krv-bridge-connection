@@ -39,3 +39,8 @@ footer:
   - label: Donate
     icon: donate
     href: /donate/
+  - label: Assitance Form
+    icon: file-pdf
+    href: /docs/krv-bridge-assistance-form.pdf
+    download: krv-bridge-assistance-form.pdf
+    accessKey: h
