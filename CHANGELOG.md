@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.17] - 2025-01-30
+
+### Added
+- Add `/partners/:partnerID` handler/page/template & DB
+- Implement IDB with schema via `@aegisjsproject/idb`
+- Add `/docs/` and support for `download` attr on links
+- Add Assistance Form as PDF
+- Redirects for dynamic pages (does not break 404 page)
+- WIP web component to create 211 search form
+- Logos for numerous partners
+
 ## [v1.0.16] - 2025-01-17
 
 ### Added
