@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* eslint-env node */
 const { load } = require('js-yaml');
+const { UserConfig } = require('@11ty/eleventy');
 // const { readJSONFile } = require('@shgysk8zer0/npm-utils/json');
 const filters = require('@shgysk8zer0/11ty-filters');
 const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
@@ -17,6 +18,11 @@ async function getCollection(name, db) {
 	return snapshot.docs.map(doc => doc.data());
 }
 
+/**
+ *
+ * @param {UserConfig} eleventyConfig
+ * @returns {object}
+ */
 module.exports = function(eleventyConfig) {
 	const {
 		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
@@ -39,7 +45,7 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addExtension('mjs', {
 		outputFileExtension: 'js', // optional, default: "html"
 		compile: async (inputContent) => {
-			const parsed = await liquid.parse(inputContent);
+			const parsed = liquid.parse(inputContent);
 
 			return data => liquid.render(parsed, data);
 		}
@@ -68,6 +74,7 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addPassthroughCopy('js');
 	eleventyConfig.addPassthroughCopy('css');
 	eleventyConfig.addPassthroughCopy('img');
+	eleventyConfig.addPassthroughCopy('docs');
 	eleventyConfig.addPassthroughCopy('.well-known');
 	eleventyConfig.addPassthroughCopy('_redirects');
 	eleventyConfig.addPassthroughCopy('robots.txt');

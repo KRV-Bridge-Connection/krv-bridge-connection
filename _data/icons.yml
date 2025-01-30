@@ -30,7 +30,6 @@ note: img/octicons/note.svg
 clock: img/octicons/clock.svg
 question: img/octicons/question.svg
 tag: img/octicons/tag.svg
-file-media: img/octicons/file-media.svg
 check: img/octicons/check.svg
 facebook: img/logos/facebook.svg
 yelp: img/logos/yelp.svg
@@ -53,3 +52,7 @@ x: img/octicons/x.svg
 apps: img/apps.svg
 address-book: img/adwaita-icons/mimetypes/x-office-address-book.svg
 calendar: img/octicons/calendar.svg
+file-pdf: img/octicons/file-pdf.svg
+file-code: img/octicons/file-code.svg
+file-media: img/octicons/file-media.svg
+file-zip: img/octicons/file-zip.svg
