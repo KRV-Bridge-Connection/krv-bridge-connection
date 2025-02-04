@@ -1,5 +1,5 @@
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
-import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPBadRequestError, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
 import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getFirestore, sluggify } from './utils.js';
 
 const JWT = 'org-jwt';
@@ -83,17 +83,22 @@ export default createHandler({
 
 					const docRef = db.doc(path);
 
-					await docRef.set({
+					const result = await docRef.set({
 						author: { sub, sub_id, name, email, picture },
 						title: data.get('title'),
 						content: data.get('content'),
 						createdAt: date,
 					});
 
-					return new Response(null, {
-						status: 201,
-						headers: { Location: path },
-					});
+					if (result.writeTime !== 0) {
+						return new Response(null, {
+							status: 201,
+							headers: { Location: path },
+						});
+					} else {
+						throw new HTTPBadGatewayError('Error saving post.');
+					}
+
 				}
 			}
 		} else {
