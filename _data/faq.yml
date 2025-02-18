@@ -1,3 +1,5 @@
+- question: I'm looking for assistance but don't know where to start
+  answer: <span>There are many ways to connect you with resources.</span><ul><li><a href="/partners/" class="btn btn-link">View our partners and their services.</a></li><li><a href="/211/" class="btn btn-link">Search 211</a></li><li><a href="/docs/krv-bridge-assistance-form.pdf" download="krv-bridge-assistance-form.pdf" class="btn btn-link">Fill out and submit our assistance form.</a></li></ul>
 - question: Where can I find support for the Borel Fire
   answer: You may be able to find a low interest disaster recovery loan through the <a href="https://www.sba.gov/article/2024/10/22/sba-offers-disaster-assistance-california-businesses-residents-affected-park-borel-fires" rel="noopener external">SBA</a>.
 - question: What services do you provide to the community
@@ -6,8 +8,6 @@
   answer: Yes, we are a 501 (c) (3) nonprofit
 - question: Where are you located
   answer: We are located in Lake Isbella on the boulevard, just across from Lake Isabella True Value. <a href="/about/#location">Here is a map.</a>
-- question: I see a lot of construction being done on the building - what's that about
-  answer: We recently acquired the building and there is a lot of work being done to make it suitable for the needs it must satisfy.
 - question: How can my nonprofit join
   answer: Currently, the best advice would be to send us a message on our <a href="/contact/">Contact Page</a>.
 - question: Where can I find the KRV Bridge connection logo

@@ -28,13 +28,12 @@ module.exports = function(eleventyConfig) {
 		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
 		DEPLOY_URL,
 	} = process.env;
+
 	if (typeof process.env.FIREBASE_CERT !== 'string') {
 		throw new Error('Missing FIREBASE_CERT in `process.env');
 	} else if (firebase.apps.length === 0) {
 		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-		firebase.initializeApp({
-			credential: firebase.credential.cert(cert),
-		});
+		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
 	}
 
 	const db = firebase.firestore();
@@ -52,19 +51,12 @@ module.exports = function(eleventyConfig) {
 	});
 
 	Object.entries(filters).forEach(([filter, cb]) => eleventyConfig.addFilter(filter, cb));
-	eleventyConfig.addShortcode('firestore', async collection => {
-		return getCollection(collection, db);
-	});
+	eleventyConfig.addShortcode('firestore', async collection => getCollection(collection, db));
 	eleventyConfig.addFilter('trim', input => input.trim());
-	eleventyConfig.addFilter('startsWith', function(string, prefix) {
-		console.log({ string, prefix });
-		return string.startsWith(prefix);
-	});
+	eleventyConfig.addFilter('startsWith', (string, prefix) => string.startsWith(prefix));
 	eleventyConfig.addFilter('time', input => new Date(`2000-01-01T${input}`).toLocaleTimeString());
 	eleventyConfig.addFilter('iso_date', input => input instanceof Date ? input.toISOString() : new Date(input).toISOStrin());
-	eleventyConfig.addFilter('is_icon', list => {
-		return JSON.stringify(list.filter(icon => typeof icon.purpose === 'string'));
-	});
+	eleventyConfig.addFilter('is_icon', list => JSON.stringify(list.filter(icon => typeof icon.purpose === 'string')));
 
 	// Add `_data/*.yml` & `_data/*.yaml` parsing as data files
 	eleventyConfig.addDataExtension('yaml', contents => load(contents));
@@ -88,6 +80,7 @@ module.exports = function(eleventyConfig) {
 	// Set global data/variables
 	// {{ environment }} -> 'production' | 'development'
 	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
+	eleventyConfig.addGlobalData('partners', getCollection('partners', db));
 	eleventyConfig.addGlobalData('importmap', importmap);
 	eleventyConfig.addGlobalData('environment',
 		process.env.ELEVENTY_RUN_MODE === 'build'
