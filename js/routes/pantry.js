@@ -7,13 +7,14 @@ import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 
+const TIMEZONE_OFFSET = 8 * HOURS;
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
 const validateWeekday = registerCallback('pantry:date:change', ({ target }) => {
 	if (target.value.length > 9) {
 		// Adjust for timezone
-		const day = new Date(target.valueAsDate.getTime() + 8 * HOURS).getDay();
+		const day = new Date(target.valueAsDate.getTime() + TIMEZONE_OFFSET).getDay();
 
 		if (day === 0 || day === 7) {
 			target.setCustomValidity('Please select a weekday [Mon-Fri].');
@@ -74,9 +75,11 @@ export default function({
 	const minDate = new Date();
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 
-
 	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
+			<h2>KRV Bridge Food Pantry</h2>
+			<legend>Schedule an Appointment</legend>
+			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
 			<div class="form-group">
 				<label for="pantry-name" class="input-label required">Name</label>
 				<input type="text" name="name" id="pantry-name" class="input" placeholder="Firstname Lastname" autocomplete="name" ${attr({ value: name })} required="" />
@@ -118,6 +121,7 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">Comments</label>
 				<textarea name="comments" id="pantry-comments" class="input" placeholder="Is there anything else you would like to say?" cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
+				<p><b>Note:</b> By adding additional comments about your needs and circumstances, you agree to allow us to share any relevant information with our partners for the purpose of connecting you with resources they may offer you.</p>
 			</div>
 		</fieldset>
 		<div class="flex row">
