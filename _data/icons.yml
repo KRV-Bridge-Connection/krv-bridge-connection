@@ -5,6 +5,7 @@ krv-bridge-full: img/branding/krv-bridge-logo-wide-blue.svg
 donate: img/donate.svg
 gift: img/octicons/gift.svg
 heart: img/octicons/heart.svg
+food: img/food.svg
 hand: img/hand.svg
 home: img/adwaita-icons/places/user-home.svg
 public-share: img/adwaita-icons/places/folder-publicshare.svg
