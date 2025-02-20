@@ -78,6 +78,21 @@ export default function({
 	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
 			<h2>KRV Bridge Food Pantry</h2>
+			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
+					https://i.imgur.com/h68vmgFm.jpeg 160w,
+					https://i.imgur.com/h68vmgFl.jpeg 320w,
+					https://i.imgur.com/h68vmgFh.jpeg 640w,
+					https://i.imgur.com/h68vmgF.jpeg 2500w"
+				class="full-width"
+				sizes="(max-width: 640px) 100vw, 640px"
+				width="640"
+				height="482"
+				src="https://i.imgur.com/h68vmgFh.jpeg"
+				alt="KRV Bridge Food Pantry"
+				loading="lazy"
+				decoding="async"
+				crossorigin="anonymous"
+				referrerpolicy="no-referrer" />
 			<legend>Schedule an Appointment</legend>
 			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
 			<div class="form-group">
@@ -125,8 +140,8 @@ export default function({
 			</div>
 		</fieldset>
 		<div class="flex row">
-			<button type="submit" class="btn btn-success">Submit</button>
-			<button type="reset" class="btn btn-danger">Reset</button>
+			<button type="submit" class="btn btn-success btn-lg">Submit</button>
+			<button type="reset" class="btn btn-danger btn-lg">Reset</button>
 		</div>
 	</form>`;
 }
