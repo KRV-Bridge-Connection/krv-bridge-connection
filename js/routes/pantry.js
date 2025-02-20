@@ -1,11 +1,21 @@
 import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onClick, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
+
+async function _alert(message, { signal } = {}) {
+	const { resolve, promise } = Promise.withResolvers();
+	const dialog = document.getElementById('pantry-message');
+	document.getElementById('pantry-message-content').textContent = message;
+	dialog.addEventListener('close', resolve, { once: true, signal });
+	dialog.showModal();
+
+	await promise;
+}
 
 const TIMEZONE_OFFSET = 8 * HOURS;
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
@@ -26,6 +36,8 @@ const validateWeekday = registerCallback('pantry:date:change', ({ target }) => {
 
 const changeHandler = registerCallback('pantry:form:change', change);
 
+const closeMessage = registerCallback('pantry:message:close', ({ target }) => target.closest('dialog').close());
+
 const submitHandler = registerCallback('pantry:form:submit', async event => {
 	event.preventDefault();
 
@@ -39,15 +51,20 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 		if (resp.ok) {
 			const { message } = await resp.json();
 			clearState();
-			alert(message);
+			await _alert(message);
 			history.length > 1 ? back() : navigate('/');
 		} else {
 			const err = await resp.json();
 			throw new Error(err.error.message);
 		}
 	} catch(err) {
-		alert(err.message);
+		await _alert(err.message);
 	}
+});
+
+const resetHandler = registerCallback('pantry:form:reset', () => {
+	clearState();
+	history.length > 1 ? back() : navigate('/');
 });
 
 /**
@@ -75,7 +92,7 @@ export default function({
 	const minDate = new Date();
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 
-	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
 			<h2>KRV Bridge Food Pantry</h2>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
@@ -84,7 +101,7 @@ export default function({
 					https://i.imgur.com/h68vmgFh.jpeg 640w,
 					https://i.imgur.com/h68vmgF.jpeg 2500w"
 				class="full-width"
-				sizes="(max-width: 640px) 100vw, 640px"
+				sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
 				width="640"
 				height="482"
 				src="https://i.imgur.com/h68vmgFh.jpeg"
@@ -141,9 +158,13 @@ export default function({
 		</fieldset>
 		<div class="flex row">
 			<button type="submit" class="btn btn-success btn-lg">Submit</button>
-			<button type="reset" class="btn btn-danger btn-lg">Reset</button>
+			<button type="reset" class="btn btn-danger btn-lg">Cancel</button>
 		</div>
-	</form>`;
+	</form>
+	<dialog id="pantry-message">
+		<div id="pantry-message-content"></div>
+		<button type="button" class="btn btn-primary" ${onClick}="${closeMessage}" ${signalAttr}="${sig}">Close</button>
+	</dialog>`;
 }
 
 export const title = `Food Pantry - ${site.title}`;

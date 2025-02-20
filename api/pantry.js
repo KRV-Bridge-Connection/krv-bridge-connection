@@ -27,14 +27,17 @@ export default createHandler({
 			} else if (! Number.isSafeInteger(household) || household < 1 || household > 8) {
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
+				const [email, telephone, comments] = await Promise.all(
+					['email', 'telephone', 'comments'].map(field => data.has(field) ? encrypt(key, data.get(field), { output: BASE64 }) : null)
+				);
 				const result = await addCollectionItem('pantry-schedule', {
 					name: data.get('name'),
-					email: data.has('email') ? await encrypt(key, data.get('email'), { output: BASE64 }) : null,
-					telephone: data.has('telephone') ? await encrypt(key, data.get('telephone'), { output: BASE64 }) : null,
+					email,
+					telephone,
 					addressLocality: data.get('addressLocality'),
 					postalCode: data.get('postalCode'),
 					household: parseInt(data.get('household')),
-					comments: await encrypt(key, data.get('comments'), { output: BASE64 }),
+					comments,
 					created: new Date(),
 					date,
 					points: parseInt(data.get('household')) * 30,
@@ -51,7 +54,7 @@ export default createHandler({
 						],
 					}),
 					new SlackDividerBlock(),
-					new SlackContextBlock({ elements: [new SlackPlainTextElement(data.get('comments'))] }),
+					new SlackContextBlock({ elements: [new SlackPlainTextElement(data.get('comments') || 'No Comments')] }),
 					new SlackActionsBlock({
 						elements: [
 							new SlackButtonElement(new SlackPlainTextElement(`Reply to <${data.get('email')}>`), {
@@ -75,6 +78,4 @@ export default createHandler({
 			throw new HTTPBadRequestError(`Missing required fields: ${missing.join(', ')}`);
 		}
 	}
-}, {
-	logger: err => console.error(err),
 });
