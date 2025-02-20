@@ -1,7 +1,7 @@
 import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
@@ -50,6 +50,12 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 	}
 });
 
+const resetHandler = registerCallback('pantry:form:reset', event => {
+	clearState();
+	history.length > 1 ? back() : navigate('/');
+	// [...event.target.elements].forEach(el => el.removeAttribute('value'));
+});
+
 /**
  *
  * @param {Date} date
@@ -75,7 +81,7 @@ export default function({
 	const minDate = new Date();
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 
-	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
 			<h2>KRV Bridge Food Pantry</h2>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
@@ -141,7 +147,7 @@ export default function({
 		</fieldset>
 		<div class="flex row">
 			<button type="submit" class="btn btn-success btn-lg">Submit</button>
-			<button type="reset" class="btn btn-danger btn-lg">Reset</button>
+			<button type="reset" class="btn btn-danger btn-lg">Cancel</button>
 		</div>
 	</form>`;
 }

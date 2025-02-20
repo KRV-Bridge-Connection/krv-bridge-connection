@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.18] - 2025-02-19
+
+### Added
+- Add Food Pantry page with Firestore endpoint/handler
+
 ## [v1.0.17] - 2025-01-30
 
 ### Added
