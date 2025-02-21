@@ -23,6 +23,11 @@ export const SCHEMA = {
 			keyPath: 'url',
 			autoIncrement: false,
 			indexes: {
+				title: {
+					keyPath: 'title',
+					multiEntry: false,
+					unique: false,
+				},
 				keywords: {
 					keyPath: 'keywords',
 					multiEntry: true,
