@@ -52,6 +52,10 @@ const config = {
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
 		'/img/adwaita-icons/status/avatar-default.svg',
+		'/js/routes/partners.js',
+		'/js/routes/pantry.js',
+		'/js/routes/posts.js',
+		'/js/routes/volunteer.js',
 		'/js/routes/404.js',
 
 		/* Fonts */
