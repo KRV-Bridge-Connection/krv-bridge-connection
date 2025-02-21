@@ -17,8 +17,34 @@ export const SLACK = new Uint8Array([101, 121, 74, 104, 98, 71, 99, 105, 79, 105
 
 export const SCHEMA = {
 	name: 'krv-bridge',
-	version: 1,
+	version: 2,
 	stores: {
+		posts: {
+			keyPath: 'url',
+			autoIncrement: false,
+			indexes: {
+				title: {
+					keyPath: 'title',
+					multiEntry: false,
+					unique: false,
+				},
+				keywords: {
+					keyPath: 'keywords',
+					multiEntry: true,
+					unique: false,
+				},
+				id: {
+					keyPath: 'id',
+					multiEntry: false,
+					unique: true,
+				},
+				created: {
+					keyPath: 'created',
+					multiEntry: false,
+					unique: false,
+				}
+			}
+		},
 		partners: {
 			keyPath: 'id',
 			autoIncrement: false,

@@ -1,9 +1,57 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
-import { site } from '../consts.js';
+import { site, SCHEMA } from '../consts.js';
 import { md } from '@aegisjsproject/markdown';
+import { getItem, putItem, openDB } from '@aegisjsproject/idb';
 
 const cache = new Map();
+const STORE_NAME = 'posts';
+
+async function _getPost(url, { signal } = {}) {
+	const { resolve, reject, promise } = Promise.withResolvers();
+
+	try {
+		if (cache.has(url)) {
+			resolve(cache.get(url));
+		} else {
+			cache.set(url, promise);
+			const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+			const post = await getItem(db, STORE_NAME, url, { signal });
+
+			if (typeof post === 'object') {
+				resolve(post);
+			} else {
+				const resp = await fetch(url, {
+					headers: { Accept: 'application/json' },
+					referrerPolicy: 'origin',
+					credentials: 'omit',
+					signal,
+				}).catch(err => {
+					reportError(err);
+					return Response.error();
+				});
+
+				if (resp.ok) {
+					const data = await resp.json();
+					data.url = url;
+					// export async function addItem(db, storeName, value, { durability = 'default', key, signal } = {})
+					// console.log({ db, STORE_NAME, data, signal });
+					data.created = new Date(data.created);
+					data.updated = new Date(data.updated);
+					await putItem(db, STORE_NAME, data, { signal }).catch(err => reportError(err));
+					resolve(data);
+				} else {
+					reject(new Error(`${resp.url} [${resp.status}]`));
+				}
+			}
+		}
+	} catch(err) {
+		reject(err);
+	}
+
+	return promise;
+}
+
 const dateOptions = { weekday: 'short', month: 'short', year: 'numeric', day: 'numeric' };
 
 const _getData = ({
@@ -20,34 +68,37 @@ async function getPost({ year, month, day, post }, signal) {
 	} else if (cache.has(id)) {
 		return cache.get(id);
 	} else {
-		const { promise, resolve, reject } = Promise.withResolvers();
-		cache.set(id, promise);
-		console.log(`Caching & fetching ${id}`);
-
 		const url = new URL('/api/posts', location.origin);
 		url.searchParams.set('id', `${year}-${month}-${day}:${post}`);
+		return await _getPost(url.href, { signal });
+		// const { promise, resolve, reject } = Promise.withResolvers();
+		// cache.set(id, promise);
+		// console.log(`Caching & fetching ${id}`);
 
-		const resp = await fetch(url, {
-			headers: { Accept: 'application/json' },
-			referrerPolicy: 'origin',
-			credentials: 'omit',
-			signal,
-		}).catch(err => err);
+		// const url = new URL('/api/posts', location.origin);
+		// url.searchParams.set('id', `${year}-${month}-${day}:${post}`);
 
-		if (resp instanceof Error) {
-			reject(resp);
-		} else if (! resp.ok) {
-			reject(new DOMException(`${resp.url} [${resp.status} ${resp.statusText}]`, 'NetworkError'));
-		} else {
-			const data = await resp.json();
-			console.log(data);
-			data.created = new Date(data.created);
-			data.updated = new Date(data.updated);
-			cache.set(id, data);
-			resolve(data);
-		}
+		// const resp = await fetch(url, {
+		// 	headers: { Accept: 'application/json' },
+		// 	referrerPolicy: 'origin',
+		// 	credentials: 'omit',
+		// 	signal,
+		// }).catch(err => err);
 
-		return promise;
+		// if (resp instanceof Error) {
+		// 	reject(resp);
+		// } else if (! resp.ok) {
+		// 	reject(new DOMException(`${resp.url} [${resp.status} ${resp.statusText}]`, 'NetworkError'));
+		// } else {
+		// 	const data = await resp.json();
+		// 	console.log(data);
+		// 	data.created = new Date(data.created);
+		// 	data.updated = new Date(data.updated);
+		// 	cache.set(id, data);
+		// 	resolve(data);
+		// }
+
+		// return promise;
 	}
 }
 
