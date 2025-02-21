@@ -1,9 +1,16 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { site } from '../consts.js';
+import { md } from '@aegisjsproject/markdown';
 
 const cache = new Map();
 const dateOptions = { weekday: 'short', month: 'short', year: 'numeric', day: 'numeric' };
+
+const _getData = ({
+	pathname: {
+		groups: { year, month, day, post } = {}
+	} = {}
+} = {}) => ({ year, month, day, post });
 
 async function getPost({ year, month, day, post }, signal) {
 	const id = `${year}-${month}-${day}:${post}`;
@@ -33,7 +40,9 @@ async function getPost({ year, month, day, post }, signal) {
 			reject(new DOMException(`${resp.url} [${resp.status} ${resp.statusText}]`, 'NetworkError'));
 		} else {
 			const data = await resp.json();
-			data.createdAt = new Date(data.createdAt._seconds * 1000);
+			console.log(data);
+			data.created = new Date(data.created);
+			data.updated = new Date(data.updated);
 			cache.set(id, data);
 			resolve(data);
 		}
@@ -53,7 +62,7 @@ export default async ({
 }) => {
 	try {
 		const {
-			title, description, content, createdAt,
+			title, description, content, created,
 			author: {
 				name = 'Missing Author',
 				picture = 'https://secure.gravatar.com/avatar/958bb1ce39fb68df75895c76b9ed5011?s=64&d=mm',
@@ -84,10 +93,10 @@ export default async ({
 				<meta itemprop="width" ${attr({ content: width })} />
 				<figcaption itemprop="description">${alt}</figcaption>
 			</figure>
-			<section itemprop="articleBody">${content}</section>
+			<section itemprop="articleBody">${md`${content}`}</section>
 			<footer>
 				<span>First posted on</span>
-				<time itemprop="dateCreated" datetime="${createdAt.toISOString()}">${createdAt.toLocaleDateString(navigator.language, dateOptions)}</time>
+				<time itemprop="dateCreated" datetime="${created.toISOString()}">${created.toLocaleDateString(navigator.language, dateOptions)}</time>
 			</footer>
 		</article>`;
 	} catch(err) {
@@ -95,10 +104,10 @@ export default async ({
 	}
 };
 
-export const title = async ({ matches, signal }) => await getPost(matches, signal)
+export const title = async ({ matches, signal }) => await getPost(_getData(matches), signal)
 	.then(post => post.title)
 	.catch(() => 'Not Found') + ' | ' + site.title;
 
-export const description = async ({ matches, signal }) => await getPost(matches, signal)
+export const description = async ({ matches, signal }) => await getPost(_getData(matches), signal)
 	.then(post => post.description)
 	.catch(() => 'Post not found');

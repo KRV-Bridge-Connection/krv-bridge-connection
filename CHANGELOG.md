@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.19] - 2025-02-21
+
+### Added
+- Now supports creating and viewing posts, inclucing markdown support
+
 ## [v1.0.18] - 2025-02-19
 
 ### Added
