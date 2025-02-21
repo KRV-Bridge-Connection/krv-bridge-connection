@@ -10,6 +10,7 @@ default:
     - https://unpkg.com/@kernvalley/
     - https://unpkg.com/@aegisjsproject/
     - https://www.gstatic.com/firebasejs/
+    - https://unpkg.com/@highlightjs/
     - https://donorbox.org/widget.js
     - https://cdn.kernvalley.us/js/pwa-reset.js
     # - https://www.google-analytics.com

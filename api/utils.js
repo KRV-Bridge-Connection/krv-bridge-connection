@@ -157,3 +157,51 @@ export async function getFirebaseRequestUser(req) {
 		return null;
 	}
 }
+
+const SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
+
+/**
+ *
+ * @param {Blob} image
+ * @param {object} options
+ * @param {string} options.clientId
+ * @param {string} [options.referrerPolicy="no-referrer"]
+ * @param {AbortSignal} [options.signal]
+ * @returns {Promise<object>}
+ */
+export async function uploadImage(image, {
+	clientId,
+	referrerPolicy = 'no-referrer',
+	signal,
+}) {
+	if (typeof clientId !== 'string' || clientId.length === 0) {
+		throw new Error('Missing clientId');
+	} else if (! (image instanceof Blob)) {
+		throw new TypeError('Image must be a `File` or `Blob`.');
+	} else if (! SUPPORTED_TYPES.includes(image.type)) {
+		throw new TypeError(`Unsupported file type: ${image.type}`);
+	} else if (signal instanceof AbortSignal && signal.aborted) {
+		throw signal.reason;
+	} else {
+		const resp = await fetch('https://api.imgur.com/3/image', {
+			method: 'POST',
+			body: image,
+			referrerPolicy,
+			credentials: 'omit',
+			signal,
+			headers: new Headers({
+				Authorization: `Client-ID ${clientId}`,
+				Accept: 'application/json',
+			})
+		});
+
+		if (resp.ok) {
+			const result = await resp.json();
+			return result.data;
+		} else {
+			const { data } = await resp.json()
+				.catch(() =>  ({ data: { error: `${resp.url} [${resp.status} ${resp.statusText}]` }}));
+			throw new Error(data.error);
+		}
+	}
+}
