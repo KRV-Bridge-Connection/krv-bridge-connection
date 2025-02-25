@@ -14,7 +14,7 @@ export default createHandler({
 		const id = cart.getAll('item[id]');
 
 		if (id.length === 0) {
-			throw new HTTPBadRequestError(`Invalid empty request.`);
+			throw new HTTPBadRequestError('Invalid empty request.');
 		} else {
 			const name = cart.getAll('item[name]');
 			const qty = cart.getAll('item[qty]');

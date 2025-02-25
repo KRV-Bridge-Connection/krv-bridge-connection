@@ -47,19 +47,19 @@ document.adoptedStyleSheets = [
 ];
 
 function playChime() {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+	const ctx = new AudioContext();
+	const osc = ctx.createOscillator();
+	const gain = ctx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(1000, ctx.currentTime); // 1kHz ding
-    gain.gain.setValueAtTime(0.2, ctx.currentTime); // Adjust volume
+	osc.type = 'sine';
+	osc.frequency.setValueAtTime(1000, ctx.currentTime); // 1kHz ding
+	gain.gain.setValueAtTime(0.2, ctx.currentTime); // Adjust volume
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+	osc.connect(gain);
+	gain.connect(ctx.destination);
 
-    osc.start();
-    osc.stop(ctx.currentTime + 0.2); // Short chime
+	osc.start();
+	osc.stop(ctx.currentTime + 0.2); // Short chime
 }
 
 async function createStream(cb = console.log, { signal } = {}) {
@@ -67,7 +67,7 @@ async function createStream(cb = console.log, { signal } = {}) {
 		throw signal.reason;
 	} else {
 		let af = NaN;
-		const scanner = 'BarcodeDetector' in globalThis ? new BarcodeDetector() : undefined;
+		const scanner = 'BarcodeDetector' in globalThis ? new globalThis.BarcodeDetector() : undefined;
 		const wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen').catch(() => undefined) : undefined;
 		const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
 		const video = document.createElement('video');
@@ -181,7 +181,6 @@ async function _addToCart(id) {
 		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
 
 		if (existing instanceof HTMLTableRowElement) {
-			const qty = existing.querySelector('input[name="qty"]');
 			const items = structuredClone(history.state?.cart ?? []);
 			const itemIndex = items.findIndex(item => item.id === id);
 			items[itemIndex].qty++;
@@ -246,7 +245,7 @@ const changeHandler = registerCallback('pantry:checkout:change', async ({ target
 				updateTotal();
 			}
 		}
-		break;
+			break;
 
 		case 'barcode':
 			if (target.validity.valid) {
@@ -260,14 +259,13 @@ const clickHandler = registerCallback('pantry:checkout:click', async ({ target }
 	switch(target.dataset.action) {
 		case 'scan':
 			document.getElementById('checkout-scanner').showPicker();
-		break;
+			break;
 
-		case 'remove': {
+		case 'remove':
 			setCart(cart.filter(item => item.id !== target.dataset.productId));
 			target.closest('tr').remove();
 			updateTotal();
-		}
-		break;
+			break;
 	}
 });
 
