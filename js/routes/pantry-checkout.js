@@ -170,6 +170,14 @@ const _getItem = async id => {
 
 async function _addToCart(id) {
 	try {
+		if (typeof id !== 'string') {
+			throw new TypeError('Invalid product ID.');
+		} else if (id.length > 12) {
+			id = id.substring(id.length - 12);
+		} else if (id.length !== 12) {
+			throw new TypeError(`Invalid product ID length for ${id}.`);
+		}
+
 		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
 
 		if (existing instanceof HTMLTableRowElement) {
