@@ -149,7 +149,7 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 
 	try {
 		const url = new URL(PANTRY_ENDPOINT, location.origin);
-		url.searchParams.set('lastUpdated', localStorage.getItem(storageKey));
+		url.searchParams.set('lastUpdated', localStorage.hasOwnProperty(storageKey) ? localStorage.getItem(storageKey) : '0');
 
 		const items = await fetch(url, {
 			headers: { Accept: 'application/json' },
