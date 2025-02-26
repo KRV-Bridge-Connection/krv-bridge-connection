@@ -3,7 +3,7 @@
 'use strict';
 
 async function updateAssets(assets, {
-	referrerPolicy = 'no-referrer',
+	// referrerPolicy = 'no-referrer',
 	version = '{{ app.version | default: pkg.version }}',
 } = {}) {
 	if (Array.isArray(assets) && assets.length !== 0) {
