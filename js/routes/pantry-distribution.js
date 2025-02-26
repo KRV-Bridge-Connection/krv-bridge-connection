@@ -14,6 +14,10 @@ export const description = 'Internal app to record food distribution.';
 const numberClass = 'small-numeric';
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
+const BARCODE_FORMATS = ['upc_a'];
+const UPC_A_PATTERN = /^\d{12}$/;
+const PANTRY_ENDPOINT = '/api/pantryDistribution';
+const SCAN_DELAY = 1000;
 const [cart, setCart] = manageState('cart', []);
 
 document.adoptedStyleSheets = [
@@ -67,14 +71,14 @@ async function createStream(cb = console.log, { signal } = {}) {
 		throw signal.reason;
 	} else {
 		let af = NaN;
-		const scanner = 'BarcodeDetector' in globalThis ? new globalThis.BarcodeDetector() : undefined;
+		const scanner = 'BarcodeDetector' in globalThis ? new globalThis.BarcodeDetector({ formats: BARCODE_FORMATS }) : undefined;
 		const wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen').catch(() => undefined) : undefined;
 		const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
 		const video = document.createElement('video');
 		video.srcObject = stream;
 		video.play();
 
-		const canvas = new OffscreenCanvas(640, 480); // Adjust dimensions as needed
+		const canvas = new OffscreenCanvas(640, 480);
 		const ctx = canvas.getContext('2d');
 
 		async function drawFrame() {
@@ -87,7 +91,7 @@ async function createStream(cb = console.log, { signal } = {}) {
 					if (results.length !== 0) {
 						playChime();
 						await Promise.allSettled(results.map(cb));
-						await new Promise(resolve => setTimeout(resolve, 1_500));
+						await new Promise(resolve => setTimeout(resolve, SCAN_DELAY));
 					}
 
 					af = requestAnimationFrame(drawFrame);
@@ -144,7 +148,14 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 	const db = await _openDB();
 
 	try {
-		const items = await fetch('/api/pantryCheckout').then(resp => resp.json());
+		const url = new URL(PANTRY_ENDPOINT, location.origin);
+		url.searchParams.set('lastUpdated', localStorage.getItem(storageKey));
+
+		const items = await fetch(url, {
+			headers: { Accept: 'application/json' },
+			referrerPolicy: 'no-referrer',
+		}).then(resp => resp.json());
+
 		await Promise.all(items.map(item => putItem(db, STORE_NAME, item, { signal: controller.signal })));
 		localStorage.setItem(storageKey, Date.now());
 	} catch(err) {
@@ -156,15 +167,31 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 }
 
 const _getItem = async id => {
-	const db = await _openDB();
+	if (typeof id === 'string' && UPC_A_PATTERN.test(id)) {
+		const db = await _openDB();
 
-	try {
-		const item = await getItem(db, STORE_NAME, id);
-		db.close();
-		return item;
-	} catch(err) {
-		alert(err);
-		db.close();
+		try {
+			const item = await getItem(db, STORE_NAME, id);
+			db.close();
+
+			if (typeof item === 'object') {
+				return item;
+			} else {
+				const url = new URL(PANTRY_ENDPOINT, location.origin);
+				url.searchParams.set('id', id);
+				const resp = await fetch(url);
+
+				if (resp.ok) {
+					const result = await resp.json();
+					// DB already open from above
+					await putItem(db, STORE_NAME, result);
+					return result;
+				}
+			}
+		} catch(err) {
+			alert(err);
+			db.close();
+		}
 	}
 };
 
@@ -188,6 +215,8 @@ async function _addToCart(id) {
 			existing.querySelector('input[name="item[total]"]').value = items[itemIndex].qty * items[itemIndex].cost;
 			setCart(items);
 			updateTotal();
+
+			return true;
 		} else {
 			const product = await _getItem(id);
 
@@ -201,17 +230,20 @@ async function _addToCart(id) {
 				const row = createItemRow(product);
 				document.getElementById('pantry-cart').tBodies.item(0).append(row);
 				updateTotal();
+
+				return true;
 			}
 		}
 	} catch(err) {
 		alert(err);
+		return false;
 	}
 }
 
-const submitHandler = registerCallback('pantry:checkout:submit', async event => {
+const submitHandler = registerCallback('pantry:distribution:submit', async event => {
 	event.preventDefault();
 
-	const resp = await fetch('/api/pantryCheckout', {
+	const resp = await fetch(PANTRY_ENDPOINT, {
 		method: 'POST',
 		body: new FormData(event.target),
 	}).catch(() => Response.error());
@@ -220,47 +252,48 @@ const submitHandler = registerCallback('pantry:checkout:submit', async event => 
 		alert('Checkout complete');
 		event.target.reset();
 	} else {
-		alert('Error completing checkout.');
+		alert('Error completing transaction.');
 	}
 });
 
-const resetHandler = registerCallback('pantry:checkout:reset', () =>{
+const resetHandler = registerCallback('pantry:distribution:reset', () =>{
 	setCart([]);
 	document.querySelector('#pantry-cart tbody').replaceChildren();
 	updateTotal();
 });
 
-const changeHandler = registerCallback('pantry:checkout:change', async ({ target }) => {
-	switch(target.name) {
-		case 'item[qty]': {
-			const row = target.closest('tr');
-			const cost = row.querySelector('input[name="item[cost]"]');
-			const index = cart.findIndex(item => item.id === row.dataset.productId);
-			row.querySelector('input[name="item[total]"]').value = target.valueAsNumber * cost.valueAsNumber;
+const barcodeHandler = registerCallback('pantry:barcode:handler', async event => {
+	event.preventDefault();
 
-			if (index !== -1) {
-				const tmp = structuredClone(history.state.cart);
-				tmp[index].qty = target.valueAsNumber;
-				setCart(tmp);
-				updateTotal();
-			}
-		}
-			break;
+	const data = new FormData(event.target);
 
-		case 'barcode':
-			if (target.validity.valid) {
-				await _addToCart(target.value);
-				target.value = null;
-			}
+	if (await _addToCart(data.get('barcode'))) {
+		event.target.reset();
 	}
 });
 
-const clickHandler = registerCallback('pantry:checkout:click', async ({ target }) => {
-	switch(target.dataset.action) {
-		case 'scan':
-			document.getElementById('checkout-scanner').showPicker();
-			break;
+const changeHandler = registerCallback('pantry:distribution:change', async ({ target }) => {
+	switch(target.name) {
+		case 'item[qty]':
+			{
+				const row = target.closest('tr');
+				const cost = row.querySelector('input[name="item[cost]"]');
+				const index = cart.findIndex(item => item.id === row.dataset.productId);
+				row.querySelector('input[name="item[total]"]').value = target.valueAsNumber * cost.valueAsNumber;
 
+				if (index !== -1) {
+					const tmp = structuredClone(history.state.cart);
+					tmp[index].qty = target.valueAsNumber;
+					setCart(tmp);
+					updateTotal();
+				}
+			}
+			break;
+	}
+});
+
+const clickHandler = registerCallback('pantry:distribution:click', async ({ target }) => {
+	switch(target.dataset.action) {
 		case 'remove':
 			setCart(cart.filter(item => item.id !== target.dataset.productId));
 			target.closest('tr').remove();
@@ -279,19 +312,28 @@ export default function({ signal }) {
 		setCart([]);
 	}
 
-	createStream(async result => {
-		if (typeof result === 'object' && typeof result.rawValue === 'string') {
-			await _addToCart(result.rawValue);
-		}
-	}, { signal });
+	if ('BarcodeDetector' in globalThis) {
+		createStream(async result => {
+			if (typeof result === 'object' && typeof result.rawValue === 'string') {
+				await _addToCart(result.rawValue);
+			}
+		}, { signal });
+	}
 
-	return html`<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
-		<fieldset class="no-border overflow-auto">
-			<legend>KRV Bridge Food Pantry</legend>
+	return html`<search>
+		<form id="barcode-entry" ${onSubmit}="${barcodeHandler}" ${signalAttr}="${sig}">
 			<div class="form-group">
 				<label for="pantry-barcode" class="input-label">Manually Enter Barcode</label>
-				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{12}" autocomplete="off" placeholder="${'#'.repeat(12)}" />
+				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{12}" minlength="12" maxlength="12" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
 			</div>
+			<button type="submit" class="btn btn-success">Search</button>
+			<button type="reset" class="btn btn-reject">Clear</button>
+		</form>
+		</search>
+		<br />
+		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
+		<fieldset class="no-border overflow-auto">
+			<legend>KRV Bridge Food Pantry</legend>
 			<table id="pantry-cart" class="full-width overflow-auto">
 				<thead>
 					<tr>

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.20] - 2025-02-26
+
+### Added
+- Add POS-like checkout & inventory system for Food Pantry
+
 ## [v1.0.19] - 2025-02-21
 
 ### Added

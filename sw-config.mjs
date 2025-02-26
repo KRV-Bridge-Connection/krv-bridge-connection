@@ -28,11 +28,19 @@ const config = {
 		'/about/',
 		'/donate/',
 		'/volunteer/',
+		'/pantry/',
+		'/pantry/distribution',
 		'/account/',
 		'/branding/',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
 		'https://cdn.kernvalley.us/img/markers.svg',
+		// Routes/modules
+		'/js/routes/partners.js',
+		'/js/routes/pantry.js',
+		'/js/routes/posts.js',
+		'/js/routes/volunteer.js',
+		'/js/routes/pantry-distribution.js',
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
 	stale: [
@@ -52,10 +60,6 @@ const config = {
 		'https://cdn.kernvalley.us/img/logos/play-badge.svg',
 		'/img/octicons/info.svg',
 		'/img/adwaita-icons/status/avatar-default.svg',
-		'/js/routes/partners.js',
-		'/js/routes/pantry.js',
-		'/js/routes/posts.js',
-		'/js/routes/volunteer.js',
 		'/js/routes/404.js',
 
 		/* Fonts */
