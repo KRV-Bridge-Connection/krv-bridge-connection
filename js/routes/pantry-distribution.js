@@ -20,6 +20,8 @@ const PANTRY_ENDPOINT = '/api/pantryDistribution';
 const SCAN_DELAY = 1000;
 const [cart, setCart] = manageState('cart', []);
 
+const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
+
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
 	css`td > input.${numberClass} {
@@ -115,8 +117,9 @@ async function createStream(cb = console.log, { signal } = {}) {
 
 		if (signal instanceof AbortSignal) {
 			signal.addEventListener('abort', async () => {
-				video.pause();
 				cancelAnimationFrame(af);
+				video.pause();
+				ctx.reset();
 				stream.getTracks().forEach(track => track.stop());
 
 				if (typeof wakeLock === 'object') {
@@ -156,7 +159,7 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 			referrerPolicy: 'no-referrer',
 		}).then(resp => resp.json());
 
-		await Promise.all(items.map(item => putItem(db, STORE_NAME, item, { signal: controller.signal })));
+		await Promise.all(items.map(item => putItem(db, STORE_NAME, _convertItem(item), { signal: controller.signal })));
 		localStorage.setItem(storageKey, Date.now());
 	} catch(err) {
 		controller.abort(err);
@@ -211,6 +214,7 @@ async function _addToCart(id) {
 			const items = structuredClone(history.state?.cart ?? []);
 			const itemIndex = items.findIndex(item => item.id === id);
 			items[itemIndex].qty++;
+			await scheduler.yield();
 			existing.querySelector('input[name="item[qty]"]').value = items[itemIndex].qty;
 			existing.querySelector('input[name="item[total]"]').value = items[itemIndex].qty * items[itemIndex].cost;
 			setCart(items);
@@ -228,6 +232,7 @@ async function _addToCart(id) {
 				items.push(product);
 				setCart(items);
 				const row = createItemRow(product);
+				await scheduler.yield();
 				document.getElementById('pantry-cart').tBodies.item(0).append(row);
 				updateTotal();
 
@@ -303,7 +308,7 @@ const clickHandler = registerCallback('pantry:distribution:click', async ({ targ
 });
 
 const calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
-const updateTotal = () => document.getElementById('cart-grand-total').textContent = calcTotal();
+const updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = calcTotal());
 
 export default function({ signal }) {
 	const sig = registerSignal(signal);
