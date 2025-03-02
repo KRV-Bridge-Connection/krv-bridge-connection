@@ -7,6 +7,8 @@ import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } fro
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
 
+const storageKey = '_lastSync:pantry:partners';
+
 const style = css`.partner-image {
 	max-width: 100%;
 	height: auto;
@@ -41,15 +43,15 @@ const DB_TTL = 86400000; // 1 Day
 const [search, setSearch] = manageSearch('search', '');
 const hide = (val, param) => ! val.toLowerCase().includes(param.toString().toLowerCase());
 
-const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty('_lastSync')
-	? Date.now() - (parseInt(localStorage.getItem('_lastSync')) || 0) > ttl
+const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty(storageKey)
+	? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl
 	: true;
 
 async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
 		try {
 			const url = new URL('/api/partners', location.origin);
-			url.searchParams.set('lastUpdated', new Date(localStorage.getItem('_lastSync') ?? '0').toISOString());
+			url.searchParams.set('lastUpdated', new Date(parseInt(localStorage.getItem(storageKey)) || 0).toISOString());
 
 			const resp = await fetch(url, {
 				headers: { Accept: 'application/json' },
@@ -68,7 +70,7 @@ async function syncDB(db, { signal } = {}) {
 					return handleIDBRequest(store.put(partner), { signal });
 				}));
 
-				localStorage.setItem('_lastSync', Date.now());
+				localStorage.setItem(storageKey, Date.now());
 			} else {
 				throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
 			}

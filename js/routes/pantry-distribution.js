@@ -49,6 +49,12 @@ document.adoptedStyleSheets = [
 	#pantry-cart tbody:empty::after {
 		display: block;
 		content: "Scan items to add to cart."
+	}
+
+	#cart-grand-total {
+		font-weight: 800;
+		font-size: 1.2rem;
+		text-decoration: underline;
 	}`,
 ];
 
