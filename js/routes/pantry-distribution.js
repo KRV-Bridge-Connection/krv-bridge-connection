@@ -8,15 +8,16 @@ import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 
-export const title = 'KRV Bridge Pantry Checkout';
+export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
 const numberClass = 'small-numeric';
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
 const BARCODE_FORMATS = ['upc_a'];
+const FRAME_RATE = 12;
 const UPC_A_PATTERN = /^\d{12}$/;
-const PANTRY_ENDPOINT = '/api/pantryDistribution';
+const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
 const SCAN_DELAY = 1000;
 const [cart, setCart] = manageState('cart', []);
 
@@ -78,11 +79,19 @@ async function createStream(cb = console.log, { signal } = {}) {
 	if (signal instanceof AbortSignal && signal.aborted) {
 		throw signal.reason;
 	} else {
-		let af = NaN;
+		let frame = NaN;
 		const scanner = 'BarcodeDetector' in globalThis ? new globalThis.BarcodeDetector({ formats: BARCODE_FORMATS }) : undefined;
 		const wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen').catch(() => undefined) : undefined;
-		const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
 		const video = document.createElement('video');
+		const stream = await navigator.mediaDevices.getUserMedia({
+			audio: false,
+			video: {
+				frameRate: FRAME_RATE,
+				facingMode: 'environment',
+			}
+		});
+
+		// document.getElementById('main').prepend(video);
 		video.srcObject = stream;
 		video.play();
 
@@ -102,9 +111,9 @@ async function createStream(cb = console.log, { signal } = {}) {
 						await new Promise(resolve => setTimeout(resolve, SCAN_DELAY));
 					}
 
-					af = requestAnimationFrame(drawFrame);
+					frame = video.requestVideoFrameCallback(drawFrame);
 				} else {
-					af = requestAnimationFrame(drawFrame);
+					frame = video.requestVideoFrameCallback(drawFrame);
 				}
 			} catch(err) {
 				alert(err.message);
@@ -123,7 +132,7 @@ async function createStream(cb = console.log, { signal } = {}) {
 
 		if (signal instanceof AbortSignal) {
 			signal.addEventListener('abort', async () => {
-				cancelAnimationFrame(af);
+				video.cancelVideoFrameCallback(frame);
 				video.pause();
 				ctx.reset();
 				stream.getTracks().forEach(track => track.stop());
@@ -157,7 +166,7 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 	const db = await _openDB();
 
 	try {
-		const url = new URL(PANTRY_ENDPOINT, location.origin);
+		const url = new URL(PANTRY_ENDPOINT);
 		url.searchParams.set('lastUpdated', localStorage.hasOwnProperty(storageKey) ? localStorage.getItem(storageKey) : '0');
 
 		const items = await fetch(url, {
@@ -181,19 +190,25 @@ const _getItem = async id => {
 
 		try {
 			const item = await getItem(db, STORE_NAME, id);
-			db.close();
 
 			if (typeof item === 'object') {
+				db.close();
 				return item;
 			} else {
-				const url = new URL(PANTRY_ENDPOINT, location.origin);
+				const url = new URL(PANTRY_ENDPOINT);
 				url.searchParams.set('id', id);
-				const resp = await fetch(url);
+
+				const resp = await fetch(url, {
+					referrerPolicy: 'no-referrer',
+					headers: { Accept: 'application/json' },
+					credentials: 'omit',
+				});
 
 				if (resp.ok) {
 					const result = await resp.json();
 					// DB already open from above
 					await putItem(db, STORE_NAME, result);
+					db.close();
 					return result;
 				}
 			}
