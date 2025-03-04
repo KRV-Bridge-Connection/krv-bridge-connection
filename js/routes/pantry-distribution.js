@@ -22,6 +22,8 @@ const SCAN_DELAY = 1000;
 const [cart, setCart] = manageState('cart', []);
 
 const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
+const _calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
+const _updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = _calcTotal());
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
@@ -75,23 +77,31 @@ function playChime() {
 	osc.stop(ctx.currentTime + 0.2); // Short chime
 }
 
-async function createStream(cb = console.log, { signal } = {}) {
-	if (signal instanceof AbortSignal && signal.aborted) {
-		throw signal.reason;
+async function createBarcodeReader(cb = console.log, {
+	delay = SCAN_DELAY,
+	facingMode = 'environment',
+	formats = BARCODE_FORMATS,
+	frameRate = FRAME_RATE,
+	signal,
+} = {}) {
+	const { promise, resolve, reject } = Promise.withResolvers();
+
+	if (! ('BarcodeDetector' in globalThis)) {
+		reject(new DOMException('`BarcodeDetector` is not supported.'));
+	} else if (signal instanceof AbortSignal && signal.aborted) {
+		reject(signal.reason);
 	} else {
 		let frame = NaN;
-		const scanner = 'BarcodeDetector' in globalThis ? new globalThis.BarcodeDetector({ formats: BARCODE_FORMATS }) : undefined;
+		const controller = new AbortController();
+		const sig = signal instanceof AbortSignal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
+		const scanner = new globalThis.BarcodeDetector({ formats });
 		const wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen').catch(() => undefined) : undefined;
 		const video = document.createElement('video');
 		const stream = await navigator.mediaDevices.getUserMedia({
 			audio: false,
-			video: {
-				frameRate: FRAME_RATE,
-				facingMode: 'environment',
-			}
+			video: { frameRate, facingMode },
 		});
 
-		// document.getElementById('main').prepend(video);
 		video.srcObject = stream;
 		video.play();
 
@@ -102,17 +112,18 @@ async function createStream(cb = console.log, { signal } = {}) {
 			try {
 				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-				if (typeof scanner !== 'undefined') {
-					const results = await scanner.detect(ctx.canvas).catch(err => [{ rawValue: err.message }]);
+				const results = await scanner.detect(ctx.canvas).catch(err => {
+					reportError(err);
+					return [];
+				});
 
-					if (results.length !== 0) {
-						playChime();
-						await Promise.allSettled(results.map(cb));
-						await new Promise(resolve => setTimeout(resolve, SCAN_DELAY));
-					}
+				if (results.length !== 0) {
+					playChime();
+					await Promise.allSettled(results.map(cb));
+					await new Promise(resolve => setTimeout(resolve, delay));
+				}
 
-					frame = video.requestVideoFrameCallback(drawFrame);
-				} else {
+				if (! sig.aborted) {
 					frame = video.requestVideoFrameCallback(drawFrame);
 				}
 			} catch(err) {
@@ -127,22 +138,23 @@ async function createStream(cb = console.log, { signal } = {}) {
 			target.height = height;
 			canvas.width = width;
 			canvas.height = height;
+			resolve(controller);
 			drawFrame();
+		}, { once: true, signal: sig });
+
+		sig.addEventListener('abort', async () => {
+			video.cancelVideoFrameCallback(frame);
+			video.pause();
+			ctx.reset();
+			stream.getTracks().forEach(track => track.stop());
+
+			if (typeof wakeLock === 'object') {
+				await wakeLock.release();
+			}
 		}, { once: true });
-
-		if (signal instanceof AbortSignal) {
-			signal.addEventListener('abort', async () => {
-				video.cancelVideoFrameCallback(frame);
-				video.pause();
-				ctx.reset();
-				stream.getTracks().forEach(track => track.stop());
-
-				if (typeof wakeLock === 'object') {
-					await wakeLock.release();
-				}
-			}, { once: true });
-		}
 	}
+
+	return promise;
 }
 
 const _openDB = async () => await openDB(SCHEMA.name, {
@@ -150,7 +162,7 @@ const _openDB = async () => await openDB(SCHEMA.name, {
 	schema: SCHEMA,
 });
 
-function createItemRow(item) {
+function _createItemRow(item) {
 	return html`<tr ${data({ productId: item.id })}>
 		<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
 		<td><input type="number" name="item[cost]" ${attr({ value: item.cost })} size="2" class="${numberClass}" readonly="" required="" /></td>
@@ -159,29 +171,6 @@ function createItemRow(item) {
 		<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 		<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 	</tr>`;
-}
-
-if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(storageKey)) < Date.now() - 86400000) {
-	const controller = new AbortController();
-	const db = await _openDB();
-
-	try {
-		const url = new URL(PANTRY_ENDPOINT);
-		url.searchParams.set('lastUpdated', localStorage.hasOwnProperty(storageKey) ? localStorage.getItem(storageKey) : '0');
-
-		const items = await fetch(url, {
-			headers: { Accept: 'application/json' },
-			referrerPolicy: 'no-referrer',
-		}).then(resp => resp.json());
-
-		await Promise.all(items.map(item => putItem(db, STORE_NAME, _convertItem(item), { signal: controller.signal })));
-		localStorage.setItem(storageKey, Date.now());
-	} catch(err) {
-		controller.abort(err);
-		alert(err);
-	} finally {
-		db.close();
-	}
 }
 
 const _getItem = async id => {
@@ -239,7 +228,7 @@ async function _addToCart(id) {
 			existing.querySelector('input[name="item[qty]"]').value = items[itemIndex].qty;
 			existing.querySelector('input[name="item[total]"]').value = items[itemIndex].qty * items[itemIndex].cost;
 			setCart(items);
-			updateTotal();
+			_updateTotal();
 
 			return true;
 		} else {
@@ -252,10 +241,10 @@ async function _addToCart(id) {
 				const items = structuredClone(history.state?.cart ?? []);
 				items.push(product);
 				setCart(items);
-				const row = createItemRow(product);
+				const row = _createItemRow(product);
 				await scheduler.yield();
 				document.getElementById('pantry-cart').tBodies.item(0).append(row);
-				updateTotal();
+				_updateTotal();
 
 				return true;
 			}
@@ -285,7 +274,7 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 const resetHandler = registerCallback('pantry:distribution:reset', () =>{
 	setCart([]);
 	document.querySelector('#pantry-cart tbody').replaceChildren();
-	updateTotal();
+	_updateTotal();
 });
 
 const barcodeHandler = registerCallback('pantry:barcode:handler', async event => {
@@ -308,10 +297,10 @@ const changeHandler = registerCallback('pantry:distribution:change', async ({ ta
 				row.querySelector('input[name="item[total]"]').value = target.valueAsNumber * cost.valueAsNumber;
 
 				if (index !== -1) {
-					const tmp = structuredClone(history.state.cart);
+					const tmp = structuredClone(history.state?.cart ?? []);
 					tmp[index].qty = target.valueAsNumber;
 					setCart(tmp);
-					updateTotal();
+					_updateTotal();
 				}
 			}
 			break;
@@ -323,13 +312,33 @@ const clickHandler = registerCallback('pantry:distribution:click', async ({ targ
 		case 'remove':
 			setCart(cart.filter(item => item.id !== target.dataset.productId));
 			target.closest('tr').remove();
-			updateTotal();
+			_updateTotal();
 			break;
 	}
 });
 
-const calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
-const updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = calcTotal());
+if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(storageKey)) < Date.now() - 86400000) {
+	const controller = new AbortController();
+	const db = await _openDB();
+
+	try {
+		const url = new URL(PANTRY_ENDPOINT);
+		url.searchParams.set('lastUpdated', localStorage.hasOwnProperty(storageKey) ? localStorage.getItem(storageKey) : '0');
+
+		const items = await fetch(url, {
+			headers: { Accept: 'application/json' },
+			referrerPolicy: 'no-referrer',
+		}).then(resp => resp.json());
+
+		await Promise.all(items.map(item => putItem(db, STORE_NAME, _convertItem(item), { signal: controller.signal })));
+		localStorage.setItem(storageKey, Date.now());
+	} catch(err) {
+		controller.abort(err);
+		alert(err);
+	} finally {
+		db.close();
+	}
+}
 
 export default function({ signal }) {
 	const sig = registerSignal(signal);
@@ -339,7 +348,7 @@ export default function({ signal }) {
 	}
 
 	if ('BarcodeDetector' in globalThis) {
-		createStream(async result => {
+		createBarcodeReader(async result => {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				await _addToCart(result.rawValue);
 			}
@@ -385,7 +394,7 @@ export default function({ signal }) {
 					<tr>
 						<td><!-- Intentionally empty --></td>
 						<th colspan="3">Grand Total</th>
-						<td id="cart-grand-total">${calcTotal()}</td>
+						<td id="cart-grand-total">${_calcTotal()}</td>
 						<td class="mobile-hidden"><!-- Intentionally empty --></td>
 					</tr>
 				</tfoot>
