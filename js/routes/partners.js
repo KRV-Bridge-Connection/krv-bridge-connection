@@ -7,7 +7,7 @@ import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } fro
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
 
-const storageKey = '_lastSync:pantry:partners';
+const storageKey = '_lastSync:partners';
 
 const style = css`.partner-image {
 	max-width: 100%;
@@ -51,7 +51,10 @@ async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
 		try {
 			const url = new URL('/api/partners', location.origin);
-			url.searchParams.set('lastUpdated', new Date(parseInt(localStorage.getItem(storageKey)) || 0).toISOString());
+
+			if (localStorage.hasOwnProperty(storageKey)) {
+				url.searchParams.set('lastUpdated', new Date(parseInt(localStorage.getItem(storageKey)) || 0).toISOString());
+			}
 
 			const resp = await fetch(url, {
 				headers: { Accept: 'application/json' },
@@ -105,7 +108,7 @@ const searchPartners = registerCallback('partner:search:submit', event => {
 
 const resetPartnerSearch = registerCallback('partner:reset', () => {
 	document.getElementById('search-orgs').removeAttribute('value');
-	setSearch();
+	setSearch('');
 	document.querySelectorAll('[data-org-name]').forEach(el => el.hidden = false);
 });
 
