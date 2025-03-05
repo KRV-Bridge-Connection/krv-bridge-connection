@@ -3,13 +3,18 @@ import { signal as signalAttr, registerSignal, onChange, onSubmit, onReset, onCl
 import { clearState, changeHandler as change, setState } from '@aegisjsproject/state/state.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
+import { manageSearch } from '@aegisjsproject/url/search.js';
 import { site } from '../consts.js';
 
 const towns = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const dowList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
 const skillList = ['Construction', 'Food Services', 'CPR', 'Teaching', 'Sound/Music', 'Writing', 'Design/Flyers', 'Social Media'];
-const interestsList = ['Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning', 'Childcare', 'Transportation'];
+const interestsList = [
+	'KRV Pantry', 'Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning',
+	'Childcare', 'Transportation',
+];
+
 const allergyList = [
 	'Peanuts', 'Tree nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish', 'Gluten', 'Latex',
 	'Pollen', 'Dust mites', 'Animal dander', 'Insect stings', 'Mold',
@@ -18,6 +23,9 @@ const allergyList = [
 const minAge = 13;
 const today = new Date();
 const youngestBday = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate(), 0, 0);
+
+const [interestParams] = manageSearch('interests', [], { multiple: true });
+const [skilsParams] = manageSearch('skills', [], { multiple: true });
 
 const resetHandler = registerCallback('volunteer:form:reset', () => {
 	clearState();
@@ -126,8 +134,8 @@ export default ({
 		needsTransportation = false,
 		needsChildcare = false,
 		bDay = '',
-		interests = [],
-		skills = [],
+		interests = interestParams,
+		skills = skilsParams,
 		notes = '',
 		newsletter = false,
 		agreed = false,
