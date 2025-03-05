@@ -9,7 +9,10 @@ const towns = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'W
 const dowList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
 const skillList = ['Construction', 'Food Services', 'CPR', 'Teaching', 'Sound/Music', 'Writing', 'Design/Flyers', 'Social Media'];
-const interestsList = ['Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning', 'Childcare', 'Transportation'];
+const interestsList = [
+	'KRV Pantry', 'Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning',
+	'Childcare', 'Transportation',
+];
 const allergyList = [
 	'Peanuts', 'Tree nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish', 'Gluten', 'Latex',
 	'Pollen', 'Dust mites', 'Animal dander', 'Insect stings', 'Mold',
