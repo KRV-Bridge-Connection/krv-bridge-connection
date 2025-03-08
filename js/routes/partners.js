@@ -1,6 +1,7 @@
 import { site, SCHEMA } from '../consts.js';
 import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
@@ -168,11 +169,11 @@ export default async function ({ matches, signal } = {}) {
 		if (result instanceof Error) {
 			return html`<div class="status-box error">${result.message}</div>`;
 		} else if (typeof result === 'object') {
-			return html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
+			const page = html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 				<h2>
 					<span itemprop="name">${result.name}</span>
 				</h2>
-				<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+				<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.image.alt ?? result.name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 				<p itemprop="description">${result.description}</p>
 
 				${typeof result.email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + result.email })} itemprop="email" class="btn btn-link btn-lg">
@@ -195,7 +196,15 @@ export default async function ({ matches, signal } = {}) {
 					</svg>
 					<span>${new URL(result.url).hostname}</span>
 				</a>`}
-			</div> ${typeof result.content === 'string' && result.content.length !== 0 ? `<div>${result.content}</div>` : ''}`;
+			</div>`;
+
+			if (typeof result.content === 'string' && result.content.length !== 0) {
+				const article = document.createElement('article');
+				article.append(md`${result.content}`);
+				page.append(article);
+			}
+
+			return page;
 		} else {
 			return html`<h2>Not Found</h2>`;
 		}
