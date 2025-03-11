@@ -1,6 +1,8 @@
-import { createHandler, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem } from './utils.js';
-import { encrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
+import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
+import { addCollectionItem, deleteCollectionItem, getCollectionItem, getPublicKey } from './utils.js';
+import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
+import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
@@ -12,7 +14,46 @@ const FORMAT = {
 	timeStyle: 'short',
 };
 
+const COLLECTION = 'pantry-schedule';
+
 export default createHandler({
+	async get(req) {
+		const { searchParams } = new URL(req.url);
+		const token = req.cookies.get('org-jwt');
+
+		if (! searchParams.has('id')) {
+			throw new HTTPBadRequestError('Missing required id.');
+		} else if (typeof token !== 'string' || token.length === 0) {
+			throw new HTTPUnauthorizedError('Missing required token for request.');
+		} else {
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['pantry-schedule:get'],
+				roles: ['admin'],
+			});
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
+			} else {
+				const appt = await getCollectionItem(COLLECTION, searchParams.get('id'));
+
+				if (typeof appt !== 'object' || typeof appt.date === 'undefined') {
+					throw new HTTPNotFoundError(`No results for id ${searchParams.get('id')}.`);
+				} else if (appt instanceof Error) {
+					throw appt;
+				} else {
+					const key = await getSecretKey();
+
+					return Response.json({
+						name: appt.name,
+						date: new Date(appt.date._seconds * 1000).toLocaleString(),
+						telephone: typeof appt.telephone === 'string' ? await decrypt(key, appt.telephone, { input: 'base64', output: 'text' }) : null,
+						email: typeof appt.email === 'string' ? await decrypt(key, appt.email, { input: 'base64', output: 'text' }) : null,
+						comments: typeof appt.comments === 'string' ? await decrypt(key, appt.comments, { input: 'base64', output: 'text' }) : null,
+					});
+				}
+			}
+		}
+	},
 	async post(req) {
 		const data = await req.formData();
 		const missing = ['name', 'household', 'addressLocality', 'postalCode', 'date', 'time', 'email'].filter(field => ! data.has(field));
@@ -27,9 +68,13 @@ export default createHandler({
 			} else if (! Number.isSafeInteger(household) || household < 1 || household > 8) {
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
-				const [email, telephone, comments] = await Promise.all(
-					['email', 'telephone', 'comments'].map(field => data.has(field) ? encrypt(key, data.get(field), { output: BASE64 }) : null)
+				const [email = null, telephone = null, comments = null] = await Promise.all(
+					['email', 'telephone', 'comments']
+						.map(field => data.get(field) ?? null)
+						.filter(field => typeof field === 'string' && field.length !== 0)
+						.map(field => encrypt(key, field, { output: BASE64 }))
 				);
+
 				const result = await addCollectionItem('pantry-schedule', {
 					name: data.get('name'),
 					email,
@@ -76,6 +121,34 @@ export default createHandler({
 			}
 		} else {
 			throw new HTTPBadRequestError(`Missing required fields: ${missing.join(', ')}`);
+		}
+	},
+
+	async delete(req) {
+		const { searchParams } = new URL(req.url);
+		const token = req.cookies.get('org-jwt');
+
+		if (! searchParams.has('id')) {
+			throw new HTTPBadRequestError('Missing required id.');
+		} else if (typeof token !== 'string' || token.length === 0) {
+			throw new HTTPUnauthorizedError('Missing required token for request.');
+		} else {
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['pantry-schedule:delete'],
+				roles: ['admin'],
+			});
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
+			} else {
+				const deleted = await deleteCollectionItem(COLLECTION, searchParams.get('id'));
+
+				if (deleted) {
+					return new Response(null, { status: NO_CONTENT });
+				} else {
+					throw new HTTPNotFoundError(`Nothing scheduled with id ${searchParams.get('id')}.`);
+				}
+			}
 		}
 	}
 });
