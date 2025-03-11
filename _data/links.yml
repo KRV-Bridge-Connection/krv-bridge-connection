@@ -2,11 +2,14 @@ nav:
   - label: Home
     icon: home
     href: /
+  - label: Food Pantry
+    href: /pantry/
+    icon: food
   - label: Partners
     href: /partners/
     icon: organization
   # - label: News
-  #   href: /posts/2025/01/08/hello-world
+  #   href: /posts/2025/02/21/container-queries-2
   - label: About
     icon: info
     href: /about/
@@ -22,10 +25,10 @@ nav:
   - label: Volunteer
     icon: hand
     href: '/volunteer/'
-  - label: Search 211
-    href: '/211/'
-    icon: search
-    accessKey: f
+  # - label: Search 211
+  #   href: '/211/'
+  #   icon: search
+  #   accessKey: f
   - label: Account
     icon: avatar-default
     href: /account/

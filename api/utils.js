@@ -132,6 +132,12 @@ export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = 
 	}
 }
 
+export async function putCollectionItem(name, id, data, { envName = ENV_CERT_NAME } = {}) {
+	const collection = await getCollection(name, { envName });
+
+	return await collection.doc(id).set(data);
+}
+
 export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME } = {}) {
 	const collection = await getCollection(name, { envName });
 	return await collection.add(data);
@@ -139,9 +145,9 @@ export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME } 
 
 export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
 	const collection = await getCollection(name, { envName });
-	const result =  await collection.doc(id).delete();
-
-	return result.writeTime > 0;
+	await collection.doc(id).delete();
+	// Not sure how to tell if anything was actually deleted
+	return true;
 }
 
 /**
