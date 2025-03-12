@@ -118,7 +118,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-email" class="input-label required">Email</label>
-				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="email" ${attr({ value: email })} required="" />
+				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="email" ${attr({ value: email })} />
 			</div>
 			<div class="form-group">
 				<label for="pantry-phone" class="input-label">Phone</label>
