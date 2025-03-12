@@ -56,7 +56,7 @@ export default createHandler({
 	},
 	async post(req) {
 		const data = await req.formData();
-		const missing = ['name', 'household', 'addressLocality', 'postalCode', 'date', 'time', 'email'].filter(field => ! data.has(field));
+		const missing = ['name', 'household', 'addressLocality', 'postalCode', 'date', 'time',].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
 			const key = await getSecretKey();
