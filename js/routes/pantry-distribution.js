@@ -138,7 +138,7 @@ async function createBarcodeReader(cb = console.log, {
 			target.height = height;
 			canvas.width = width;
 			canvas.height = height;
-			resolve(controller);
+			resolve({ controller, video, stream, wakeLock });
 			drawFrame();
 		}, { once: true, signal: sig });
 
@@ -352,7 +352,15 @@ export default function({ signal }) {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				await _addToCart(result.rawValue);
 			}
-		}, { signal });
+		}, { signal }).then(({ video }) => {
+			const details = document.createElement('details');
+			const summary = document.createElement('summary');
+			summary.classList.add('btn', 'btn-primary');
+			summary.textContent = 'View Camera Feed';
+			video.classList.add('fill-width');
+			details.append(summary, video);
+			document.getElementById('scanner').prepend(details, document.createElement('br'));
+		}).catch(reportError);
 	}
 
 	return html`<search>
