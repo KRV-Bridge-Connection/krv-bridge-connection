@@ -82,12 +82,14 @@ export default createHandler({
 									action: `email-${nowId}`,
 									style: SLACK_PRIMARY,
 								}),
-								new SlackButtonElement(new SlackPlainTextElement(`[${location.geo.latitude}, ${location.geo.longitude}]`), {
-									url: `https://www.google.com/maps/@${location.geo.latitude},${location.geo.longitude},18.05z?hl=en`,
-									action: `geo-${nowId}`,
-									style: SLACK_PRIMARY,
-								}),
-							]
+								typeof location?.geo?.latitude === 'number' && typeof location.geo.longitude === 'number'
+									? new SlackButtonElement(new SlackPlainTextElement(`[${location.geo.latitude}, ${location.geo.longitude}]`), {
+										url: `https://www.google.com/maps/@${location.geo.latitude},${location.geo.longitude},18.05z?hl=en`,
+										action: `geo-${nowId}`,
+										style: SLACK_PRIMARY,
+									})
+									:undefined,
+							].filter(btn => typeof btn === 'object')
 						})
 					);
 
