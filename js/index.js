@@ -1,6 +1,7 @@
 import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
+import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from './consts.js';
 import { navigate } from './functions.js';
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router/router.js';
@@ -68,6 +69,26 @@ function loadHandler() {
 	on('[data-navigate]', 'click', ({ currentTarget }) => navigate(currentTarget.dataset.navigate));
 
 	if (location.pathname.startsWith('/contact/')) {
+		on('#contact-coordinates', 'click', async ({ currentTarget }) => {
+			currentTarget.disabled = true;
+
+			try {
+				const { coords } = await getLocation({ enableHighAccuracy: true });
+
+				if (typeof coords?.latitude === 'number') {
+					const result = document.createElement('div');
+					document.getElementById('contact-latitude').value = coords.latitude;
+					document.getElementById('contact-longitude').value = coords.longitude;
+					result.textContent = `Your location has been added. [${coords.latitude}, ${coords.longitude}]`;
+					currentTarget.replaceWith(result);
+				} else {
+					throw new TypeError('Geo Coordinates are invalid.');
+				}
+			} catch(err) {
+				reportError(err);
+				currentTarget.disabled = false;
+			}
+		});
 		const params = new URLSearchParams(location.search);
 
 		if (params.has('subject') || params.has('body')) {
@@ -96,6 +117,17 @@ function loadHandler() {
 						phone: data.get('telephone'),
 						subject: data.get('subject'),
 						body: data.get('body'),
+						location: {
+							address: data.has('addressLocality') ? {
+								streetAddress: data.get('streetAddress'),
+								addressLocality: data.get('addressLocality'),
+								postalCode: data.get('postalCode'),
+							} : undefined,
+							geo: data.has('latitude') && data.has('longitude') ? {
+								latitude: parseFloat(data.get('latitude')),
+								longitude: parseFloat(data.get('longitude')),
+							} : undefined
+						}
 					})
 				});
 

@@ -28,6 +28,42 @@ description: Contact the KRV Bridge Connection
 			</label>
 			<input type="tel" id="contact-phone" class="input" name="telephone" placeholder="555-555-5555" autocomplete="tel" />
 		</div>
+		<div>
+			<p>An address helps us reach you for services like pick-ups or deliveries. If you don't have a traditional address, please click the <q>Add Geo Coordinates</q> button. This allows assist someone in finding you if necessary to provide services.</p>
+			<div class="form-group">
+				<label for="contact-street-address" class="input-label">Address</label>
+				<input type="text" name="streetAddress" id="contact-street-address" class="input" autocomplete="street-address" placeholder="123 Some St." />
+				<div class="flex row">
+					<label>
+						<input type="text" name="addressLocality" class="input inline-block" aria-label="City or Town" placeholder="City or Town" list="contact-towns-list" autocomplete="address-level2" />
+						<datalist id="contact-towns-list">
+							<option label="Lake Isabella" value="Lake Isabella"></option>
+							<option label="Bodfish" value="Bodfish"></option>
+							<option label="Wofford Heights" value="Wofford Heights"></option>
+							<option label="Mt Mesa" value="Mt Mesa"></option>
+							<option label="South Lake" value="South Lake"></option>
+							<option label="Weldon" value="Weldon"></option>
+							<option label="Onyx" value="Onyx"></option>
+							<option label="Kernville" value="Kernville"></option>
+							<option label="Canebrake" value="Canebrake"></option>
+							<option label="Havilah" value="Havilah"></option>
+							<option label="Caliente" value="Caliente"></option>
+							<option label="Alta Sierra" value="Alta Sierra"></option>
+							<option label="Riverkern" value="Riverkern"></option>
+							<option label="Roads End" value="Roads End"></option>
+							<option label="Johnsondale" value="Johnsondale"></option>
+						</datalist>
+					</label>
+					<span aria-hidden="true">,</span>
+					<label>
+						<input type="text" name="postalCode" class="input inline-block" aria-label="Zip Code" inputmode="numeric" pattern="[0-9]{5,}" minlength="5" placeholder="#####" autocomplete="postal-code" />
+					</label>
+				</div>
+			</div>
+			<button type="button" id="contact-coordinates" class="btn btn-primary">Add Geo Coordinates</button>
+			<input type="hidden" name="latitude" id="contact-latitude" readonly="" />
+			<input type="hidden" name="longitude" id="contact-longitude" readonly="" />
+		</div>
 		<div class="form-group">
 			<label for="contact-subject" class="input-label required">
 				<span class="label-text">Subject</span>
