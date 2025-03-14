@@ -77,18 +77,18 @@ export default createHandler({
 						new SlackContextBlock({ elements: [new SlackPlainTextElement(body)] }),
 						new SlackActionsBlock({
 							elements: [
-								new SlackButtonElement(new SlackPlainTextElement(`Reply to <${email}>`), {
+								typeof email === 'string' ? new SlackButtonElement(new SlackPlainTextElement(`Reply to <${email}>`), {
 									url: `mailto:${email}`,
 									action: `email-${nowId}`,
 									style: SLACK_PRIMARY,
-								}),
+								}) : undefined,
 								typeof location?.geo?.latitude === 'number' && typeof location.geo.longitude === 'number'
 									? new SlackButtonElement(new SlackPlainTextElement(`[${location.geo.latitude}, ${location.geo.longitude}]`), {
 										url: `https://www.google.com/maps/@${location.geo.latitude},${location.geo.longitude},18.05z?hl=en`,
 										action: `geo-${nowId}`,
 										style: SLACK_PRIMARY,
 									})
-									:undefined,
+									: undefined,
 							].filter(btn => typeof btn === 'object')
 						})
 					);
