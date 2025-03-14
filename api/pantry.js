@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, deleteCollectionItem, getCollectionItem, getPublicKey } from './utils.js';
+import { addCollectionItem, deleteCollectionItem, getCollectionItem, getCollectionItems, getPublicKey } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
@@ -21,11 +21,33 @@ export default createHandler({
 		const { searchParams } = new URL(req.url);
 		const token = req.cookies.get('org-jwt');
 
-		if (! searchParams.has('id')) {
-			throw new HTTPBadRequestError('Missing required id.');
-		} else if (typeof token !== 'string' || token.length === 0) {
+		if (typeof token !== 'string' || token.length === 0) {
 			throw new HTTPUnauthorizedError('Missing required token for request.');
-		} else {
+		} else if (! searchParams.has('id')) {
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['pantry-schedule:get'],
+				roles: ['admin'],
+			});
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
+			} else {
+				const appts = await getCollectionItems(COLLECTION, {
+					limit: 20,
+					filters: [
+						['date', '>', new Date()]
+					]
+				});
+
+				return Response.json(appts.map(({ name, date, created, points, household}) => ({
+					name,
+					points,
+					household,
+					date: new Date(date._seconds * 1000).toISOString(),
+					created: new Date(created._seconds * 1000),
+				})));
+			}
+		} else  {
 			const result = await verifyJWT(token, await getPublicKey(), {
 				entitlements: ['pantry-schedule:get'],
 				roles: ['admin'],
@@ -60,7 +82,7 @@ export default createHandler({
 
 		if (missing.length === 0) {
 			const key = await getSecretKey();
-			const date = new Date(`${data.get('date')}T${data.get('time')}`);
+			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
 			const household = parseInt(data.get('household'));
 
 			if (Number.isNaN(date.getTime())) {

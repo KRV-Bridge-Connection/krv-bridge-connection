@@ -43,6 +43,7 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 
 	try {
 		const data = new FormData(event.target);
+		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
 		const resp = await fetch('/api/pantry', {
 			method: 'POST',
 			body: data,
@@ -82,7 +83,7 @@ export default function({
 		household = '',
 		addressLocality = '',
 		postalCode = '',
-		date = '',
+		date = new Date().toISOString().split('T')[0],
 		time = '',
 		comments = '',
 	},

@@ -47,7 +47,7 @@ export default createHandler({
 				throw new HTTPForbiddenError(`Token ${result.jti} has been revoked.`);
 			} else {
 				const isFormData = [FORM_MULTIPART, FORM_URL_ENCODED].some(type => req.headers.get('Content-Type').startsWith(type));
-				const { subject, body, email, name, phone } = isFormData ? Object.fromEntries(await req.formData()) : await req.json();
+				const { subject, body, email, name, phone, location } = isFormData ? Object.fromEntries(await req.formData()) : await req.json();
 
 				if (! isString(subject, { minLength: 4 })) {
 					throw new HTTPBadRequestError('No subject given');
@@ -66,6 +66,11 @@ export default createHandler({
 							fields: [
 								new SlackMarkdownElement(`*From*: ${name}`),
 								new SlackMarkdownElement(`*Phone*: ${isTel(phone) ? formatPhoneNumber(phone) : 'Not given'}`),
+								new SlackPlainTextElement(`Address: ${
+									typeof location?.address?.addressLocality === 'string'
+										? `${location.address.streetAddress ?? 'No Street Address'} ${location.address.addressLocality}`
+										: 'No Address given'}`
+								)
 							],
 						}),
 						new SlackDividerBlock(),
@@ -75,6 +80,11 @@ export default createHandler({
 								new SlackButtonElement(new SlackPlainTextElement(`Reply to <${email}>`), {
 									url: `mailto:${email}`,
 									action: `email-${nowId}`,
+									style: SLACK_PRIMARY,
+								}),
+								new SlackButtonElement(new SlackPlainTextElement(`[${location.geo.latitude}, ${location.geo.longitude}]`), {
+									url: `https://www.google.com/maps/@${location.geo.latitude},${location.geo.longitude},18.05z?hl=en`,
+									action: `geo-${nowId}`,
 									style: SLACK_PRIMARY,
 								}),
 							]
@@ -101,4 +111,5 @@ export default createHandler({
 	allowHeaders: [ 'Content-Type', 'Authorization'],
 	requireContentLength: true,
 	requireCORS: true,
+	logger: err => console.error(err),
 });
