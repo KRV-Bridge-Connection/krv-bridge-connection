@@ -85,7 +85,6 @@ function loadHandler() {
 					throw new TypeError('Geo Coordinates are invalid.');
 				}
 			} catch(err) {
-				alert(err);
 				reportError(err);
 				currentTarget.disabled = false;
 			}
