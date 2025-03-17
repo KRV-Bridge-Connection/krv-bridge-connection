@@ -67,7 +67,10 @@ export default createHandler({
 
 					return Response.json({
 						name: appt.name,
-						date: new Date(appt.date._seconds * 1000).toLocaleString(),
+						points: appt.points,
+						household: appt.household,
+						addressLocality: appt.addressLocality,
+						date: new Date(appt.date._seconds * 1000).toISOString(),
 						telephone: typeof appt.telephone === 'string' ? await decrypt(key, appt.telephone, { input: 'base64', output: 'text' }) : null,
 						email: typeof appt.email === 'string' ? await decrypt(key, appt.email, { input: 'base64', output: 'text' }) : null,
 						comments: typeof appt.comments === 'string' ? await decrypt(key, appt.comments, { input: 'base64', output: 'text' }) : null,
