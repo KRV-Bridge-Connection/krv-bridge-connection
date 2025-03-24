@@ -40,10 +40,14 @@ const closeMessage = registerCallback('pantry:message:close', ({ target }) => ta
 
 const submitHandler = registerCallback('pantry:form:submit', async event => {
 	event.preventDefault();
+	// Store the submitter, with a default empty object just in case.
+	const submitter = event.submitter ?? {};
 
 	try {
+		submitter.disabled = true;
 		const data = new FormData(event.target);
 		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
+
 		const resp = await fetch('/api/pantry', {
 			method: 'POST',
 			body: data,
@@ -53,6 +57,7 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 			const { message } = await resp.json();
 			clearState();
 			await _alert(message);
+			submitter.disabled = false;
 			history.length > 1 ? back() : navigate('/');
 		} else {
 			const err = await resp.json();
@@ -60,6 +65,7 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 		}
 	} catch(err) {
 		await _alert(err.message);
+		submitter.disabled = false;
 	}
 });
 
