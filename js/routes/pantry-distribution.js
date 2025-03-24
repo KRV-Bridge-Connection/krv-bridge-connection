@@ -257,18 +257,28 @@ async function _addToCart(id) {
 
 const submitHandler = registerCallback('pantry:distribution:submit', async event => {
 	event.preventDefault();
+	const submitter = event.submitter;
 
-	const resp = await fetch(PANTRY_ENDPOINT, {
-		method: 'POST',
-		body: new FormData(event.target),
-	}).catch(() => Response.error());
+	try {
+		submitter.disabled = true;
+		const resp = await fetch(PANTRY_ENDPOINT, {
+			method: 'POST',
+			body: new FormData(event.target),
+		}).catch(() => Response.error());
 
-	if (resp.ok) {
-		alert('Checkout complete');
-		event.target.reset();
-	} else {
-		alert('Error completing transaction.');
+		if (resp.ok) {
+			alert('Checkout complete');
+			event.target.reset();
+		} else {
+			alert('Error completing transaction.');
+		}
+	} catch(err) {
+		reportError(err);
+		alert(err);
+	} finally {
+		submitter.disabled = false;
 	}
+
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', () =>{
