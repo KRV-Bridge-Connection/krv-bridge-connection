@@ -96,8 +96,7 @@ export default createHandler({
 				const [email = null, telephone = null, comments = null] = await Promise.all(
 					['email', 'telephone', 'comments']
 						.map(field => data.get(field) ?? null)
-						.filter(field => typeof field === 'string' && field.length !== 0)
-						.map(field => encrypt(key, field, { output: BASE64 }))
+						.map(field => typeof field === 'string' && field.length !== 0 ? encrypt(key, field, { output: BASE64 }) : null)
 				);
 
 				const result = await addCollectionItem('pantry-schedule', {
