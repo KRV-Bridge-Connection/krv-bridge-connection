@@ -36,7 +36,7 @@ const categories = [
 	'Borel Fire',
 	'Homelessness',
 	'Elected Officials',
-];
+].sort();
 
 const getCategoryLink = category => {
 	const link = new URL('/partners/', location.origin);
@@ -291,9 +291,9 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		<div>
 			${createPartners(results.filter(result => result.partner))}
 		</div>
-		<section class="flex row wrap">
+		<section>
 			<h3>Filter by Category</h3>
-			${listCategories()}
+			<div class="flex row wrap">${listCategories()}</div>
 		</section>`;
 	}
 }
