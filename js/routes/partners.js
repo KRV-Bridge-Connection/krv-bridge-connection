@@ -3,11 +3,8 @@ import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } fro
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onReset, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
-import { navigate } from '@aegisjsproject/router/router.js';
 
 const categories = [
 	'Housing & Rental Assistance',
@@ -182,19 +179,6 @@ async function syncDB(db, { signal } = {}) {
 	}
 }
 
-const searchPartners = registerCallback('partner:search:submit', event => {
-	event.preventDefault();
-	const data = new FormData(event.target);
-	const url = new URL(location.pathname, location.origin);
-	url.searchParams.set('category', data.get('category'));
-
-	navigate(url, history.state);
-});
-
-const resetPartnerSearch = registerCallback('partner:reset', () => {
-	navigate(new URL(location.pathname, location.origin));
-});
-
 export async function getMetadata({ matches, signal } = {}) {
 	if (typeof matches.pathname.groups.partner === 'string' && matches.pathname.groups.partner.length !== 0) {
 		const {
@@ -278,10 +262,9 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 		await syncDB(db, { signal });
 		const results = await getAllItems(db, STORE_NAME, null, { signal });
-		const sig = registerSignal(signal);
 
 		return html`<search>
-			<form id="org-search" ${onSubmit}="${searchPartners}" ${onReset}="${resetPartnerSearch}" ${signalAttr}="${sig}">
+			<form id="org-search" action="/partners/" method="GET">
 				<div class="form-group">
 					<label for="search-orgs" class="visually-hidden">Search by Category</label>
 					<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: search })} list="org-categories" required="" />
