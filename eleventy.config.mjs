@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-env node */
+/* global process */
 import { load } from 'js-yaml';
-// import { UserConfig } from '@11ty/eleventy';
 import * as filters from '@shgysk8zer0/11ty-filters';
 import { markdownIt } from '@shgysk8zer0/11ty-netlify/markdown';
 import { importmap} from '@shgysk8zer0/importmap';
@@ -56,6 +56,7 @@ export default function(eleventyConfig) {
 			eleventyConfig.addFilter(filter, cb);
 		}
 	});
+
 	eleventyConfig.addShortcode('firestore', async collection => getCollection(collection, db));
 	eleventyConfig.addFilter('trim', input => input.trim());
 	eleventyConfig.addFilter('startsWith', (string, prefix) => string.startsWith(prefix));
