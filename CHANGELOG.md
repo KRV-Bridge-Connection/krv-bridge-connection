@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.0] - 2025-04-02
+
+### Added
+- Implement category search for partners/organizations
+
+### Changed
+- Switch from CJS 11ty to ESM 11ty
+- Various dependency updates
+
 ## [v1.0.21] - 2025-03-14
 
 ### Changed

@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 /* eslint-env node */
-const { load } = require('js-yaml');
-const { UserConfig } = require('@11ty/eleventy');
-// const { readJSONFile } = require('@shgysk8zer0/npm-utils/json');
-const filters = require('@shgysk8zer0/11ty-filters');
-const { markdownIt } = require('@shgysk8zer0/11ty-netlify/markdown');
-const { importmap } = require('@shgysk8zer0/importmap');
-const firebase = require('firebase-admin');
-const { Liquid } = require('liquidjs');
+/* global process */
+import { load } from 'js-yaml';
+import * as filters from '@shgysk8zer0/11ty-filters';
+import { markdownIt } from '@shgysk8zer0/11ty-netlify/markdown';
+import { importmap} from '@shgysk8zer0/importmap';
+import firebase from 'firebase-admin';
+import { Liquid } from 'liquidjs';
+import { config } from 'dotenv';
+
 
 if (process.env.ELEVENTY_SOURCE === 'cli'  && ! ('FIREBASE_CERT' in process.env)) {
-	require('dotenv').config();
+	config();
 }
 
 async function getCollection(name, db) {
@@ -23,7 +24,7 @@ async function getCollection(name, db) {
  * @param {UserConfig} eleventyConfig
  * @returns {object}
  */
-module.exports = function(eleventyConfig) {
+export default function(eleventyConfig) {
 	const {
 		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
 		DEPLOY_URL,
@@ -50,7 +51,12 @@ module.exports = function(eleventyConfig) {
 		}
 	});
 
-	Object.entries(filters).forEach(([filter, cb]) => eleventyConfig.addFilter(filter, cb));
+	Object.entries(filters).forEach(([filter, cb]) => {
+		if (typeof cb === 'function') {
+			eleventyConfig.addFilter(filter, cb);
+		}
+	});
+
 	eleventyConfig.addShortcode('firestore', async collection => getCollection(collection, db));
 	eleventyConfig.addFilter('trim', input => input.trim());
 	eleventyConfig.addFilter('startsWith', (string, prefix) => string.startsWith(prefix));
@@ -88,7 +94,6 @@ module.exports = function(eleventyConfig) {
 			: 'development'
 	);
 
-	// {% if dev %}
 	eleventyConfig.addGlobalData('dev', process.env.ELEVENTY_RUN_MODE === 'build');
 	eleventyConfig.addGlobalData('env', {
 		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,

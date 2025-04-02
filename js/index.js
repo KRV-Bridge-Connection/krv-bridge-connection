@@ -12,6 +12,7 @@ import './admin.js';
 
 initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
+	'/partners/?category=:category': '/js/routes/partners.js',
 	'/partners/:partner([\\w\\-]*)': '/js/routes/partners.js',
 	'/pantry/': '/js/routes/pantry.js',
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
