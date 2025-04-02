@@ -34,7 +34,8 @@ const categories = [
 	'Entrepreneurship',
 	'Insurance',
 	'Borel Fire',
-	'Homelessness'
+	'Homelessness',
+	'Elected Officials',
 ];
 
 const getCategoryLink = category => {
