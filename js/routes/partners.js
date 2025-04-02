@@ -9,7 +9,6 @@ import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
 import { navigate } from '@aegisjsproject/router/router.js';
 
-
 const categories = [
 	'Housing & Rental Assistance',
 	'Mental Health',
@@ -41,17 +40,22 @@ const categories = [
 	'Homelessness'
 ];
 
-const listCategories = () => categories.map(category => {
-	const a = document.createElement('a');
-	const link = new URL(location.pathname, location.origin);
+const getCategoryLink = category => {
+	const link = new URL('/partners/', location.origin);
 	link.searchParams.set('category', category);
-	a.href = link;
-	a.textContent = category;
-	a.classList.add('btn', 'btn-link');
-	return a.outerHTML;
-}).join(' ');
+	return link.href;
+};
+
+const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
 
 const storageKey = '_lastSync:partners';
+
+const categoryLink = category => `<a href="${getCategoryLink(category)}" class="btn btn-link">
+	<svg class="icon" width="16" height="16" fill="currentColor" aria-hidden="true">
+		<use xlink:href="/img/icons.svg#tag"></use>
+	</svg>
+	<span>${category}</span>
+</a>`;
 
 const style = css`.partner-image {
 	max-width: 100%;
@@ -93,8 +97,8 @@ const createPartner = result => {
 			<span itemprop="name">${result.name}</span>
 		</h2>
 		<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.image.alt ?? result.name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<div class="flex row wrap">${result.categories.map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
-
 		${typeof result.email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + result.email })} itemprop="email" class="btn btn-link btn-lg">
 			<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
 				<use xlink:href="/img/icons.svg#mail"></use>
@@ -254,6 +258,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 	} else if (typeof category === 'string' && category.length !== 0) {
 		const { searchParams } = new URL(url);
 		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+		await syncDB(db, { signal });
 
 		try {
 			const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase(), { indexName: 'categories', signal });
