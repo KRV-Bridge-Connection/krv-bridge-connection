@@ -256,7 +256,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 
 		try {
-			const results = await getAllItems(db, STORE_NAME, searchParams.get('category'), { indexName: 'categories', signal });
+			const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase(), { indexName: 'categories', signal });
 			db.close();
 
 			if (Array.isArray(results) && results.length !== 0) {

@@ -3,8 +3,12 @@ import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from '
 
 const STORE = 'partners';
 
-function transformPartner({ lastUpdated, ...data }) {
-	return { ...data, lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString() };
+function transformPartner({ lastUpdated, categories, ...data }) {
+	return {
+		...data,
+		lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString(),
+		categories: Array.isArray(categories) ? categories.map(category => category.toLowerCase()) : [],
+	};
 }
 
 export default createHandler({
