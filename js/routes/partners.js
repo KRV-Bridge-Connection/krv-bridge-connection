@@ -11,6 +11,32 @@ const STORE_NAME = 'partners';
 // const DB_TTL = 604800000; // 1 week
 const DB_TTL = 86400000; // 1 Day
 const [search] = manageSearch('search', '');
+const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
+	<use xlink:href="/img/icons.svg#link-external"></use>
+</svg>`;
+
+const phoneIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Call">
+	<use xlink:href="/img/icons.svg#call-start"></use>
+</svg>`;
+
+const emailIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
+	<use xlink:href="/img/icons.svg#mail"></use>
+</svg>`;
+
+const getPhoneLink = ({ telephone }) => typeof telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + telephone })} itemprop="telephone" class="btn btn-link btn-lg">
+	${phoneIcon}
+	<span>${telephone.includes(',') ? `${telephone.replace('+1-', '').split(',')[0]} ext ${telephone.split(',')[1]}` : telephone.replace('+1-', '')}</span>
+</a>`;
+
+const getEmailLink = ({ email }) => typeof email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + email })} itemprop="email" class="btn btn-link btn-lg">
+	${emailIcon}
+	<span>${email}</span>
+</a>`;
+
+const getWebsite = ({ url }) => typeof url === 'string' && URL.canParse(url) ? `<a ${attr({ href: url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
+	${linkIcon}
+	<span>${new URL(url).hostname}</span>
+</a>` : '';
 
 const categories = [
 	'Housing & Rental Assistance',
@@ -122,27 +148,19 @@ const createPartner = result => {
 		<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.image.alt ?? result.name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<div class="flex row wrap">${result.categories.map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
-		${typeof result.email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + result.email })} itemprop="email" class="btn btn-link btn-lg">
-			<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
-				<use xlink:href="/img/icons.svg#mail"></use>
-			</svg>
-			<span>${result.email}</span>
-		</a>`}
+		<section class="card main-contact">
+			<h3>Main Contact</h3>
+			${getEmailLink(result)}
+			${getPhoneLink(result)}
+			${getWebsite(result)}
+		</section>
 
-		${typeof result.telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + result.telephone })} itemprop="telephone" class="btn btn-link btn-lg">
-			<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Call">
-				<use xlink:href="/img/icons.svg#call-start"></use>
-			</svg>
-			<span>${result.telephone.replace('+1-', '')}</span>
-		</a>`}
-
-		${typeof result.url === 'string' && URL.canParse(result.url) ? `<a ${attr({ href: result.url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
-			<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
-				<use xlink:href="/img/icons.svg#link-external"></use>
-			</svg>
-			<span>${new URL(result.url).hostname}</span>
-		</a>` : ''}
-	</div>`;
+		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
+			<h3 itemprop="name">${typeof contact.name === 'string' ? `${contact.name} &mdash; ${contact.contactType}` : contact.contactType}</h3>
+			${getPhoneLink(contact)}
+			${getEmailLink(contact)}
+			${typeof contact.description === 'string' ? `<p itemprop="description">${contact.description}</p>` : ''}
+		</div>`).join('\n') : ''}`;
 
 	if (typeof result.content === 'string' && result.content.length !== 0) {
 		const article = document.createElement('article');
