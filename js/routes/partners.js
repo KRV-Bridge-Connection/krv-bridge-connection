@@ -1,10 +1,16 @@
 import { site, SCHEMA } from '../consts.js';
 import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
-import { html } from '@aegisjsproject/core/parsers/html.js';
+import { htmlUnsafe, html } from '@aegisjsproject/core/parsers/html.js';
 import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
+
+const cache = new Map();
+const STORE_NAME = 'partners';
+// const DB_TTL = 604800000; // 1 week
+const DB_TTL = 86400000; // 1 Day
+const [search] = manageSearch('search', '');
 
 const categories = [
 	'Housing & Rental Assistance',
@@ -39,15 +45,13 @@ const categories = [
 	'Elected Officials',
 ].sort();
 
-const getCategoryLink = category => {
-	const link = new URL('/partners/', location.origin);
+const storageKey = '_lastSync:partners';
+
+const getCategoryLink = (category) => {
+	const link = new URL('/resources/', location.origin);
 	link.searchParams.set('category', category);
 	return link.href;
 };
-
-const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
-
-const storageKey = '_lastSync:partners';
 
 const categoryLink = category => `<a href="${getCategoryLink(category)}" class="btn btn-link">
 	<svg class="icon" width="16" height="16" fill="currentColor" aria-hidden="true">
@@ -55,6 +59,33 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 	</svg>
 	<span>${category}</span>
 </a>`;
+
+const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
+
+const searchForm = `<search>
+	<form id="org-search" action="/resources/" method="GET">
+		<div class="form-group">
+			<label for="search-orgs" class="visually-hidden">Search by Category</label>
+			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: search })} list="org-categories" required="" />
+			<datalist id="org-categories">
+				${categories.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
+			</datalist>
+			<br />
+			<button type="submit" class="btn btn-success">
+				<svg class="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
+					<use xlink:href="/img/icons.svg#search"></use>
+				</svg>
+				<span>Search</span>
+			</button>
+			<button type="reset" class="btn btn-danger">
+				<svg class="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
+					<use xlink:href="/img/icons.svg#x"></use>
+				</svg>
+				<span>Reset</span>
+			</button>
+		</div>
+	</form>
+</search>`;
 
 const style = css`.partner-image {
 	max-width: 100%;
@@ -83,13 +114,6 @@ const style = css`.partner-image {
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
-const cache = new Map();
-const STORE_NAME = 'partners';
-// const DB_TTL = 604800000; // 1 week
-const DB_TTL = 86400000; // 1 Day
-const [search] = manageSearch('search', '');
-const hide = (val, param) => ! val.toLowerCase().includes(param.toString().toLowerCase());
-
 const createPartner = result => {
 	const page = html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 		<h2>
@@ -112,12 +136,12 @@ const createPartner = result => {
 			<span>${result.telephone.replace('+1-', '')}</span>
 		</a>`}
 
-		${typeof result.url !== 'string' && URL.canParse(result.url) ? '' : `<a ${attr({ href: result.url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
+		${typeof result.url === 'string' && URL.canParse(result.url) ? `<a ${attr({ href: result.url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
 			<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 				<use xlink:href="/img/icons.svg#link-external"></use>
 			</svg>
 			<span>${new URL(result.url).hostname}</span>
-		</a>`}
+		</a>` : ''}
 	</div>`;
 
 	if (typeof result.content === 'string' && result.content.length !== 0) {
@@ -129,11 +153,11 @@ const createPartner = result => {
 	return page;
 };
 
-const createPartners = results => results.map(({ name, description, image, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}  ${attr({ hidden: hide(name, search )})}>
+const createPartners = results => results.map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
 	<b class="block partner-name">${name}</b>
 	<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<p>${description}</p>
-	<a href="/partners/${id}" class="btn btn-primary btn-lg">
+	<a href="/${partner ? 'partners' : 'resources'}/${id}" class="btn btn-primary btn-lg">
 		<svg height="18" width="18" fill="currentColor" aria-hidden="true">
 			<use xlink:href="/img/icons.svg#organization"></use>
 		</svg>
@@ -182,7 +206,14 @@ async function syncDB(db, { signal } = {}) {
 }
 
 export async function getMetadata({ matches, signal } = {}) {
-	if (typeof matches.pathname.groups.partner === 'string' && matches.pathname.groups.partner.length !== 0) {
+	if (typeof matches.search.groups.category === 'string' && matches.search.groups.category.length !== 0) {
+		const category = new URLSearchParams(matches.search.input).get('category');
+
+		return {
+			title: `Search results for ${category}`,
+			description: `Search results for ${category}`,
+		};
+	} else if (typeof matches.pathname.groups.partner === 'string' && matches.pathname.groups.partner.length !== 0) {
 		const {
 			name: title = 'Not Found',
 			description = `No results for ${matches.pathname.groups.partner.replaceAll('-', ' ')}`,
@@ -251,7 +282,12 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			db.close();
 
 			if (Array.isArray(results) && results.length !== 0) {
-				return createPartners(results) + listCategories();
+				return htmlUnsafe`
+					${searchForm}
+					<h2>Search Results for <q>${searchParams.get('category')}</q></h2>
+					${createPartners(results)}
+					${listCategories()}
+				`;
 			} else {
 				throw new Error(`No results for ${searchParams.get('category')}`);
 			}
@@ -265,30 +301,8 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		await syncDB(db, { signal });
 		const results = await getAllItems(db, STORE_NAME, null, { signal });
 
-		return html`<search>
-			<form id="org-search" action="/partners/" method="GET">
-				<div class="form-group">
-					<label for="search-orgs" class="visually-hidden">Search by Category</label>
-					<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: search })} list="org-categories" required="" />
-					<datalist id="org-categories">
-						${categories.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
-					</datalist>
-					<br />
-					<button type="submit" class="btn btn-success">
-						<svg clas="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
-							<use xlink:href="/img/icons.svg#search"></use>
-						</svg>
-						<span>Search</span>
-					</button>
-					<button type="reset" class="btn btn-danger">
-						<svg clas="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
-							<use xlink:href="/img/icons.svg#x"></use>
-						</svg>
-						<span>Reset</span>
-					</button>
-				</div>
-			</form>
-		</search>
+		// `htmlUnsafe` to alow `action` attribute
+		return htmlUnsafe`${searchForm}
 		<div>
 			${createPartners(results.filter(result => result.partner))}
 		</div>
