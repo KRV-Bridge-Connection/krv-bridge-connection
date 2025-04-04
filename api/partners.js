@@ -35,7 +35,7 @@ export default createHandler({
 			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
 			return Response.json(results.map(transformPartner));
 		} else {
-			const partners = await getCollectionItems(STORE);
+			const partners = await getCollectionItems(STORE, { limit: 100 });
 			return Response.json(partners.map(transformPartner));
 		}
 	},
