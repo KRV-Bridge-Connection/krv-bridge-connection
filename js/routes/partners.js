@@ -1,6 +1,6 @@
 import { site, SCHEMA } from '../consts.js';
 import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
-import { htmlUnsafe, html } from '@aegisjsproject/core/parsers/html.js';
+import { html } from '@aegisjsproject/core/parsers/html.js';
 import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
@@ -300,7 +300,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			db.close();
 
 			if (Array.isArray(results) && results.length !== 0) {
-				return htmlUnsafe`
+				return html`
 					${searchForm}
 					<h2>Search Results for <q>${searchParams.get('category')}</q></h2>
 					${createPartners(results)}
@@ -319,8 +319,8 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		await syncDB(db, { signal });
 		const results = await getAllItems(db, STORE_NAME, null, { signal });
 
-		// `htmlUnsafe` to alow `action` attribute
-		return htmlUnsafe`${searchForm}
+		// Use `htmlUnsafe` to alow `action` attribute
+		return html`${searchForm}
 		<div>
 			${createPartners(results.filter(result => result.partner))}
 		</div>
