@@ -5,11 +5,15 @@ import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { manageSearch } from '@aegisjsproject/url/search.js';
+import { navigate } from '@aegisjsproject/router/router.js';
+import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
+import { onSubmit } from '@aegisjsproject/callback-registry/events.js';
 
 const cache = new Map();
 const STORE_NAME = 'partners';
 // const DB_TTL = 604800000; // 1 week
 const DB_TTL = 86400000; // 1 Day
+const storageKey = '_lastSync:partners';
 const [search] = manageSearch('search', '');
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 	<use xlink:href="/img/icons.svg#link-external"></use>
@@ -71,8 +75,6 @@ const categories = [
 	'Elected Officials',
 ].sort();
 
-const storageKey = '_lastSync:partners';
-
 const getCategoryLink = (category) => {
 	const link = new URL('/resources/', location.origin);
 	link.searchParams.set('category', category);
@@ -88,8 +90,17 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 
 const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
 
+const submitHandler = registerCallback('org:search:submit', async event => {
+	event.preventDefault();
+	const data = new FormData(event.target);
+	const url = new URL('/resources/', location.origin);
+	url.searchParams.set('category', data.get('category'));
+	await navigate(url);
+	event.target.reset();
+});
+
 const searchForm = `<search>
-	<form id="org-search" action="/resources/" method="GET">
+	<form id="org-search" action="/resources/" ${onSubmit}="${submitHandler}" method="GET">
 		<div class="form-group">
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
 			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: search })} list="org-categories" required="" />
@@ -312,22 +323,28 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		} catch (err) {
 			reportError(err);
 			db.close();
-			return html`<div class="status-box error">${err.message}</div>${listCategories()}`;
+
+			return html`
+				${searchForm}
+				<div class="status-box error">${err.message}</div>
+				${listCategories()}
+			`;
 		}
 	} else {
 		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 		await syncDB(db, { signal });
 		const results = await getAllItems(db, STORE_NAME, null, { signal });
 
-		// Use `htmlUnsafe` to alow `action` attribute
-		return html`${searchForm}
-		<div>
-			${createPartners(results.filter(result => result.partner))}
-		</div>
-		<section>
-			<h3>Filter by Category</h3>
-			<div class="flex row wrap">${listCategories()}</div>
-		</section>`;
+		return html`
+			${searchForm}
+			<div>
+				${createPartners(results.filter(result => result.partner))}
+			</div>
+			<section>
+				<h3>Filter by Category</h3>
+				<div class="flex row wrap">${listCategories()}</div>
+			</section>
+		`;
 	}
 }
 
