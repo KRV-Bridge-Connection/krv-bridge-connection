@@ -12,7 +12,7 @@ import { onSubmit } from '@aegisjsproject/callback-registry/events.js';
 
 const cache = new Map();
 const STORE_NAME = 'partners';
-// const DB_TTL = 604800000; // 1 week
+// const ONE_WEEK = 604800000; // 1 week
 const DB_TTL = 86400000; // 1 Day
 const storageKey = '_lastSync:partners';
 const [search] = manageSearch('search', '');
