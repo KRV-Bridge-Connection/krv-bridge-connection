@@ -2,12 +2,16 @@ import { createHandler, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
 import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from './utils.js';
 
 const STORE = 'partners';
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-function transformPartner({ lastUpdated, categories, ...data }) {
+function transformPartner({ lastUpdated, categories, hoursAvailable = {}, ...data }) {
 	return {
 		...data,
 		lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString(),
 		categories: Array.isArray(categories) ? categories.map(category => category.toLowerCase()) : [],
+		hoursAvailable: Array.isArray(hoursAvailable)
+			? hoursAvailable.sort((day1, day2) => DAYS.indexOf(day1.dayOfWeek) - DAYS.indexOf(day2.dayOfWeek))
+			: []
 	};
 }
 

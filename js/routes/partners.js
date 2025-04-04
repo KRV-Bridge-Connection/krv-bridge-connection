@@ -27,12 +27,12 @@ const emailIcon = `<svg class="icon" width="18" height="18" fill="currentColor" 
 	<use xlink:href="/img/icons.svg#mail"></use>
 </svg>`;
 
-const getPhoneLink = ({ telephone }) => typeof telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + telephone })} itemprop="telephone" class="btn btn-link btn-lg">
+const getPhoneLink = ({ telephone }) => typeof telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + telephone, content: telephone })} itemprop="telephone" class="btn btn-link btn-lg">
 	${phoneIcon}
 	<span>${telephone.includes(',') ? `${telephone.replace('+1-', '').split(',')[0]} ext ${telephone.split(',')[1]}` : telephone.replace('+1-', '')}</span>
 </a>`;
 
-const getEmailLink = ({ email }) => typeof email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + email })} itemprop="email" class="btn btn-link btn-lg">
+const getEmailLink = ({ email }) => typeof email !== 'string' ? '' : `<a ${attr({ href: 'mailto:' + email, content: email })} itemprop="email" class="btn btn-link btn-lg">
 	${emailIcon}
 	<span>${email}</span>
 </a>`;
@@ -41,6 +41,19 @@ const getWebsite = ({ url }) => typeof url === 'string' && URL.canParse(url) ? `
 	${linkIcon}
 	<span>${new URL(url).hostname}</span>
 </a>` : '';
+
+const getTime = time => new Date('2000-01-01T' + time).toLocaleTimeString(navigator.language, {
+	hour: 'numeric',
+	minute: '2-digit',
+});
+
+const getHours = ({ hoursAvailable }) => Array.isArray(hoursAvailable) && hoursAvailable.length !== 0
+	? '<ul class="hours-list block">' +  hoursAvailable.map(({ dayOfWeek, opens, closes }) => `<li class="hours block" itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
+		<b itemprop="dayOfWeek" content="${dayOfWeek}">${dayOfWeek.substring(0, 3)}</b>
+		<time datetime="${opens}" itemprop="opens">${getTime(opens)}</time>
+		<span class="spacer">&mdash;</span>
+		<time datetime="${closes}" itemprop="closes">${getTime(closes)}</time>
+	</li>`).join('') : '';
 
 const categories = [
 	'Housing & Rental Assistance',
@@ -167,9 +180,12 @@ const createPartner = result => {
 		</section>
 
 		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
-			<h3 itemprop="name">${typeof contact.name === 'string' ? `${contact.name} &mdash; ${contact.contactType}` : contact.contactType}</h3>
+			<h3>${typeof contact.name === 'string'
+		? `<span itemprop="name">${contact.name}</span> &mdash; <span itemprop="contactType">${contact.contactType}</span>`
+		: `<span itemprop="contactType">${contact.contactType}</span>`}</h3>
 			${getPhoneLink(contact)}
 			${getEmailLink(contact)}
+			${getHours(contact)}
 			${typeof contact.description === 'string' ? `<p itemprop="description">${contact.description}</p>` : ''}
 		</div>`).join('\n') : ''}`;
 
