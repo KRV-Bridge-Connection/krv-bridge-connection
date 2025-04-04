@@ -12,8 +12,9 @@ import { onSubmit } from '@aegisjsproject/callback-registry/events.js';
 
 const cache = new Map();
 const STORE_NAME = 'partners';
-// const ONE_WEEK = 604800000; // 1 week
-const DB_TTL = 86400000; // 1 Day
+// const ONE_WEEK = 604800000;
+const ONE_DAY = 86400000;
+const DB_TTL = ONE_DAY;
 const storageKey = '_lastSync:partners';
 const [search] = manageSearch('search', '');
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
