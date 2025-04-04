@@ -303,63 +303,81 @@ async function getPartnerInfo({
 	return promise;
 }
 
-export default async function ({ matches, signal, url, params: { partner, category } = {} } = {}) {
-	if (typeof partner === 'string' && partner.length !== 0) {
-		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
-		await syncDB(db, { signal });
+await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(async db => {
+	try {
+		await syncDB(db);
+	} catch(err) {
+		reportError(err);
+	} finally {
 		db.close();
-		const result = await getPartnerInfo(matches, { signal }).catch(err => err);
+	}
+});
 
-		if (result instanceof Error) {
-			return html`<div class="status-box error">${result.message}</div>`;
-		} else if (typeof result === 'object') {
-			return createPartner(result);
-		} else {
-			return html`<h2>Not Found</h2>`;
-		}
-	} else if (typeof category === 'string' && category.length !== 0) {
-		const { searchParams } = new URL(url);
-		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
-		await syncDB(db, { signal });
+export default async function ({ matches, signal, url, params: { partner, category } = {} } = {}) {
+	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 
-		try {
-			const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase(), { indexName: 'categories', signal });
+	try {
+		if (typeof partner === 'string' && partner.length !== 0) {
 			db.close();
+			const result = await getPartnerInfo(matches, { signal }).catch(err => err);
 
-			if (Array.isArray(results) && results.length !== 0) {
+			if (result instanceof Error) {
+				return html`<div class="status-box error">${result.message}</div>`;
+			} else if (typeof result === 'object') {
+				return createPartner(result);
+			} else {
+				return html`<h2>Not Found</h2>`;
+			}
+		} else if (typeof category === 'string' && category.length !== 0) {
+			const { searchParams } = new URL(url);
+
+			try {
+				const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase(), { indexName: 'categories', signal });
+				db.close();
+
+				if (Array.isArray(results) && results.length !== 0) {
+					return html`
+						${searchForm}
+						<h2>Search Results for <q>${searchParams.get('category')}</q></h2>
+						${createPartners(results)}
+						${listCategories()}
+					`;
+				} else {
+					throw new Error(`No results for ${searchParams.get('category')}`);
+				}
+			} catch (err) {
+				reportError(err);
+				db.close();
+
 				return html`
 					${searchForm}
-					<h2>Search Results for <q>${searchParams.get('category')}</q></h2>
-					${createPartners(results)}
+					<div class="status-box error">${err.message}</div>
 					${listCategories()}
 				`;
-			} else {
-				throw new Error(`No results for ${searchParams.get('category')}`);
 			}
-		} catch (err) {
-			reportError(err);
+		} else {
+			const results = await getAllItems(db, STORE_NAME, null, { signal });
 			db.close();
 
 			return html`
 				${searchForm}
-				<div class="status-box error">${err.message}</div>
-				${listCategories()}
+				<div>
+					${createPartners(results.filter(result => result.partner))}
+				</div>
+				<section>
+					<h3>Filter by Category</h3>
+					<div class="flex row wrap">${listCategories()}</div>
+				</section>
 			`;
 		}
-	} else {
-		const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
-		await syncDB(db, { signal });
-		const results = await getAllItems(db, STORE_NAME, null, { signal });
+	} catch(err) {
+		reportError(err);
+		db.close();
 
 		return html`
 			${searchForm}
-			<div>
-				${createPartners(results.filter(result => result.partner))}
-			</div>
-			<section>
-				<h3>Filter by Category</h3>
-				<div class="flex row wrap">${listCategories()}</div>
-			</section>
+			<div class="status-box error">${err.message}</div>
+			${listCategories()}
 		`;
 	}
 }
