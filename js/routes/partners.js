@@ -5,10 +5,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
-import { manageSearch } from '@aegisjsproject/url/search.js';
-import { navigate } from '@aegisjsproject/router/router.js';
-import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit } from '@aegisjsproject/callback-registry/events.js';
+import { getSearch } from '@aegisjsproject/url/search.js';
 
 const cache = new Map();
 const STORE_NAME = 'partners';
@@ -16,7 +13,7 @@ const STORE_NAME = 'partners';
 const ONE_DAY = 86400000;
 const DB_TTL = ONE_DAY;
 const storageKey = '_lastSync:partners';
-const [search] = manageSearch('search', '');
+const category = getSearch('category', '');
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 	<use xlink:href="/img/icons.svg#link-external"></use>
 </svg>`;
@@ -102,20 +99,11 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 
 const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
 
-const submitHandler = registerCallback('org:search:submit', async event => {
-	event.preventDefault();
-	const data = new FormData(event.target);
-	const url = new URL('/resources/', location.origin);
-	url.searchParams.set('category', data.get('category'));
-	await navigate(url);
-	event.target.reset();
-});
-
-const searchForm = `<search>
-	<form id="org-search" action="/resources/" ${onSubmit}="${submitHandler}" method="GET">
+const searchForm = () => `<search>
+	<form id="org-search" action="/resources/" method="GET">
 		<div class="form-group">
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
-			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: search })} list="org-categories" required="" />
+			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString() })} list="org-categories" required="" />
 			<datalist id="org-categories">
 				${categories.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
 			</datalist>
@@ -135,6 +123,34 @@ const searchForm = `<search>
 		</div>
 	</form>
 </search>`;
+
+const search211 = () => `<form action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
+	<fieldset class="no-border">
+		<legend>Search 2-1-1</legend>
+		<p>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</p>
+		<div class="form-group">
+			<label for="211-search" class="input-label required">How can we help?</label>
+			<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" ${attr({ value: category })} autocomplete="off" required="" />
+			<input type="hidden" name="location" value="93240" />
+		</div>
+	</fieldset>
+	<button type="submit" class="btn btn-success">
+		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+			<use xlink:href="/img/icons.svg#search"></use>
+		</svg>
+		<span>Search 211</span>
+	</button>
+	<a href="tel:211" class="btn btn-primary">
+		${phoneIcon}
+		<span>Call 211</span>
+	</button>
+	<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
+		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+			<use xlink:href="/img/icons.svg#link-external"></use>
+		</svg>
+		<span>More information</span>
+	</a>
+</form>`;
 
 const style = css`.partner-image {
 	max-width: 100%;
@@ -335,42 +351,21 @@ export default async function ({ matches, signal, url, params: { partner, catego
 				db.close();
 
 				if (Array.isArray(results) && results.length !== 0) {
-					return html`
-						${searchForm}
+					const frag = html`
+						${searchForm()}
 						<h2>Search Results for <q>${escape(searchParams.get('category'))}</q></h2>
 						${createPartners(results)}
 						${listCategories()}
 					`;
+
+					frag.querySelector('form').action = '/resources/';
+					return frag;
 				} else {
 					const frag = html`
 						<h2 class="status-box error">No Results found for <q>${escape(searchParams.get('category'))}</q></h2>
-						<form action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
-							<fieldset class="no-border">
-								<legend>Search 2-1-1</legend>
-								<p>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</p>
-								<div class="form-group">
-									<label for="211-search" class="input-label required">How can we help?</label>
-									<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" ${attr({ value: searchParams.get('category')})} autocomplete="off" required="" />
-									<input type="hidden" name="location" value="93240" />
-								</div>
-							</fieldset>
-							<button type="submit" class="btn btn-success">
-								<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-									<use xlink:href="/img/icons.svg#search"></use>
-								</svg>
-								<span>Search 211</span>
-							</button>
-							<a href="tel:211" class="btn btn-primary">
-								${phoneIcon}
-								<span>Call 211</span>
-							</button>
-							<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
-								<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-									<use xlink:href="/img/icons.svg#link-external"></use>
-								</svg>
-								<span>More information</span>
-							</a>
-						</form>
+						${search211()}
+						<hr />
+						${listCategories()}
 					`;
 
 					frag.querySelector('form').action = 'https://www.211ca.org/search';
@@ -381,18 +376,21 @@ export default async function ({ matches, signal, url, params: { partner, catego
 				reportError(err);
 				db.close();
 
-				return html`
-					${searchForm}
+				const frag = html`
+					${searchForm()}
 					<div class="status-box error">${err.message}</div>
 					${listCategories()}
 				`;
+
+				frag.querySelector('form').action = '/resources/';
+				return frag;
 			}
 		} else {
 			const results = await getAllItems(db, STORE_NAME, null, { signal });
 			db.close();
 
-			return html`
-				${searchForm}
+			const frag = html`
+				${searchForm()}
 				<div>
 					${createPartners(results.filter(result => result.partner))}
 				</div>
@@ -401,13 +399,16 @@ export default async function ({ matches, signal, url, params: { partner, catego
 					<div class="flex row wrap">${listCategories()}</div>
 				</section>
 			`;
+
+			frag.querySelector('form').action = '/resources/';
+			return frag;
 		}
 	} catch(err) {
 		reportError(err);
 		db.close();
 
 		return html`
-			${searchForm}
+			${searchForm()}
 			<div class="status-box error">${err.message}</div>
 			${listCategories()}
 		`;
