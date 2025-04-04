@@ -1,5 +1,6 @@
 import { site, SCHEMA } from '../consts.js';
 import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
+import { escape } from '@aegisjsproject/core/dom.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
@@ -42,14 +43,11 @@ const getWebsite = ({ url }) => typeof url === 'string' && URL.canParse(url) ? `
 	<span>${new URL(url).hostname}</span>
 </a>` : '';
 
-const getTime = time => new Date('2000-01-01T' + time).toLocaleTimeString(navigator.language, {
-	hour: 'numeric',
-	minute: '2-digit',
-});
+const getTime = time => new Date('2000-01-01T' + time).toLocaleTimeString(navigator.language, { hour: 'numeric', minute: '2-digit'});
 
 const getHours = ({ hoursAvailable }) => Array.isArray(hoursAvailable) && hoursAvailable.length !== 0
 	? '<ul class="hours-list block">' +  hoursAvailable.map(({ dayOfWeek, opens, closes }) => `<li class="hours block" itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
-		<b itemprop="dayOfWeek" content="${dayOfWeek}">${dayOfWeek.substring(0, 3)}</b>
+		<b itemprop="dayOfWeek" content="${dayOfWeek}">${dayOfWeek}</b>
 		<time datetime="${opens}" itemprop="opens">${getTime(opens)}</time>
 		<span class="spacer">&mdash;</span>
 		<time datetime="${closes}" itemprop="closes">${getTime(closes)}</time>
@@ -338,12 +336,45 @@ export default async function ({ matches, signal, url, params: { partner, catego
 				if (Array.isArray(results) && results.length !== 0) {
 					return html`
 						${searchForm}
-						<h2>Search Results for <q>${searchParams.get('category')}</q></h2>
+						<h2>Search Results for <q>${escape(searchParams.get('category'))}</q></h2>
 						${createPartners(results)}
 						${listCategories()}
 					`;
 				} else {
-					throw new Error(`No results for ${searchParams.get('category')}`);
+					const frag = html`
+						<h2 class="status-box error">No Results found for <q>${escape(searchParams.get('category'))}</q></h2>
+						<form action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
+							<fieldset class="no-border">
+								<legend>Search 2-1-1</legend>
+								<p>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</p>
+								<div class="form-group">
+									<label for="211-search" class="input-label required">How can we help?</label>
+									<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" ${attr({ value: searchParams.get('category')})} autocomplete="off" required="" />
+									<input type="hidden" name="location" value="93240" />
+								</div>
+							</fieldset>
+							<button type="submit" class="btn btn-success">
+								<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+									<use xlink:href="/img/icons.svg#search"></use>
+								</svg>
+								<span>Search 211</span>
+							</button>
+							<a href="tel:211" class="btn btn-primary">
+								${phoneIcon}
+								<span>Call 211</span>
+							</button>
+							<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
+								<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+									<use xlink:href="/img/icons.svg#link-external"></use>
+								</svg>
+								<span>More information</span>
+							</a>
+						</form>
+					`;
+
+					frag.querySelector('form').action = 'https://www.211ca.org/search';
+
+					return frag;
 				}
 			} catch (err) {
 				reportError(err);
