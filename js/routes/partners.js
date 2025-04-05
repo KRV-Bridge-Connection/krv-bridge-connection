@@ -6,7 +6,11 @@ import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
+import { createSVGFallbackLogo } from '../functions.js';
 
+const darkMode = matchMedia('(prefers-color-scheme: dark)');
+const getSVGFill = () => darkMode.matches ? '#242424' : '#fafafa';
+const getSVGTextColor = () => darkMode.matches ? '#fefefe' : '#232323';
 const cache = new Map();
 const STORE_NAME = 'partners';
 // const ONE_WEEK = 604800000;
@@ -184,7 +188,9 @@ const createPartner = result => {
 		<h2>
 			<span itemprop="name">${result.name}</span>
 		</h2>
-		<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: result.image.alt ?? result.name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		${typeof result?.image?.src === 'string'
+		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
+		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor() }).outerHTML}
 		<div class="flex row wrap">${result.categories.map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
 		<section class="card main-contact">
@@ -215,7 +221,9 @@ const createPartner = result => {
 
 const createPartners = results => results.map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
 	<b class="block partner-name">${name}</b>
-	<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	${typeof image?.src === 'string'
+		? `<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
+		: createSVGFallbackLogo(name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor() }).outerHTML}
 	<p>${description}</p>
 	<a href="/${partner ? 'partners' : 'resources'}/${id}" class="btn btn-primary btn-lg">
 		<svg height="18" width="18" fill="currentColor" aria-hidden="true">
