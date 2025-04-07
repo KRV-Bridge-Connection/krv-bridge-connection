@@ -2,11 +2,41 @@ import { site, SCHEMA } from '../consts.js';
 import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
 import { escape } from '@aegisjsproject/core/dom.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
-import { md } from '@aegisjsproject/markdown';
 import { css } from '@aegisjsproject/core/parsers/css.js';
+import { md } from '@aegisjsproject/markdown';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { createSVGFallbackLogo } from '../functions.js';
+
+const style = css`.partner-image {
+	max-width: 100%;
+	height: auto;
+	background-color: #fafafa;
+	background-color: light-dark(transparent, #fafafa);
+	padding: 0.3em;
+	border-radius: 4px;
+}
+
+.card.org-card, .card.resource-contact {
+	border-color: #dadada;
+	border-color: light-dark(#dadada, rgb(73, 80, 87));
+	margin-bottom: 0.5em;
+}
+
+.org-card .partner-name {
+	font-size: 1.4em;
+	font-weight: 700;
+	margin-bottom: 0.3em;
+}
+
+.org-card .btn-lg {
+	min-width: 11em;
+}
+
+svg.resource-logo {
+	aspect-ratio: 8/3;
+	height: auto;
+}`;
 
 const darkMode = matchMedia('(prefers-color-scheme: dark)');
 const getSVGFill = () => darkMode.matches ? '#242424' : '#fafafa';
@@ -18,6 +48,39 @@ const ONE_DAY = 86400000;
 const DB_TTL = ONE_DAY;
 const storageKey = '_lastSync:partners';
 const category = getSearch('category', '');
+export const ORG_CATEGORIES = [
+	'Housing & Rental Assistance',
+	'Mental Health',
+	'Substance Abuse',
+	'Suicide Prevention',
+	'Domestic Violence',
+	'Sexual Assault',
+	'Human Trafficking',
+	'Child Abuse',
+	'Post-Incarceration Support',
+	'Veteran\'s Services',
+	'Senior Services',
+	'Disabled Services',
+	'Legal Assistance',
+	'Family & Pregnancy Resources',
+	'Transportation',
+	'Food',
+	'Clothing',
+	'Financial Services',
+	'Law Enforcement',
+	'Healthcare',
+	'Utility Assistance',
+	'Disaster Relief & Recovery',
+	'Employment',
+	'Education',
+	'Business',
+	'Entrepreneurship',
+	'Insurance',
+	'Borel Fire',
+	'Homelessness',
+	'Elected Officials',
+].sort();
+
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 	<use xlink:href="/img/icons.svg#link-external"></use>
 </svg>`;
@@ -55,39 +118,6 @@ const getHours = ({ hoursAvailable }) => Array.isArray(hoursAvailable) && hoursA
 		<time datetime="${closes}" itemprop="closes">${getTime(closes)}</time>
 	</li>`).join('') : '';
 
-const categories = [
-	'Housing & Rental Assistance',
-	'Mental Health',
-	'Substance Abuse',
-	'Suicide Prevention',
-	'Domestic Violence',
-	'Sexual Assault',
-	'Human Trafficking',
-	'Child Abuse',
-	'Post-Incarceration Support',
-	'Veteran\'s Services',
-	'Senior Services',
-	'Disabled Services',
-	'Legal Assistance',
-	'Family & Pregnancy Resources',
-	'Transportation',
-	'Food',
-	'Clothing',
-	'Financial Services',
-	'Law Enforcement',
-	'Healthcare',
-	'Utility Assistance',
-	'Disaster Relief & Recovery',
-	'Employment',
-	'Education',
-	'Business',
-	'Entrepreneurship',
-	'Insurance',
-	'Borel Fire',
-	'Homelessness',
-	'Elected Officials',
-].sort();
-
 const getCategoryLink = (category) => {
 	const link = new URL('/resources/', location.origin);
 	link.searchParams.set('category', category);
@@ -101,7 +131,7 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 	<span>${category}</span>
 </a>`;
 
-const listCategories = () => categories.map(category => categoryLink(category)).join(' ');
+const listCategories = () => ORG_CATEGORIES.map(category => categoryLink(category)).join(' ');
 
 const searchForm = () => `<search>
 	<form id="org-search" action="/resources/" method="GET">
@@ -109,7 +139,7 @@ const searchForm = () => `<search>
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
 			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString() })} list="org-categories" required="" />
 			<datalist id="org-categories">
-				${categories.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
+				${ORG_CATEGORIES.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
 			</datalist>
 			<br />
 			<button type="submit" class="btn btn-success">
@@ -156,31 +186,6 @@ const search211 = () => `<form action="https://www.211ca.org/search" method="GET
 	</a>
 </form>`;
 
-const style = css`.partner-image {
-	max-width: 100%;
-	height: auto;
-	background-color: #fafafa;
-	background-color: light-dark(transparent, #fafafa);
-	padding: 0.3em;
-	border-radius: 4px;
-}
-
-.card.org-card {
-	border-color: #dadada;
-	border-color: light-dark(#dadada, rgb(73, 80, 87));
-	margin-bottom: 0.5em;
-}
-
-.org-card .partner-name {
-	font-size: 1.4em;
-	font-weight: 700;
-	margin-bottom: 0.3em;
-}
-
-.org-card .btn-lg {
-	min-width: 11em;
-}`;
-
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
 const createPartner = result => {
@@ -190,20 +195,21 @@ const createPartner = result => {
 		</h2>
 		${typeof result?.image?.src === 'string'
 		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
-		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor() }).outerHTML}
+		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 		<div class="flex row wrap">${result.categories.map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
-		<section class="card main-contact">
+		<section class="card resource-contact main-contact">
 			<h3>Main Contact</h3>
 			${getEmailLink(result)}
 			${getPhoneLink(result)}
 			${getWebsite(result)}
 		</section>
 
-		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
+		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
 			<h3>${typeof contact.name === 'string'
 		? `<span itemprop="name">${contact.name}</span> &mdash; <span itemprop="contactType">${contact.contactType}</span>`
 		: `<span itemprop="contactType">${contact.contactType}</span>`}</h3>
+			${typeof contact.description === 'string' ? `<p itemprop="description">${escape(contact.description)}</p>` : ''}
 			${getPhoneLink(contact)}
 			${getEmailLink(contact)}
 			${getHours(contact)}
@@ -223,7 +229,7 @@ const createPartners = results => results.map(({ name, description, image, partn
 	<b class="block partner-name">${name}</b>
 	${typeof image?.src === 'string'
 		? `<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
-		: createSVGFallbackLogo(name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor() }).outerHTML}
+		: createSVGFallbackLogo(name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 	<p>${description}</p>
 	<a href="/${partner ? 'partners' : 'resources'}/${id}" class="btn btn-primary btn-lg">
 		<svg height="18" width="18" fill="currentColor" aria-hidden="true">
