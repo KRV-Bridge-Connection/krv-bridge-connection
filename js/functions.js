@@ -9,6 +9,7 @@ export function createSVGFallbackLogo(text, {
 	fontSize = 16,
 	fontWeight = 400,
 	borderRadius = 5,
+	classList,
 } = {}) {
 	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -34,6 +35,12 @@ export function createSVGFallbackLogo(text, {
 	textElement.setAttribute('text-anchor', 'middle');
 
 	svg.append(rect, textElement);
+
+	if (Array.isArray(classList)) {
+		svg.classList.add(...classList);
+	} else if (typeof classList === 'string') {
+		svg.classList.add(classList);
+	}
 
 	// Important: Append SVG to document body temporarily for text measurement
 	document.body.appendChild(svg);

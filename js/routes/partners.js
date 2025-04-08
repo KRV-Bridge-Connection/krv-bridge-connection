@@ -137,7 +137,7 @@ const searchForm = () => `<search>
 	<form id="org-search" action="/resources/" method="GET">
 		<div class="form-group">
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
-			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString() })} list="org-categories" required="" />
+			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString() })} list="org-categories" autofocus="" required="" />
 			<datalist id="org-categories">
 				${ORG_CATEGORIES.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
 			</datalist>
@@ -212,6 +212,7 @@ const createPartner = result => {
 			${typeof contact.description === 'string' ? `<p itemprop="description">${escape(contact.description)}</p>` : ''}
 			${getPhoneLink(contact)}
 			${getEmailLink(contact)}
+			${getWebsite(contact)}
 			${getHours(contact)}
 			${typeof contact.description === 'string' ? `<p itemprop="description">${contact.description}</p>` : ''}
 		</div>`).join('\n') : ''}`;
