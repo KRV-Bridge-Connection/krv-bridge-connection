@@ -4,11 +4,13 @@ import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from '
 const STORE = 'partners';
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-function transformPartner({ lastUpdated, categories, hoursAvailable = {}, ...data }) {
+const headers = { 'Cache-Control': 'public, max-age=86400' };
+
+function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data }) {
 	return {
 		...data,
 		lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString(),
-		categories: Array.isArray(categories) ? categories.map(category => category.toLowerCase()) : [],
+		keywords: Array.isArray(keywords) ? keywords.map(keyword => keyword.toLowerCase()) : [],
 		hoursAvailable: Array.isArray(hoursAvailable)
 			? hoursAvailable.sort((day1, day2) => DAYS.indexOf(day1.dayOfWeek) - DAYS.indexOf(day2.dayOfWeek))
 			: []
@@ -28,15 +30,15 @@ export default createHandler({
 				throw new HTTPNotFoundError(`No results for ${params.get('id')}.`);
 			}
 		} else if (params.has('category')) {
-			const results = await getCollectionItemsWhere(STORE, 'categories', 'array-contains', params.get('category'));
-			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200 });
+			const results = await getCollectionItemsWhere(STORE, 'keywords', 'array-contains', params.get('category').toLowerCase());
+			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200 }, { headers });
 		} else if (params.has('lastUpdated')) {
 			const lastUpdated = new Date(params.get('lastUpdated'));
 			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
 			return Response.json(results.map(transformPartner));
 		} else {
 			const partners = await getCollectionItems(STORE, { limit: 100 });
-			return Response.json(partners.map(transformPartner));
+			return Response.json(partners.map(transformPartner), { headers });
 		}
 	},
 });
