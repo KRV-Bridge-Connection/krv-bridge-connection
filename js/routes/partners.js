@@ -118,6 +118,28 @@ const getHours = ({ hoursAvailable }) => Array.isArray(hoursAvailable) && hoursA
 		<time datetime="${closes}" itemprop="closes">${getTime(closes)}</time>
 	</li>`).join('') : '';
 
+function getAddress({
+	address: {
+		streetAddress,
+		postOfficeBoxNumber,
+		addressLocality,
+		addressRegion = 'CA',
+		postalCode,
+		addressCountry = 'US',
+	} = {}
+} = {}) {
+	return typeof streetAddress === 'string' ? `<div itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+		<div itemprop="streetAddress">${streetAddress}</div>
+		${postOfficeBoxNumber ? `<div itemprop="postOfficeBoxNumber">P.O. Box ${postOfficeBoxNumber}</div>` : ''}
+		<div>
+			<span itemprop="addressLocality">${addressLocality}</span>,
+			<span itemprop="addressRegion">${addressRegion ?? 'CA'}</span>
+			<span itemprop="postalCode">${postalCode}</span>
+		</div>
+		<div itemprop="addressCountry">${addressCountry ?? 'US'}</div>
+	</div>` : '';
+}
+
 const getCategoryLink = (category) => {
 	const link = new URL('/resources/', location.origin);
 	link.searchParams.set('category', category);
@@ -128,7 +150,7 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 	<svg class="icon" width="16" height="16" fill="currentColor" aria-hidden="true">
 		<use xlink:href="/img/icons.svg#tag"></use>
 	</svg>
-	<span>${category}</span>
+	<span itemprop="keywords">${category}</span>
 </a>`;
 
 const listCategories = () => ORG_CATEGORIES.map(category => categoryLink(category)).join(' ');
@@ -196,13 +218,14 @@ const createPartner = result => {
 		${typeof result?.image?.src === 'string'
 		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
 		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
-		<div class="flex row wrap">${result.categories.map(category => categoryLink(category)).join(' ')}</div>
+		<div class="flex row wrap">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
 		<section class="card resource-contact main-contact">
 			<h3>Main Contact</h3>
 			${getEmailLink(result)}
 			${getPhoneLink(result)}
 			${getWebsite(result)}
+			${getAddress(result)}
 		</section>
 
 		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
@@ -213,8 +236,8 @@ const createPartner = result => {
 			${getPhoneLink(contact)}
 			${getEmailLink(contact)}
 			${getWebsite(contact)}
+			${getAddress(contact)}
 			${getHours(contact)}
-			${typeof contact.description === 'string' ? `<p itemprop="description">${contact.description}</p>` : ''}
 		</div>`).join('\n') : ''}`;
 
 	if (typeof result.content === 'string' && result.content.length !== 0) {
