@@ -388,7 +388,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			const { searchParams } = new URL(url);
 
 			try {
-				const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase(), { indexName: 'keywords', signal });
+				const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase().trim(), { indexName: 'keywords', signal });
 				db.close();
 
 				if (Array.isArray(results) && results.length !== 0) {
