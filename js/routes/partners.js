@@ -155,11 +155,11 @@ const categoryLink = category => `<a href="${getCategoryLink(category)}" class="
 
 const listCategories = () => ORG_CATEGORIES.map(category => categoryLink(category)).join(' ');
 
-const searchForm = () => `<search>
+const searchForm = ({ autoFocus = false } = {}) => `<search>
 	<form id="org-search" action="/resources/" method="GET">
 		<div class="form-group">
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
-			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString() })} list="org-categories" autofocus="" required="" />
+			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" autocomplete="off" ${attr({ value: category.toString(), autofocus: autoFocus })} list="org-categories" required="" />
 			<datalist id="org-categories">
 				${ORG_CATEGORIES.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
 			</datalist>
@@ -180,33 +180,35 @@ const searchForm = () => `<search>
 	</form>
 </search>`;
 
-const search211 = () => `<form action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
-	<fieldset class="no-border">
-		<legend>Search 2-1-1</legend>
-		<p>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</p>
-		<div class="form-group">
-			<label for="211-search" class="input-label required">How can we help?</label>
-			<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" ${attr({ value: category })} autocomplete="off" required="" />
-			<input type="hidden" name="location" value="93240" />
-		</div>
-	</fieldset>
-	<button type="submit" class="btn btn-success">
-		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-			<use xlink:href="/img/icons.svg#search"></use>
-		</svg>
-		<span>Search 211</span>
-	</button>
-	<a href="tel:211" class="btn btn-primary">
-		${phoneIcon}
-		<span>Call 211</span>
-	</button>
-	<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
-		<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-			<use xlink:href="/img/icons.svg#link-external"></use>
-		</svg>
-		<span>More information</span>
-	</a>
-</form>`;
+const search211 = () => `<search>
+	<form id="search-211" action="https://www.211ca.org/search" method="GET" target="_blank" rel="noopener noreferrer external">
+		<fieldset class="no-border">
+			<legend>Search 2-1-1</legend>
+			<p>211 is a free information and referral service that connects people to health and human services in their community 24 hours a day, 7 days a week.</p>
+			<div class="form-group">
+				<label for="211-search" class="input-label required">How can we help?</label>
+				<input type="search" name="search" id="211-search" class="input" placeholder="What are you searching for?" list="211-suggestions" ${attr({ value: category })} autocomplete="off" required="" />
+				<input type="hidden" name="location" value="93240" />
+			</div>
+		</fieldset>
+		<button type="submit" class="btn btn-success">
+			<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+				<use xlink:href="/img/icons.svg#search"></use>
+			</svg>
+			<span>Search 211</span>
+		</button>
+		<a href="tel:211" class="btn btn-primary">
+			${phoneIcon}
+			<span>Call 211</span>
+		</button>
+		<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
+			<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+				<use xlink:href="/img/icons.svg#link-external"></use>
+			</svg>
+			<span>More information</span>
+		</a>
+	</form>
+</search>`;
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
@@ -220,13 +222,13 @@ const createPartner = result => {
 		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 		<div class="flex row wrap">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
-		<section class="card resource-contact main-contact">
+		${['email', 'telephone', 'url', 'address'].some(prop => result.hasOwnProperty(prop)) ? `<section class="card resource-contact main-contact">
 			<h3>Main Contact</h3>
 			${getEmailLink(result)}
 			${getPhoneLink(result)}
 			${getWebsite(result)}
 			${getAddress(result)}
-		</section>
+		</section>` : ''}
 
 		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
 			<h3>${typeof contact.name === 'string'
@@ -390,20 +392,27 @@ export default async function ({ matches, signal, url, params: { partner, catego
 
 				if (Array.isArray(results) && results.length !== 0) {
 					const frag = html`
-						${searchForm()}
+						${searchForm({ autoFocus: false })}
 						<h2>Search Results for <q>${escape(searchParams.get('category'))}</q></h2>
 						${createPartners(results)}
-						${listCategories()}
+						<hr />
+						<section>
+							<h2>Not finding what you're looking for? Search 2-1-1.</h2>
+							${search211({ autoFocus: false })}
+						</section>
+						<div class="flex row wrap">${listCategories()}</div>
 					`;
 
-					frag.querySelector('form').action = '/resources/';
+					frag.getElementById('org-search').action = '/resources/';
+					frag.getElementById('search-211').action = 'https://www.211ca.org/search';
+
 					return frag;
 				} else {
 					const frag = html`
 						<h2 class="status-box error">No Results found for <q>${escape(searchParams.get('category'))}</q></h2>
 						${search211()}
 						<hr />
-						${listCategories()}
+						<div class="flex row wrap">${listCategories()}</div>
 					`;
 
 					frag.querySelector('form').action = 'https://www.211ca.org/search';
@@ -415,9 +424,9 @@ export default async function ({ matches, signal, url, params: { partner, catego
 				db.close();
 
 				const frag = html`
-					${searchForm()}
+					${searchForm({ autoFocus: true })}
 					<div class="status-box error">${err.message}</div>
-					${listCategories()}
+					<div class="flex row wrap">${listCategories()}</div>
 				`;
 
 				frag.querySelector('form').action = '/resources/';
@@ -428,7 +437,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			db.close();
 
 			const frag = html`
-				${searchForm()}
+				${searchForm({ autoFocus: false })}
 				<div>
 					${createPartners(results.filter(result => result.partner))}
 				</div>
@@ -446,7 +455,7 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		db.close();
 
 		return html`
-			${searchForm()}
+			${searchForm({ autoFocus: true })}
 			<div class="status-box error">${err.message}</div>
 			${listCategories()}
 		`;
