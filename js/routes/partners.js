@@ -159,10 +159,10 @@ const listCategories = () => ORG_CATEGORIES.map(category => categoryLink(categor
 
 const searchForm = ({ autoFocus = false } = {}) => `<search>
 	<form id="org-search" action="/resources/" method="GET" itemprop="potentialAction" itemtype="https://schema.org/SearchAction" itemscope="">
-		<meta itemprop="target" ${attr({ content: `${new URL(location.pathname, location.origin)}?category={query}` })}/>
+		<meta itemprop="target" ${attr({ content: `${new URL(location.pathname, location.origin)}?category={category}` })}/>
 		<div class="form-group">
 			<label for="search-orgs" class="visually-hidden">Search by Category</label>
-			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" itemprop="query" autocomplete="off" ${attr({ value: category.toString(), autofocus: autoFocus })} list="org-categories" required="" />
+			<input type="search" name="category" id="search-orgs" class="input" placeholder="Search by category" itemprop="query query-input" autocomplete="off" ${attr({ value: category.toString(), autofocus: autoFocus })} list="org-categories" required="" />
 			<datalist id="org-categories">
 				${ORG_CATEGORIES.map((category) => `<option ${attr({ label: category, value: category })}></option>`).join('\n')}
 			</datalist>
