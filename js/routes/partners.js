@@ -80,6 +80,7 @@ export const ORG_CATEGORIES = [
 	'Borel Fire',
 	'Homelessness',
 	'Elected Officials',
+	'Public Safety',
 ].sort();
 
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">

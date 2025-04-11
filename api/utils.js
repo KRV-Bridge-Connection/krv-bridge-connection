@@ -59,7 +59,9 @@ export async function getCollectionItems(name, {
 		  });
 	}
 
-	const snapshot = await query.offset((page - 1) * limit).limit(limit).get();
+	const snapshot = Number.isSafeInteger(limit) && limit > 0
+		? await query.offset((page - 1) * limit).limit(limit).get()
+		: await query.get();
 
 	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
