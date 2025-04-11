@@ -83,6 +83,8 @@ export const ORG_CATEGORIES = [
 	'Public Safety',
 ].sort();
 
+const sortPartners = (a, b) => a.partner === b.partner ? 0 : a.partner ? -1 : 1;
+
 const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
 	<use xlink:href="/img/icons.svg#link-external"></use>
 </svg>`;
@@ -254,7 +256,7 @@ const createPartner = result => {
 	return page;
 };
 
-const createPartners = results => results.map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
+const createPartners = results => results.sort(sortPartners).map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
 	<b class="block partner-name">${name}</b>
 	${typeof image?.src === 'string'
 		? `<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
