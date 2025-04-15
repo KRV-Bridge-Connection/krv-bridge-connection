@@ -1,8 +1,9 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey } from './utils.js';
+import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
+import { getSUID } from '@shgysk8zer0/suid';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
@@ -120,7 +121,10 @@ export default createHandler({
 						.map(field => typeof field === 'string' && field.length !== 0 ? encrypt(key, field, { output: BASE64 }) : null)
 				);
 
-				const result = await addCollectionItem('pantry-schedule', {
+				const created = new Date();
+				const id = getSUID({ date: created, alphabet: 'base64url' });
+
+				await putCollectionItem(COLLECTION, id, {
 					name: data.get('name'),
 					email,
 					telephone,
@@ -128,7 +132,7 @@ export default createHandler({
 					postalCode: data.get('postalCode'),
 					household: parseInt(data.get('household')),
 					comments,
-					created: new Date(),
+					created,
 					date,
 					points: parseInt(data.get('household')) * 30,
 				});
@@ -159,8 +163,8 @@ export default createHandler({
 				await message.send({ signal: req.signal }).catch(console.error);
 
 				return Response.json({
-					id: result.id,
-					message: `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your reference code is ${result.id}.`,
+					id: id,
+					message: `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your reference code is ${id}.`,
 					date: date.toISOString(),
 				});
 			}
@@ -196,4 +200,6 @@ export default createHandler({
 			}
 		}
 	}
+}, {
+	logger: err => console.error(err),
 });
