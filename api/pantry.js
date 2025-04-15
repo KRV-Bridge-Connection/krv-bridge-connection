@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, deleteCollectionItem, getCollectionItem, getCollectionItems, getPublicKey } from './utils.js';
+import { addCollectionItem, deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
@@ -21,8 +21,29 @@ export default createHandler({
 		const { searchParams } = new URL(req.url);
 		const token = req.cookies.get('org-jwt');
 
-		if (typeof token !== 'string' || token.length === 0) {
-			throw new HTTPUnauthorizedError('Missing required token for request.');
+		if (searchParams.has('name')) {
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['pantry-schedule:get'],
+				roles: ['admin'],
+			});
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
+			} else {
+				const db = await getFirestore();
+				const now = new Date();
+				const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 14);
+
+				const collectionRef = db.collection(COLLECTION);
+				const query = collectionRef
+				  .where('name', '==', searchParams.get('name'))
+				  .where('date', '>=', startDate);
+
+				const snapshot = await query.count().get();
+				const count = snapshot.data().count;
+
+				return Response.json({ count, allowed: count < 2, since: startDate.toISOString() });
+			}
 		} else if (! searchParams.has('id')) {
 			const result = await verifyJWT(token, await getPublicKey(), {
 				entitlements: ['pantry-schedule:get'],
