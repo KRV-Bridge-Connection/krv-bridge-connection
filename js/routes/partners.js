@@ -48,6 +48,7 @@ const ONE_DAY = 86400000;
 const DB_TTL = ONE_DAY;
 const storageKey = '_lastSync:partners';
 const category = getSearch('category', '');
+
 export const ORG_CATEGORIES = [
 	'Housing & Rental Assistance',
 	'Mental Health',
@@ -82,6 +83,10 @@ export const ORG_CATEGORIES = [
 	'Elected Officials',
 	'Public Safety',
 ].sort();
+
+const ALIASES = {
+	'medical': 'healthcare',
+};
 
 const sortPartners = (a, b) => a.partner === b.partner ? 0 : a.partner ? -1 : 1;
 
@@ -132,15 +137,16 @@ function getAddress({
 		addressCountry = 'US',
 	} = {}
 } = {}) {
-	return typeof streetAddress === 'string' ? `<div itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
-		<div itemprop="streetAddress">${streetAddress}</div>
-		${postOfficeBoxNumber ? `<div itemprop="postOfficeBoxNumber">P.O. Box ${postOfficeBoxNumber}</div>` : ''}
+	console.log({ streetAddress, postOfficeBoxNumber });
+	return (typeof streetAddress === 'string' || typeof postOfficeBoxNumber === 'string') ? `<div itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+		${typeof streetAddress === 'string' ? `<div itemprop="streetAddress">${streetAddress}</div>` : ''}
+		${typeof postOfficeBoxNumber === 'string' ? `<div itemprop="postOfficeBoxNumber">P.O. Box ${postOfficeBoxNumber}</div>` : ''}
 		<div>
 			<span itemprop="addressLocality">${addressLocality}</span>,
 			<span itemprop="addressRegion">${addressRegion ?? 'CA'}</span>
 			<span itemprop="postalCode">${postalCode}</span>
 		</div>
-		<div itemprop="addressCountry">${addressCountry ?? 'US'}</div>
+		<div itemprop="addressCountry" hidden="">${addressCountry ?? 'US'}</div>
 	</div>` : '';
 }
 
@@ -218,6 +224,7 @@ const search211 = () => `<search>
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
 const createPartner = result => {
+	console.log(result);
 	const page = html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 		<h2>
 			<span itemprop="name">${result.name}</span>
@@ -377,7 +384,10 @@ export default async function ({ matches, signal, url, params: { partner, catego
 	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 
 	try {
-		if (typeof partner === 'string' && partner.length !== 0) {
+		if (typeof category === 'string' && ALIASES.hasOwnProperty(category.toLowerCase())) {
+			url.searchParams.set('category', ALIASES[category.toLowerCase()]);
+			return url;
+		} else if (typeof partner === 'string' && partner.length !== 0) {
 			db.close();
 			const result = await getPartnerInfo(matches, { signal }).catch(err => err);
 
