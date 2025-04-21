@@ -8,13 +8,28 @@ import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 
+// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=AS120931
+// Setup on FeedingAmerica
+
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
+
+export const openCheckIn = ({ rawValue } = {}) => {
+	if (typeof rawValue === 'string' && /[A-z\d]{8}/.test(rawValue)) {
+		const url = new URL('https://training.neighborintake.org/search-results');
+		url.searchParams.set('searchCategory', 'Alt. Id');
+		url.searchParams.set('searchTerm', rawValue);
+		window.open(url);
+	}
+};
 
 const numberClass = 'small-numeric';
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
-const BARCODE_FORMATS = ['upc_a'];
+const BARCODE = 'upc_a';
+const QR_CODE = 'qr_code';
+const ENABLE_NEIGHBORHOD_INTAKE = false;
+const BARCODE_FORMATS = ENABLE_NEIGHBORHOD_INTAKE ? [BARCODE, QR_CODE] : [BARCODE];
 const FRAME_RATE = 12;
 const UPC_A_PATTERN = /^\d{12}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
@@ -360,7 +375,14 @@ export default function({ signal }) {
 	if ('BarcodeDetector' in globalThis) {
 		createBarcodeReader(async result => {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
-				await _addToCart(result.rawValue);
+				switch (result.format) {
+					case BARCODE:
+						await _addToCart(result.rawValue);
+						break;
+
+					case QR_CODE:
+						openCheckIn(result);
+				}
 			}
 		}, { signal }).then(({ video }) => {
 			const details = document.createElement('details');
