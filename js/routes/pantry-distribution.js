@@ -15,11 +15,11 @@ export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
 export const openCheckIn = ({ rawValue } = {}) => {
-	if (typeof rawValue === 'string' && /[A-z\d]{8}/.test(rawValue)) {
+	if (typeof rawValue === 'string' && /^[A-z\d]{7,9}$/.test(rawValue)) {
 		const url = new URL('https://training.neighborintake.org/search-results');
 		url.searchParams.set('searchCategory', 'Alt. Id');
 		url.searchParams.set('searchTerm', rawValue);
-		window.open(url);
+		globalThis.open(url);
 	}
 };
 
