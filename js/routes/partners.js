@@ -52,6 +52,7 @@ const category = getSearch('category', '');
 export const ORG_CATEGORIES = [
 	'Housing & Rental Assistance',
 	'Mental Health',
+	'Behavioral Health',
 	'Substance Abuse',
 	'Suicide Prevention',
 	'Domestic Violence',
