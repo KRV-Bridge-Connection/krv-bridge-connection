@@ -44,7 +44,7 @@ document.addEventListener(NAV_EVENT, event => {
 
 			loadHandler();
 		}
-	}, { signal: AbortSignal.timeout(10_000)});
+	});
 });
 
 if (! CSS.supports('height', '1dvh')) {

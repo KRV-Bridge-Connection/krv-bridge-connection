@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.3] - 2025-04-25
+
+### Changed
+- Various updates & fixes to routes and handlers
+
 ## [v1.1.2] - 2025-04-10
 
 ### Changed
