@@ -12,7 +12,7 @@ const sizes = ['X-Small', 'Small', 'Medium', 'Large', 'XL', 'XXL', 'XXXL'];
 const skillList = ['Construction', 'Food Services', 'CPR', 'Teaching', 'Sound/Music', 'Writing', 'Design/Flyers', 'Social Media'];
 const interestsList = [
 	'KRV Pantry', 'Manual labor', 'Working a booth', 'Event setup/teardown', 'Serving food', 'Trash pickup/cleaning',
-	'Childcare', 'Transportation',
+	'Childcare', 'Transportation', 'Gardening', 'Tutoring/Mentoring', 'Photography', 'Security', 'Marketing/Promotions',
 ];
 
 const allergyList = [
