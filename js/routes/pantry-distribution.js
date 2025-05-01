@@ -7,16 +7,18 @@ import { onClick, onChange, onSubmit, onReset, signal as signalAttr, registerSig
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
+import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescanner';
 
-// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=AS120931
+// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
 // Setup on FeedingAmerica
 
+const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
 export const openCheckIn = ({ rawValue } = {}) => {
 	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
-		const url = new URL('https://training.neighborintake.org/search-results');
+		const url = new URL('/search-results', NEIGBOR_INTAKE);
 		url.searchParams.set('searchCategory', 'Alt. Id');
 		url.searchParams.set('searchTerm', rawValue.trim());
 		globalThis.open(url);
@@ -26,14 +28,10 @@ export const openCheckIn = ({ rawValue } = {}) => {
 const numberClass = 'small-numeric';
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
-const BARCODE = 'upc_a';
-const QR_CODE = 'qr_code';
 const ENABLE_NEIGHBORHOD_INTAKE = false;
-const BARCODE_FORMATS = ENABLE_NEIGHBORHOD_INTAKE ? [BARCODE, QR_CODE] : [BARCODE];
-const FRAME_RATE = 12;
+const BARCODE_FORMATS = ENABLE_NEIGHBORHOD_INTAKE ? [UPC_A, QR_CODE] : [UPC_A];
 const UPC_A_PATTERN = /^\d{12}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
-const SCAN_DELAY = 1000;
 const [cart, setCart] = manageState('cart', []);
 
 const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
@@ -75,102 +73,6 @@ document.adoptedStyleSheets = [
 		text-decoration: underline;
 	}`,
 ];
-
-function playChime() {
-	const ctx = new AudioContext();
-	const osc = ctx.createOscillator();
-	const gain = ctx.createGain();
-
-	osc.type = 'sine';
-	osc.frequency.setValueAtTime(1000, ctx.currentTime); // 1kHz ding
-	gain.gain.setValueAtTime(0.2, ctx.currentTime); // Adjust volume
-
-	osc.connect(gain);
-	gain.connect(ctx.destination);
-
-	osc.start();
-	osc.stop(ctx.currentTime + 0.2); // Short chime
-}
-
-async function createBarcodeReader(cb = console.log, {
-	delay = SCAN_DELAY,
-	facingMode = 'environment',
-	formats = BARCODE_FORMATS,
-	frameRate = FRAME_RATE,
-	signal,
-} = {}) {
-	const { promise, resolve, reject } = Promise.withResolvers();
-
-	if (! ('BarcodeDetector' in globalThis)) {
-		reject(new DOMException('`BarcodeDetector` is not supported.'));
-	} else if (signal instanceof AbortSignal && signal.aborted) {
-		reject(signal.reason);
-	} else {
-		let frame = NaN;
-		const controller = new AbortController();
-		const sig = signal instanceof AbortSignal ? AbortSignal.any([signal, controller.signal]) : controller.signal;
-		const scanner = new globalThis.BarcodeDetector({ formats });
-		const wakeLock = 'wakeLock' in navigator ? await navigator.wakeLock.request('screen').catch(() => undefined) : undefined;
-		const video = document.createElement('video');
-		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: false,
-			video: { frameRate, facingMode },
-		});
-
-		video.srcObject = stream;
-		video.play();
-
-		const canvas = new OffscreenCanvas(640, 480);
-		const ctx = canvas.getContext('2d');
-
-		async function drawFrame() {
-			try {
-				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-				const results = await scanner.detect(ctx.canvas).catch(err => {
-					reportError(err);
-					return [];
-				});
-
-				if (results.length !== 0) {
-					playChime();
-					await Promise.allSettled(results.map(cb));
-					await new Promise(resolve => setTimeout(resolve, delay));
-				}
-
-				if (! sig.aborted) {
-					frame = video.requestVideoFrameCallback(drawFrame);
-				}
-			} catch(err) {
-				alert(err.message);
-			}
-		}
-
-		video.addEventListener('loadedmetadata', ({ target }) => {
-			const tracks = stream.getVideoTracks();
-			const { width, height } = tracks[0].getSettings();
-			target.width = width;
-			target.height = height;
-			canvas.width = width;
-			canvas.height = height;
-			resolve({ controller, video, stream, wakeLock });
-			drawFrame();
-		}, { once: true, signal: sig });
-
-		sig.addEventListener('abort', async () => {
-			video.cancelVideoFrameCallback(frame);
-			video.pause();
-			ctx.reset();
-			stream.getTracks().forEach(track => track.stop());
-
-			if (typeof wakeLock === 'object') {
-				await wakeLock.release();
-			}
-		}, { once: true });
-	}
-
-	return promise;
-}
 
 const _openDB = async () => await openDB(SCHEMA.name, {
 	version: SCHEMA.version,
@@ -376,7 +278,7 @@ export default function({ signal }) {
 		createBarcodeReader(async result => {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				switch (result.format) {
-					case BARCODE:
+					case UPC_A:
 						await _addToCart(result.rawValue);
 						break;
 
@@ -384,7 +286,7 @@ export default function({ signal }) {
 						openCheckIn(result);
 				}
 			}
-		}, { signal }).then(({ video }) => {
+		}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video }) => {
 			const details = document.createElement('details');
 			const summary = document.createElement('summary');
 			summary.classList.add('btn', 'btn-primary');
