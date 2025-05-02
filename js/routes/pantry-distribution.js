@@ -30,19 +30,19 @@ const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
 const ENABLE_NEIGHBORHOD_INTAKE = false;
 const BARCODE_FORMATS = ENABLE_NEIGHBORHOD_INTAKE ? [UPC_A, QR_CODE] : [UPC_A];
-const UPC_A_PATTERN = /^\d{12}$/;
+const UPC_A_PATTERN = /^\d{12,15}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
 const [cart, setCart] = manageState('cart', []);
 
 const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
 const _calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
-const _updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = _calcTotal());
+const _updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = _calcTotal().toFixed(2));
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
 	css`td > input.${numberClass} {
 		display: inline-block;
-		width: 1.8em;
+		width: 2.5em;
 	}
 
 	#scanner > fieldset {
@@ -54,7 +54,15 @@ document.adoptedStyleSheets = [
 		border: none;
 		color: inherit;
 		padding: 0;
+		appearance: textfield;
 	}
+
+	#scanner input[type="number"][readonly]::-webkit-outer-spin-button,
+	#scanner input[type="number"][readonly]::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
 
 	#scanner input:not([readonly]) {
 		border-width: 0 0 1px 0;
@@ -82,9 +90,9 @@ const _openDB = async () => await openDB(SCHEMA.name, {
 function _createItemRow(item) {
 	return html`<tr ${data({ productId: item.id })}>
 		<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
-		<td><input type="number" name="item[cost]" ${attr({ value: item.cost })} size="2" class="${numberClass}" readonly="" required="" /></td>
-		<td><input type="number" name="item[qty]" min="1" max="10" size="2" class="${numberClass}" ${attr({ value: item.qty ?? 1 })} required="" /></td>
-		<td><input type="number" name="item[total]" size="3" class="${numberClass}" ${attr({ value: (item.qty ?? 1) * item.cost })} readonly="" required="" /></td>
+		<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="5" class="${numberClass}" readonly="" required="" /></td>
+		<td><input type="number" name="item[qty]" min="1" max="15" size="4" class="${numberClass}" ${attr({ value: item.qty ?? 1 })} required="" /></td>
+		<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: ((item.qty ?? 1) * item.cost).toFixed(2) })} readonly="" required="" /></td>
 		<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 		<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 	</tr>`;
@@ -125,13 +133,21 @@ const _getItem = async id => {
 	}
 };
 
+async function _addProduct(product) {
+	const items = structuredClone(history.state?.cart ?? []);
+	items.push(product);
+	setCart(items);
+	const row = _createItemRow(product);
+	await scheduler.yield();
+	document.getElementById('pantry-cart').tBodies.item(0).append(row);
+	_updateTotal();
+}
+
 async function _addToCart(id) {
 	try {
 		if (typeof id !== 'string') {
 			throw new TypeError('Invalid product ID.');
-		} else if (id.length > 12) {
-			id = id.substring(id.length - 12);
-		} else if (id.length !== 12) {
+		} else if (id.length < 12) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
 		}
 
@@ -155,13 +171,7 @@ async function _addToCart(id) {
 				throw new Error(`Could not find product with ID of ${id}`);
 			} else {
 				product.qty = 1;
-				const items = structuredClone(history.state?.cart ?? []);
-				items.push(product);
-				setCart(items);
-				const row = _createItemRow(product);
-				await scheduler.yield();
-				document.getElementById('pantry-cart').tBodies.item(0).append(row);
-				_updateTotal();
+				await _addProduct(product);
 
 				return true;
 			}
@@ -203,6 +213,29 @@ const resetHandler = registerCallback('pantry:distribution:reset', () =>{
 	document.querySelector('#pantry-cart tbody').replaceChildren();
 	_updateTotal();
 });
+
+const addItemSubmit = registerCallback('pantry:distribution:add:submit', async event => {
+	event.preventDefault();
+	const { target, submitter } = event;
+
+	try {
+		submitter.disabled = true;
+		const data = new FormData(target);
+
+		await _addProduct({
+			id: data.get('id'),
+			name: data.get('name'),
+			cost: parseFloat(data.get('cost')),
+			qty: parseInt(data.get('qty')),
+		});
+
+		target.reset();
+	} finally {
+		submitter.disabled = false;
+	}
+});
+
+const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target }) => target.hidePopover());
 
 const barcodeHandler = registerCallback('pantry:barcode:handler', async event => {
 	event.preventDefault();
@@ -325,18 +358,17 @@ export default function({ signal }) {
 				<tbody class="overflow-auto">${cart.map(item => String.dedent`
 					<tr ${data({ productId: item.id })}>
 						<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
-						<td><input type="number" name="item[cost]" ${attr({ value: item.cost })} size="2" class="${numberClass}" readonly="" required="" /></td>
-						<td><input type="number" name="item[qty]" min="1" max="10" size="2" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
-						<td><input type="number" name="item[total]" size="3" class="${numberClass}" ${attr({ value: item.qty * item.cost })} readonly="" required="" /></td>
+						<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="2" class="${numberClass}" readonly="" required="" /></td>
+						<td><input type="number" name="item[qty]" min="1" max="10" size="5" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
+						<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: (item.qty * item.cost).toFixed(2) })} readonly="" required="" /></td>
 						<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 					</tr>
 				`).join('')}</tbody>
 				<tfoot>
 					<tr>
-						<td><!-- Intentionally empty --></td>
-						<th colspan="3">Grand Total</th>
-						<td id="cart-grand-total">${_calcTotal()}</td>
+						<th colspan="2">Grand Total</th>
+						<td id="cart-grand-total" colspan="3">${_calcTotal()}</td>
 						<td class="mobile-hidden"><!-- Intentionally empty --></td>
 					</tr>
 				</tfoot>
@@ -345,6 +377,28 @@ export default function({ signal }) {
 		<div class="flex row no-wrap">
 			<button type="submit" class="btn btn-success">Submit</button>
 			<button type="reset" class="btn btn-danger">Empty Cart</button>
+			<button type="button" class="btn btn-secondary" popovertarget="pantry-manual" popovertargetaction="show">Add Item</button>
+		</div>
+	</form>
+	<form id="pantry-manual" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
+		<fieldset class="no-border">
+			<input type="hidden" name="id" value="${'0'.repeat(15)}" />
+			<div class="form-group">
+				<label for="pantry-entry-name" class="input-label required=">Name</label>
+				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" required="" />
+			</div>
+			<div class="form-group">
+				<label for="pantry-entry-cost" class="input-label required">Points</label>
+				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0.25" max="20" step="0.01" required="" />
+			</div>
+			<div class="form-group">
+				<label for="pantry-entry-qty" class="input-label required">Quantity</label>
+				<input type="number" name="qty" id="pantry-entry-qty" class="input" placeholder="##" min="1" step="1" value="1" required="" />
+			</div>
+		</fieldset>
+		<div class="flex row">
+			<button type="submit" class="btn btn-success">Add</button>
+			<button type="reset" class="btn btn-danger">Cancel</button>
 		</div>
 	</form>`;
 }
