@@ -5,7 +5,7 @@ import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onChange, onSubmit, onReset, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
-import { alert } from '@shgysk8zer0/kazoo/asyncDialog.js';
+import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescanner';
 
@@ -13,6 +13,7 @@ import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescan
 // Setup on FeedingAmerica
 
 const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
+const ADD_ITEM_ID = 'pantry-manual';
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
@@ -188,16 +189,19 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 
 	try {
 		submitter.disabled = true;
-		const resp = await fetch(PANTRY_ENDPOINT, {
-			method: 'POST',
-			body: new FormData(event.target),
-		}).catch(() => Response.error());
 
-		if (resp.ok) {
-			alert('Checkout complete');
-			event.target.reset();
-		} else {
-			alert('Error completing transaction.');
+		if (await confirm('Complete checkout?')) {
+			const resp = await fetch(PANTRY_ENDPOINT, {
+				method: 'POST',
+				body: new FormData(event.target),
+			}).catch(() => Response.error());
+
+			if (resp.ok) {
+				alert('Checkout complete');
+				event.target.reset();
+			} else {
+				alert('Error completing transaction.');
+			}
 		}
 	} catch(err) {
 		reportError(err);
@@ -338,6 +342,7 @@ export default function({ signal }) {
 			</div>
 			<button type="submit" class="btn btn-success">Search</button>
 			<button type="reset" class="btn btn-reject">Clear</button>
+			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 		</form>
 		</search>
 		<br />
@@ -377,10 +382,10 @@ export default function({ signal }) {
 		<div class="flex row no-wrap">
 			<button type="submit" class="btn btn-success">Submit</button>
 			<button type="reset" class="btn btn-danger">Empty Cart</button>
-			<button type="button" class="btn btn-secondary" popovertarget="pantry-manual" popovertargetaction="show">Add Item</button>
+			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 		</div>
 	</form>
-	<form id="pantry-manual" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
+	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
 			<input type="hidden" name="id" value="${'0'.repeat(15)}" />
 			<div class="form-group">
