@@ -15,6 +15,7 @@ import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescan
 const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
 const ADD_ITEM_ID = 'pantry-manual';
 const MISSING_ID = '0'.repeat(15);
+const MAX_PER_ITEM = 100;
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
@@ -93,7 +94,7 @@ function _createItemRow(item) {
 	return html`<tr ${data({ productId: item.id })}>
 		<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
 		<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="5" class="${numberClass}" readonly="" required="" /></td>
-		<td><input type="number" name="item[qty]" min="1" max="15" size="4" class="${numberClass}" ${attr({ value: item.qty ?? 1 })} required="" /></td>
+		<td><input type="number" name="item[qty]" min="1" max="${MAX_PER_ITEM}" size="4" class="${numberClass}" ${attr({ value: item.qty ?? 1 })} required="" /></td>
 		<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: ((item.qty ?? 1) * item.cost).toFixed(2) })} readonly="" required="" /></td>
 		<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 		<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
@@ -371,7 +372,7 @@ export default function({ signal }) {
 					<tr ${data({ productId: item.id })}>
 						<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
 						<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="2" class="${numberClass}" readonly="" required="" /></td>
-						<td><input type="number" name="item[qty]" min="1" max="100" size="5" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
+						<td><input type="number" name="item[qty]" min="1" max="${MAX_PER_ITEM}" size="5" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
 						<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: (item.qty * item.cost).toFixed(2) })} readonly="" required="" /></td>
 						<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
@@ -408,7 +409,7 @@ export default function({ signal }) {
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-qty" class="input-label required">Quantity</label>
-				<input type="number" name="qty" id="pantry-entry-qty" class="input" placeholder="##" min="1" step="1" value="1" required="" />
+				<input type="number" name="qty" id="pantry-entry-qty" class="input" placeholder="##" min="1" max="${MAX_PER_ITEM}" step="1" value="1" required="" />
 			</div>
 		</fieldset>
 		<div class="flex row">
