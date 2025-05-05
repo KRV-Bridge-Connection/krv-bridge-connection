@@ -3,7 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onChange, onSubmit, onReset, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
@@ -14,6 +14,7 @@ import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescan
 
 const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
 const ADD_ITEM_ID = 'pantry-manual';
+const MISSING_ID = '0'.repeat(15);
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
@@ -136,11 +137,11 @@ const _getItem = async id => {
 
 async function _addProduct(product) {
 	const items = structuredClone(history.state?.cart ?? []);
-	items.push(product);
-	setCart(items);
 	const row = _createItemRow(product);
+	items.push(product);
 	await scheduler.yield();
 	document.getElementById('pantry-cart').tBodies.item(0).append(row);
+	setCart(items);
 	_updateTotal();
 }
 
@@ -152,7 +153,7 @@ async function _addToCart(id) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
 		}
 
-		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
+		const existing = id === MISSING_ID ? null : document.querySelector(`tr[data-product-id="${id}"]`);
 
 		if (existing instanceof HTMLTableRowElement) {
 			const items = structuredClone(history.state?.cart ?? []);
@@ -240,6 +241,12 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 });
 
 const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target }) => target.hidePopover());
+
+const addItemToggle = registerCallback('pantry:distribution:add:toggle', ({ target, newState }) => {
+	if (newState === 'open') {
+		target.querySelector('[autofocus]').focus();
+	}
+});
 
 const barcodeHandler = registerCallback('pantry:barcode:handler', async event => {
 	event.preventDefault();
@@ -385,12 +392,12 @@ export default function({ signal }) {
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 		</div>
 	</form>
-	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
+	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
-			<input type="hidden" name="id" value="${'0'.repeat(15)}" />
+			<input type="hidden" name="id" value="${MISSING_ID}" />
 			<div class="form-group">
-				<label for="pantry-entry-name" class="input-label required=">Name</label>
-				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" required="" />
+				<label for="pantry-entry-name" class="input-label required">Name</label>
+				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" autofocus="" required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-cost" class="input-label required">Points</label>
