@@ -245,7 +245,9 @@ const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target
 
 const addItemToggle = registerCallback('pantry:distribution:add:toggle', ({ target, newState }) => {
 	if (newState === 'open') {
-		target.querySelector('[autofocus]').focus();
+		const input = target.querySelector('[autofocus]');
+		input.focus();
+		input.select();
 	}
 });
 
