@@ -7,6 +7,24 @@ import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 
+const postalCodes = {
+	'alta sierra': '95949',
+	'weldon': '93240',
+	'bodfish': '93205',
+	'south lake': '93240',
+	'mt mesa': '93240',
+	'mountain mesa': '93240',
+	'wofford heights': '93285',
+	'lake isabella': '93240',
+	'kernville': '93238',
+	'onyx': '93255',
+	'canebrake': '93255',
+	'havilah': '93518',
+	'caliente': '93518',
+	'squirrel mountain valley': '93240',
+	'squirrel valley': '93240',
+};
+
 async function _alert(message, { signal } = {}) {
 	const { resolve, promise } = Promise.withResolvers();
 	const dialog = document.getElementById('pantry-message');
@@ -74,6 +92,14 @@ const resetHandler = registerCallback('pantry:form:reset', () => {
 	history.length > 1 ? back() : navigate('/');
 });
 
+const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value, form } }) => {
+	const val = value.toLowerCase().replaceAll(/[^A-Za-z ]/g, '');
+
+	if (typeof postalCodes[val] === 'string') {
+		form.elements.namedItem('postalCode').value = postalCodes[val];
+	}
+});
+
 /**
  *
  * @param {Date} date
@@ -100,8 +126,8 @@ export default function({
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 
 	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
-		<fieldset class="no-border">
-			<h2>KRV Bridge Food Pantry</h2>
+		<div>
+			<h2>KRV Bridge Choice Food Pantry</h2>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
 					https://i.imgur.com/h68vmgFm.jpeg 160w,
 					https://i.imgur.com/h68vmgFl.jpeg 320w,
@@ -117,6 +143,12 @@ export default function({
 				decoding="async"
 				crossorigin="anonymous"
 				referrerpolicy="no-referrer" />
+			<p>The Choice Pantry is provided to KRV residents to compliment other resources to meet nutritional needs.
+			As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
+			food that they want rather than a preset box of items.
+			The Choice Pantry is available up to twice per month and provides food based on household size.</p>
+		</div>
+		<fieldset class="no-border">
 			<legend>Schedule an Appointment</legend>
 			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
 			<div class="form-group">
@@ -137,7 +169,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-address-locality required" class="input-label">City</label>
-				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} required="" />
+				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
 				<datalist id="pantry-towns-list">
 					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
 				</datalist>
