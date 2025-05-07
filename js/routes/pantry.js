@@ -6,7 +6,6 @@ import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
-import '@aegisjsproject/md-editor';
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -120,6 +119,7 @@ export default function({
 		email = '',
 		telephone = '',
 		household = '1',
+		income = '',
 		streetAddress = '',
 		addressLocality = '',
 		postalCode = '',
@@ -197,6 +197,12 @@ export default function({
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<div class="form-group">
+				<label for="pantry-household-income" class="input-label">Approximate Household Income</label>
+				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} required="" />
+			</div>
+			<div class="form-group">
+				<label for="pantry-street-address" class="input-label required">Address</label>
+				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" ${attr({ value: streetAddress })} required="" />
 				<label for="pantry-address-locality required" class="input-label">City</label>
 				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
 				<datalist id="pantry-towns-list">
@@ -211,10 +217,6 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-household-size" class="input-label">Household Size</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
-			</div>
-			<div class="form-group">
-				<label for="md" class="input-label">Markdown</label>
-				<md-editor name="md" id="md" class="input" required=""></md-editor>
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a date</label>
