@@ -1,4 +1,5 @@
-import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
+import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
@@ -16,6 +17,83 @@ const FORMAT = {
 };
 
 const COLLECTION = 'pantry-schedule';
+export const QRSERVER = 'https://api.qrserver.com/';
+
+async function getQRCode(data, {
+	size,
+	margin,
+	format,
+	color,
+	bgColor,
+	ecc,
+	signal,
+	// ...rest
+} = {}) {
+	const url = new URL('/v1/create-qr-code/',  QRSERVER);
+	url.searchParams.set('data', data);
+
+	if (typeof size === 'number' && ! Number.isNaN(size)) {
+		url.searchParams.set('size', `${Math.clamp(10, size, 1000)}x${Math.clamp(10, size, 1000)}`);
+	}
+
+	if (typeof margin === 'number' && ! Number.isNaN(margin)) {
+		url.searchParams.set('margin', Math.clamp(0, margin, 50));
+	}
+
+	if (typeof color === 'string') {
+		url.searchParams.set('color', color.replace('#', ''));
+	}
+
+	if (typeof bgColor === 'string') {
+		url.searchParams.set('bgcolor', bgColor.replace('#', ''));
+	}
+
+	if (typeof format === 'string') {
+		url.searchParams.set('format', format.toLowerCase());
+	}
+
+	if (typeof ecc === 'string') {
+		url.searchParams.set('ecc', ecc);
+	}
+
+	const resp = await fetch(url, {
+		headers: { Accept: 'image/png' },
+		referrerPolicy: 'no-referrer',
+		mode: 'cors',
+		signal,
+	});
+
+	if (resp.ok) {
+		return await resp.blob();
+	} else {
+		throw new HTTPBadGatewayError(`Unable to fetch from ${QRSERVER}.`);
+	}
+}
+
+// const _escapeCSV = str => typeof str === 'string' || typeof str === 'number' ? `"${str.toString().replaceAll('"', '""')}"` : '""';
+// const _escapeRow = row => row.map(_escapeCSV).join(',') + '\n';
+// const _decrypt = async (key, field) => typeof field === 'string' && field.length !== 0
+// 	? await decrypt(key, field, { output: TEXT })
+// 	: null;
+
+// async function _toCSVRow(key, { name, date, addressLocality, postalCode, email, telephone, comments, household }) {
+// 	return _escapeRow([
+// 		name,
+// 		new Date(date._seconds * 1000).toISOString(),
+// 		addressLocality,
+// 		postalCode,
+// 		await _decrypt(key, email),
+// 		await _decrypt(key, telephone),
+// 		await _decrypt(key, comments),
+// 		household,
+// 	]);
+// }
+
+// async function _createCSVFile(records, name) {
+// 	const key = await getSecretKey();
+// 	const rows = await Promise.all(records.map(record => _toCSVRow(key, record)));
+// 	return new File(rows, name, { type: 'text/csv' });
+// }
 
 export default createHandler({
 	async get(req) {
@@ -103,10 +181,11 @@ export default createHandler({
 	},
 	async post(req) {
 		const data = await req.formData();
-		const missing = ['name', 'household', 'addressLocality', 'postalCode', 'date', 'time',].filter(field => ! data.has(field));
+		const missing = [
+			'givenName', 'familyName', 'bDay', 'household', 'householdIncome', 'addressLocality', 'postalCode', 'date', 'time',
+		].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
-			const key = await getSecretKey();
 			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
 			const household = parseInt(data.get('household'));
 
@@ -115,8 +194,9 @@ export default createHandler({
 			} else if (! Number.isSafeInteger(household) || household < 1 || household > 8) {
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
-				const [email = null, telephone = null, comments = null] = await Promise.all(
-					['email', 'telephone', 'comments']
+				const key = await getSecretKey();
+				const [streetAddress, email = null, telephone = null, comments = null] = await Promise.all(
+					['streetAddress', 'email', 'telephone', 'comments']
 						.map(field => data.get(field) ?? null)
 						.map(field => typeof field === 'string' && field.length !== 0 ? encrypt(key, field, { output: BASE64 }) : null)
 				);
@@ -125,12 +205,21 @@ export default createHandler({
 				const id = getSUID({ date: created, alphabet: 'base64url' });
 
 				await putCollectionItem(COLLECTION, id, {
-					name: data.get('name'),
+					givenName: data.get('givenName'),
+					additionalName: data.get('additionalyName'),
+					familyName: data.get('familyName'),
+					name: ['givenName', 'additionalName', 'familyName']
+						.map(field => data.get(field))
+						.filter(field => typeof field === 'string' && field.length !== 0)
+						.join(' '),
+					bday: data.get('bDay'),
 					email,
 					telephone,
+					streetAddress,
 					addressLocality: data.get('addressLocality'),
 					postalCode: data.get('postalCode'),
 					household: parseInt(data.get('household')),
+					householdIncome: parseInt(data.get('householdIncome')),
 					comments,
 					created,
 					date,
@@ -143,13 +232,14 @@ export default createHandler({
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
 						fields: [
-							new SlackMarkdownElement(`*Name*: ${data.get('name')}`),
+							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
 							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
+							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * 30}`),
 						],
 					}),
 					new SlackDividerBlock(),
 					new SlackContextBlock({ elements: [new SlackPlainTextElement(data.get('comments') || 'No Comments')] }),
-					new SlackActionsBlock({
+					data.has('email') ? new SlackActionsBlock({
 						elements: [
 							new SlackButtonElement(new SlackPlainTextElement(`Reply to <${data.get('email')}>`), {
 								url: `mailto:${data.get('email')}`,
@@ -157,16 +247,35 @@ export default createHandler({
 								style: SLACK_PRIMARY,
 							}),
 						]
-					})
+					}) : undefined
 				);
 
-				await message.send({ signal: req.signal }).catch(console.error);
+				const token = await createJWT({
+					iss: 'krvbridge.org',
+					scope: 'pantry',
+					// sub: `${data.get('givenName')} ${data.get('familyName')}`,
+					given_name: data.get('givenName'),
+					family_name: data.get('familyName'),
+					iat: created.toISOString(),
+					toe: date.toISOString(),
+					txn: id,
+					roles: ['guest'],
+					authorization_details: {
+						household,
+						points: household * 30,
+					}
+				}, await getPrivateKey());
 
-				return Response.json({
-					id: id,
-					message: `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your reference code is ${id}.`,
-					date: date.toISOString(),
-				});
+
+				const qr = await getQRCode(token, { signal: req.signal });
+				const body = new FormData();
+				body.set('id', id);
+				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your reference code is ${id}.`);
+				body.set('date', date.toISOString());
+				body.set('qr', qr);
+
+				await message.send({ signal: req.signal }).catch(console.error);
+				return new Response(body);
 			}
 		} else {
 			throw new HTTPBadRequestError(`Missing required fields: ${missing.join(', ')}`);
