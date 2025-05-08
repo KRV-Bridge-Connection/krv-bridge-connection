@@ -202,7 +202,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-gender required">Gender</label>
-				<select name="gender" id="pantry-gender" class="input" autocomplete="sex" required="">
+				<select name="gender" id="pantry-gender" class="input" autocomplete="sex">
 					<option label="Please select one"></option>
 					${GENDERS.map(opt => `<option ${attr({ label: opt, value: opt, selected: opt === gender.toString() })}></option>`).join('\n')}
 				</select>
