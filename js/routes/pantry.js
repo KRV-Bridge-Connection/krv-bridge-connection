@@ -6,6 +6,7 @@ import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
+import { getSearch } from '@aegisjsproject/url/search.js';
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -25,17 +26,37 @@ const postalCodes = {
 	'squirrel valley': '93240',
 };
 
-async function _alert(message, { signal } = {}) {
+async function _alert(message, qr, { signal } = {}) {
 	const { resolve, promise } = Promise.withResolvers();
 	const dialog = document.getElementById('pantry-message');
+	const qrSrc = qr instanceof Blob ? URL.createObjectURL(qr) : null;
 	document.getElementById('pantry-message-content').textContent = message;
-	dialog.addEventListener('close', resolve, { once: true, signal });
+
+	if (typeof qrSrc === 'string') {
+		document.getElementById('pantry-token-qr').replaceChildren(html`<div class="center pantry-qr">
+			<img src="${qrSrc}" decoding="async" class="card qr-code" />
+			<br />
+			<a class="btn btn-primary" href="${qrSrc}" download="krv-pantry-qr.png">Save QR Code</a>
+		</div>`);
+
+		dialog.addEventListener('close', () => {
+			resolve();
+			URL.revokeObjectURL(qrSrc);
+		}, { once: true, signal });
+
+	} else {
+		dialog.addEventListener('close', resolve, { once: true, signal });
+		document.getElementById('pantry-token-qr').replaceChildren();
+	}
+
 	dialog.showModal();
 
 	await promise;
 }
 
 const TIMEZONE_OFFSET = 8 * HOURS;
+// Options given on Neighbor Intake
+const GENDERS = ['Male','Female','Transgender','Trans Female/Trans Woman','Trans Male/Trans Man','None of these','Don\'t Know / Prefer not to answer'];
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
@@ -72,9 +93,12 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 		});
 
 		if (resp.ok) {
-			const { message } = await resp.json();
+			const body = await resp.formData();
+			const message = body.get('message');
+			// const token = body.get('token');
+			const qr = body.get('qr');
 			clearState();
-			await _alert(message);
+			await _alert(message, qr);
 			submitter.disabled = false;
 			history.length > 1 ? back() : navigate('/');
 		} else {
@@ -109,12 +133,18 @@ const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toS
 
 export default function({
 	state: {
-		name = '',
-		email = '',
-		telephone = '',
-		household = '',
-		addressLocality = '',
-		postalCode = '',
+		givenName = getSearch('givenName', ''),
+		additionalName = getSearch('additionalName', ''),
+		familyName = getSearch('familyName', ''),
+		gender = getSearch('gender', ''),
+		bDay = getSearch('bDay', ''),
+		email = getSearch('email', ''),
+		telephone = getSearch('telephone', ''),
+		household = getSearch('household', '1'),
+		income = getSearch('income', ''),
+		streetAddress = getSearch('streetAddress', ''),
+		addressLocality = getSearch('addressLocality', ''),
+		postalCode = getSearch('postalCode', ''),
 		date = new Date().toISOString().split('T')[0],
 		time = '',
 		comments = '',
@@ -151,35 +181,60 @@ export default function({
 		<fieldset class="no-border">
 			<legend>Schedule an Appointment</legend>
 			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
-			<div class="form-group">
-				<label for="pantry-name" class="input-label required">Name</label>
-				<input type="text" name="name" id="pantry-name" class="input" placeholder="Firstname Lastname" autocomplete="name" ${attr({ value: name })} required="" />
+			<div class="form-group flex wrap space-between">
+				<span>
+					<label for="pantry-given-name" class="input-label required">First Name</label>
+					<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name" autocomplete="given-name" ${attr({ value: givenName })} required="" />
+				</span>
+				<span>
+					<label for="pantry-additional-name" class="input-label">Middle Name</label>
+					<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" ${attr({ value: additionalName })} />
+				</span>
+				<span>
+					<label for="pantry-given-name" class="input-label required">Last Name</label>
+					<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
+				</span>
 			</div>
 			<div class="form-group">
-				<label for="pantry-email" class="input-label required">Email</label>
-				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="email" ${attr({ value: email })} />
+				<label for="pantry-bday" class="input-label required="">Birthday</label>
+				<input type="date" name="bDay" id="pantry-bday" class="input" placeholder="yyyy-mm-dd" inputmode="numeric" pattern="\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])" autocomplete="bday" ${attr({ value: bDay })} required="" />
+			</div>
+			<div class="form-group">
+				<label for="pantry-gender required">Gender</label>
+				<select name="gender" id="pantry-gender" class="input" autocomplete="sex" required="">
+					<option label="Please select one"></option>
+					${GENDERS.map(opt => `<option ${attr({ label: opt, value: opt, selected: opt === gender.toString() })}></option>`).join('\n')}
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="pantry-email" class="input-label">Email</label>
+				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="home email" ${attr({ value: email })} />
 			</div>
 			<div class="form-group">
 				<label for="pantry-phone" class="input-label">Phone</label>
-				<input type="tel" name="telephone" id="pantry-phone" class="input" placeholder="555-555-5555" autocomplete="tel" ${attr({ value: telephone })} />
+				<input type="tel" name="telephone" id="pantry-phone" class="input" placeholder="555-555-5555" autocomplete="mobile tel" ${attr({ value: telephone })} />
+			</div>
+			<div class="form-group">
+				<label for="pantry-street-address" class="input-label">Address</label>
+				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" ${attr({ value: streetAddress })} />
+				<label for="pantry-address-locality required" class="input-label">City</label>
+				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
+				<datalist id="pantry-towns-list">
+					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
+				</datalist>
+				<label for="pantry-postal-code" class="input-label required">Zip Code</label>
+				<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" autocomplete="home postal-code" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
+				<datalist id="pantry-postal-list">
+					${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
+				</datalist>
 			</div>
 			<div class="form-group">
 				<label for="pantry-household-size" class="input-label">Household Size</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-address-locality required" class="input-label">City</label>
-				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
-				<datalist id="pantry-towns-list">
-					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
-				</datalist>
-			</div>
-			<div class="form-group">
-				<label for="pantry-postal-code" class="input-label required">Zip Code</label>
-				<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
-				<datalist id="pantry-postal-list">
-					${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
-				</datalist>
+				<label for="pantry-household-income" class="input-label">Approximate Household Income</label>
+				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a date</label>
@@ -202,6 +257,7 @@ export default function({
 	</form>
 	<dialog id="pantry-message">
 		<div id="pantry-message-content"></div>
+		<div id="pantry-token-qr"></div>
 		<button type="button" class="btn btn-primary" ${onClick}="${closeMessage}" ${signalAttr}="${sig}">Close</button>
 	</dialog>`;
 }
