@@ -1,4 +1,4 @@
-import { manageState } from '@aegisjsproject/state';
+import { manageState, setState } from '@aegisjsproject/state';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
@@ -8,6 +8,8 @@ import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescanner';
+import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
+import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 
 // https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
 // Setup on FeedingAmerica
@@ -18,6 +20,7 @@ const MISSING_ID = '0'.repeat(15);
 const MAX_PER_ITEM = 100;
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
+const key = await fetchWellKnownKey(location.origin);
 
 export const openCheckIn = ({ rawValue } = {}) => {
 	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
@@ -32,7 +35,7 @@ const numberClass = 'small-numeric';
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
 const ENABLE_NEIGHBORHOD_INTAKE = false;
-const BARCODE_FORMATS = ENABLE_NEIGHBORHOD_INTAKE ? [UPC_A, QR_CODE] : [UPC_A];
+const BARCODE_FORMATS = [UPC_A, QR_CODE];
 const UPC_A_PATTERN = /^\d{12,15}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
 const [cart, setCart] = manageState('cart', []);
@@ -52,12 +55,21 @@ document.adoptedStyleSheets = [
 		padding: 1.2em 0;
 	}
 
-	#scanner input[readonly] {
+	#scanner input[readonly]:not(.display-text) {
 		background-color: inherit;
 		border: none;
 		color: inherit;
 		padding: 0;
 		appearance: textfield;
+	}
+
+	input.display-text {
+		display: inline;
+		border: none;
+		padding: none;
+		appearance: unset;
+		color: inherit;
+		background: inherit;
 	}
 
 	#scanner input[type="number"][readonly]::-webkit-outer-spin-button,
@@ -217,6 +229,7 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 const resetHandler = registerCallback('pantry:distribution:reset', () =>{
 	setCart([]);
 	document.querySelector('#pantry-cart tbody').replaceChildren();
+	document.getElementById('appt-details').hidden = true;
 	_updateTotal();
 });
 
@@ -235,6 +248,7 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 			qty: parseInt(data.get('qty')),
 		});
 
+		document.getElementById('appt-details').hidden = true;
 		target.reset();
 	} finally {
 		submitter.disabled = false;
@@ -314,7 +328,15 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 	}
 }
 
-export default function({ signal }) {
+export default function({
+	state: {
+		givenName = '',
+		familyName = '',
+		household = '',
+		points = '',
+	},
+	signal,
+} = {}) {
 	const sig = registerSignal(signal);
 
 	if (! Array.isArray(history.state?.cart)) {
@@ -330,7 +352,35 @@ export default function({ signal }) {
 						break;
 
 					case QR_CODE:
-						openCheckIn(result);
+						if (result.rawValue.length > 50) {
+							const decoded = await verifyJWT(result.rawValue, key);
+
+							if (decoded instanceof Error) {
+								throw new Error('Error validating JWT', { cause: decoded });
+							} else {
+								const {
+									given_name: givenName,
+									family_name: familyName,
+									authorization_details: {
+										household,
+										points,
+									} = {}
+								} = decoded;
+
+								setState('givenName', givenName);
+								setState('familyName', familyName);
+								setState('points', points);
+								setState('household', household);
+
+								document.getElementById('pantry-given-name').value = givenName;
+								document.getElementById('pantry-family-name').value = familyName;
+								document.getElementById('pantry-points').value = points;
+								document.getElementById('pantry-household').value = household;
+								document.getElementById('appt-details').hidden = false;
+							}
+						} else if (ENABLE_NEIGHBORHOD_INTAKE) {
+							openCheckIn(result);
+						}
 				}
 			}
 		}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video }) => {
@@ -359,6 +409,25 @@ export default function({ signal }) {
 		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border overflow-auto">
 			<legend>KRV Bridge Food Pantry</legend>
+			<div>
+				<a href="/pantry/" class="btn btn-link no-router" target="_blank">Create an Appointment</a>
+			</div>
+			<div id="appt-details" ${attr({ hidden: Number.isNaN(parseInt(points)) })}>
+				<input type="hidden" name="appt" id="pantry-appt" class="display-text" />
+				<div>
+					<b>Name:</b>
+					<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
+					<input type="text" id="pantry-family-name" class="display-text" name="familyName"${attr({ value: familyName })} readonly="" />.
+				</div>
+				<div>
+					<b>Points:</b>
+					<input type="text" id="pantry-points" class="display-text" name="budget" ${attr({ value: points })} readonly" />
+				</div>
+				<div>
+					<b>Household Size:</b>
+					<input type="text" id="pantry-household" class="display-text" name="household"${attr({ value: household })} readonly="" />
+				</div>
+			</div>
 			<table id="pantry-cart" class="full-width overflow-auto">
 				<thead>
 					<tr>

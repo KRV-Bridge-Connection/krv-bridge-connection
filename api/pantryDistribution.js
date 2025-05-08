@@ -45,7 +45,14 @@ export default createHandler({
 			const name = cart.getAll('item[name]');
 			const qty = cart.getAll('item[qty]');
 			const items = id.map((id, i) => ({ id, name: name[i], qty: parseInt(qty[i]) }));
-			const result = await addCollectionItem(TRANSACTIONS, { orderId, created, items });
+			const result = await addCollectionItem(TRANSACTIONS, {
+				orderId,
+				created,
+				items,
+				appt: cart.get('appt'),
+				givenName: cart.get('givenName'),
+				familyName: cart.get('familyName'),
+			});
 
 			return new Response(null, {
 				status: 201,
