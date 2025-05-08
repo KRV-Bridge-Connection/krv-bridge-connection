@@ -181,6 +181,7 @@ export default function({
 		<fieldset class="no-border">
 			<legend>Schedule an Appointment</legend>
 			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
+			<p class="status-box info">Fields marked with a <q>*</q> are required</p>
 			<div class="form-group flex wrap space-between">
 				<span>
 					<label for="pantry-given-name" class="input-label required">First Name</label>
@@ -197,7 +198,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-bday" class="input-label required="">Birthday</label>
-				<input type="date" name="bDay" id="pantry-bday" class="input" placeholder="yyyy-mm-dd" inputmode="numeric" pattern="\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])" autocomplete="bday" ${attr({ value: bDay })} required="" />
+				<input type="date" name="bDay" id="pantry-bday" class="input" placeholder="yyyy-mm-dd" inputmode="numeric" pattern="\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])" autocomplete="bday" ${attr({ value: bDay })} />
 			</div>
 			<div class="form-group">
 				<label for="pantry-gender required">Gender</label>
@@ -216,8 +217,8 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-street-address" class="input-label">Address</label>
-				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" ${attr({ value: streetAddress })} />
-				<label for="pantry-address-locality required" class="input-label">City</label>
+				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" placeholder="Street Address" ${attr({ value: streetAddress })} />
+				<label for="pantry-address-locality required" class="input-label required">City</label>
 				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
 				<datalist id="pantry-towns-list">
 					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
@@ -229,11 +230,11 @@ export default function({
 				</datalist>
 			</div>
 			<div class="form-group">
-				<label for="pantry-household-size" class="input-label">Household Size</label>
+				<label for="pantry-household-size" class="input-label required">Household Size</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-household-income" class="input-label">Approximate Household Income</label>
+				<label for="pantry-household-income" class="input-label required">Approximate Household Income</label>
 				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} required="" />
 			</div>
 			<div class="form-group">

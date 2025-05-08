@@ -227,7 +227,7 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', () =>{
-	setCart([]);
+	history.replaceState({ cart: [] }, '', location.href);
 	document.querySelector('#pantry-cart tbody').replaceChildren();
 	document.getElementById('appt-details').hidden = true;
 	_updateTotal();
@@ -353,12 +353,16 @@ export default function({
 
 					case QR_CODE:
 						if (result.rawValue.length > 50) {
-							const decoded = await verifyJWT(result.rawValue, key);
+							const decoded = await verifyJWT(result.rawValue, key, {
+								scope: 'pantry',
+							});
 
 							if (decoded instanceof Error) {
 								throw new Error('Error validating JWT', { cause: decoded });
 							} else {
 								const {
+									txn: id,
+									toe: timestamp,
 									given_name: givenName,
 									family_name: familyName,
 									authorization_details: {
@@ -367,16 +371,25 @@ export default function({
 									} = {}
 								} = decoded;
 
-								setState('givenName', givenName);
-								setState('familyName', familyName);
-								setState('points', points);
-								setState('household', household);
+								const date = new Date(timestamp);
+								const now = Date.now();
+								const time = date.getTime();
 
-								document.getElementById('pantry-given-name').value = givenName;
-								document.getElementById('pantry-family-name').value = familyName;
-								document.getElementById('pantry-points').value = points;
-								document.getElementById('pantry-household').value = household;
-								document.getElementById('appt-details').hidden = false;
+								const timeWindow = 28_800_000;
+
+								if (time < now - timeWindow || now + timeWindow > time || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+									setState('givenName', givenName);
+									setState('familyName', familyName);
+									setState('points', points);
+									setState('household', household);
+
+									document.getElementById('pantry-appt').value = id;
+									document.getElementById('pantry-given-name').value = givenName;
+									document.getElementById('pantry-family-name').value = familyName;
+									document.getElementById('pantry-points').value = points;
+									document.getElementById('pantry-household').value = household;
+									document.getElementById('appt-details').hidden = false;
+								}
 							}
 						} else if (ENABLE_NEIGHBORHOD_INTAKE) {
 							openCheckIn(result);
