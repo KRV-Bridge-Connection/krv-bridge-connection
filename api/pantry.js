@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
@@ -8,7 +8,7 @@ import { getSUID } from '@shgysk8zer0/suid';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
-	SlackActionsBlock, SLACK_PRIMARY,
+	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
 
 const FORMAT = {
@@ -28,18 +28,19 @@ const REPLACEMENTS = {
 
 const PHONETIC_PATTERN = new RegExp(Object.keys(REPLACEMENTS).join('|'), 'g');
 
+// Simple attempt at dealing with name spelling variations
 const normalizeName = name => name.toString()
 	.trim()
 	.toUpperCase()
 	.normalize('NFD')
 	.replaceAll(/\p{Diacritic}/gu, '')
-	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(/[AEIOU]/g, '')
+	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
 
 async function getRecentVisits(name, date = new Date()) {
 	const db = await getFirestore();
-	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 14, 0, 0);
+	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30, 0, 0);
 	const snapshot = await db.collection(COLLECTION)
 		.where('_name', '==', normalizeName(name))
 		.where('date', '>', prior)
@@ -49,14 +50,13 @@ async function getRecentVisits(name, date = new Date()) {
 	return snapshot.data().count;
 }
 
-async function getQRCode(data, {
+function getQRCodeURL(data, {
 	size,
 	margin,
 	format,
 	color,
 	bgColor,
 	ecc,
-	signal,
 	// ...rest
 } = {}) {
 	const url = new URL('/v1/create-qr-code/',  QRSERVER);
@@ -86,18 +86,7 @@ async function getQRCode(data, {
 		url.searchParams.set('ecc', ecc);
 	}
 
-	const resp = await fetch(url, {
-		headers: { Accept: 'image/png' },
-		referrerPolicy: 'no-referrer',
-		mode: 'cors',
-		signal,
-	});
-
-	if (resp.ok) {
-		return await resp.blob();
-	} else {
-		throw new HTTPBadGatewayError(`Unable to fetch from ${QRSERVER}.`);
-	}
+	return url;
 }
 
 // const _escapeCSV = str => typeof str === 'string' || typeof str === 'number' ? `"${str.toString().replaceAll('"', '""')}"` : '""';
@@ -261,6 +250,33 @@ export default createHandler({
 
 				const nowId = Date.now().toString(34);
 
+				const token = await createJWT({
+					iss: 'krvbridge.org',
+					scope: 'pantry',
+					entitlements: ['pantry:use'],
+					roles: ['guest'],
+					// sub: `${data.get('givenName')} ${data.get('familyName')}`,
+					given_name: data.get('givenName'),
+					family_name: data.get('familyName'),
+					iat: Math.floor(created.getTime() / 1000),
+					nbf: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime() / 1000),
+					exp: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59).getTime() / 1000),
+					toe: Math.floor(date.getTime() / 1000),
+					txn: id,
+					authorization_details: {
+						household,
+						points: household * PTS_PER_PERSON,
+					}
+				}, await getPrivateKey());
+
+				const qrURL = getQRCodeURL(token);
+				const qr = await fetch(qrURL, {
+					headers: { Accept: 'image/png' },
+					referrerPolicy: 'no-referrer',
+					mode: 'cors',
+					signal: req.signal,
+				}).then(resp => resp.blob());
+
 				const message = new SlackMessage(process.env.SLACK_WEBHOOK,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
@@ -271,7 +287,10 @@ export default createHandler({
 						],
 					}),
 					new SlackDividerBlock(),
-					new SlackContextBlock({ elements: [new SlackPlainTextElement(data.get('comments') || 'No Comments')] }),
+					new SlackContextBlock({ elements: [
+						new SlackPlainTextElement(data.get('comments') || 'No Comments'),
+					]}),
+					new SlackImageBlock(qrURL.href, { alt: 'QR Code for JWT'}),
 					data.has('email') ? new SlackActionsBlock({
 						elements: [
 							new SlackButtonElement(new SlackPlainTextElement(`Reply to <${data.get('email')}>`), {
@@ -283,31 +302,15 @@ export default createHandler({
 					}) : undefined
 				);
 
-				const token = await createJWT({
-					iss: 'krvbridge.org',
-					scope: 'pantry',
-					// sub: `${data.get('givenName')} ${data.get('familyName')}`,
-					given_name: data.get('givenName'),
-					family_name: data.get('familyName'),
-					iat: created.toISOString(),
-					toe: date.toISOString(),
-					txn: id,
-					roles: ['guest'],
-					authorization_details: {
-						household,
-						points: household * PTS_PER_PERSON,
-					}
-				}, await getPrivateKey());
+				console.log(message.toString());
 
-
-				const qr = await getQRCode(token, { signal: req.signal });
 				const body = new FormData();
 				body.set('id', id);
 				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${PTS_PER_PERSON * household}.`);
 				body.set('date', date.toISOString());
 				body.set('qr', qr);
 
-				await message.send({ signal: req.signal }).catch(console.error);
+				await message.send({ signal: req.signal }).catch(err => console.error(err));
 				return new Response(body);
 			}
 		} else {

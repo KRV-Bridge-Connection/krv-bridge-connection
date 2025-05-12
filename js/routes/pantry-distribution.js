@@ -361,6 +361,8 @@ export default function({
 								throw new Error('Error validating JWT', { cause: decoded });
 							} else {
 								const {
+									nbf,
+									exp,
 									txn: id,
 									toe: timestamp,
 									given_name: givenName,
@@ -371,13 +373,12 @@ export default function({
 									} = {}
 								} = decoded;
 
-								const date = new Date(timestamp);
+								const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
+								const notBefore = new Date(nbf * 1000);
+								const expires = new Date(exp * 1000);
 								const now = Date.now();
-								const time = date.getTime();
 
-								const timeWindow = 28_800_000;
-
-								if (time < now - timeWindow || now + timeWindow > time || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+								if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
 									setState('givenName', givenName);
 									setState('familyName', familyName);
 									setState('points', points);
