@@ -10,5 +10,6 @@
   "comment:create", "comment:update", "comment:delete",
   "link:create", "link:update", "link:delete",
   "invoice:create", "invoice:update", "invoice:delete",
-  "volunteers:list", "volunteers:delete"
+  "volunteers:list", "volunteers:delete", "pantry-inventory:create",
+  "pantry-inventory:delete"
 ]

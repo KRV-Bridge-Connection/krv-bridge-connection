@@ -17,7 +17,37 @@ const FORMAT = {
 };
 
 const COLLECTION = 'pantry-schedule';
+
 export const QRSERVER = 'https://api.qrserver.com/';
+
+const REPLACEMENTS = {
+	'CH': 'K',
+	'C': 'K',
+	'PH': 'F',
+};
+
+const PHONETIC_PATTERN = new RegExp(Object.keys(REPLACEMENTS).join('|'), 'g');
+
+const normalizeName = name => name.toString()
+	.trim()
+	.toUpperCase()
+	.normalize('NFD')
+	.replaceAll(/\p{Diacritic}/gu, '')
+	.replaceAll(/([A-Z])\1+/g, '$1')
+	.replaceAll(/[AEIOU]/g, '')
+	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
+
+async function getRecentVisits(name, date = new Date()) {
+	const db = await getFirestore();
+	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 14, 0, 0);
+	const snapshot = await db.collection(COLLECTION)
+		.where('_name', '==', normalizeName(name))
+		.where('date', '>', prior)
+		.count()
+		.get();
+
+	return snapshot.data().count;
+}
 
 async function getQRCode(data, {
 	size,
@@ -182,12 +212,12 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 		const missing = [
-			'givenName', 'familyName', 'bDay', 'household', 'householdIncome', 'addressLocality', 'postalCode', 'date', 'time',
+			'givenName', 'familyName', 'bDay', 'household', 'addressLocality', 'postalCode', 'date', 'time',
 		].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
 			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
-			const household = parseInt(data.get('household'));
+			const household = Math.min(Math.max(parseInt(data.get('household')), 1), 8);
 
 			if (Number.isNaN(date.getTime())) {
 				throw new HTTPBadRequestError('Invalid date/time given.');
@@ -203,11 +233,14 @@ export default createHandler({
 
 				const created = new Date();
 				const id = getSUID({ date: created, alphabet: 'base64url' });
+				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')}`);
+				const PTS_PER_PERSON = recentVists < 2 ? 30 : 5;
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalyName'),
 					familyName: data.get('familyName'),
+					_name: normalizeName(`${data.get('givenName')} ${data.get('familyName')}`),
 					name: ['givenName', 'additionalName', 'familyName']
 						.map(field => data.get(field))
 						.filter(field => typeof field === 'string' && field.length !== 0)
@@ -223,7 +256,7 @@ export default createHandler({
 					comments,
 					created,
 					date,
-					points: parseInt(data.get('household')) * 30,
+					points: parseInt(data.get('household')) * PTS_PER_PERSON,
 				});
 
 				const nowId = Date.now().toString(34);
@@ -234,7 +267,7 @@ export default createHandler({
 						fields: [
 							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
 							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
-							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * 30}`),
+							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * PTS_PER_PERSON}`),
 						],
 					}),
 					new SlackDividerBlock(),
@@ -262,7 +295,7 @@ export default createHandler({
 					roles: ['guest'],
 					authorization_details: {
 						household,
-						points: household * 30,
+						points: household * PTS_PER_PERSON,
 					}
 				}, await getPrivateKey());
 
@@ -270,7 +303,7 @@ export default createHandler({
 				const qr = await getQRCode(token, { signal: req.signal });
 				const body = new FormData();
 				body.set('id', id);
-				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your reference code is ${id}.`);
+				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${PTS_PER_PERSON * household}.`);
 				body.set('date', date.toISOString());
 				body.set('qr', qr);
 

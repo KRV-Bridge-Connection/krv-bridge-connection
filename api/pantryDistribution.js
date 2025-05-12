@@ -11,7 +11,7 @@ export default createHandler({
 		if (searchParams.has('id')) {
 			const barcode = searchParams.get('id');
 
-			if (! /^[0-9]{12}$/.test(barcode)) {
+			if (! /^[0-9]{12,15}$/.test(barcode)) {
 				throw new HTTPBadRequestError(`Invalid barcode: ${barcode}.`);
 			} else {
 				const item = await getCollectionItem(INVENTORY, barcode);
