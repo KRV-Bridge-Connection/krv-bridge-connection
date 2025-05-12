@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
@@ -8,7 +8,7 @@ import { getSUID } from '@shgysk8zer0/suid';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
-	SlackActionsBlock, SLACK_PRIMARY,
+	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
 
 const FORMAT = {
@@ -50,14 +50,13 @@ async function getRecentVisits(name, date = new Date()) {
 	return snapshot.data().count;
 }
 
-async function getQRCode(data, {
+function getQRCodeURL(data, {
 	size,
 	margin,
 	format,
 	color,
 	bgColor,
 	ecc,
-	signal,
 	// ...rest
 } = {}) {
 	const url = new URL('/v1/create-qr-code/',  QRSERVER);
@@ -87,18 +86,7 @@ async function getQRCode(data, {
 		url.searchParams.set('ecc', ecc);
 	}
 
-	const resp = await fetch(url, {
-		headers: { Accept: 'image/png' },
-		referrerPolicy: 'no-referrer',
-		mode: 'cors',
-		signal,
-	});
-
-	if (resp.ok) {
-		return await resp.blob();
-	} else {
-		throw new HTTPBadGatewayError(`Unable to fetch from ${QRSERVER}.`);
-	}
+	return url;
 }
 
 // const _escapeCSV = str => typeof str === 'string' || typeof str === 'number' ? `"${str.toString().replaceAll('"', '""')}"` : '""';
@@ -262,28 +250,6 @@ export default createHandler({
 
 				const nowId = Date.now().toString(34);
 
-				const message = new SlackMessage(process.env.SLACK_WEBHOOK,
-					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
-					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
-						fields: [
-							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
-							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
-							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * PTS_PER_PERSON}`),
-						],
-					}),
-					new SlackDividerBlock(),
-					new SlackContextBlock({ elements: [new SlackPlainTextElement(data.get('comments') || 'No Comments')] }),
-					data.has('email') ? new SlackActionsBlock({
-						elements: [
-							new SlackButtonElement(new SlackPlainTextElement(`Reply to <${data.get('email')}>`), {
-								url: `mailto:${data.get('email')}`,
-								action: `email-${nowId}`,
-								style: SLACK_PRIMARY,
-							}),
-						]
-					}) : undefined
-				);
-
 				const token = await createJWT({
 					iss: 'krvbridge.org',
 					scope: 'pantry',
@@ -303,15 +269,48 @@ export default createHandler({
 					}
 				}, await getPrivateKey());
 
+				const qrURL = getQRCodeURL(token);
+				const qr = await fetch(qrURL, {
+					headers: { Accept: 'image/png' },
+					referrerPolicy: 'no-referrer',
+					mode: 'cors',
+					signal: req.signal,
+				}).then(resp => resp.blob());
 
-				const qr = await getQRCode(token, { signal: req.signal });
+				const message = new SlackMessage(process.env.SLACK_WEBHOOK,
+					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
+					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
+						fields: [
+							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
+							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
+							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * PTS_PER_PERSON}`),
+						],
+					}),
+					new SlackDividerBlock(),
+					new SlackContextBlock({ elements: [
+						new SlackPlainTextElement(data.get('comments') || 'No Comments'),
+					]}),
+					new SlackImageBlock(qrURL.href, { alt: 'QR Code for JWT'}),
+					data.has('email') ? new SlackActionsBlock({
+						elements: [
+							new SlackButtonElement(new SlackPlainTextElement(`Reply to <${data.get('email')}>`), {
+								url: `mailto:${data.get('email')}`,
+								action: `email-${nowId}`,
+								style: SLACK_PRIMARY,
+							}),
+						]
+					}) : undefined
+				);
+
+				console.log(message.toString());
+
 				const body = new FormData();
 				body.set('id', id);
 				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${PTS_PER_PERSON * household}.`);
 				body.set('date', date.toISOString());
 				body.set('qr', qr);
 
-				await message.send({ signal: req.signal }).catch(console.error);
+				await message.send({ signal: req.signal }).catch(err => console.error(err));
 				return new Response(body);
 			}
 		} else {
