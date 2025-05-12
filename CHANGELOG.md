@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.6] - 2025-05-12
+
 ### Added
 - More fields in pantry
-- Support QR Codes for all the pantry things (with autofill)
+- Support QR codes for all the pantry things (with autofill)
+- JWT via QR codes in pantry distribution
+- QR code gen for pantry reg
 
 ## [v1.1.5] - 2025-05-05
 

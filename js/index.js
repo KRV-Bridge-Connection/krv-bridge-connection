@@ -15,6 +15,8 @@ initRouter({
 	'/(partners|resources)/?category=:category': '/js/routes/partners.js',
 	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
 	'/pantry/': '/js/routes/pantry.js',
+	'/pantry/qr': '/js/routes/pantry-qr.js',
+	// '/pantry/': '/js/routes/pantry-inventory.js',
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
 	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
 }, {
