@@ -28,18 +28,19 @@ const REPLACEMENTS = {
 
 const PHONETIC_PATTERN = new RegExp(Object.keys(REPLACEMENTS).join('|'), 'g');
 
+// Simple attempt at dealing with name spelling variations
 const normalizeName = name => name.toString()
 	.trim()
 	.toUpperCase()
 	.normalize('NFD')
 	.replaceAll(/\p{Diacritic}/gu, '')
-	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(/[AEIOU]/g, '')
+	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
 
 async function getRecentVisits(name, date = new Date()) {
 	const db = await getFirestore();
-	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 14, 0, 0);
+	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30, 0, 0);
 	const snapshot = await db.collection(COLLECTION)
 		.where('_name', '==', normalizeName(name))
 		.where('date', '>', prior)
@@ -286,13 +287,16 @@ export default createHandler({
 				const token = await createJWT({
 					iss: 'krvbridge.org',
 					scope: 'pantry',
+					entitlements: ['pantry:use'],
+					roles: ['guest'],
 					// sub: `${data.get('givenName')} ${data.get('familyName')}`,
 					given_name: data.get('givenName'),
 					family_name: data.get('familyName'),
-					iat: created.toISOString(),
-					toe: date.toISOString(),
+					iat: Math.floor(created.getTime() / 1000),
+					nbf: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime() / 1000),
+					exp: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59).getTime() / 1000),
+					toe: Math.floor(date.getTime() / 1000),
 					txn: id,
-					roles: ['guest'],
 					authorization_details: {
 						household,
 						points: household * PTS_PER_PERSON,
