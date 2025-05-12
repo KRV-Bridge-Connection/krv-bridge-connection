@@ -234,8 +234,8 @@ export default function({
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-household-income" class="input-label required">Approximate Household Income</label>
-				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} required="" />
+				<label for="pantry-household-income" class="input-label">Approximate Household Income</label>
+				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} />
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a date</label>
