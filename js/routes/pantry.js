@@ -243,7 +243,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a time</label>
-				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" step="900" ${attr({ value: time })} required="" />
+				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" ${attr({ value: time })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">Comments</label>
