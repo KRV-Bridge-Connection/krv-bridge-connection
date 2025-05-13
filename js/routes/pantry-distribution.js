@@ -11,49 +11,7 @@ import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescan
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 
-// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
-// Setup on FeedingAmerica
-
-const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
-const ADD_ITEM_ID = 'pantry-manual';
-const MISSING_ID = '0'.repeat(15);
-const MAX_PER_ITEM = 100;
-export const title = 'KRV Bridge Pantry Distribution';
-export const description = 'Internal app to record food distribution.';
-const key = await fetchWellKnownKey(location.origin);
-
-export const openCheckIn = ({ rawValue } = {}) => {
-	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
-		const url = new URL('/search-results', NEIGBOR_INTAKE);
-		url.searchParams.set('searchCategory', 'Alt. Id');
-		url.searchParams.set('searchTerm', rawValue.trim());
-		globalThis.open(url);
-	}
-};
-
 const numberClass = 'small-numeric';
-const storageKey = '_lastSync:pantry:inventory';
-const STORE_NAME = 'inventory';
-const ENABLE_NEIGHBORHOD_INTAKE = false;
-const BARCODE_FORMATS = [UPC_A, QR_CODE];
-const UPC_A_PATTERN = /^\d{12,15}$/;
-const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
-const [cart, setCart] = manageState('cart', []);
-
-const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
-const _calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
-
-async function _updateTotal() {
-	await scheduler.yield();
-	const cartTotal = document.getElementById('cart-grand-total');
-	const total = _calcTotal();
-	cartTotal.textContent = total.toFixed(2);
-	const points = parseInt(cartTotal.dataset.points);
-
-	if (! Number.isNaN(points)) {
-		cartTotal.classList.toggle('cart-over-budget', total > points);
-	}
-}
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
@@ -112,6 +70,55 @@ document.adoptedStyleSheets = [
 		}
 	}`,
 ];
+
+const numberFormatter = new Intl.NumberFormat('en', {
+	maximumFractionDigits: 2,
+	minimumFractionDigits: 2,
+	minimumIntegerDigits: 1,
+});
+
+// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
+// Setup on FeedingAmerica
+
+const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
+const ADD_ITEM_ID = 'pantry-manual';
+const MISSING_ID = '0'.repeat(15);
+const MAX_PER_ITEM = 100;
+export const title = 'KRV Bridge Pantry Distribution';
+export const description = 'Internal app to record food distribution.';
+const key = await fetchWellKnownKey(location.origin);
+
+export const openCheckIn = ({ rawValue } = {}) => {
+	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
+		const url = new URL('/search-results', NEIGBOR_INTAKE);
+		url.searchParams.set('searchCategory', 'Alt. Id');
+		url.searchParams.set('searchTerm', rawValue.trim());
+		globalThis.open(url);
+	}
+};
+
+const storageKey = '_lastSync:pantry:inventory';
+const STORE_NAME = 'inventory';
+const ENABLE_NEIGHBORHOD_INTAKE = false;
+const BARCODE_FORMATS = [UPC_A, QR_CODE];
+const UPC_A_PATTERN = /^\d{12,15}$/;
+const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
+const [cart, setCart] = manageState('cart', []);
+
+const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
+const _calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
+
+async function _updateTotal() {
+	await scheduler.yield();
+	const cartTotal = document.getElementById('cart-grand-total');
+	const total = _calcTotal();
+	cartTotal.textContent = numberFormatter.format(total);
+	const points = parseFloat(cartTotal.dataset.points);
+
+	if (! Number.isNaN(points)) {
+		cartTotal.classList.toggle('cart-over-budget', total > points);
+	}
+}
 
 const _openDB = async () => await openDB(SCHEMA.name, {
 	version: SCHEMA.version,
@@ -429,7 +436,7 @@ export default function({
 		<form id="barcode-entry" ${onSubmit}="${barcodeHandler}" ${signalAttr}="${sig}">
 			<div class="form-group">
 				<label for="pantry-barcode" class="input-label">Manually Enter Barcode</label>
-				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{12}" minlength="12" maxlength="12" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
+				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{12,15}" minlength="12" maxlength="15" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
 			</div>
 			<button type="submit" class="btn btn-success">Search</button>
 			<button type="reset" class="btn btn-reject">Clear</button>
@@ -473,9 +480,9 @@ export default function({
 				<tbody class="overflow-auto">${cart.map(item => String.dedent`
 					<tr ${data({ productId: item.id })}>
 						<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
-						<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="2" class="${numberClass}" readonly="" required="" /></td>
+						<td><input type="number" name="item[cost]" ${attr({ value: numberFormatter.format(item.cost) })} size="2" class="${numberClass}" readonly="" required="" /></td>
 						<td><input type="number" name="item[qty]" min="1" max="${MAX_PER_ITEM}" size="5" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
-						<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: (item.qty * item.cost).toFixed(2) })} readonly="" required="" /></td>
+						<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: numberFormatter.format(item.qty * item.cost) })} readonly="" required="" /></td>
 						<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 					</tr>
@@ -483,7 +490,7 @@ export default function({
 				<tfoot>
 					<tr>
 						<th colspan="2">Grand Total</th>
-						<td id="cart-grand-total" colspan="3" ${attr({ 'data-points': typeof points === 'number' ? points : null })}>${_calcTotal()}</td>
+						<td id="cart-grand-total" colspan="3" ${attr({ 'data-points': typeof points === 'number' ? points : null })}>${numberFormatter.format(_calcTotal())}</td>
 						<td class="mobile-hidden"><!-- Intentionally empty --></td>
 					</tr>
 				</tfoot>
