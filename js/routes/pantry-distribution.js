@@ -42,7 +42,18 @@ const [cart, setCart] = manageState('cart', []);
 
 const _convertItem = ({ updated, ...data }) => ({ updated: new Date(updated._seconds * 1000), ...data });
 const _calcTotal = () => cart.reduce((sum, item) => sum + item.cost * item.qty, 0);
-const _updateTotal = () => scheduler.yield().then(() => document.getElementById('cart-grand-total').textContent = _calcTotal().toFixed(2));
+
+async function _updateTotal() {
+	await scheduler.yield();
+	const cartTotal = document.getElementById('cart-grand-total');
+	const total = _calcTotal();
+	cartTotal.textContent = total.toFixed(2);
+	const points = parseInt(cartTotal.dataset.points);
+
+	if (! Number.isNaN(points)) {
+		cartTotal.classList.toggle('cart-over-budget', total > points);
+	}
+}
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
@@ -94,6 +105,11 @@ document.adoptedStyleSheets = [
 		font-weight: 800;
 		font-size: 1.2rem;
 		text-decoration: underline;
+
+		&.cart-over-budget {
+			background-color: #da1212;
+			color: #fafafa;
+		}
 	}`,
 ];
 
@@ -390,6 +406,7 @@ export default function({
 									document.getElementById('pantry-points').value = points;
 									document.getElementById('pantry-household').value = household;
 									document.getElementById('appt-details').hidden = false;
+									document.getElementById('cart-grand-total').dataset.points = points;
 								}
 							}
 						} else if (ENABLE_NEIGHBORHOD_INTAKE) {
@@ -466,7 +483,7 @@ export default function({
 				<tfoot>
 					<tr>
 						<th colspan="2">Grand Total</th>
-						<td id="cart-grand-total" colspan="3">${_calcTotal()}</td>
+						<td id="cart-grand-total" colspan="3" ${attr({ 'data-points': typeof points === 'number' ? points : null })}>${_calcTotal()}</td>
 						<td class="mobile-hidden"><!-- Intentionally empty --></td>
 					</tr>
 				</tfoot>
