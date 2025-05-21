@@ -12,6 +12,7 @@ import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 
 const numberClass = 'small-numeric';
+const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
@@ -235,6 +236,7 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 
 			if (resp.ok) {
 				alert('Checkout complete');
+				setCart([]);
 				event.target.reset();
 			} else {
 				alert('Error completing transaction.');
@@ -249,11 +251,16 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 
 });
 
-const resetHandler = registerCallback('pantry:distribution:reset', () =>{
-	history.replaceState({ cart: [] }, '', location.href);
-	document.querySelector('#pantry-cart tbody').replaceChildren();
-	document.getElementById('appt-details').hidden = true;
-	_updateTotal();
+const resetHandler = registerCallback('pantry:distribution:reset', event => {
+	console.log(event);
+	if (event.isTrusted && cart.length !== 0 && ! globalThis.confirm('Reset pantry?')) {
+		event.preventDefault();
+	} else {
+		history.replaceState({ cart: [] }, '', location.href);
+		document.querySelector('#pantry-cart tbody').replaceChildren();
+		document.getElementById('appt-details').hidden = true;
+		_updateTotal();
+	}
 });
 
 const addItemSubmit = registerCallback('pantry:distribution:add:submit', async event => {
@@ -351,8 +358,9 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 	}
 }
 
-export default function({
+export default async function({
 	state: {
+		token = '',
 		givenName = '',
 		familyName = '',
 		household = '',
@@ -375,7 +383,7 @@ export default function({
 						break;
 
 					case QR_CODE:
-						if (result.rawValue.length > 50) {
+						if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
 							const decoded = await verifyJWT(result.rawValue, key, {
 								scope: 'pantry',
 							});
@@ -406,6 +414,7 @@ export default function({
 									setState('familyName', familyName);
 									setState('points', points);
 									setState('household', household);
+									setState('token', result.rawValue);
 
 									document.getElementById('pantry-appt').value = id;
 									document.getElementById('pantry-given-name').value = givenName;
@@ -414,9 +423,10 @@ export default function({
 									document.getElementById('pantry-household').value = household;
 									document.getElementById('appt-details').hidden = false;
 									document.getElementById('cart-grand-total').dataset.points = points;
+									document.getElementById('pantry-token').value = result.rawValue;
 								}
 							}
-						} else if (ENABLE_NEIGHBORHOD_INTAKE) {
+						} else if(ENABLE_NEIGHBORHOD_INTAKE) {
 							openCheckIn(result);
 						}
 				}
@@ -452,6 +462,7 @@ export default function({
 			</div>
 			<div id="appt-details" ${attr({ hidden: Number.isNaN(parseInt(points)) })}>
 				<input type="hidden" name="appt" id="pantry-appt" class="display-text" />
+				<input type="hidden" name="pantry-token" id="pantry-token" ${attr({ value: token })} />
 				<div>
 					<b>Name:</b>
 					<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
