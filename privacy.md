@@ -42,3 +42,4 @@ For any inquiries or concerns regarding this privacy policy, please [contact us]
 
 This privacy policy is effective as of 10/10/2023 and may be updated from time to time. Users are encouraged to review the policy periodically for any changes.
 
+No mobile information will be shared with third parties/affiliates for marketing/promotional purposes. All OPT-IN requests include text messaging originator opt-in data and consent; this information will not be shared with third parties.
