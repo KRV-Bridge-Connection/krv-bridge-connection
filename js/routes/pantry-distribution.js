@@ -252,7 +252,6 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', event => {
-	console.log(event);
 	if (event.isTrusted && cart.length !== 0 && ! globalThis.confirm('Reset pantry?')) {
 		event.preventDefault();
 	} else {
@@ -278,7 +277,6 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 			qty: parseInt(data.get('qty')),
 		});
 
-		document.getElementById('appt-details').hidden = true;
 		target.reset();
 	} finally {
 		submitter.disabled = false;
