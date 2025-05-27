@@ -7,7 +7,7 @@ import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, r
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
-import { createBarcodeReader, QR_CODE, UPC_A } from '@aegisjsproject/barcodescanner';
+import { createBarcodeReader, QR_CODE, UPC_A, UPC_E } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 
@@ -101,8 +101,8 @@ export const openCheckIn = ({ rawValue } = {}) => {
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
 const ENABLE_NEIGHBORHOD_INTAKE = false;
-const BARCODE_FORMATS = [UPC_A, QR_CODE];
-const UPC_A_PATTERN = /^\d{12,15}$/;
+const BARCODE_FORMATS = [UPC_A, UPC_E, QR_CODE];
+const UPC_PATTERN = /^\d{8,15}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
 const [cart, setCart] = manageState('cart', []);
 
@@ -138,7 +138,7 @@ function _createItemRow(item) {
 }
 
 const _getItem = async id => {
-	if (typeof id === 'string' && UPC_A_PATTERN.test(id)) {
+	if (typeof id === 'string' && UPC_PATTERN.test(id)) {
 		const db = await _openDB();
 
 		try {
@@ -186,7 +186,7 @@ async function _addToCart(id) {
 	try {
 		if (typeof id !== 'string') {
 			throw new TypeError('Invalid product ID.');
-		} else if (id.length < 12) {
+		} else if (id.length < 8) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
 		}
 
@@ -377,6 +377,7 @@ export default async function({
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				switch (result.format) {
 					case UPC_A:
+					case UPC_E:
 						await _addToCart(result.rawValue);
 						break;
 
@@ -444,7 +445,7 @@ export default async function({
 		<form id="barcode-entry" ${onSubmit}="${barcodeHandler}" ${signalAttr}="${sig}">
 			<div class="form-group">
 				<label for="pantry-barcode" class="input-label">Manually Enter Barcode</label>
-				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{12,15}" minlength="12" maxlength="15" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
+				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{8,15}" minlength="8" maxlength="15" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
 			</div>
 			<button type="submit" class="btn btn-success">Search</button>
 			<button type="reset" class="btn btn-reject">Clear</button>
