@@ -22,6 +22,7 @@ export const QRSERVER = 'https://api.qrserver.com/';
 
 const REPLACEMENTS = {
 	'CH': 'K',
+	'CK': 'K',
 	'C': 'K',
 	'PH': 'F',
 };
@@ -51,7 +52,7 @@ async function getRecentVisits(name, date = new Date()) {
 }
 
 function getQRCodeURL(data, {
-	size,
+	size = 480,
 	margin,
 	format,
 	color,
@@ -128,19 +129,20 @@ export default createHandler({
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
 			} else {
-				const db = await getFirestore();
-				const now = new Date();
-				const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 14);
+				// const db = await getFirestore();
+				// const now = new Date();
+				// const startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
 
-				const collectionRef = db.collection(COLLECTION);
-				const query = collectionRef
-				  .where('name', '==', searchParams.get('name'))
-				  .where('date', '>=', startDate);
+				// const collectionRef = db.collection(COLLECTION);
+				// const query = collectionRef
+				//   .where('_name', '==', normalizeName(searchParams.get('name')))
+				//   .where('date', '>=', startDate);
 
-				const snapshot = await query.count().get();
-				const count = snapshot.data().count;
+				// const snapshot = await query.count().get();
+				// const count = snapshot.data().count;
+				const count = await getRecentVisits(searchParams.get('name'));
 
-				return Response.json({ count, allowed: count < 2, since: startDate.toISOString() });
+				return Response.json({ count, allowed: count < 2, since: new Date().toISOString() });
 			}
 		} else if (! searchParams.has('id')) {
 			const result = await verifyJWT(token, await getPublicKey(), {
