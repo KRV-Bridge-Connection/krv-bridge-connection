@@ -10,9 +10,11 @@ import { SCHEMA } from '../consts.js';
 import { createBarcodeReader, QR_CODE, UPC_A, UPC_E } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
+import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
 
 const numberClass = 'small-numeric';
 const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
+const STATUS_ID = 'pantry-submit-status';
 
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
@@ -223,29 +225,37 @@ async function _addToCart(id) {
 
 const submitHandler = registerCallback('pantry:distribution:submit', async event => {
 	event.preventDefault();
-	const submitter = event.submitter;
+	const { submitter, target } = event;
+	const status = document.getElementById(STATUS_ID);
+	const body = new FormData(target);
 
 	try {
+		status.reset({ idle: false });
 		submitter.disabled = true;
 
-		if (await confirm('Complete checkout?')) {
+		if (! body.has('item[id]')) {
+			throw new Error('No items in cart.');
+		} else  if (await confirm('Complete checkout?')) {
 			const resp = await fetch(PANTRY_ENDPOINT, {
 				method: 'POST',
-				body: new FormData(event.target),
+				body: new FormData(target),
 			}).catch(() => Response.error());
 
 			if (resp.ok) {
-				alert('Checkout complete');
 				setCart([]);
-				event.target.reset();
+				target.reset();
+				status.resolve();
 			} else {
 				alert('Error completing transaction.');
+				status.reject();
 			}
 		}
 	} catch(err) {
+		status.reject();
 		reportError(err);
 		alert(err);
 	} finally {
+		setTimeout(() => status.idle = true, 3000);
 		submitter.disabled = false;
 	}
 
@@ -441,6 +451,14 @@ export default async function({
 		}).catch(reportError);
 	}
 
+	setTimeout(() => {
+		const status = new HTMLStatusIndicatorElement();
+		status.id = STATUS_ID;
+		status.idle = true;
+		// status.idle = true;
+		document.querySelector('#scanner .btn-success').append(status);
+	}, 2000);
+
 	return html`<search>
 		<form id="barcode-entry" ${onSubmit}="${barcodeHandler}" ${signalAttr}="${sig}">
 			<div class="form-group">
@@ -465,7 +483,7 @@ export default async function({
 				<div>
 					<b>Name:</b>
 					<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
-					<input type="text" id="pantry-family-name" class="display-text" name="familyName"${attr({ value: familyName })} readonly="" />.
+					<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />.
 				</div>
 				<div>
 					<b>Points:</b>
