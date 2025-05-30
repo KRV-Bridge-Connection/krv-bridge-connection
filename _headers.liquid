@@ -4,7 +4,11 @@ permalink: /_headers
 ---
 /
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
+  X-Frame-Options: DENY{%  comment  %}
+  Cross-Origin-Resource-Policy: cross-origin{% endcomment %}
+  Cross-Origin-Opener-Policy: same-origin{% comment %} 
+  Cross-Origin-Embedder-Policy: require-corp {% endcomment %}
+  Permissions-Policy: {% comment %}cross-origin-isolated=(self), {% endcomment %}web-share=(self), camera=(self), storage-acces=(self), screen-wake-lock=(self), geolocation=(self) 
   Referrer-Policy: no-referrer
   X-XSS-Protection: 1; mode=block
   Link: <https://fonts.gstatic.com>; rel=preconnect; crossorigin=anonymous;
@@ -17,6 +21,10 @@ permalink: /_headers
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer
+  {% comment %}Cross-Origin-Resource-Policy: cross-origin{% endcomment %}
+  Cross-Origin-Opener-Policy: same-origin{% comment %}
+  Cross-Origin-Embedder-Policy: require-corp{% endcomment %}
+  Permissions-Policy: {% comment %}cross-origin-isolated=(self), {% endcomment %}web-share=(self), camera=(self), storage-acces=(self), screen-wake-lock=(self), geolocation=(self)
   X-XSS-Protection: 1; mode=block
   Link: <https://fonts.gstatic.com>; rel=preconnect; crossorigin=anonymous;
   Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
