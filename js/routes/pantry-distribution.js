@@ -195,13 +195,14 @@ async function _addToCart(id) {
 		const existing = id === MISSING_ID ? null : document.querySelector(`tr[data-product-id="${id}"]`);
 
 		if (existing instanceof HTMLTableRowElement) {
+			await scheduler.yield();
 			const items = structuredClone(history.state?.cart ?? []);
 			const itemIndex = items.findIndex(item => item.id === id);
 			items[itemIndex].qty++;
-			await scheduler.yield();
 			existing.querySelector('input[name="item[qty]"]').value = items[itemIndex].qty;
-			existing.querySelector('input[name="item[total]"]').value = items[itemIndex].qty * items[itemIndex].cost;
+			existing.querySelector('input[name="item[total]"]').value = numberFormatter.format(items[itemIndex].qty * items[itemIndex].cost);
 			setCart(items);
+			await scheduler.yield();
 			_updateTotal();
 
 			return true;
