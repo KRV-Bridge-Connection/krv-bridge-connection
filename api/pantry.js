@@ -43,6 +43,7 @@ async function getRecentVisits(name, date = new Date()) {
 	const db = await getFirestore();
 	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30, 0, 0);
 	const snapshot = await db.collection(COLLECTION)
+		.where('extra_trip', '==', false)
 		.where('_name', '==', normalizeName(name))
 		.where('date', '>', prior)
 		.count()
@@ -225,7 +226,8 @@ export default createHandler({
 				const created = new Date();
 				const id = getSUID({ date: created, alphabet: 'base64url' });
 				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')}`);
-				const PTS_PER_PERSON = recentVists < 2 ? 30 : 5;
+				const normalTrip = recentVists < 2;
+				const PTS_PER_PERSON = normalTrip ? 30 : 5;
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
@@ -246,6 +248,7 @@ export default createHandler({
 					householdIncome: parseInt(data.get('householdIncome')),
 					comments,
 					created,
+					extra_trip: ! normalTrip,
 					date,
 					points: parseInt(data.get('household')) * PTS_PER_PERSON,
 				});
