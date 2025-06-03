@@ -16,6 +16,12 @@ const numberClass = 'small-numeric';
 const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 const STATUS_ID = 'pantry-submit-status';
 
+const SUGGESTED_ITEMS = [
+	'Divert Item',
+	'Bread',
+	'Fruit',
+];
+
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
 	css`td > input.${numberClass} {
@@ -85,7 +91,6 @@ const numberFormatter = new Intl.NumberFormat('en', {
 
 const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
 const ADD_ITEM_ID = 'pantry-manual';
-const MISSING_ID = '0'.repeat(15);
 const MAX_PER_ITEM = 100;
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
@@ -192,7 +197,7 @@ async function _addToCart(id) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
 		}
 
-		const existing = id === MISSING_ID ? null : document.querySelector(`tr[data-product-id="${id}"]`);
+		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
 
 		if (existing instanceof HTMLTableRowElement) {
 			await scheduler.yield();
@@ -259,7 +264,6 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 		setTimeout(() => status.idle = true, 3000);
 		submitter.disabled = false;
 	}
-
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', event => {
@@ -282,7 +286,7 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 		const data = new FormData(target);
 
 		await _addProduct({
-			id: data.get('id'),
+			id: crypto.randomUUID(),
 			name: data.get('name'),
 			cost: parseFloat(data.get('cost')),
 			qty: parseInt(data.get('qty')),
@@ -355,10 +359,12 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 		const items = await fetch(url, {
 			headers: { Accept: 'application/json' },
 			referrerPolicy: 'no-referrer',
+			signal: controller.signal,
 		}).then(resp => resp.json());
 
 		await Promise.all(items.map(item => putItem(db, STORE_NAME, _convertItem(item), { signal: controller.signal })));
 		localStorage.setItem(storageKey, Date.now());
+		controller.abort();
 	} catch(err) {
 		controller.abort(err);
 		alert(err);
@@ -456,7 +462,6 @@ export default async function({
 		const status = new HTMLStatusIndicatorElement();
 		status.id = STATUS_ID;
 		status.idle = true;
-		// status.idle = true;
 		document.querySelector('#scanner .btn-success').append(status);
 	}, 2000);
 
@@ -533,17 +538,16 @@ export default async function({
 	</form>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
-			<input type="hidden" name="id" value="${MISSING_ID}" />
 			<div class="form-group">
 				<label for="pantry-entry-name" class="input-label required">Name</label>
 				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" list="pantry-add-item-names" autofocus="" required="" />
 				<datalist id="pantry-add-item-names">
-					<option label="Divert Item" value="Divert Item"></option>
+					${SUGGESTED_ITEMS.map(item => `<option ${attr({ label: item, value: item })}></option>`).join('')}
 				</datalist>
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-cost" class="input-label required">Points</label>
-				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0.25" value="1" max="20" step="0.01" required="" />
+				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-qty" class="input-label required">Quantity</label>

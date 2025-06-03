@@ -101,9 +101,9 @@ shortcuts:
   # - name: Resources
   #   description: Directory of Resources
   #   url: /resources/
-  - name: Search 211
-    description: Search 211 for available resources
-    url: /211/
+  - name: Resources
+    description: Search Resoucres
+    url: /resources/
     icons:
     - src: /img/shortcuts/resources.svg
       sizes: 192x192
@@ -146,10 +146,10 @@ related_applications:
   # - platform: windows
   #   url: "#"
 features:
-  - Easily find the services you're looking for
+  - Easily find the services and resources you're looking for
+  - Schedule an appointment for our Choice Pantry
   - Find out how to contact numerous nonprofit organizations
   - Learn about upcoming events to benefit residents of the Kern River Valley
-  - Organization memebers may update org info, make room reservations and manage calendars
 # https://github.com/w3c/manifest/wiki/Categories
 categories:
   - business
