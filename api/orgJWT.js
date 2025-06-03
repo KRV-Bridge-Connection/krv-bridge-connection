@@ -17,6 +17,13 @@ async function getFirebase() {
 	}
 }
 
+const cookieName = 'org-jwt';
+const path = '/api/';
+const sameSite = 'strict';
+const secure = true;
+const httpOnly = true;
+const partitioned = true;
+
 export default createHandler({
 	async get(req, {
 		ip = null,
@@ -72,14 +79,14 @@ export default createHandler({
 				}, key);
 
 				const cookie = new Cookie({
-					name: 'org-jwt',
+					name: cookieName,
 					value: token,
-					expires: expires,
-					path: '/api/',
-					sameSite: 'strict',
-					secure: true,
-					httpOnly: true,
-					partitioned: true,
+					expires,
+					path,
+					sameSite,
+					secure,
+					httpOnly,
+					partitioned,
 				});
 
 				return Response.json({ expires, jti }, { headers: new Headers({ 'Set-Cookie': cookie }) });
@@ -87,8 +94,25 @@ export default createHandler({
 				throw new HTTPNotFoundError(`No user record exists for user ${uid}.`);
 			}
 		}
+	},
+	// For logout
+	async delete() {
+		const cookie = new Cookie({
+			name: cookieName,
+			value: null,
+			expires: -1,
+			path,
+			sameSite,
+			secure,
+			httpOnly,
+			partitioned,
+		});
+
+		return new Response(null, {
+			headers: { 'Set-Cookie': cookie },
+			status: 201,
+		});
 	}
 }, {
 	allowCredentials: true,
-	requireJWT: true,
 });
