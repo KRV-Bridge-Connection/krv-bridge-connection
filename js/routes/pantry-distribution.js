@@ -325,9 +325,9 @@ const changeHandler = registerCallback('pantry:distribution:change', async ({ ta
 				const row = target.closest('tr');
 				const cost = row.querySelector('input[name="item[cost]"]');
 				const index = cart.findIndex(item => item.id === row.dataset.productId);
-				row.querySelector('input[name="item[total]"]').value = target.valueAsNumber * cost.valueAsNumber;
 
 				if (index !== -1) {
+					row.querySelector('input[name="item[total]"]').value = numberFormatter.format(target.valueAsNumber * cost.valueAsNumber);
 					const tmp = structuredClone(history.state?.cart ?? []);
 					tmp[index].qty = target.valueAsNumber;
 					setCart(tmp);
@@ -389,74 +389,72 @@ export default async function({
 		setCart([]);
 	}
 
-	if ('BarcodeDetector' in globalThis) {
-		createBarcodeReader(async result => {
-			if (typeof result === 'object' && typeof result.rawValue === 'string') {
-				switch (result.format) {
-					case UPC_A:
-					case UPC_E:
-						await _addToCart(result.rawValue);
-						break;
+	createBarcodeReader(async result => {
+		if (typeof result === 'object' && typeof result.rawValue === 'string') {
+			switch (result.format) {
+				case UPC_A:
+				case UPC_E:
+					await _addToCart(result.rawValue);
+					break;
 
-					case QR_CODE:
-						if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
-							const decoded = await verifyJWT(result.rawValue, key, {
-								scope: 'pantry',
-							});
+				case QR_CODE:
+					if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
+						const decoded = await verifyJWT(result.rawValue, key, {
+							scope: 'pantry',
+						});
 
-							if (decoded instanceof Error) {
-								throw new Error('Error validating JWT', { cause: decoded });
-							} else {
-								const {
-									nbf,
-									exp,
-									txn: id,
-									toe: timestamp,
-									given_name: givenName,
-									family_name: familyName,
-									authorization_details: {
-										household,
-										points,
-									} = {}
-								} = decoded;
+						if (decoded instanceof Error) {
+							throw new Error('Error validating JWT', { cause: decoded });
+						} else {
+							const {
+								nbf,
+								exp,
+								txn: id,
+								toe: timestamp,
+								given_name: givenName,
+								family_name: familyName,
+								authorization_details: {
+									household,
+									points,
+								} = {}
+							} = decoded;
 
-								const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
-								const notBefore = new Date(nbf * 1000);
-								const expires = new Date(exp * 1000);
-								const now = Date.now();
+							const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
+							const notBefore = new Date(nbf * 1000);
+							const expires = new Date(exp * 1000);
+							const now = Date.now();
 
-								if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
-									setState('givenName', givenName);
-									setState('familyName', familyName);
-									setState('points', points);
-									setState('household', household);
-									setState('token', result.rawValue);
+							if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+								setState('givenName', givenName);
+								setState('familyName', familyName);
+								setState('points', points);
+								setState('household', household);
+								setState('token', result.rawValue);
 
-									document.getElementById('pantry-appt').value = id;
-									document.getElementById('pantry-given-name').value = givenName;
-									document.getElementById('pantry-family-name').value = familyName;
-									document.getElementById('pantry-points').value = points;
-									document.getElementById('pantry-household').value = household;
-									document.getElementById('appt-details').hidden = false;
-									document.getElementById('cart-grand-total').dataset.points = points;
-									document.getElementById('pantry-token').value = result.rawValue;
-								}
+								document.getElementById('pantry-appt').value = id;
+								document.getElementById('pantry-given-name').value = givenName;
+								document.getElementById('pantry-family-name').value = familyName;
+								document.getElementById('pantry-points').value = points;
+								document.getElementById('pantry-household').value = household;
+								document.getElementById('appt-details').hidden = false;
+								document.getElementById('cart-grand-total').dataset.points = points;
+								document.getElementById('pantry-token').value = result.rawValue;
 							}
-						} else if(ENABLE_NEIGHBORHOD_INTAKE) {
-							openCheckIn(result);
 						}
-				}
+					} else if(ENABLE_NEIGHBORHOD_INTAKE) {
+						openCheckIn(result);
+					}
 			}
-		}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video }) => {
-			const details = document.createElement('details');
-			const summary = document.createElement('summary');
-			summary.classList.add('btn', 'btn-primary');
-			summary.textContent = 'View Camera Feed';
-			video.classList.add('fill-width');
-			details.append(summary, video);
-			document.getElementById('scanner').prepend(details, document.createElement('br'));
-		}).catch(reportError);
-	}
+		}
+	}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video }) => {
+		const details = document.createElement('details');
+		const summary = document.createElement('summary');
+		summary.classList.add('btn', 'btn-primary');
+		summary.textContent = 'View Camera Feed';
+		video.classList.add('fill-width');
+		details.append(summary, video);
+		document.getElementById('scanner').prepend(details, document.createElement('br'));
+	}).catch(reportError);
 
 	setTimeout(() => {
 		const status = new HTMLStatusIndicatorElement();
