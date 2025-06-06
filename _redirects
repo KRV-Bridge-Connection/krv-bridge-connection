@@ -9,6 +9,7 @@
 /posts/* /dynamic.html 200
 /pantry/* /dynamic.html 200
 /pantry /pantry/ 301
+/pantry?fbclid=:junk /pantry/ 301
 /volunteer /volunteer/ 301
 /resources /resources/ 301
 /partners  /partners/ 301
