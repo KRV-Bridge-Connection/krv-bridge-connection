@@ -40,7 +40,7 @@ default:
     - "blob:"
     - "data:"
   media-src:
-    - "'none'"
+    - "'self' blob:"
   font-src:
     - https://cdn.kernvalley.us/fonts/
     - https://fonts.gstatic.com/
