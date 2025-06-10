@@ -73,30 +73,6 @@ document.adoptedStyleSheets = [
 		color: inherit;
 	}
 
-	#scanner > fieldset {
-    padding: 1.2em 0;
-    overflow: visible; /* Ensure fieldset doesn't create its own scrollbar */
-}
-
-	#scanner {
-		max-height: 80dvh;
-		overflow-y: auto;
-	}
-
-	#pantry-cart {
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-	#pantry-cart-foot {
-		position: sticky;
-		bottom: 0;
-		background-color: #232323;
-		color: #fafafa;
-		z-index: 10; /* Ensure it appears above the tbody content */
-	}
-
-
 	#cart-grand-total {
 		font-weight: 800;
 		font-size: 1.2rem;
