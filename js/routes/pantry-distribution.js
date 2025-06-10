@@ -7,7 +7,7 @@ import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, r
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
-import { createBarcodeReader, QR_CODE, UPC_A, UPC_E } from '@aegisjsproject/barcodescanner';
+import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
@@ -373,6 +373,8 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 	}
 }
 
+preloadRxing();
+
 export default async function({
 	state: {
 		token = '',
@@ -389,7 +391,7 @@ export default async function({
 		setCart([]);
 	}
 
-	createBarcodeReader(async result => {
+	createBarcodeScanner(async result => {
 		if (typeof result === 'object' && typeof result.rawValue === 'string') {
 			switch (result.format) {
 				case UPC_A:
