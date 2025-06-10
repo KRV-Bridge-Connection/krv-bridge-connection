@@ -12,9 +12,19 @@ import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
 
+export const title = 'KRV Bridge Pantry Distribution';
+export const description = 'Internal app to record food distribution.';
+
+// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
+// Setup on FeedingAmerica
+const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
+const ADD_ITEM_ID = 'pantry-manual';
+const MAX_PER_ITEM = 99;
+
 const numberClass = 'small-numeric';
 const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 const STATUS_ID = 'pantry-submit-status';
+const key = await fetchWellKnownKey(location.origin);
 
 const SUGGESTED_ITEMS = [
 	'Divert Item',
@@ -63,11 +73,6 @@ document.adoptedStyleSheets = [
 		color: inherit;
 	}
 
-	#pantry-cart tbody:empty::after {
-		display: block;
-		content: "Scan items to add to cart."
-	}
-
 	#cart-grand-total {
 		font-weight: 800;
 		font-size: 1.2rem;
@@ -77,6 +82,16 @@ document.adoptedStyleSheets = [
 			background-color: #da1212;
 			color: #fafafa;
 		}
+	}
+
+	#pantry-cart {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	#pantry-cart-foot {
+		position: sticky;
+		bottom: 0;
 	}`,
 ];
 
@@ -85,16 +100,6 @@ const numberFormatter = new Intl.NumberFormat('en', {
 	minimumFractionDigits: 2,
 	minimumIntegerDigits: 1,
 });
-
-// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
-// Setup on FeedingAmerica
-
-const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
-const ADD_ITEM_ID = 'pantry-manual';
-const MAX_PER_ITEM = 100;
-export const title = 'KRV Bridge Pantry Distribution';
-export const description = 'Internal app to record food distribution.';
-const key = await fetchWellKnownKey(location.origin);
 
 export const openCheckIn = ({ rawValue } = {}) => {
 	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
@@ -203,11 +208,13 @@ async function _addToCart(id) {
 			await scheduler.yield();
 			const items = structuredClone(history.state?.cart ?? []);
 			const itemIndex = items.findIndex(item => item.id === id);
+			const qty = existing.querySelector('input[name="item[qty]"]');
 			items[itemIndex].qty++;
-			existing.querySelector('input[name="item[qty]"]').value = items[itemIndex].qty;
+			qty.value = items[itemIndex].qty;
 			existing.querySelector('input[name="item[total]"]').value = numberFormatter.format(items[itemIndex].qty * items[itemIndex].cost);
 			setCart(items);
 			await scheduler.yield();
+			qty.reportValidity();
 			_updateTotal();
 
 			return true;
@@ -521,7 +528,7 @@ export default async function({
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 					</tr>
 				`).join('')}</tbody>
-				<tfoot>
+				<tfoot id="pantry-cart-foot">
 					<tr>
 						<th colspan="2">Grand Total</th>
 						<td id="cart-grand-total" colspan="3" ${attr({ 'data-points': typeof points === 'number' ? points : null })}>${numberFormatter.format(_calcTotal())}</td>
