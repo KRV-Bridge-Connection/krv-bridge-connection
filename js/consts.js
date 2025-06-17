@@ -10,7 +10,7 @@ export const site = {
 	title: 'KRV Bridge Connection',
 };
 
-export const DB_VERSION = 6;
+export const DB_VERSION = 9;
 export const ORG_TOKEN_KEY = 'token:expires';
 
 export const pubicKey = '{"key_ops":["verify"],"ext":true,"kty":"EC","x":"TSyH_WceOud8bA_jN4FLnn2Mucn1XuGAdLrPU38NxoQ","y":"QhnIVTKPjIjqbFbLn1K4WM4KdVSvb95zGqpNEyrIRIE","crv":"P-256"}';
@@ -83,5 +83,16 @@ export const SCHEMA = {
 				},
 			},
 		},
+		eventGuests: {
+			keyPath: 'id',
+			autoIncrement: false,
+			indexes: {
+				email: {
+					keyPath: 'email',
+					multiEntry: false,
+					unique: true,
+				}
+			}
+		}
 	},
 };

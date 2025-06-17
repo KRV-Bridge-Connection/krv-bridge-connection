@@ -14,10 +14,6 @@ import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indic
 
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
-
-// https://training.neighborintake.org/search-results?searchCategory=Alt.%20Id&searchTerm=:term
-// Setup on FeedingAmerica
-const NEIGBOR_INTAKE = 'https://training.neighborintake.org';
 const ADD_ITEM_ID = 'pantry-manual';
 const MAX_PER_ITEM = 99;
 
@@ -30,6 +26,10 @@ const SUGGESTED_ITEMS = [
 	'Divert Item',
 	'Bread',
 	'Fruit',
+	'Vegetables',
+	'Trail Mix',
+	'Snacks',
+	'Cheese',
 ];
 
 document.adoptedStyleSheets = [
@@ -101,18 +101,8 @@ const numberFormatter = new Intl.NumberFormat('en', {
 	minimumIntegerDigits: 1,
 });
 
-export const openCheckIn = ({ rawValue } = {}) => {
-	if (typeof rawValue === 'string' && /^[A-Za-z\d]{7,9}$/.test(rawValue.trim())) {
-		const url = new URL('/search-results', NEIGBOR_INTAKE);
-		url.searchParams.set('searchCategory', 'Alt. Id');
-		url.searchParams.set('searchTerm', rawValue.trim());
-		globalThis.open(url);
-	}
-};
-
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
-const ENABLE_NEIGHBORHOD_INTAKE = false;
 const BARCODE_FORMATS = [UPC_A, UPC_E, QR_CODE];
 const UPC_PATTERN = /^\d{8,15}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
@@ -196,15 +186,13 @@ async function _addProduct(product) {
 
 async function _addToCart(id) {
 	try {
+		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
+
 		if (typeof id !== 'string') {
 			throw new TypeError('Invalid product ID.');
 		} else if (id.length < 8) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
-		}
-
-		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
-
-		if (existing instanceof HTMLTableRowElement) {
+		} else if (existing instanceof HTMLTableRowElement) {
 			await scheduler.yield();
 			const items = structuredClone(history.state?.cart ?? []);
 			const itemIndex = items.findIndex(item => item.id === id);
@@ -453,8 +441,6 @@ export default async function({
 								document.getElementById('pantry-token').value = result.rawValue;
 							}
 						}
-					} else if(ENABLE_NEIGHBORHOD_INTAKE) {
-						openCheckIn(result);
 					}
 			}
 		}
