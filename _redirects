@@ -13,4 +13,6 @@
 /volunteer /volunteer/ 301
 /resources /resources/ 301
 /partners  /partners/ 301
+/event/ /dynamic.html 200
+/event/* /dynamic.html 200
 /* /404.html

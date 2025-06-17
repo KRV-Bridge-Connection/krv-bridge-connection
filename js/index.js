@@ -19,6 +19,7 @@ initRouter({
 	// '/pantry/': '/js/routes/pantry-inventory.js',
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
 	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
+	'/event/sign-in/': '/js/routes/sign-in.js',
 }, {
 	rootEl: document.getElementById('main'),
 	notFound: '/js/routes/404.js',
