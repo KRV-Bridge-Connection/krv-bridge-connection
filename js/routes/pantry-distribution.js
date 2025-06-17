@@ -143,8 +143,8 @@ function _createItemRow(item) {
 		<td><input type="text" name="item[name]" ${attr({ value: item.name })} readonly="" required="" /></td>
 		<td><input type="number" name="item[cost]" ${attr({ value: item.cost.toFixed(2) })} size="5" class="${numberClass}" readonly="" required="" /></td>
 		<td><input type="number" name="item[qty]" min="1" max="${MAX_PER_ITEM}" size="4" class="${numberClass}" ${attr({ value: item.qty ?? 1 })} required="" /></td>
-		<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: ((item.qty ?? 1) * item.cost).toFixed(2) })} readonly="" required="" /></td>
-		<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
+		<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: numberFormatter.format((item.qty ?? 1) * item.cost) })} readonly="" required="" /></td>
+		<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id, name: item.name })} aria-label="Remove Item">X</button></td>
 		<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 	</tr>`;
 }
@@ -348,9 +348,12 @@ const changeHandler = registerCallback('pantry:distribution:change', async ({ ta
 const clickHandler = registerCallback('pantry:distribution:click', async ({ target }) => {
 	switch(target.dataset.action) {
 		case 'remove':
-			setCart(cart.filter(item => item.id !== target.dataset.productId));
-			target.closest('tr').remove();
-			_updateTotal();
+			if (await confirm(`Delete ${target.dataset.name ?? 'Product'}?`)) {
+				setCart(cart.filter(item => item.id !== target.dataset.productId));
+				target.closest('tr').remove();
+				_updateTotal();
+
+			}
 			break;
 	}
 });
@@ -524,7 +527,7 @@ export default async function({
 						<td><input type="number" name="item[cost]" ${attr({ value: numberFormatter.format(item.cost) })} size="2" class="${numberClass}" readonly="" required="" /></td>
 						<td><input type="number" name="item[qty]" min="1" max="${MAX_PER_ITEM}" size="5" class="${numberClass}" ${attr({ value: item.qty })} required="" /></td>
 						<td><input type="number" name="item[total]" size="7" class="${numberClass}" ${attr({ value: numberFormatter.format(item.qty * item.cost) })} readonly="" required="" /></td>
-						<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id })} aria-label="Remove Item">X</button></td>
+						<td><button type="button" class="btn btn-danger" data-action="remove" ${data({ productId: item.id, name: item.name })} aria-label="Remove Item">X</button></td>
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 					</tr>
 				`).join('')}</tbody>
