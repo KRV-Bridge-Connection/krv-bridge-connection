@@ -1,9 +1,11 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onSubmit, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getAllItems, clearStore, putItem } from '@aegisjsproject/idb';
 import { saveFile } from '@shgysk8zer0/kazoo/filesystem.js';
+import { confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 
 const STORE = 'eventGuests';
@@ -22,8 +24,11 @@ const clearGuests = registerCallback('event:guests:clear', async ({ currentTarge
 
 	try {
 		currentTarget.disabled = true;
-		await clearStore(db, STORE);
-		document.querySelector(`#${TABLE} tbody`).replaceChildren();
+
+		if (await confirm('Are you sure you want to clear sign-ins?')) {
+			await clearStore(db, STORE);
+			document.querySelector(`#${TABLE} tbody`).replaceChildren();
+		}
 	} catch(err) {
 		reportError(err);
 	} finally {
@@ -96,6 +101,27 @@ const addGuest = registerCallback('event:guests:add', async event => {
 		submitter.disabled = false;
 	}
 });
+
+document.adoptedStyleSheets = [
+	...document.adoptedStyleSheets,
+	css`
+		#${POPOVER}:popover-open {
+			border: none;
+			border-radius: 6px;
+			padding: 1.2em;
+
+			.flex {
+				gap: 1em;
+
+				.input {
+					width: auto;
+					max-width: unset;
+					flex: 1 1 45%;
+				}
+			}
+		}
+	`,
+];
 
 export default async ({ signal }) => {
 	const sig = registerSignal(signal);
