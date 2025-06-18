@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.9] - 2025-06-18
+
+### Added
+- Add basic event sign-in
+
+### Changed
+- Various updates to pantry
+
 ## [v1.1.8] - 2025-06-06
 
 ### Changed
