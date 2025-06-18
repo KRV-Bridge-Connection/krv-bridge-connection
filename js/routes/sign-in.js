@@ -11,6 +11,7 @@ import { SCHEMA } from '../consts.js';
 const STORE = 'eventGuests';
 const POPOVER = 'guest-popover';
 const TABLE = 'guests-list';
+const EMAIL = 'event-guest-email';
 
 /**
  * @param {object} config
@@ -123,6 +124,8 @@ document.adoptedStyleSheets = [
 	`,
 ];
 
+const randomEmail = registerCallback('event:guests:email-gen', () => document.getElementById(EMAIL).value = `${crypto.randomUUID().replaceAll('-', '')}@na.tld`);
+
 export default async ({ signal }) => {
 	const sig = registerSignal(signal);
 	const db = await _openDB({ signal });
@@ -157,12 +160,13 @@ export default async ({ signal }) => {
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="event-guest-email" class="input-label required">Email</label>
-					<input type="email" name="email" id="event-guest-email" class="input" placeholder="user@example.com" autocomplete="off" required="" />
+					<label for="${EMAIL}" class="input-label required">Email</label>
+					<input type="email" name="email" id="${EMAIL}" class="input" placeholder="user@example.com" autocomplete="off" required="" />
 				</div>
 			</fieldset>
 			<div>
 				<button type="submit" class="btn btn-success">Add</button>
+				<button type="button" class="btn btn-primary" ${onClick}="${randomEmail}">No Email</button>
 				<button type="reset" class="btn btn-warning" popovertarget="${POPOVER}" popovertargetaction="hide">Cancel</button>
 			</div>
 		</form>
