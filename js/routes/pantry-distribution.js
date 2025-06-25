@@ -3,7 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
@@ -20,6 +20,7 @@ const MAX_PER_ITEM = 99;
 const numberClass = 'small-numeric';
 const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 const STATUS_ID = 'pantry-submit-status';
+const ORIENTATION = 'portrait';
 const key = await fetchWellKnownKey(location.origin);
 
 const SUGGESTED_ITEMS = [
@@ -92,6 +93,21 @@ document.adoptedStyleSheets = [
 	#pantry-cart-foot {
 		position: sticky;
 		bottom: 0;
+	}
+
+	#cart-end-btn {
+		right: 1em;
+		bottom: 1em;
+	}
+
+	:root:has(#pantry-cart) {
+		body > button[is="share-button"] {
+			display: none;
+		}
+
+		:fullscreen #sidebar, :fullscreen #footer {
+			display: none;
+		}
 	}`,
 ];
 
@@ -99,6 +115,20 @@ const numberFormatter = new Intl.NumberFormat('en', {
 	maximumFractionDigits: 2,
 	minimumFractionDigits: 2,
 	minimumIntegerDigits: 1,
+});
+
+const unlock = () => screen.orientation.unlock();
+const lockScreen = registerCallback('pantry:distribution:orientation-lock', async ({ currentTarget }) => {
+	await document.getElementById('main').requestFullscreen();
+	await screen.orientation.lock(ORIENTATION);
+
+	if (currentTarget.hasAttribute(signalAttr)) {
+		const signal = getSignal(currentTarget.getAttribute(signalAttr));
+
+		if (signal instanceof AbortSignal) {
+			signal.addEventListener('abort', unlock, { once: true });
+		}
+	}
 });
 
 const storageKey = '_lastSync:pantry:inventory';
@@ -259,6 +289,10 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 		setTimeout(() => status.idle = true, 3000);
 		submitter.disabled = false;
 	}
+});
+
+const scrollToEnd = registerCallback('pantry:distribution:scroll-to-end', () => {
+	document.getElementById('pantry-cart').scrollIntoView({ behavior: 'smooth', block: 'end' });
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', event => {
@@ -530,6 +564,11 @@ export default async function({
 			<button type="submit" class="btn btn-success">Submit</button>
 			<button type="reset" class="btn btn-danger">Empty Cart</button>
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
+			<button type="button" class="btn btn-secondary" ${onClick}="${lockScreen}" ${signalAttr}="${sig}" aria-label="Lock Orientation" ${attr({ disabled: ! (screen?.orientation?.lock instanceof Function) })}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" class="icon" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
+				</svg>
+			</button>
 		</div>
 	</form>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
@@ -554,5 +593,10 @@ export default async function({
 			<button type="submit" class="btn btn-success">Add</button>
 			<button type="reset" class="btn btn-danger">Cancel</button>
 		</div>
-	</form>`;
+	</form>
+	<button type="button" id="cart-end-btn" class="btn btn-secondary fixed bottom right" ${onClick}="${scrollToEnd}" ${signalAttr}="${sig}" aria-label="Scroll to Cart End">
+		<svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" class="icon" fill="currentColor" aria-hidden="true">
+			<path fill-rule="evenodd" d="M5 11L0 6l1.5-1.5L5 8.25 8.5 4.5 10 6l-5 5z"/>
+		</svg>
+	</button>`;
 }
