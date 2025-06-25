@@ -105,6 +105,10 @@ document.adoptedStyleSheets = [
 			display: none;
 		}
 
+		#main:fullscreen {
+			overflow: auto;
+		}
+
 		:fullscreen #sidebar, :fullscreen #footer {
 			display: none;
 		}
