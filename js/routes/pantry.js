@@ -10,7 +10,7 @@ import { getSearch } from '@aegisjsproject/url/search.js';
 
 const postalCodes = {
 	'alta sierra': '95949',
-	'weldon': '93240',
+	'weldon': '93283',
 	'bodfish': '93205',
 	'south lake': '93240',
 	'mt mesa': '93240',
@@ -230,7 +230,7 @@ export default function({
 				</datalist>
 			</div>
 			<div class="form-group">
-				<label for="pantry-household-size" class="input-label required">Household Size</label>
+				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<div class="form-group">
@@ -238,15 +238,18 @@ export default function({
 				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} />
 			</div>
 			<div class="form-group">
-				<label for="pantry-date" class="input-label required">Pick a date</label>
+				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${validateWeekday}" ${signalAttr}="${sig}" ${attr({ value: date })} required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-time" class="input-label required">Pick a time</label>
+				<label for="pantry-time" class="input-label required">Pick a Time</label>
 				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" ${attr({ value: time })} required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-comments" class="input-label">Comments</label>
+				<label for="pantry-comments" class="input-label">
+					<span>Comments / Additional Resource Request</span>
+					<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
+				</label>
 				<textarea name="comments" id="pantry-comments" class="input" placeholder="Is there anything else you would like to say?" cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
 				<p><b>Note:</b> By adding additional comments about your needs and circumstances, you agree to allow us to share any relevant information with our partners for the purpose of connecting you with resources they may offer you.</p>
 			</div>
