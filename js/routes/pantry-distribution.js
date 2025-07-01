@@ -437,47 +437,51 @@ export default async function({
 
 				case QR_CODE:
 					if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
-						const decoded = await verifyJWT(result.rawValue, key, {
-							scope: 'pantry',
-						});
+						try {
+							const decoded = await verifyJWT(result.rawValue, key, {
+								scope: 'pantry',
+							});
 
-						if (decoded instanceof Error) {
-							throw new Error('Error validating JWT', { cause: decoded });
-						} else {
-							const {
-								nbf,
-								exp,
-								txn: id,
-								toe: timestamp,
-								given_name: givenName,
-								family_name: familyName,
-								authorization_details: {
-									household,
-									points,
-								} = {}
-							} = decoded;
+							if (decoded instanceof Error) {
+								throw new Error('Error validating token. It may be invalid or expired.', { cause: decoded });
+							} else {
+								const {
+									nbf,
+									exp,
+									txn: id,
+									toe: timestamp,
+									given_name: givenName,
+									family_name: familyName,
+									authorization_details: {
+										household,
+										points,
+									} = {}
+								} = decoded;
 
-							const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
-							const notBefore = new Date(nbf * 1000);
-							const expires = new Date(exp * 1000);
-							const now = Date.now();
+								const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
+								const notBefore = new Date(nbf * 1000);
+								const expires = new Date(exp * 1000);
+								const now = Date.now();
 
-							if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
-								setState('givenName', givenName);
-								setState('familyName', familyName);
-								setState('points', points);
-								setState('household', household);
-								setState('token', result.rawValue);
+								if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+									setState('givenName', givenName);
+									setState('familyName', familyName);
+									setState('points', points);
+									setState('household', household);
+									setState('token', result.rawValue);
 
-								document.getElementById('pantry-appt').value = id;
-								document.getElementById('pantry-given-name').value = givenName;
-								document.getElementById('pantry-family-name').value = familyName;
-								document.getElementById('pantry-points').value = points;
-								document.getElementById('pantry-household').value = household;
-								document.getElementById('appt-details').hidden = false;
-								document.getElementById('cart-grand-total').dataset.points = points;
-								document.getElementById('pantry-token').value = result.rawValue;
+									document.getElementById('pantry-appt').value = id;
+									document.getElementById('pantry-given-name').value = givenName;
+									document.getElementById('pantry-family-name').value = familyName;
+									document.getElementById('pantry-points').value = points;
+									document.getElementById('pantry-household').value = household;
+									document.getElementById('appt-details').hidden = false;
+									document.getElementById('cart-grand-total').dataset.points = points;
+									document.getElementById('pantry-token').value = result.rawValue;
+								}
 							}
+						} catch(err) {
+							await alert(err);
 						}
 					}
 			}
