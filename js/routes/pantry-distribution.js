@@ -3,7 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onChange, onSubmit, onReset, onToggle, signal as signalAttr, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onToggle, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
@@ -24,13 +24,14 @@ const ORIENTATION = 'portrait';
 const key = await fetchWellKnownKey(location.origin);
 
 const SUGGESTED_ITEMS = [
-	'Divert Item',
+	'Eggs',
 	'Bread',
 	'Fruit',
 	'Vegetables',
 	'Trail Mix',
 	'Snacks',
 	'Cheese',
+	'Divert Item',
 ];
 
 document.adoptedStyleSheets = [
@@ -341,13 +342,9 @@ const addItemToggle = registerCallback('pantry:distribution:add:toggle', ({ targ
 	}
 });
 
-const barcodeHandler = registerCallback('pantry:barcode:handler', async event => {
-	event.preventDefault();
-
-	const data = new FormData(event.target);
-
-	if (await _addToCart(data.get('barcode'))) {
-		event.target.reset();
+const focusInput = registerCallback('pantry:distribution:input:focus', ({ target }) => {
+	if (target instanceof HTMLInputElement && ! target.readOnly) {
+		target.select();
 	}
 });
 
@@ -503,20 +500,9 @@ export default async function({
 		document.querySelector('#scanner .btn-success').append(status);
 	}, 2000);
 
-	return html`<search>
-		<form id="barcode-entry" ${onSubmit}="${barcodeHandler}" ${signalAttr}="${sig}">
-			<div class="form-group">
-				<label for="pantry-barcode" class="input-label">Manually Enter Barcode</label>
-				<input name="barcode" id="pantry-barcode" class="input" type="search" inputmode="numeric" pattern="[0-9]{8,15}" minlength="8" maxlength="15" autocomplete="off" placeholder="${'#'.repeat(12)}" required="" />
-			</div>
-			<button type="submit" class="btn btn-success">Search</button>
-			<button type="reset" class="btn btn-reject">Clear</button>
-			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
-		</form>
-		</search>
-		<br />
+	return html`
 		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
-		<fieldset class="no-border overflow-auto">
+		<fieldset class="no-border overflow-auto" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<legend>KRV Bridge Food Pantry</legend>
 			<div>
 				<a href="/pantry/" class="btn btn-link no-router" target="_blank">Create an Appointment</a>
@@ -580,7 +566,7 @@ export default async function({
 		</div>
 	</form>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
-		<fieldset class="no-border">
+		<fieldset class="no-border" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<div class="form-group">
 				<label for="pantry-entry-name" class="input-label required">Name</label>
 				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" list="pantry-add-item-names" autofocus="" required="" />

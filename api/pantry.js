@@ -41,7 +41,7 @@ const normalizeName = name => name.toString()
 
 async function getRecentVisits(name, date = new Date()) {
 	const db = await getFirestore();
-	const prior = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30, 0, 0);
+	const prior = new Date(date.getFullYear(), date.getMonth() - 1, date.getDate(), 0, 0);
 	const snapshot = await db.collection(COLLECTION)
 		.where('extra_trip', '==', false)
 		.where('_name', '==', normalizeName(name))
@@ -130,17 +130,6 @@ export default createHandler({
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
 			} else {
-				// const db = await getFirestore();
-				// const now = new Date();
-				// const startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-
-				// const collectionRef = db.collection(COLLECTION);
-				// const query = collectionRef
-				//   .where('_name', '==', normalizeName(searchParams.get('name')))
-				//   .where('date', '>=', startDate);
-
-				// const snapshot = await query.count().get();
-				// const count = snapshot.data().count;
 				const count = await getRecentVisits(searchParams.get('name'));
 
 				return Response.json({ count, allowed: count < 2, since: new Date().toISOString() });
@@ -161,7 +150,7 @@ export default createHandler({
 					]
 				});
 
-				return Response.json(appts.map(({ name, date, created, points, household}) => ({
+				return Response.json(appts.map(({ name, date, created, points, household }) => ({
 					name,
 					points,
 					household,
@@ -191,6 +180,7 @@ export default createHandler({
 						name: appt.name,
 						points: appt.points,
 						household: appt.household,
+						streetAddress: typeof appt.streetAddress === 'string' ? await decrypt(key, appt.streetAddress, { input: 'base64', output: 'text' }) : null,
 						addressLocality: appt.addressLocality,
 						date: new Date(appt.date._seconds * 1000).toISOString(),
 						telephone: typeof appt.telephone === 'string' ? await decrypt(key, appt.telephone, { input: 'base64', output: 'text' }) : null,
@@ -350,6 +340,4 @@ export default createHandler({
 			}
 		}
 	}
-}, {
-	logger: err => console.error(err),
 });
