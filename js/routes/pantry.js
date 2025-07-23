@@ -8,6 +8,8 @@ import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 
+const CARES_FORM = '/docs/cares-form.pdf';
+
 const postalCodes = {
 	'alta sierra': '95949',
 	'weldon': '93283',
@@ -177,6 +179,20 @@ export default function({
 			As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
 			food that they want rather than a preset box of items.
 			The Choice Pantry is available up to twice per month and provides food based on household size.</p>
+		</div>
+		<div>
+			<h3>Notice</h3>
+			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
+			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
+			<p>
+				If you have not already done so, please print and fill out the following form and bring it with you to the pantry:
+				<a href="${CARES_FORM}" download="pantry-cares-form.pdf" target="_blank" rel="noopener noreferrer" class="btn btn-outine-primary">
+					<span>Download the CARES Form</span>
+					<svg class="current-color icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+						<use xlink:href="/img/icons.svg#file-pdf"></use>
+					</svg>
+				</a>
+			</p>
 		</div>
 		<fieldset class="no-border">
 			<legend>Schedule an Appointment</legend>
