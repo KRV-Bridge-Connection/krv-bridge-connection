@@ -7,8 +7,22 @@ import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
+import { attemptSync, getResultValue, succeeded } from '@aegisjsproject/attempt';
 
 const CARES_FORM = '/docs/cares-form.pdf';
+
+const date = getSearch('date', null);
+
+/**
+ * Returns a date string in ISO format.
+ *
+ * @returns {string}
+ */
+function _getDateStr() {
+	const result = attemptSync(str => new Date(str).toISOString(), date);
+
+	return succeeded(result) ? getResultValue(result) : new Date().toISOString();
+}
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -147,7 +161,7 @@ export default function({
 		streetAddress = getSearch('streetAddress', ''),
 		addressLocality = getSearch('addressLocality', ''),
 		postalCode = getSearch('postalCode', ''),
-		date = new Date().toISOString().split('T')[0],
+		date = _getDateStr().split('T')[0],
 		time = '',
 		comments = '',
 	},
