@@ -40,6 +40,8 @@ const postalCodes = {
 	'caliente': '93518',
 	'squirrel mountain valley': '93240',
 	'squirrel valley': '93240',
+	'keyesville': '93240',
+	'keysville': '93240',
 };
 
 async function _alert(message, qr, { signal } = {}) {
@@ -72,7 +74,6 @@ async function _alert(message, qr, { signal } = {}) {
 
 const TIMEZONE_OFFSET = 8 * HOURS;
 // Options given on Neighbor Intake
-const GENDERS = ['Male','Female','Transgender','Trans Female/Trans Woman','Trans Male/Trans Man','None of these','Don\'t Know / Prefer not to answer'];
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
@@ -152,12 +153,9 @@ export default function({
 		givenName = getSearch('givenName', ''),
 		additionalName = getSearch('additionalName', ''),
 		familyName = getSearch('familyName', ''),
-		gender = getSearch('gender', ''),
-		bDay = getSearch('bDay', ''),
 		email = getSearch('email', ''),
 		telephone = getSearch('telephone', ''),
 		household = getSearch('household', '1'),
-		income = getSearch('income', ''),
 		streetAddress = getSearch('streetAddress', ''),
 		addressLocality = getSearch('addressLocality', ''),
 		postalCode = getSearch('postalCode', ''),
@@ -227,17 +225,6 @@ export default function({
 				</span>
 			</div>
 			<div class="form-group">
-				<label for="pantry-bday" class="input-label required="">Birthday</label>
-				<input type="date" name="bDay" id="pantry-bday" class="input" placeholder="yyyy-mm-dd" inputmode="numeric" pattern="\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])" autocomplete="bday" ${attr({ value: bDay })} />
-			</div>
-			<div class="form-group">
-				<label for="pantry-gender required">Gender</label>
-				<select name="gender" id="pantry-gender" class="input" autocomplete="sex">
-					<option label="Please select one"></option>
-					${GENDERS.map(opt => `<option ${attr({ label: opt, value: opt, selected: opt === gender.toString() })}></option>`).join('\n')}
-				</select>
-			</div>
-			<div class="form-group">
 				<label for="pantry-email" class="input-label">Email</label>
 				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="home email" ${attr({ value: email })} />
 			</div>
@@ -262,10 +249,6 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" ${attr({ value: household })} required="" />
-			</div>
-			<div class="form-group">
-				<label for="pantry-household-income" class="input-label">Approximate Household Income</label>
-				<input type="number" name="householdIncome" id="pantry-household-income" class="input" placeholder="####" min="0"" autocomplete="off" ${attr({ value: income })} />
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
