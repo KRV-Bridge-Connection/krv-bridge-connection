@@ -11,7 +11,7 @@ import { attemptSync, getResultValue, succeeded } from '@aegisjsproject/attempt'
 
 const CARES_FORM = '/docs/cares-form.pdf';
 
-const date = getSearch('date', null);
+const date = getSearch('date', '');
 
 /**
  * Returns a date string in ISO format.
@@ -19,9 +19,30 @@ const date = getSearch('date', null);
  * @returns {string}
  */
 function _getDateStr() {
-	const result = attemptSync(str => new Date(str).toISOString(), date);
+	const result = attemptSync(str => {
+		if (str?.length === 0) {
+			return new Date();
+		} else if (str?.includes('T')) {
+			return new Date(str);
+		} else {
+			return new Date(str + 'T09:00:00');
+		}
+	}, date);
 
-	return succeeded(result) ? getResultValue(result) : new Date().toISOString();
+	if (succeeded(result)) {
+		const date = getResultValue(result);
+		const day = date.getDay();
+
+		if (day === 0 || day === 6 || Number.isNaN(day)) {
+			// If the date is a weekend let the user pick the date
+			return '';
+		} else {
+			return date.toISOString();
+		}
+	} else {
+		return succeeded(result) ? getResultValue(result) : new Date().toISOString();
+	}
+
 }
 
 const postalCodes = {
