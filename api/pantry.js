@@ -228,14 +228,12 @@ export default createHandler({
 						.map(field => data.get(field))
 						.filter(field => typeof field === 'string' && field.length !== 0)
 						.join(' '),
-					bday: data.get('bDay'),
 					email,
 					telephone,
 					streetAddress,
 					addressLocality: data.get('addressLocality'),
 					postalCode: data.get('postalCode'),
 					household: parseInt(data.get('household')),
-					householdIncome: parseInt(data.get('householdIncome')),
 					comments,
 					created,
 					extra_trip: ! normalTrip,
