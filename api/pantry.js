@@ -20,16 +20,18 @@ const COLLECTION = 'pantry-schedule';
 
 const PTS = [
 	30, // 1
-	30, // 2
-	55, // 3
-	80, // 4
-	100, // 5
-	115, // 6
-	130, // 7
-	140, // 8
+	60, // 2
+	80, // 3
+	100, // 4
+	115, // 5
+	130, // 6
+	140, // 7
+	150, // 8
 ];
 
-const _getPoints = household => PTS[Math.min(Math.max(parseInt(household), 1), PTS.length - 1)];
+const _getPoints = household => PTS[Math.min(Math.max(parseInt(household), 1), PTS.length) - 1];
+
+console.log([1,2,3,4,5,6,7,8].map(s => [s,_getPoints(s)]));
 
 export const QRSERVER = 'https://api.qrserver.com/';
 
