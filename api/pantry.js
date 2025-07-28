@@ -31,8 +31,6 @@ const PTS = [
 
 const _getPoints = household => PTS[Math.min(Math.max(parseInt(household), 1), PTS.length) - 1];
 
-console.log([1,2,3,4,5,6,7,8].map(s => [s,_getPoints(s)]));
-
 export const QRSERVER = 'https://api.qrserver.com/';
 
 const REPLACEMENTS = {
