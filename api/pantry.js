@@ -18,6 +18,19 @@ const FORMAT = {
 
 const COLLECTION = 'pantry-schedule';
 
+const PTS = [
+	30, // 1
+	30, // 2
+	55, // 3
+	80, // 4
+	100, // 5
+	115, // 6
+	130, // 7
+	140, // 8
+];
+
+const _getPoints = household => PTS[Math.min(Math.max(parseInt(household), 1), PTS.length - 1)];
+
 export const QRSERVER = 'https://api.qrserver.com/';
 
 const REPLACEMENTS = {
@@ -194,7 +207,7 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 		const missing = [
-			'givenName', 'familyName', 'bDay', 'household', 'addressLocality', 'postalCode', 'date', 'time',
+			'givenName', 'familyName', 'household', 'addressLocality', 'postalCode', 'date', 'time',
 		].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
@@ -217,7 +230,7 @@ export default createHandler({
 				const id = getSUID({ date: created, alphabet: 'base64url' });
 				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')}`);
 				const normalTrip = recentVists < 2;
-				const PTS_PER_PERSON = normalTrip ? 30 : 5;
+				const points = normalTrip ? _getPoints(household) : household * 5;
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
@@ -238,7 +251,7 @@ export default createHandler({
 					created,
 					extra_trip: ! normalTrip,
 					date,
-					points: parseInt(data.get('household')) * PTS_PER_PERSON,
+					points,
 				});
 
 				const nowId = Date.now().toString(34);
@@ -258,7 +271,7 @@ export default createHandler({
 					txn: id,
 					authorization_details: {
 						household,
-						points: household * PTS_PER_PERSON,
+						points,
 					}
 				}, await getPrivateKey());
 
@@ -276,7 +289,7 @@ export default createHandler({
 						fields: [
 							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
 							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
-							new SlackMarkdownElement(`*Points*: ${parseInt(data.get('household')) * PTS_PER_PERSON}`),
+							new SlackMarkdownElement(`*Points*: ${points}`),
 						],
 					}),
 					new SlackDividerBlock(),
@@ -299,7 +312,7 @@ export default createHandler({
 
 				const body = new FormData();
 				body.set('id', id);
-				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${PTS_PER_PERSON * household}.`);
+				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${points}. Please bring this QR code with you to check in.`);
 				body.set('date', date.toISOString());
 				body.set('qr', qr);
 
