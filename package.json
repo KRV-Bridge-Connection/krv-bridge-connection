@@ -84,7 +84,7 @@
   "devDependencies": {
     "@shgysk8zer0/eslint-config": "^1.0.4",
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "eslint-plugin-frontmatter2": "^1.0.0"
   }
 }
