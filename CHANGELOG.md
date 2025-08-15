@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add support for more complex pantry schedules (closed days, different hours)
+
 ## [v1.1.10] - 20205-07-30
 
 ### Changed
