@@ -36,6 +36,9 @@ const CLOSED = [
 	'2026-07-04', // Independence Day
 	'2026-09-07', // Labor Day
 	'2026-11-11', // Veterans Day
+	'2026-11-26', // Thanksgiving
+	'2026-11-27', // Day after Thanksgiving
+	'2026-12-25', // Christmas
 ];
 
 /**
@@ -129,17 +132,13 @@ const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'W
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
 const dateChange = registerCallback('pantry:date:change', ({ target }) => {
-	if (target.value.length <=9) {
-		//
+	if (target.value.length !== 10) {
+		target.setCustomValidity('Please select a valid date. YYYY-MM-DD format is required.');
 	} else if (CLOSED.includes(target.value)) {
-		target.setCustomValidity('The pantry is closed on holidays.');
+		target.setCustomValidity('The pantry is closed on this day.');
 	} else {
 		const date = new Date(target.valueAsDate.getTime() + TIMEZONE_OFFSET);
 		const { min, max, disabled } = getOpeningHours(date);
-
-		/**
-		 * @type {HTMLInputElement} timeInput
-		 */
 		const timeInput = target.form.elements.namedItem('time');
 		timeInput.disabled = disabled;
 
@@ -323,7 +322,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
-				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" ${attr({ value: time, min, max, disabled })} required="" />
+				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">
