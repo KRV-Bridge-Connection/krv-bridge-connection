@@ -7,19 +7,62 @@ import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
-import { attemptSync, getResultValue, succeeded } from '@aegisjsproject/attempt';
+import { attemptSync } from '@aegisjsproject/attempt';
 
 const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
 
+const OPENING_HOURS = [
+	{ dayOfWeek: 'Sunday', opens: null, closes: null },
+	{ dayOfWeek: 'Monday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Saturday', opens: null, closes: null },
+];
+
+const CLOSED = [
+	'2025-09-01', // Labor Day
+	'2025-11-11', // Veterans Day
+	'2025-11-27', // Thanksgiving
+	'2025-11-28', // Day after Thanksgiving
+	'2025-12-25', // Christmas
+	'2026-01-01', // New Year's Day
+	'2026-01-19', // Martin Luther King Jr. Day
+	'2026-02-16', // Presidents' Day
+	'2026-05-25', // Memorial Day
+	'2026-07-04', // Independence Day
+	'2026-09-07', // Labor Day
+	'2026-11-11', // Veterans Day
+];
+
 /**
- * Returns a date string in ISO format.
  *
- * @returns {string}
+ * @param {Date} date
+ * @returns {{min: string|null, max: string|null, disabled: boolean}}
  */
-function _getDateStr() {
-	const result = attemptSync(str => {
+const getOpeningHours = (date) => {
+	if (CLOSED.includes(date.toISOString().split('T')[0])) {
+		return { disabled: true, min: null, max: null };
+	} else {
+		const { opens, closes } = OPENING_HOURS[date.getDay()];
+
+		if (typeof opens === 'string' && typeof closes === 'string') {
+			return { min: opens, max: closes, disabled: false };
+		} else {
+			return { disabled: true, min: null, max: null };
+		}
+	}
+};
+
+/**
+ *
+ * @returns {Date}
+ */
+const _getDate = () => {
+	const { value, ok } = attemptSync(str => {
 		if (str?.length === 0) {
 			return new Date();
 		} else if (str?.includes('T')) {
@@ -29,21 +72,8 @@ function _getDateStr() {
 		}
 	}, date);
 
-	if (succeeded(result)) {
-		const date = getResultValue(result);
-		const day = date.getDay();
-
-		if (day === 0 || day === 6 || Number.isNaN(day)) {
-			// If the date is a weekend let the user pick the date
-			return '';
-		} else {
-			return date.toISOString();
-		}
-	} else {
-		return succeeded(result) ? getResultValue(result) : new Date().toISOString();
-	}
-
-}
+	return ok ? value : new Date();
+};
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -98,14 +128,28 @@ const TIMEZONE_OFFSET = 8 * HOURS;
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
-const validateWeekday = registerCallback('pantry:date:change', ({ target }) => {
-	if (target.value.length > 9) {
-		// Adjust for timezone
-		const day = new Date(target.valueAsDate.getTime() + TIMEZONE_OFFSET).getDay();
+const dateChange = registerCallback('pantry:date:change', ({ target }) => {
+	if (target.value.length <=9) {
+		//
+	} else if (CLOSED.includes(target.value)) {
+		target.setCustomValidity('The pantry is closed on holidays.');
+	} else {
+		const date = new Date(target.valueAsDate.getTime() + TIMEZONE_OFFSET);
+		const { min, max, disabled } = getOpeningHours(date);
 
-		if (day === 0 || day === 7) {
-			target.setCustomValidity('Please select a weekday [Mon-Fri].');
+		/**
+		 * @type {HTMLInputElement} timeInput
+		 */
+		const timeInput = target.form.elements.namedItem('time');
+		timeInput.disabled = disabled;
+
+		if (disabled) {
+			timeInput.value = '';
+			target.setCustomValidity('The pantry is closed on this date.');
 		} else {
+			timeInput.value = '';
+			timeInput.min = min;
+			timeInput.max = max;
 			target.setCustomValidity('');
 		}
 	}
@@ -180,15 +224,17 @@ export default function({
 		streetAddress = getSearch('streetAddress', ''),
 		addressLocality = getSearch('addressLocality', ''),
 		postalCode = getSearch('postalCode', ''),
-		date = _getDateStr().split('T')[0],
+		// date = _getDate(),
 		time = '',
 		comments = '',
 	},
 	signal,
 }) {
+	const date = _getDate();
 	const sig = registerSignal(signal);
 	const minDate = new Date();
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
+	const { min, max, disabled } = getOpeningHours(date);
 
 	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
@@ -273,15 +319,15 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
-				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${validateWeekday}" ${signalAttr}="${sig}" ${attr({ value: date })} required="" />
+				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled ? null : date.toISOString().split('T')[0] })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
-				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" ${attr({ value: time })} required="" />
+				<input type="time" name="time" id="pantry-time" class="input" min="09:00" max="16:00" ${attr({ value: time, min, max, disabled })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">
-					<span>Comments / Additional Resource Request</span>
+					<span>Additional Resource Request</span>
 					<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
 				</label>
 				<textarea name="comments" id="pantry-comments" class="input" placeholder="Is there anything else you would like to say?" cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
