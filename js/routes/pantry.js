@@ -13,15 +13,27 @@ const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
 
-const OPENING_HOURS = [
-	{ dayOfWeek: 'Sunday', opens: null, closes: null },
-	{ dayOfWeek: 'Monday', opens: '09:00:00', closes: '16:00:00' },
-	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
-	{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
-	{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
-	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '16:00:00' },
-	{ dayOfWeek: 'Saturday', opens: null, closes: null },
-];
+const HOURS_CHANGE = 1756512000000; // 2025-08-29T17:00
+
+const OPENING_HOURS = Date.now() < HOURS_CHANGE
+	? [
+		{ dayOfWeek: 'Sunday', opens: null, closes: null },
+		{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Saturday', opens: null, closes: null },
+	]
+	: [
+		{ dayOfWeek: 'Sunday', opens: null, closes: null },
+		{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Tuesday', opens: '13:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Wednesday', opens: null, closes: null },
+		{ dayOfWeek: 'Thursday', opens: null, closes: null },
+		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
+		{ dayOfWeek: 'Saturday', opens: null, closes: null },
+	];
 
 const CLOSED = [
 	'2025-09-01', // Labor Day
