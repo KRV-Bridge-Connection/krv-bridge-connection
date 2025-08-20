@@ -52,9 +52,22 @@ const normalizeName = name => name.toString()
 	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
 
+function getLastMonth(date = new Date()) {
+	// Avoid using date getter twice
+	const d = date.getDate();
+	const prior = new Date(date.getFullYear(), date.getMonth() - 1, d, 0, 0, 0, 0);
+
+	if (prior.getDate() !== d) {
+		prior.setDate(0);
+	}
+
+	return prior;
+}
+
 async function getRecentVisits(name, date = new Date()) {
 	const db = await getFirestore();
-	const prior = new Date(date.getFullYear(), date.getMonth() - 1, date.getDate(), 0, 0);
+	const prior = getLastMonth(date);
+
 	const snapshot = await db.collection(COLLECTION)
 		.where('extra_trip', '==', false)
 		.where('_name', '==', normalizeName(name))
