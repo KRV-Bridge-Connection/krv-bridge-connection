@@ -36,6 +36,7 @@ const OPENING_HOURS = Date.now() < HOURS_CHANGE
 	];
 
 const CLOSED = [
+ '2025-08-21', // Ran empty
 	'2025-09-01', // Labor Day
 	'2025-11-11', // Veterans Day
 	'2025-11-27', // Thanksgiving
