@@ -22,7 +22,7 @@ const OPENING_HOURS = Date.now() < HOURS_CHANGE
 		{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
 		{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
 		{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '16:00:00' },
+		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
 		{ dayOfWeek: 'Saturday', opens: null, closes: null },
 	]
 	: [
