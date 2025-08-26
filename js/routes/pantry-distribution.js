@@ -34,6 +34,18 @@ const SUGGESTED_ITEMS = [
 	'Divert Item',
 ];
 
+const QUICK_ITEMS = [
+	{ name: 'Bread', cost: 3 },
+	{ name: 'Eggs', cost: 0.5 },
+	{ name: 'Water', cost: 0.5 },
+	{ name: 'Fruit', cost: 0.5 },
+	{ name: 'Vegetables', cost: 1 },
+	{ name: 'Snacks', cost: 1 },
+	{ name: 'Granola Bar', cost: 1 },
+	{ name: 'Baby Food', cost: 1 },
+	{ name: 'Frozen Meal', cost: 5 },
+];
+
 document.adoptedStyleSheets = [
 	...document.adoptedStyleSheets,
 	css`td > input.${numberClass} {
@@ -53,7 +65,7 @@ document.adoptedStyleSheets = [
 		appearance: textfield;
 	}
 
-	input.display-text {
+	#scanner input.display-text {
 		display: inline;
 		border: none;
 		padding: none;
@@ -73,6 +85,10 @@ document.adoptedStyleSheets = [
 		border-width: 0 0 1px 0;
 		background-color: inherit;
 		color: inherit;
+	}
+
+	#scanner .quick-items {
+		gap: 0.7rem;
 	}
 
 	#cart-grand-total {
@@ -293,6 +309,17 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 	} finally {
 		setTimeout(() => status.idle = true, 3000);
 		submitter.disabled = false;
+	}
+});
+
+const quickAdd = registerCallback('pantry:distribution:quick-add', async ({ target }) => {
+	const { name, cost: costStr } = target.dataset;
+	const cost = parseFloat(costStr);
+
+	if (typeof name === 'string' && ! Number.isNaN(cost) && cost > 0) {
+		await _addProduct({
+			name, cost, id: crypto.randomUUID(), qty: 1,
+		});
 	}
 });
 
@@ -554,6 +581,10 @@ export default async function({
 				</tfoot>
 			</table>
 		</fieldset>
+		<div>
+			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost })}>${name}</button>`).join('')}</div>
+			<hr />
+		</div>
 		<div class="flex row no-wrap">
 			<button type="submit" class="btn btn-success">Submit</button>
 			<button type="reset" class="btn btn-danger">Empty Cart</button>
