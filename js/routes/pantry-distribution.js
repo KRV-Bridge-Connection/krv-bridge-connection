@@ -35,15 +35,16 @@ const SUGGESTED_ITEMS = [
 ];
 
 const QUICK_ITEMS = [
-	{ name: 'Bread', cost: 3 },
-	{ name: 'Eggs', cost: 0.5 },
-	{ name: 'Water', cost: 0.5 },
-	{ name: 'Fruit', cost: 0.5 },
-	{ name: 'Vegetables', cost: 1 },
-	{ name: 'Snacks', cost: 1 },
-	{ name: 'Granola Bar', cost: 1 },
-	{ name: 'Baby Food', cost: 1 },
-	{ name: 'Frozen Meal', cost: 5 },
+	{ name: 'Bread', cost: 3, id: 'A9D5D64F-20B5-4946-A466-110F131469D7' },
+	{ name: 'Eggs', cost: 0.5, id: 'F484DA58-CBD2-45B8-9009-4CA9C90C0B99' },
+	{ name: 'Water', cost: 0.5, id: 'B9C63BFA-91DA-484B-999F-5CC078B4DCB9' },
+	{ name: 'Fruit', cost: 0.5, id: 'B3CC6364-FC34-45BE-A674-64FCA1E2A15E' },
+	{ name: 'Vegetables', cost: 1, id: 'F270F0C2-C5C4-4C21-BBC7-B26EF0657271' },
+	{ name: 'Snacks', cost: 1, id: '113A4AF0-99E4-4967-B160-2D7FC80872D9' },
+	{ name: 'Granola Bar', cost: 1, id: '2FAD54D7-6C24-444F-BF66-BECF5F581F0F' },
+	{ name: 'Baby Food', cost: 1, id: '1FB8120C-C69C-47AF-8610-B98C7476BFA8' },
+	{ name: 'Frozen Meal', cost: 5, id: '04746271-3D97-488B-BA98-01E2B8D4FDAE' },
+	{ name: 'Garden Bag', cost: 5, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
 ];
 
 document.adoptedStyleSheets = [
@@ -87,7 +88,7 @@ document.adoptedStyleSheets = [
 		color: inherit;
 	}
 
-	#scanner .quick-items {
+	#pantry-manual .quick-items {
 		gap: 0.7rem;
 	}
 
@@ -321,6 +322,8 @@ const quickAdd = registerCallback('pantry:distribution:quick-add', async ({ targ
 			name, cost, id: crypto.randomUUID(), qty: 1,
 		});
 	}
+
+	target.closest('[popover]').hidePopover();
 });
 
 const scrollToEnd = registerCallback('pantry:distribution:scroll-to-end', () => {
@@ -581,10 +584,6 @@ export default async function({
 				</tfoot>
 			</table>
 		</fieldset>
-		<div>
-			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost })}>${name}</button>`).join('')}</div>
-			<hr />
-		</div>
 		<div class="flex row no-wrap">
 			<button type="submit" class="btn btn-success">Submit</button>
 			<button type="reset" class="btn btn-danger">Empty Cart</button>
@@ -597,6 +596,10 @@ export default async function({
 		</div>
 	</form>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
+		<div>
+			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost, id }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost, id })}>${name}</button>`).join('')}</div>
+			<hr />
+		</div>
 		<fieldset class="no-border" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<div class="form-group">
 				<label for="pantry-entry-name" class="input-label required">Name</label>
