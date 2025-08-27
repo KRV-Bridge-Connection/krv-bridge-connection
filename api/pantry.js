@@ -11,6 +11,8 @@ import {
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
 
+const QZONE = 7;
+
 const FORMAT = {
 	dateStyle: 'medium',
 	timeStyle: 'short',
@@ -101,6 +103,8 @@ function getQRCodeURL(data, {
 	if (typeof color === 'string') {
 		url.searchParams.set('color', color.replace('#', ''));
 	}
+
+	url.searchParams.set('qzone', QZONE);
 
 	if (typeof bgColor === 'string') {
 		url.searchParams.set('bgcolor', bgColor.replace('#', ''));
