@@ -122,7 +122,12 @@ async function _alert(message, qr, { signal } = {}) {
 		document.getElementById('pantry-token-qr').replaceChildren(html`<div class="center pantry-qr">
 			<img src="${qrSrc}" decoding="async" class="card qr-code" />
 			<br />
-			<a class="btn btn-primary" href="${qrSrc}" download="krv-pantry-qr.png">Save QR Code</a>
+			<a class="btn btn-primary" href="${qrSrc}" download="krv-pantry-qr.png">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M9 12h2l-3 3-3-3h2V7h2v5zm3-8c0-.44-.91-3-4.5-3C5.08 1 3 2.92 3 5 1.02 5 0 6.52 0 8c0 1.53 1 3 3 3h3V9.7H3C1.38 9.7 1.3 8.28 1.3 8c0-.17.05-1.7 1.7-1.7h1.3V5c0-1.39 1.56-2.7 3.2-2.7 2.55 0 3.13 1.55 3.2 1.8v1.2H12c.81 0 2.7.22 2.7 2.2 0 2.09-2.25 2.2-2.7 2.2h-2V11h2c2.08 0 4-1.16 4-3.5C16 5.06 14.08 4 12 4z"/>
+				</svg>
+				<span>Save QR Code</span>
+			</a>
 		</div>`);
 
 		dialog.addEventListener('close', () => {
@@ -355,7 +360,12 @@ export default function({
 	<dialog id="pantry-message">
 		<div id="pantry-message-content"></div>
 		<div id="pantry-token-qr"></div>
-		<button type="button" class="btn btn-primary" ${onClick}="${closeMessage}" ${signalAttr}="${sig}">Close</button>
+		<button type="button" class="btn btn-primary" ${onClick}="${closeMessage}" ${signalAttr}="${sig}">
+			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
+				<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+			</svg>
+			<span>Close</span>
+		</button>
 	</dialog>`;
 }
 
