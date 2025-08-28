@@ -15,31 +15,21 @@ const date = getSearch('date', '');
 
 const HOURS_CHANGE = 1756512000000; // 2025-08-29T17:00
 
-const OPENING_HOURS = Date.now() < HOURS_CHANGE
-	? [
-		{ dayOfWeek: 'Sunday', opens: null, closes: null },
-		{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
-		{ dayOfWeek: 'Saturday', opens: null, closes: null },
-	]
-	: [
-		{ dayOfWeek: 'Sunday', opens: null, closes: null },
-		{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Tuesday', opens: '13:00:00', closes: '16:00:00' },
-		{ dayOfWeek: 'Wednesday', opens: null, closes: null },
-		{ dayOfWeek: 'Thursday', opens: null, closes: null },
-		{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
-		{ dayOfWeek: 'Saturday', opens: null, closes: null },
-	];
+const OPENING_HOURS =  [
+	{ dayOfWeek: 'Sunday', opens: null, closes: null },
+	{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Wednesday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Thursday', opens: '09:00:00', closes: '16:00:00' },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
+	{ dayOfWeek: 'Saturday', opens: null, closes: null },
+];
 
 const CLOSED = [
 	'2025-08-21', // Ran empty
 	'2025-08-22', // Pantry empty until Monday
 	'2025-08-27', // Ran empty Wed
-	'2025-98-28', // Still empty Thurs
+	'2025-08-28', // Still empty Thurs
 	'2025-08-29', // Probably empty Fri too
 	'2025-09-01', // Labor Day
 	'2025-11-11', // Veterans Day
