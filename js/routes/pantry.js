@@ -27,7 +27,7 @@ const CLOSED = [
 	'2025-08-21', // Ran empty
 	'2025-08-22', // Pantry empty until Monday
 	'2025-08-27', // Ran empty Wed
-	'2025-98-28', // Still empty Thurs
+	'2025-08-28', // Still empty Thurs
 	'2025-08-29', // Probably empty Fri too
 	'2025-09-01', // Labor Day
 	'2025-11-11', // Veterans Day
