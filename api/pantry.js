@@ -300,7 +300,7 @@ export default createHandler({
 					signal: req.signal,
 				}).then(resp => resp.blob());
 
-				const message = new SlackMessage(process.env.SLACK_WEBHOOK,
+				const message = new SlackMessage(process.env.PANTRY_SLACK_URL,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
 						fields: [
@@ -324,8 +324,6 @@ export default createHandler({
 						]
 					}) : undefined
 				);
-
-				console.log(message.toString());
 
 				const body = new FormData();
 				body.set('id', id);
