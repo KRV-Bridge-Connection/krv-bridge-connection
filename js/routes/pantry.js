@@ -13,8 +13,6 @@ const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
 
-const HOURS_CHANGE = 1756512000000; // 2025-08-29T17:00
-
 const OPENING_HOURS =  [
 	{ dayOfWeek: 'Sunday', opens: null, closes: null },
 	{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
