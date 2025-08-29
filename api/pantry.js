@@ -1,7 +1,7 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
-import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
+import { encrypt, decrypt, BASE64, TEXT, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { getSUID } from '@shgysk8zer0/suid';
@@ -10,6 +10,71 @@ import {
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
+import { succeed, fail, NONE } from '@aegisjsproject/attempt';
+import { readFile } from 'node:fs/promises';
+// import { decrypt, encrypt, TEXT, BASE64 } from '@shgysk8zer0/aes-gcm';
+
+/**
+ *
+ * @param {CryptoKey} key
+ * @returns {[Proxy, (prop, val) => Promise<[boolean, null, true]|[null, err, false]>]}
+ */
+export function useSecretStore(key, targetObject = globalThis.process?.env ?? {}) {
+	if (! (key instanceof CryptoKey && key.usages.includes('decrypt'))) {
+		throw new TypeError('Key must be a `CryptoKey` with usages that include `"decrypt"`.');
+	} else {
+		const proxy =  new Proxy(targetObject, {
+			get(target, property) {
+				try {
+					const encrypted = Reflect.get(target, property);
+
+					if (typeof encrypted === 'string') {
+						return decrypt(key, encrypted, { output: TEXT, input: BASE64 }).then(succeed, fail);
+					} else {
+						return succeed(NONE);
+					}
+				} catch(err) {
+					return fail(err);
+				}
+			},
+			has(target, property) {
+				return Reflect.has(target, property);
+			},
+			ownKeys(target) {
+				return Reflect.ownKeys(target);
+			},
+			async defineProperty(target, property, {
+				value,
+				enumerable,
+				configurable,
+				writable,
+				get,
+				set,
+			}) {
+				if ([enumerable, configurable, writable, get, set].some(prop => typeof prop !== 'undefined')) {
+					// This is just a proxy to an unknown source
+					fail(new TypeError('Cannot set extended atttributes when defining property descriptor.'));
+				} else {
+					const encrypted = await encrypt(key, value, { output: BASE64 });
+					return Reflect.defineProperty(target, property, { value: encrypted });
+				}
+			}
+		});
+
+		const setter = key.usages.includes('encrypt')
+			? async (property, value) => {
+				try {
+					const encrypted = await encrypt(key, value, { output: BASE64 });
+					return succeed(Reflect.set(targetObject, property, encrypted));
+				} catch(err) {
+					return fail(err);
+				}
+			}
+			: () => fail(new TypeError('Provided key does not support encryption.'));
+
+		return Object.freeze([proxy, setter]);
+	}
+}
 
 const QZONE = 7;
 
@@ -237,6 +302,8 @@ export default createHandler({
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
 				const key = await getSecretKey();
+				const [store] = useSecretStore(key, await readFile('_data/secrets.json', { encoding: 'utf-8' }).then(data => JSON.parse(data)));
+
 				const [streetAddress, email = null, telephone = null, comments = null] = await Promise.all(
 					['streetAddress', 'email', 'telephone', 'comments']
 						.map(field => data.get(field) ?? null)
@@ -300,7 +367,8 @@ export default createHandler({
 					signal: req.signal,
 				}).then(resp => resp.blob());
 
-				const message = new SlackMessage(process.env.PANTRY_SLACK_URL,
+				const [webhook] = await store.PANTRY_SLACK_URL;
+				const message = new SlackMessage(webhook,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
 						fields: [
