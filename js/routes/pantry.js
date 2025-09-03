@@ -1,5 +1,6 @@
 import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onClick, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
@@ -9,6 +10,11 @@ import { clearState, setState, changeHandler as change } from '@aegisjsproject/s
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
+
+const style = css`#pantry-date:not(:user-invalid) + #pantry-date-invalid,
+#pantry-time:not(:user-invalid) + #pantry-time-invalid {
+	visibility: hidden;
+}`;
 
 const CARES_FORM = '/docs/cares-form.pdf';
 
@@ -231,6 +237,8 @@ const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value,
  */
 const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
+
 export default function({
 	state: {
 		givenName = getSearch('givenName', ''),
@@ -292,8 +300,8 @@ export default function({
 			food that they want rather than a preset box of items.
 			The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
 		</div>
-		<div hidden="">
-			<h3>Notice</h3>
+		<section aria-labelledby="pantry-hud-notice" hidden="">
+			<h3 id="pantry-hud-notice">Notice</h3>
 			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
 			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
 			<p>
@@ -305,9 +313,9 @@ export default function({
 					</svg>
 				</a>
 			</p>
-		</div>
-		<section class="pantry-general-hours">
-			<h3>General Pantry Hours</h3>
+		</section>
+		<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
+			<h3 id="general-pantry-hours">General Pantry Hours</h3>
 			<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
 			<ul>
 				${OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
@@ -318,8 +326,8 @@ export default function({
 				</li>`).join('')}
 			</ul>
 		</section>
-		<section itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
-			<h3>Address</h3>
+		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
+			<h3 id="pantry-address">Address</h3>
 			<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
 			<div>
 				<span itemprop="addressLocality">Lake Isabella</span>,
@@ -376,10 +384,12 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
+				<div id="pantry-date-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
 				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} required="" />
+				<div id="pantry-time-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">
