@@ -55,7 +55,7 @@ const CLOSED = [
 const getOpeningHours = (date) => {
 	if (CLOSED.includes(date.toISOString().split('T')[0])) {
 		return { disabled: true, min: null, max: null };
-	} else if (history.state.isAdmin) {
+	} else if (history.state?.isAdmin) {
 		const day = date.getDay();
 
 		return day === 0 || day === 6 || Number.isNaN(day)
