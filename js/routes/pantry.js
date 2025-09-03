@@ -5,9 +5,10 @@ import { onSubmit, onReset, onClick, onChange, signal as signalAttr, registerSig
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
-import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
+import { clearState, setState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
+import { konami } from '@shgysk8zer0/konami';
 
 const CARES_FORM = '/docs/cares-form.pdf';
 
@@ -54,6 +55,12 @@ const CLOSED = [
 const getOpeningHours = (date) => {
 	if (CLOSED.includes(date.toISOString().split('T')[0])) {
 		return { disabled: true, min: null, max: null };
+	} else if (history.state.isAdmin) {
+		const day = date.getDay();
+
+		return day === 0 || day === 6 || Number.isNaN(day)
+			? { min: null, max: null, disabled: true }
+			: { min: '08:00', max: '17:00', disabled: false };
 	} else {
 		const { opens, closes } = OPENING_HOURS[date.getDay()];
 
@@ -238,6 +245,7 @@ export default function({
 		// date = _getDate(),
 		time = '',
 		comments = '',
+		isAdmin = false,
 	},
 	signal,
 }) {
@@ -246,6 +254,14 @@ export default function({
 	const minDate = new Date();
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 	const { min, max, disabled } = getOpeningHours(date);
+
+	if (! isAdmin) {
+		// Not a great solution, but need something for now...
+		konami({ signal }).then(() => {
+			setState('isAdmin', true);
+			document.getElementById('pantry-date').setCustomValidity('');
+		});
+	}
 
 	return html`<form id="pantry-form" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
@@ -276,7 +292,7 @@ export default function({
 			food that they want rather than a preset box of items.
 			The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
 		</div>
-		<div>
+		<div hidden="">
 			<h3>Notice</h3>
 			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
 			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
@@ -359,7 +375,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
-				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled ? null : date.toISOString().split('T')[0] })} required="" />
+				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
