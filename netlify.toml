@@ -27,4 +27,4 @@
     "node:crypto"
   ]
   node_bundler = "esbuild"
-  included_files = ["_data/jwk.json"]
+  included_files = ["_data/jwk.json", "_data/secrets.json"]

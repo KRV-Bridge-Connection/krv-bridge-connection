@@ -20,7 +20,7 @@ const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
 
-const OPENING_HOURS =  [
+const OPENING_HOURS = [
 	{ dayOfWeek: 'Sunday', opens: null, closes: null },
 	{ dayOfWeek: 'Monday', opens: '13:00:00', closes: '16:00:00' },
 	{ dayOfWeek: 'Tuesday', opens: '13:00:00', closes: '16:00:00' },

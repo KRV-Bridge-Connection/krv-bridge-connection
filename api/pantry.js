@@ -5,11 +5,19 @@ import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { getSUID } from '@shgysk8zer0/suid';
+import { useSecretStore } from '@aegisjsproject/secret-store';
+import { readFile } from 'node:fs/promises';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
+
+async function getSecretStore(key) {
+	const file = await readFile('_data/secrets.json', { encoding: 'utf8' });
+	const [store] = useSecretStore(key, JSON.parse(file));
+	return store;
+}
 
 const QZONE = 7;
 
@@ -237,6 +245,8 @@ export default createHandler({
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
 				const key = await getSecretKey();
+				const store = await getSecretStore(key);
+
 				const [streetAddress, email = null, telephone = null, comments = null] = await Promise.all(
 					['streetAddress', 'email', 'telephone', 'comments']
 						.map(field => data.get(field) ?? null)
@@ -300,7 +310,7 @@ export default createHandler({
 					signal: req.signal,
 				}).then(resp => resp.blob());
 
-				const message = new SlackMessage(process.env.SLACK_WEBHOOK,
+				const message = new SlackMessage(await store.PANTRY_SLACK_URL,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
 						fields: [
@@ -324,8 +334,6 @@ export default createHandler({
 						]
 					}) : undefined
 				);
-
-				console.log(message.toString());
 
 				const body = new FormData();
 				body.set('id', id);
