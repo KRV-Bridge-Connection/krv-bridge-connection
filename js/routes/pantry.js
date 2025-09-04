@@ -11,8 +11,8 @@ import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 
-const style = css`#pantry-date:not(:user-invalid) + #pantry-date-invalid,
-#pantry-time:not(:user-invalid) + #pantry-time-invalid {
+const style = css`#pantry-date:not(:invalid) + #pantry-date-invalid,
+#pantry-time:not(:invalid) + #pantry-time-invalid {
 	visibility: hidden;
 }`;
 
@@ -384,12 +384,12 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
-				<div id="pantry-date-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
+				<div id="pantry-date-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
 				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} required="" />
-				<div id="pantry-time-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
+				<div id="pantry-time-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">
