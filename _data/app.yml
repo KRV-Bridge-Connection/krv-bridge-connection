@@ -73,26 +73,26 @@ shortcuts:
     - src: /img/shortcuts/about-36.png
       sizes: 36x36
       type: image/png
-  - name: Contact
-    description: Contact KRV Bridge Connection
-    url: /contact/
+  - name: Pantry
+    description: Schedule an appointment in our Choice Pantry
+    url: /pantry/
     icons:
-    - src: /img/shortcuts/contact.svg
+    - src: /img/shortcuts/pantry.svg
       sizes: 192x192
       type: image/svg+xml
-    - src: /img/shortcuts/contact-192.png
+    - src: /img/shortcuts/pantry-192.png
       sizes: 192x192
       type: image/png
-    - src: /img/shortcuts/contact-144.png
+    - src: /img/shortcuts/pantry-144.png
       sizes: 144x144
       type: image/png
-    - src: /img/shortcuts/contact-96.png
+    - src: /img/shortcuts/pantry-96.png
       sizes: 96x96
       type: image/png
-    - src: /img/shortcuts/contact-72.png
+    - src: /img/shortcuts/pantry-72.png
       sizes: 72x72
       type: image/png
-    - src: /img/shortcuts/contact-48.png
+    - src: /img/shortcuts/pantry-48.png
       sizes: 48x48
       type: image/png
     - src: /img/shortcuts/contact-36.png

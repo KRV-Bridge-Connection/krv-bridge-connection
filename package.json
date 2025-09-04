@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Bringing multiple nonprofit services into the KRV",
   "private": true,
   "type": "module",
@@ -80,7 +80,7 @@
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
-    "firebase-admin": "^13.4.0"
+    "firebase-admin": "^13.5.0"
   },
   "devDependencies": {
     "@shgysk8zer0/eslint-config": "^1.0.4",

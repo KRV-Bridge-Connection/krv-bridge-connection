@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.11] - 2025-08-29
+
+### Added
+- Add "Bridge to Wellbeing" application
+
+### Changed
+- Add panry schedule (days/hours/holidays)
+- Use pantry schedule for date & time validation
+- Update FAQ
+
 ### Added
 - Add support for more complex pantry schedules (closed days, different hours)
 

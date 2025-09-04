@@ -1,13 +1,20 @@
 import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onClick, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
-import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
+import { clearState, setState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
+import { konami } from '@shgysk8zer0/konami';
+
+const style = css`#pantry-date:not(:user-invalid) + #pantry-date-invalid,
+#pantry-time:not(:user-invalid) + #pantry-time-invalid {
+	visibility: hidden;
+}`;
 
 const CARES_FORM = '/docs/cares-form.pdf';
 
@@ -54,6 +61,12 @@ const CLOSED = [
 const getOpeningHours = (date) => {
 	if (CLOSED.includes(date.toISOString().split('T')[0])) {
 		return { disabled: true, min: null, max: null };
+	} else if (history.state?.isAdmin) {
+		const day = date.getDay();
+
+		return day === 0 || day === 6 || Number.isNaN(day)
+			? { min: null, max: null, disabled: true }
+			: { min: '08:00', max: '17:00', disabled: false };
 	} else {
 		const { opens, closes } = OPENING_HOURS[date.getDay()];
 
@@ -141,6 +154,8 @@ const TIMEZONE_OFFSET = 8 * HOURS;
 const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
+const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
+
 const dateChange = registerCallback('pantry:date:change', ({ target }) => {
 	if (target.value.length !== 10) {
 		target.setCustomValidity('Please select a valid date. YYYY-MM-DD format is required.');
@@ -222,6 +237,8 @@ const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value,
  */
 const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
+
 export default function({
 	state: {
 		givenName = getSearch('givenName', ''),
@@ -236,6 +253,7 @@ export default function({
 		// date = _getDate(),
 		time = '',
 		comments = '',
+		isAdmin = false,
 	},
 	signal,
 }) {
@@ -245,9 +263,20 @@ export default function({
 	const maxDate = new Date(Date.now() + 2 * WEEKS);
 	const { min, max, disabled } = getOpeningHours(date);
 
-	return html`<form id="pantry-form" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+	if (! isAdmin) {
+		// Not a great solution, but need something for now...
+		konami({ signal }).then(() => {
+			setState('isAdmin', true);
+			document.getElementById('pantry-date').setCustomValidity('');
+		});
+	}
+
+	return html`<form id="pantry-form" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
-			<h2>KRV Bridge Choice Food Pantry</h2>
+			<h2>
+				<span itemprop="name">KRV Bridge Connection</span>
+				<sapn itemprop="contactType">Choice Food Pantry</span>
+			</h2>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
 					https://i.imgur.com/h68vmgFm.jpeg 160w,
 					https://i.imgur.com/h68vmgFl.jpeg 320w,
@@ -262,14 +291,17 @@ export default function({
 				loading="lazy"
 				decoding="async"
 				crossorigin="anonymous"
+				itemprop="image"
 				referrerpolicy="no-referrer" />
-			<p>The Choice Pantry is provided to KRV residents to compliment other resources to meet nutritional needs.
-			As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
+			<p itemprop="description">Our Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
+			temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
+			are not enough.</p>
+			<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
 			food that they want rather than a preset box of items.
-			The Choice Pantry is available up to twice per month and provides food based on household size.</p>
+			The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
 		</div>
-		<div>
-			<h3>Notice</h3>
+		<section aria-labelledby="pantry-hud-notice" hidden="">
+			<h3 id="pantry-hud-notice">Notice</h3>
 			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
 			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
 			<p>
@@ -281,10 +313,33 @@ export default function({
 					</svg>
 				</a>
 			</p>
-		</div>
+		</section>
+		<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
+			<h3 id="general-pantry-hours">General Pantry Hours</h3>
+			<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
+			<ul>
+				${OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
+					<span itemprop="dayOfWeek">${dayOfWeek}</span>
+					${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
+						? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
+						: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
+				</li>`).join('')}
+			</ul>
+		</section>
+		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
+			<h3 id="pantry-address">Address</h3>
+			<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
+			<div>
+				<span itemprop="addressLocality">Lake Isabella</span>,
+				<span itemprop="addressRegion">CA</span>
+				<meta itemprop="postalCode" content="93240" />
+				<meta itemprop="addressCountry" content="US" />
+			</div>
+		</section>
 		<fieldset class="no-border">
 			<legend>Schedule an Appointment</legend>
-			<p>No appointment necessary, but we would appreciate the notice to ensure someone is available to assist you.</p>
+			<p>To ensure we can serve you, an appointment is required. Using this form is the only way to see our most up-to-date hours,
+			as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
 			<p class="status-box info">Fields marked with a <q>*</q> are required</p>
 			<div class="form-group flex wrap space-between">
 				<span>
@@ -311,7 +366,7 @@ export default function({
 			<div class="form-group">
 				<label for="pantry-street-address" class="input-label">Address</label>
 				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" placeholder="Street Address" ${attr({ value: streetAddress })} />
-				<label for="pantry-address-locality required" class="input-label required">City</label>
+				<label for="pantry-address-locality" class="input-label required">City</label>
 				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
 				<datalist id="pantry-towns-list">
 					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
@@ -328,11 +383,13 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
-				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled ? null : date.toISOString().split('T')[0] })} required="" />
+				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
+				<div id="pantry-date-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
 				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} required="" />
+				<div id="pantry-time-invalid">Please double check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
 				<label for="pantry-comments" class="input-label">
