@@ -5,19 +5,12 @@ import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { getSUID } from '@shgysk8zer0/suid';
-import { useSecretStore } from '@aegisjsproject/secret-store';
-import { readFile } from 'node:fs/promises';
+import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
-
-async function getSecretStore(key) {
-	const file = await readFile('_data/secrets.json', { encoding: 'utf8' });
-	const [store] = useSecretStore(key, JSON.parse(file));
-	return store;
-}
 
 const QZONE = 7;
 
@@ -245,7 +238,7 @@ export default createHandler({
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
 				const key = await getSecretKey();
-				const store = await getSecretStore(key);
+				const [store] = await openSecretStoreFile(key, '_data/secrets.json', { signal: req.signal });
 
 				const [streetAddress, email = null, telephone = null, comments = null] = await Promise.all(
 					['streetAddress', 'email', 'telephone', 'comments']
