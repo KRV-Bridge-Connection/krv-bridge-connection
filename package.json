@@ -71,6 +71,7 @@
   "homepage": "https://krvbridge.org",
   "dependencies": {
     "@aegisjsproject/attempt": "^1.0.5",
+    "@aegisjsproject/secret-store": "^1.0.0",
     "@shgysk8zer0/11ty-netlify": "^1.1.27",
     "@shgysk8zer0/aes-gcm": "^1.0.8",
     "@shgysk8zer0/geoutils": "^1.0.6",
