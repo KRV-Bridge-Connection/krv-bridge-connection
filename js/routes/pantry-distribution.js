@@ -547,11 +547,11 @@ export default async function({
 				</div>
 				<div>
 					<b>Points:</b>
-					<input type="text" id="pantry-points" class="display-text" name="budget" ${attr({ value: points })} readonly" />
+					<input type="text" id="pantry-points" class="display-text" name="budget" ${attr({ value: points })} readonly="" />
 				</div>
 				<div>
 					<b>Household Size:</b>
-					<input type="text" id="pantry-household" class="display-text" name="household"${attr({ value: household })} readonly="" />
+					<input type="text" id="pantry-household" class="display-text" name="household" ${attr({ value: household })} readonly="" />
 				</div>
 			</div>
 			<table id="pantry-cart" class="full-width overflow-auto">
