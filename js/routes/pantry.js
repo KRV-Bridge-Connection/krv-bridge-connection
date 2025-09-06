@@ -244,6 +244,7 @@ export default function({
 		givenName = getSearch('givenName', ''),
 		additionalName = getSearch('additionalName', ''),
 		familyName = getSearch('familyName', ''),
+		suffix='',
 		email = getSearch('email', ''),
 		telephone = getSearch('telephone', ''),
 		household = getSearch('household', '1'),
@@ -353,6 +354,26 @@ export default function({
 				<span>
 					<label for="pantry-given-name" class="input-label required">Last Name</label>
 					<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
+				</span>
+				<span>
+					<label for="pantry-name-suffix" class="input-label">Suffix</label>
+					<input type="text"
+						name="suffix"
+						id="pantry-name-suffix"
+						class="input"
+						${attr({ value: suffix })}
+						autocomplete="honorific-suffix"
+						list="suffix-options"
+						size="3"
+						minlength="2"
+						placeholder="Jr., Sr., III, etc." />
+					<datalist id="suffix-options">
+						<option value="Jr">
+						<option value="Sr">
+						<option value="II">
+						<option value="III">
+						<option value="IV">
+					</datalist>
 				</span>
 			</div>
 			<div class="form-group">
