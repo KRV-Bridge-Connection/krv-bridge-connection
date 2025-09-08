@@ -248,7 +248,7 @@ export default createHandler({
 
 				const created = new Date();
 				const id = getSUID({ date: created, alphabet: 'base64url' });
-				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')}`);
+				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`);
 				const normalTrip = recentVists < 2;
 				const points = normalTrip ? _getPoints(household) : household * 5;
 
@@ -256,7 +256,8 @@ export default createHandler({
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalyName'),
 					familyName: data.get('familyName'),
-					_name: normalizeName(`${data.get('givenName')} ${data.get('familyName')}`),
+					suffix: data.get('suffix'),
+					_name: normalizeName(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`),
 					name: ['givenName', 'additionalName', 'familyName']
 						.map(field => data.get(field))
 						.filter(field => typeof field === 'string' && field.length !== 0)
