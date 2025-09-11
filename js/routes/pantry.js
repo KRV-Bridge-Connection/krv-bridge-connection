@@ -16,6 +16,7 @@ const style = css`#pantry-date:not(:invalid) + #pantry-date-invalid,
 	visibility: hidden;
 }`;
 
+const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
@@ -300,6 +301,16 @@ export default function({
 			<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
 			food that they want rather than a preset box of items.
 			The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
+			<p>
+				Apply for food assistance in California through the official
+				<a href="${CAL_BENEFITS}" class="btn btn-link" target="_blank" rel="noopener noreferrer">
+					<span>CalFresh (SNAP/Food Stamps)</span>
+					<svg class="icon" width="18" height="18" fill="currentColor" role="presentation" aria-hidden="true">
+						<use href="/img/icons.svg#link-external"></use>
+					</svg>
+				</a>
+				website.
+			</p>
 		</div>
 		<section aria-labelledby="pantry-hud-notice" hidden="">
 			<h3 id="pantry-hud-notice">Notice</h3>
