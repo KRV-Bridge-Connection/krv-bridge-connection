@@ -248,7 +248,7 @@ export default function({
 		suffix='',
 		email = getSearch('email', ''),
 		telephone = getSearch('telephone', ''),
-		household = getSearch('household', '1'),
+		household = getSearch('household', ''),
 		streetAddress = getSearch('streetAddress', ''),
 		addressLocality = getSearch('addressLocality', ''),
 		postalCode = getSearch('postalCode', ''),
@@ -413,6 +413,7 @@ export default function({
 				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
+			<p>Please be aware that scheduling is limited to pantry days and hours, and appointments may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
@@ -428,8 +429,11 @@ export default function({
 					<span>Additional Resource Request</span>
 					<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
 				</label>
-				<textarea name="comments" id="pantry-comments" class="input" placeholder="Is there anything else you would like to say?" cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
+				<textarea name="comments" id="pantry-comments" class="input" placeholder="Please describe any other needs or support you are looking for." cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
 				<p><b>Note:</b> By adding additional comments about your needs and circumstances, you agree to allow us to share any relevant information with our partners for the purpose of connecting you with resources they may offer you.</p>
+				<p>
+					Looking for something specific? Our <a href="/resources/" target="_blank" class="no-router">resources directory <svg class="icon" height="18" width="18" fill="currentColor" role="presentation" aria-hidden="true"><use href="/img/icons.svg#link-external"></use></svg></a> has an extensive list of community partners and services.
+				</p>
 			</div>
 		</fieldset>
 		<div class="flex row">
