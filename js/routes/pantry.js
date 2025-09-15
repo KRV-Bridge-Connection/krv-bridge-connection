@@ -39,6 +39,7 @@ const CLOSED = [
 	'2025-08-29', // Probably empty Fri too
 	'2025-09-01', // Labor Day
 	'2025-09-15', // Missing delivery... Ran out
+	'2025-09-16', // Assume we will be out still
 	'2025-11-11', // Veterans Day
 	'2025-11-27', // Thanksgiving
 	'2025-11-28', // Day after Thanksgiving
