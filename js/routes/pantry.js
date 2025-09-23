@@ -16,7 +16,7 @@ const style = css`#pantry-date:not(:invalid) + #pantry-date-invalid,
 	visibility: hidden;
 }`;
 
-const MESSAGE = 'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
+const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
 
