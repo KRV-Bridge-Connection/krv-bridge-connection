@@ -7,7 +7,7 @@ import { onClick, onChange, onSubmit, onReset, onToggle, onFocus, signal as sign
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
-import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E } from '@aegisjsproject/barcodescanner';
+import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E, EAN_13 } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
@@ -155,7 +155,7 @@ const lockScreen = registerCallback('pantry:distribution:orientation-lock', asyn
 
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
-const BARCODE_FORMATS = [UPC_A, UPC_E, QR_CODE];
+const BARCODE_FORMATS = [UPC_A, UPC_E, QR_CODE, EAN_13];
 const UPC_PATTERN = /^\d{8,15}$/;
 const PANTRY_ENDPOINT = new URL('/api/pantryDistribution', location.origin).href;
 const [cart, setCart] = manageState('cart', []);
@@ -459,6 +459,7 @@ export default async function({
 			switch (result.format) {
 				case UPC_A:
 				case UPC_E:
+				case EAN_13:
 					await _addToCart(result.rawValue);
 					break;
 
