@@ -43,6 +43,7 @@ const CLOSED = [
 	'2025-09-16', // Assume we will be out still
 	'2025-09-19', // Canyon closed, so no food
 	// '2025-09-22', // Keeping closed until we know when food is coming
+	'2025-09-23', // Ran empty again... Delivery tomorrow!
 	'2025-11-11', // Veterans Day
 	'2025-11-27', // Thanksgiving
 	'2025-11-28', // Day after Thanksgiving
