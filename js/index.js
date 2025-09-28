@@ -6,6 +6,7 @@ import { SLACK } from './consts.js';
 import { navigate } from './functions.js';
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router/router.js';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
+import { observeCommands } from '@aegisjsproject/commands';
 import './components.js';
 import './user.js';
 import './admin.js';
@@ -27,6 +28,7 @@ initRouter({
 });
 
 observeEvents(document.getElementById('main'));
+observeCommands();
 
 document.addEventListener(NAV_EVENT, event => {
 	event.waitUntil(async () => {
