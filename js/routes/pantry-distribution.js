@@ -455,12 +455,14 @@ export default async function({
 	const closeWatcher = new CloseWatcher({ signal });
 	OTHER_ELS.forEach(id => document.getElementById(id).inert = true);
 
-	closeWatcher.addEventListener('close', async () => {
-		if (await confirm('Exit page?')) {
+	closeWatcher.addEventListener('cancel', (event) => {
+		if (globalThis.confirm('Exit page?')) {
 			closeWatcher.destroy();
-			await navigate('/');
-			unlock();
 			OTHER_ELS.forEach(id => document.getElementById(id).inert = false);
+			navigate('/');
+			unlock();
+		} else {
+			event.preventDefault();
 		}
 	}, { signal });
 
