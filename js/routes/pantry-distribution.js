@@ -3,6 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
+import { navigate } from '@aegisjsproject/router/router.js';
 import { onClick, onChange, onSubmit, onReset, onToggle, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
@@ -16,6 +17,7 @@ export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 const ADD_ITEM_ID = 'pantry-manual';
 const MAX_PER_ITEM = 99;
+const OTHER_ELS = ['nav', 'sidebar', 'footer'];
 
 const numberClass = 'small-numeric';
 const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
@@ -36,6 +38,7 @@ const SUGGESTED_ITEMS = [
 
 const QUICK_ITEMS = [
 	{ name: 'Bread', cost: 3, id: 'A9D5D64F-20B5-4946-A466-110F131469D7' },
+	{ name: 'Frozen Food (Sm)', cost: 1, id: 'CDFB935F-40D1-45C4-8C72-857A5B889ED8' },
 	{ name: 'Eggs', cost: 0.5, id: 'F484DA58-CBD2-45B8-9009-4CA9C90C0B99' },
 	{ name: 'Water', cost: 0.5, id: 'B9C63BFA-91DA-484B-999F-5CC078B4DCB9' },
 	{ name: 'Fruit', cost: 0.5, id: 'B3CC6364-FC34-45BE-A674-64FCA1E2A15E' },
@@ -44,7 +47,7 @@ const QUICK_ITEMS = [
 	{ name: 'Granola Bar', cost: 1, id: '2FAD54D7-6C24-444F-BF66-BECF5F581F0F' },
 	{ name: 'Baby Food', cost: 1, id: '1FB8120C-C69C-47AF-8610-B98C7476BFA8' },
 	{ name: 'Frozen Meal', cost: 5, id: '04746271-3D97-488B-BA98-01E2B8D4FDAE' },
-	{ name: 'Garden Bag', cost: 5, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
+	{ name: 'Garden Bag', cost: 3, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
 ];
 
 document.adoptedStyleSheets = [
@@ -449,6 +452,21 @@ export default async function({
 	signal,
 } = {}) {
 	const sig = registerSignal(signal);
+	const closeWatcher = new CloseWatcher({ signal });
+	OTHER_ELS.forEach(id => document.getElementById(id).inert = true);
+
+	closeWatcher.addEventListener('close', async () => {
+		if (await confirm('Exit page?')) {
+			closeWatcher.destroy();
+			await navigate('/');
+			unlock();
+			OTHER_ELS.forEach(id => document.getElementById(id).inert = false);
+		}
+	}, { signal });
+
+	signal.addEventListener('abort', () => {
+		OTHER_ELS.forEach(id => document.getElementById(id).inert = false);
+	});
 
 	if (! Array.isArray(history.state?.cart)) {
 		setCart([]);
