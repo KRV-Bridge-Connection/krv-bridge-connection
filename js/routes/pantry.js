@@ -2,7 +2,7 @@ import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onReset, onClick, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router/router.js';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
@@ -11,9 +11,18 @@ import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 
-const style = css`#pantry-date:not(:invalid) + #pantry-date-invalid,
+const style = css`#pantry-message {
+	max-width: min(800px, 95%);
+}
+
+#pantry-date:not(:invalid) + #pantry-date-invalid,
 #pantry-time:not(:invalid) + #pantry-time-invalid {
 	visibility: hidden;
+}
+
+#pantry-message .btns {
+	justify-content: center;
+	gap: 0.8rem;
 }`;
 
 const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
@@ -129,16 +138,8 @@ async function _alert(message, qr, { signal } = {}) {
 	document.getElementById('pantry-message-content').textContent = message;
 
 	if (typeof qrSrc === 'string') {
-		document.getElementById('pantry-token-qr').replaceChildren(html`<div class="center pantry-qr">
-			<img src="${qrSrc}" decoding="async" class="card qr-code" />
-			<br />
-			<a class="btn btn-primary" href="${qrSrc}" download="krv-pantry-qr.png">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
-					<path fill-rule="evenodd" d="M9 12h2l-3 3-3-3h2V7h2v5zm3-8c0-.44-.91-3-4.5-3C5.08 1 3 2.92 3 5 1.02 5 0 6.52 0 8c0 1.53 1 3 3 3h3V9.7H3C1.38 9.7 1.3 8.28 1.3 8c0-.17.05-1.7 1.7-1.7h1.3V5c0-1.39 1.56-2.7 3.2-2.7 2.55 0 3.13 1.55 3.2 1.8v1.2H12c.81 0 2.7.22 2.7 2.2 0 2.09-2.25 2.2-2.7 2.2h-2V11h2c2.08 0 4-1.16 4-3.5C16 5.06 14.08 4 12 4z"/>
-				</svg>
-				<span>Save QR Code</span>
-			</a>
-		</div>`);
+		document.querySelectorAll('.pantry-qr-dl').forEach(a => a.href = qrSrc);
+		document.getElementById('pantry-qr-img').src = qrSrc;
 
 		dialog.addEventListener('close', () => {
 			resolve();
@@ -186,8 +187,6 @@ const dateChange = registerCallback('pantry:date:change', ({ target }) => {
 });
 
 const changeHandler = registerCallback('pantry:form:change', change);
-
-const closeMessage = registerCallback('pantry:message:close', ({ target }) => target.closest('dialog').close());
 
 const submitHandler = registerCallback('pantry:form:submit', async event => {
 	event.preventDefault();
@@ -448,14 +447,29 @@ export default function({
 		</div>
 	</form>
 	<dialog id="pantry-message">
-		<div id="pantry-message-content"></div>
-		<div id="pantry-token-qr"></div>
-		<button type="button" class="btn btn-primary" ${onClick}="${closeMessage}" ${signalAttr}="${sig}">
-			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
-				<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
-			</svg>
-			<span>Close</span>
-		</button>
+		<p id="pantry-message-content"></p>
+		<div id="pantry-token-qr">
+			<div class="center pantry-qr">
+				<a id="pantry-dl-container" class="pantry-qr-dl" download="krv-pantry-qr.png">
+					<img id="pantry-qr-img" class="card qr-code" decoding="async" />
+				</a>
+			</div>
+		</div>
+		<p class="center">This QR Code is necessary to check-in to your pantry appointment. Please save it and have it available when you arrive.</p>
+		<div class="flex row wrap btns">
+			<a id="pantry-qr-download" class="btn btn-success pantry-qr-dl" download="krv-pantry-qr.png">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M9 12h2l-3 3-3-3h2V7h2v5zm3-8c0-.44-.91-3-4.5-3C5.08 1 3 2.92 3 5 1.02 5 0 6.52 0 8c0 1.53 1 3 3 3h3V9.7H3C1.38 9.7 1.3 8.28 1.3 8c0-.17.05-1.7 1.7-1.7h1.3V5c0-1.39 1.56-2.7 3.2-2.7 2.55 0 3.13 1.55 3.2 1.8v1.2H12c.81 0 2.7.22 2.7 2.2 0 2.09-2.25 2.2-2.7 2.2h-2V11h2c2.08 0 4-1.16 4-3.5C16 5.06 14.08 4 12 4z"/>
+				</svg>
+				<span>Save QR Code</span>
+			</a>
+			<button type="button" class="btn btn-secondary" command="close" commandfor="pantry-message">
+				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
+					<use href="/img/icons.svg#x"></use>
+				</svg>
+				<span>Close</span>
+			</button>
+		</div>
 	</dialog>`;
 }
 
