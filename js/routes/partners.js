@@ -8,6 +8,25 @@ import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { createSVGFallbackLogo } from '../functions.js';
 
+const SOURCE = 'krv-bridge';
+const MEDIUM = 'referrer';
+const CONTENT = 'resource-directory';
+const CAMPAIGN = 'resource-directory';
+
+function _addUTM(url) {
+	if (typeof url === 'string') {
+		return _addUTM(URL.parse(url));
+	} else if (url instanceof URL) {
+		url.searchParams.set('utm_source', SOURCE);
+		url.searchParams.set('utm_medium', MEDIUM);
+		url.searchParams.set('utm_content', CONTENT);
+		url.searchParams.set('utm_campaign', CAMPAIGN);
+		return url.href;
+	} else {
+		return null;
+	}
+}
+
 const style = css`.partner-image {
 	max-width: 100%;
 	height: auto;
@@ -113,7 +132,7 @@ const getEmailLink = ({ email }) => typeof email !== 'string' ? '' : `<a ${attr(
 	<span>${email}</span>
 </a>`;
 
-const getWebsite = ({ url }) => typeof url === 'string' && URL.canParse(url) ? `<a ${attr({ href: url })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
+const getWebsite = ({ url }) => typeof url === 'string' && URL.canParse(url) ? `<a ${attr({ href: _addUTM(url) })} target="_blank" itemprop="url" rel="noopener noreferrer external" class="btn btn-link btn-lg">
 	${linkIcon}
 	<span>${new URL(url).hostname}</span>
 </a>` : '';
