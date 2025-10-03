@@ -93,6 +93,19 @@ const getOpeningHours = (date) => {
 	}
 };
 
+const getPantrySchedule = () => `<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
+	<h3 id="general-pantry-hours">General Pantry Hours</h3>
+	<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
+	<ul>
+		${OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
+			<span itemprop="dayOfWeek">${dayOfWeek}</span>
+			${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
+				? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
+				: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
+		</li>`).join('')}
+	</ul>
+</section>`;
+
 /**
  *
  * @returns {Date}
@@ -331,18 +344,7 @@ export default function({
 				</a>
 			</p>
 		</section>
-		<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
-			<h3 id="general-pantry-hours">General Pantry Hours</h3>
-			<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
-			<ul>
-				${OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
-					<span itemprop="dayOfWeek">${dayOfWeek}</span>
-					${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
-						? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
-						: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
-				</li>`).join('')}
-			</ul>
-		</section>
+
 		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
 			<h3 id="pantry-address">Address</h3>
 			<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
@@ -419,6 +421,7 @@ export default function({
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
 			<p>Please be aware that scheduling is limited to pantry days and hours, and appointments may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
+			${getPantrySchedule()}
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
