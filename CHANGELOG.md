@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### [v1.1.14] - 2025-10-06
+
+### Changed
+- Update `@shgysk8zer0/importmap`
+
+### Fixed
+- Fix checking pantry visits
+
 ## [v1.1.13] - 2025-09-28
 
 ### Changed
