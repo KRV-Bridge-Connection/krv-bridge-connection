@@ -248,7 +248,7 @@ export default createHandler({
 
 				const created = new Date();
 				const id = getSUID({ date: created, alphabet: 'base64url' });
-				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`);
+				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
 				const normalTrip = recentVists < 2;
 				const points = normalTrip ? _getPoints(household) : household * 5;
 
