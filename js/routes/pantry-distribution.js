@@ -39,6 +39,8 @@ const SUGGESTED_ITEMS = [
 const QUICK_ITEMS = [
 	{ name: 'Bread', cost: 3, id: 'A9D5D64F-20B5-4946-A466-110F131469D7' },
 	{ name: 'Frozen Food (Sm)', cost: 1, id: 'CDFB935F-40D1-45C4-8C72-857A5B889ED8' },
+	{ name: 'Small Canned Food', cost: 2, id: '58393A8E-5116-4FE2-B094-EAFC8539CB45' },
+	{ name: 'Large Canned Food', cost: 2, id: 'B0E1D581-D21B-49BC-AF94-13323C57B0B5' },
 	{ name: 'Eggs', cost: 0.5, id: 'F484DA58-CBD2-45B8-9009-4CA9C90C0B99' },
 	{ name: 'Water', cost: 0.5, id: 'B9C63BFA-91DA-484B-999F-5CC078B4DCB9' },
 	{ name: 'Fruit', cost: 0.5, id: 'B3CC6364-FC34-45BE-A674-64FCA1E2A15E' },
