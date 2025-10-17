@@ -37,7 +37,7 @@ const OPENING_HOURS = [
 	{ dayOfWeek: 'Tuesday', opens: '13:00:00', closes: '16:00:00' },
 	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
 	{ dayOfWeek: 'Thursday', opens: null, closes: null },
-	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '12:00:00' },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
 	{ dayOfWeek: 'Saturday', opens: null, closes: null },
 ];
 
