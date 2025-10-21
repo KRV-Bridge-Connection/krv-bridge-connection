@@ -4,7 +4,7 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
-import { navigate, back } from '@aegisjsproject/router/router.js';
+import { navigate, back } from '@aegisjsproject/router';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
 import { clearState, setState, changeHandler as change } from '@aegisjsproject/state/state.js';
 import { getSearch } from '@aegisjsproject/url/search.js';

@@ -1,4 +1,4 @@
-import { navigate as nav } from '@aegisjsproject/router/router.js';
+import { navigate as nav } from '@aegisjsproject/router';
 
 export function createSVGFallbackLogo(text, {
 	width = 300,

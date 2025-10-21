@@ -5,6 +5,7 @@ import {
 } from 'firebase/firebase-auth.js';
 
 import { getFirebaseApp } from './app.js';
+import { ORG_TOKEN_KEY } from '../consts.js';
 
 const auths = new Map();
 
@@ -60,7 +61,8 @@ export async function login({
 
 export async function logout() {
 	const auth = await getFirebaseAuth();
-	await cookieStore.delete({ name: 'token', path:'/api/' });
+	// await cookieStore.delete({ name: 'org-jwt', path:'/api/' });
+	localStorage.removeItem(ORG_TOKEN_KEY);
 	return signOut(auth);
 }
 

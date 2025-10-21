@@ -20,5 +20,6 @@ export default {
 		format: 'esm',
 		plugins: [terser()],
 		sourcemap: true,
+		inlineDynamicImports: true,
 	}
 };
