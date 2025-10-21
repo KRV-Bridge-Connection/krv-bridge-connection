@@ -35,7 +35,7 @@ observeEvents(document.getElementById('main'));
 
 Promise.all([
 	getJSON('/firebase.json', { referrerPolicy: 'origin' }),
-	import('@aegisjsproject/firebase-account-routes/app.js'),
+	import('@aegisjsproject/firebase-account-routes/auth.js'),
 ]).then(([config, { initializeFirebaseApp }]) => initializeFirebaseApp(config)).catch(reportError);
 
 // getJSON('/firebase.json', { referrerPolicy: 'origin' }).then(initializeFirebaseApp);
