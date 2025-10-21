@@ -1,32 +1,18 @@
 import { HOURS as HOUR } from '@shgysk8zer0/consts/date.js';
-import { deleteUser as dUser, updateProfile as uProfile } from 'firebase/firebase-auth.js';
-import { getCurrentUser } from './auth.js';
+import { getCurrentUser } from '@aegisjsproject/firebase-account-routes/auth.js';
 import { ORG_TOKEN_KEY } from '../consts.js';
-
-export async function updateProfile({ name: displayName, image: photoURL }) {
-	const user = await getCurrentUser();
-
-	if (user) {
-		await uProfile(user, { displayName, photoURL });
-	}
-}
 
 export async function getToken() {
 	const user = await getCurrentUser();
-	return user.getIdToken();
+
+	if (! user.isAnonymous) {
+		return user.getIdToken();
+	}
 }
 
 export async function createTokenCookie(name = 'token') {
 	const value = await getToken();
 	await cookieStore.set({ name, value, expires: Date.now() + HOUR, sameSite: 'strict' });
-}
-
-export async function deleteUser() {
-	const user = await getCurrentUser();
-
-	if (user) {
-		await dUser(user);
-	}
 }
 
 export const hasOrgToken = () => localStorage.hasOwnProperty(ORG_TOKEN_KEY);
