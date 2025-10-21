@@ -4,12 +4,14 @@ import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
 import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from './consts.js';
 import { navigate } from './functions.js';
-import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router/router.js';
+import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
+// import { initializeFirebaseApp } from '@aegisjsproject/firebase-account-routes/auth.js';
+import { getJSON } from '@shgysk8zer0/kazoo/http.js';
 // import { observeCommands } from '@aegisjsproject/commands';
 import './components.js';
-import './user.js';
-import './admin.js';
+// import './user.js';
+// import './admin.js';
 
 initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
@@ -21,6 +23,8 @@ initRouter({
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
 	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
 	'/event/sign-in/': '/js/routes/sign-in.js',
+	'/account/:page': '@aegisjsproject/firebase-account-routes',
+	'/account/': '@aegisjsproject/firebase-account-routes',
 }, {
 	rootEl: document.getElementById('main'),
 	notFound: '/js/routes/404.js',
@@ -28,6 +32,13 @@ initRouter({
 });
 
 observeEvents(document.getElementById('main'));
+
+Promise.all([
+	getJSON('/firebase.json', { referrerPolicy: 'origin' }),
+	import('@aegisjsproject/firebase-account-routes/auth.js'),
+]).then(([config, { initializeFirebaseApp }]) => initializeFirebaseApp(config)).catch(reportError);
+
+// getJSON('/firebase.json', { referrerPolicy: 'origin' }).then(initializeFirebaseApp);
 
 document.addEventListener(NAV_EVENT, event => {
 	event.waitUntil(async () => {

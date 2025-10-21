@@ -15,4 +15,5 @@
 /partners  /partners/ 301
 /event/ /dynamic.html 200
 /event/* /dynamic.html 200
+/account/* /dynamic.html 200
 /* /404.html

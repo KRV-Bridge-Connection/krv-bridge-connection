@@ -126,8 +126,13 @@ export default createHandler({
 				} else {
 					const snapshot = await collection.get();
 					const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+					const key = await getSecretKey();
+					const volunteers = await Promise.all(docs.map(async ({ email, phone, ...rest }) => {
+						const [clearPhone, clearEmail] = await decryptAll(key, phone, email);
+						return { phone: clearPhone, email: clearEmail, ...rest };
+					}));
 
-					return Response.json(docs, { status: docs.length === 0 ? NOT_FOUND : OK });
+					return Response.json(volunteers, { status: docs.length === 0 ? NOT_FOUND : OK });
 				}
 			}
 		}

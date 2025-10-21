@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.0] - 2025-10-21
+
+### Added
+- Add `@aegisjsproject/firebase-account-routes`
+- Add corresponding route handlers
+
+### Removed
+- Remove all main bundle usage or Firebase
+
 ### [v1.1.14] - 2025-10-06
 
 ### Changed
