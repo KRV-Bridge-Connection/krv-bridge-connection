@@ -1,17 +1,9 @@
 import { HOURS as HOUR } from '@shgysk8zer0/consts/date.js';
-import { getCurrentUser } from '@aegisjsproject/firebase-account-routes/auth.js';
+import { getIdToken } from '@aegisjsproject/firebase-account-routes/auth.js';
 import { ORG_TOKEN_KEY } from '../consts.js';
 
-export async function getToken() {
-	const user = await getCurrentUser();
-
-	if (! user.isAnonymous) {
-		return user.getIdToken();
-	}
-}
-
 export async function createTokenCookie(name = 'token') {
-	const value = await getToken();
+	const value = await getIdToken();
 	await cookieStore.set({ name, value, expires: Date.now() + HOUR, sameSite: 'strict' });
 }
 
@@ -23,7 +15,7 @@ export async function genOrgToken({ signal } = {}) {
 	if (hasValidOrgToken()) {
 		return Math.max(parseInt(localStorage.getItem(ORG_TOKEN_KEY), 0)) || -1;
 	} else {
-		const token = await getToken();
+		const token = await getIdToken();
 
 		if (typeof token === 'string') {
 			const resp = await fetch('/api/orgJWT', {

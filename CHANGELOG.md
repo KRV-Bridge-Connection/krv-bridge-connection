@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.1] - 2025-10-22
+
+### Added
+- Begin implementing Invoker Commands
+
+### Changed
+- Switch to installing PWA via a `command` (`--install`)
+- Use `@aegisjsproject/router` for contact page
+
+### Removed
+- Remove multiple old scripts and pages
+
 ## [v2.0.0] - 2025-10-21
 
 ### Added
