@@ -1,17 +1,16 @@
-import { ready, toggleClass, css, on } from '@shgysk8zer0/kazoo/dom.js';
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
-import { init } from '@shgysk8zer0/kazoo/data-handlers.js';
-import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
-import { SLACK } from './consts.js';
-import { navigate } from './functions.js';
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
-// import { initializeFirebaseApp } from '@aegisjsproject/firebase-account-routes/auth.js';
-import { getJSON } from '@shgysk8zer0/kazoo/http.js';
-// import { observeCommands } from '@aegisjsproject/commands';
-import './components.js';
-// import './user.js';
-// import './admin.js';
+import { registerRootCommand, initRootCommands } from '@aegisjsproject/commands';
+import '@shgysk8zer0/components/share-button.js';
+import '@shgysk8zer0/components/weather/current.js';
+import '@kernvalley/components/events.js';
+import '@shgysk8zer0/components/github/user.js';
+import '@shgysk8zer0/components/notification/html-notification.js';
+import '@shgysk8zer0/components/install/prompt.js';
+import '@shgysk8zer0/components/app/stores.js';
+import '@shgysk8zer0/components/scroll-snap.js';
+import '@shgysk8zer0/components/youtube/player.js';
 
 initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
@@ -19,7 +18,7 @@ initRouter({
 	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
 	'/pantry/': '/js/routes/pantry.js',
 	'/pantry/qr': '/js/routes/pantry-qr.js',
-	// '/pantry/': '/js/routes/pantry-inventory.js',
+	'/contact/': '/js/routes/contact.js',
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
 	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
 	'/event/sign-in/': '/js/routes/sign-in.js',
@@ -32,13 +31,22 @@ initRouter({
 });
 
 observeEvents(document.getElementById('main'));
+initRootCommands();
 
-Promise.all([
-	getJSON('/firebase.json', { referrerPolicy: 'origin' }),
-	import('@aegisjsproject/firebase-account-routes/auth.js'),
-]).then(([config, { initializeFirebaseApp }]) => initializeFirebaseApp(config)).catch(reportError);
+if (! CSS.supports('height', '1dvh')) {
+	document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
 
-// getJSON('/firebase.json', { referrerPolicy: 'origin' }).then(initializeFirebaseApp);
+	requestIdleCallback(() => {
+		window.addEventListener('resize', debounce(() => {
+			document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
+		}), { passive: true });
+	});
+}
+
+document.documentElement.classList.add('js');
+document.documentElement.classList.remove('no-js');
+// For use with Invoker Commands
+document.documentElement.id = 'doc';
 
 document.addEventListener(NAV_EVENT, event => {
 	event.waitUntil(async () => {
@@ -56,152 +64,29 @@ document.addEventListener(NAV_EVENT, event => {
 				newLink.inert = true;
 				newLink.classList.add('active', 'no-pointer-events');
 			}
-
-			loadHandler();
 		}
 	});
 });
-
-if (! CSS.supports('height', '1dvh')) {
-	css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`});
-
-	requestIdleCallback(() => {
-		on([window], {
-			resize: debounce(() => css([document.documentElement], { '--viewport-height': `${window.innerHeight}px`})),
-		}, { passive: true });
-	});
-}
-
-toggleClass([document.documentElement], {
-	'no-dialog': document.createElement('dialog') instanceof HTMLUnknownElement,
-	'no-details': document.createElement('details') instanceof HTMLUnknownElement,
-	'js': true,
-	'no-js': false,
-});
-
-function loadHandler() {
-	init();
-
-	on('[data-navigate]', 'click', ({ currentTarget }) => navigate(currentTarget.dataset.navigate));
-
-	if (location.pathname.startsWith('/contact/')) {
-		on('#contact-coordinates', 'click', async ({ currentTarget }) => {
-			currentTarget.disabled = true;
-
-			try {
-				const { coords } = await getLocation({ enableHighAccuracy: true });
-
-				if (typeof coords?.latitude === 'number') {
-					const result = document.createElement('div');
-					document.getElementById('contact-latitude').value = coords.latitude;
-					document.getElementById('contact-longitude').value = coords.longitude;
-					result.textContent = `Your location has been added. [${coords.latitude}, ${coords.longitude}]`;
-					currentTarget.replaceWith(result);
-				} else {
-					throw new TypeError('Geo Coordinates are invalid.');
-				}
-			} catch(err) {
-				reportError(err);
-				currentTarget.disabled = false;
-			}
-		});
-		const params = new URLSearchParams(location.search);
-
-		if (params.has('subject') || params.has('body')) {
-			document.querySelector('input[name="subject"]').value = params.get('subject');
-			document.querySelector('[name="body"]').value = params.get('body');
-		}
-
-		on('#contact-form', 'submit', async event => {
-			event.preventDefault();
-			const target = event.target;
-			const data = new FormData(target);
-
-			const HTMLNotification = customElements.get('html-notification');
-
-			try {
-				const resp = await fetch('/api/slack', {
-					method: 'POST',
-					referrerPolicy: 'origin',
-					headers: {
-						Authorization: `Bearer ${new TextDecoder().decode(SLACK)}`,
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						name: data.get('name'),
-						email: data.get('email'),
-						phone: data.get('telephone'),
-						subject: data.get('subject'),
-						body: data.get('body'),
-						location: {
-							address: data.has('addressLocality') ? {
-								streetAddress: data.get('streetAddress'),
-								addressLocality: data.get('addressLocality'),
-								postalCode: data.get('postalCode'),
-							} : undefined,
-							geo: data.has('latitude') && data.has('longitude') ? {
-								latitude: parseFloat(data.get('latitude')),
-								longitude: parseFloat(data.get('longitude')),
-							} : undefined
-						}
-					})
-				});
-
-				if (resp.ok) {
-					const notification = new HTMLNotification('Message Sent!', {
-						body: 'Your message has been sent.',
-						icon: '/img/icon-32.png',
-						requireInteraction: true,
-						actions: [
-							{ title: 'Go to Home Page', action: 'home' },
-							{ title: 'Dismiss', action: 'dismiss' },
-						]
-					});
-
-					notification.addEventListener('notificationclick', event => {
-						switch(event.action) {
-							case 'dismiss':
-								event.target.close();
-								target.reset();
-								break;
-
-							case 'home':
-								location.href = '/';
-								break;
-						}
-					});
-
-					requestAnimationFrame(() => notification.hidden = false);
-
-					target.reset();
-				} else if (resp.headers.get('Content-Type').startsWith('application/json')) {
-					const { error } = await resp.json();
-
-					if ( typeof error?.message === 'string') {
-						throw new Error(error.message);
-					} else {
-						throw new Error('Oops. Something went wrong sending the message.');
-					}
-				} else {
-					throw new Error('Message not sent.');
-				}
-			} catch(err) {
-				console.error(err);
-				const notification = new HTMLNotification('Error Sending Message', {
-					body: err.message,
-				});
-
-				requestAnimationFrame(() => notification.hidden = false);
-			}
-		});
-	}
-}
 
 Promise.all([
 	customElements.whenDefined('install-prompt'),
-	ready(),
 ]).then(([HTMLInstallPromptElement]) => {
-	on('#install-btn', ['click'], () => new HTMLInstallPromptElement().show())
-		.forEach(el => el.hidden = false);
-	loadHandler();
+	const btn = document.getElementById('install-btn');
+	registerRootCommand('--install', () => new HTMLInstallPromptElement().show());
+	btn.command = '--install';
+	btn.commandForElement = document.documentElement;
+	btn.hidden = false;
 });
+
+Promise.all([
+	fetch('/firebase.json', { referrerPolicy: 'origin', headers: { Accept: 'application/json' } })
+		.then(resp => resp.json()),
+	import('@aegisjsproject/firebase-account-routes/auth.js'),
+]).then(([config, { initializeFirebaseApp, logout }]) => {
+	initializeFirebaseApp(config);
+
+	registerRootCommand('--logout', async ({ source }) => {
+		source.disabled = true;
+		logout().finally(() => source.disabled = false);
+	});
+}).catch(reportError);
