@@ -5,6 +5,14 @@ import { clearState, changeHandler as change } from '@aegisjsproject/state/state
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from '/js/consts.js';
+
+const escapeHtml = str => typeof str === 'string'
+	? str.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+	: '';
+
 const changeHandler = registerCallback('contact:change', change);
 
 const getIcon = (icon, {
@@ -209,7 +217,7 @@ export default ({
 					${getIcon('comment')}
 					<span class="label-text">Message</span>
 				</label>
-				<textarea id="contact-body" name="body" class="input" rows="5" placeholder="Enter your Message" ${attr({ value: body ?? params.get('body') })} required=""></textarea>
+				<textarea id="contact-body" name="body" class="input" rows="5" placeholder="Enter your Message" required="">${escapeHtml(body ?? params.get('body'))}</textarea>
 			</div>
 		</fieldset>
 		<div class="flex row">

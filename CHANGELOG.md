@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix setting value for message body on contact page
+
 ## [v2.0.1] - 2025-10-22
 
 ### Added
