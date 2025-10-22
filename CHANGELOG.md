@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fix setting value for message body on contact page
+- Fix redirect for `/.well-known/change-password`
 
 ## [v2.0.1] - 2025-10-22
 
