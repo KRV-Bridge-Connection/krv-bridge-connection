@@ -1,4 +1,4 @@
-/.well-known/change-password	/account/forgot-password/	301!
+/.well-known/change-password	/account/forgot-password	301!
 /.well-known/jwks.json  /api/jwk
 /api/* /.netlify/functions/:splat 200!
 /api/firebase-config	/firebase.json 301
