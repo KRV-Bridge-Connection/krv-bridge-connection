@@ -609,7 +609,7 @@ export default async function({
 		</fieldset>
 		<div class="flex row no-wrap">
 			<button type="submit" class="btn btn-success">Submit</button>
-			<button type="reset" class="btn btn-danger">Empty Cart</button>
+			<!--<button type="reset" class="btn btn-danger">Empty Cart</button>-->
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 			<button type="button" class="btn btn-secondary" ${onClick}="${lockScreen}" ${signalAttr}="${sig}" aria-label="Lock Orientation" ${attr({ disabled: ! (screen?.orientation?.lock instanceof Function) })}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" class="icon" fill="currentColor" aria-hidden="true">
