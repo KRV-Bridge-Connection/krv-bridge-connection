@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.2] - 2025-10-29
+
+### Added
+- Add Pantry Inventory Management
+
 ### Fixed
 - Fix setting value for message body on contact page
 - Fix redirect for `/.well-known/change-password`
