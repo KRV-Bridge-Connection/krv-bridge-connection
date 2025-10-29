@@ -1,6 +1,6 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
-import { deleteCollectionItem, getCollectionItem, getCollectionItems, getFirestore, getPublicKey, putCollectionItem } from './utils.js';
+import { deleteCollectionItem, getCollectionItem, getCollectionItems, getPublicKey, putCollectionItem } from './utils.js';
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
@@ -32,9 +32,17 @@ const PTS = [
 	150, // 8
 ];
 
-const _getPoints = household => PTS[Math.min(Math.max(parseInt(household), 1), PTS.length) - 1];
+const MAX_HOUSEHOLD = PTS.length;
 
-export const QRSERVER = 'https://api.qrserver.com/';
+const MONTHLY_VISITS = 2;
+
+const BASE_POINTS = 5;
+
+function _getPoints(household) {
+	return PTS[Math.min(Math.max(parseInt(household), 1), MAX_HOUSEHOLD) - 1];
+}
+
+const QRSERVER = 'https://api.qrserver.com/';
 
 const REPLACEMENTS = {
 	'CH': 'K',
@@ -44,6 +52,8 @@ const REPLACEMENTS = {
 };
 
 const PHONETIC_PATTERN = new RegExp(Object.keys(REPLACEMENTS).join('|'), 'g');
+
+const getFirebaseDate = date => new Date(date._seconds * 1000);
 
 // Simple attempt at dealing with name spelling variations
 const normalizeName = name => name.toString()
@@ -67,18 +77,25 @@ function getLastMonth(date = new Date()) {
 	return prior;
 }
 
-async function getRecentVisits(name, date = new Date()) {
-	const db = await getFirestore();
+async function getRecentVisits(name, date = new Date(), { countExtra = false } = {}) {
 	const prior = getLastMonth(date);
 
-	const snapshot = await db.collection(COLLECTION)
-		.where('extra_trip', '==', false)
-		.where('_name', '==', normalizeName(name))
-		.where('date', '>', prior)
-		.count()
-		.get();
+	const filters = countExtra ? [
+		['date', '>', prior],
+		['_name', '==', normalizeName(name)],
+	] : [
+		['date', '>', prior],
+		['_name', '==', normalizeName(name)],
+		['extra_trip', '==', false]
+	];
 
-	return snapshot.data().count;
+	return getCollectionItems(COLLECTION, { filters });
+}
+
+async function getRecentVisitCount(name, date = new Date()) {
+	const visits = await getRecentVisits(name, date);
+
+	return visits.length;
 }
 
 function getQRCodeURL(data, {
@@ -122,31 +139,6 @@ function getQRCodeURL(data, {
 	return url;
 }
 
-// const _escapeCSV = str => typeof str === 'string' || typeof str === 'number' ? `"${str.toString().replaceAll('"', '""')}"` : '""';
-// const _escapeRow = row => row.map(_escapeCSV).join(',') + '\n';
-// const _decrypt = async (key, field) => typeof field === 'string' && field.length !== 0
-// 	? await decrypt(key, field, { output: TEXT })
-// 	: null;
-
-// async function _toCSVRow(key, { name, date, addressLocality, postalCode, email, telephone, comments, household }) {
-// 	return _escapeRow([
-// 		name,
-// 		new Date(date._seconds * 1000).toISOString(),
-// 		addressLocality,
-// 		postalCode,
-// 		await _decrypt(key, email),
-// 		await _decrypt(key, telephone),
-// 		await _decrypt(key, comments),
-// 		household,
-// 	]);
-// }
-
-// async function _createCSVFile(records, name) {
-// 	const key = await getSecretKey();
-// 	const rows = await Promise.all(records.map(record => _toCSVRow(key, record)));
-// 	return new File(rows, name, { type: 'text/csv' });
-// }
-
 export default createHandler({
 	async get(req) {
 		const { searchParams } = new URL(req.url);
@@ -161,9 +153,24 @@ export default createHandler({
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
 			} else {
-				const count = await getRecentVisits(searchParams.get('name'));
+				const visits = await getRecentVisits(searchParams.get('name'), new Date(), { countExtra: true });
+				const count = visits.length;
+				const nextVisit = count >= MONTHLY_VISITS
+					? getFirebaseDate(visits[MONTHLY_VISITS - 1].date)
+					: new Date();
 
-				return Response.json({ count, allowed: count < 2, since: new Date().toISOString() });
+				if (count > MONTHLY_VISITS) {
+					nextVisit.setMonth(nextVisit.getMonth() + 1);
+				}
+
+				return Response.json({
+					name: searchParams.get('name'),
+					visits: visits.map(({ date }) => getFirebaseDate(date)),
+					count,
+					allowed: count < MONTHLY_VISITS,
+					nextVisit: nextVisit.toISOString(),
+					since: new Date().toISOString(),
+				});
 			}
 		} else if (! searchParams.has('id')) {
 			const result = await verifyJWT(token, await getPublicKey(), {
@@ -230,11 +237,11 @@ export default createHandler({
 
 		if (missing.length === 0) {
 			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
-			const household = Math.min(Math.max(parseInt(data.get('household')), 1), 8);
+			const household = Math.min(Math.max(parseInt(data.get('household')), 1), MAX_HOUSEHOLD);
 
 			if (Number.isNaN(date.getTime())) {
 				throw new HTTPBadRequestError('Invalid date/time given.');
-			} else if (! Number.isSafeInteger(household) || household < 1 || household > 8) {
+			} else if (! Number.isSafeInteger(household) || household < 1 || household > MAX_HOUSEHOLD) {
 				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
 				const key = await getSecretKey();
@@ -248,9 +255,9 @@ export default createHandler({
 
 				const created = new Date();
 				const id = getSUID({ date: created, alphabet: 'base64url' });
-				const recentVists = await getRecentVisits(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
-				const normalTrip = recentVists < 2;
-				const points = normalTrip ? _getPoints(household) : household * 5;
+				const recentVists = await getRecentVisitCount(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
+				const normalTrip = recentVists < MONTHLY_VISITS;
+				const points = normalTrip ? _getPoints(household) : household * BASE_POINTS;
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
