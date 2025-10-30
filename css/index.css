@@ -8,6 +8,7 @@
 @import url("./vars.css");
 @import url("./form-extras.css");
 @import url("./admin.css");
+@import url("./print.css") print;
 
 :root {
 	font-size: 18px;

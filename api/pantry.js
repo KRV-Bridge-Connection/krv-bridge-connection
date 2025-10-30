@@ -258,6 +258,10 @@ export default createHandler({
 				const recentVists = await getRecentVisitCount(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
 				const normalTrip = recentVists < MONTHLY_VISITS;
 				const points = normalTrip ? _getPoints(household) : household * BASE_POINTS;
+				const name = ['givenName', 'additionalName', 'familyName']
+					.map(field => data.get(field))
+					.filter(field => typeof field === 'string' && field.length !== 0)
+					.join(' ');
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
@@ -265,10 +269,7 @@ export default createHandler({
 					familyName: data.get('familyName'),
 					suffix: data.get('suffix'),
 					_name: normalizeName(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`),
-					name: ['givenName', 'additionalName', 'familyName']
-						.map(field => data.get(field))
-						.filter(field => typeof field === 'string' && field.length !== 0)
-						.join(' '),
+					name,
 					email,
 					telephone,
 					streetAddress,
@@ -289,7 +290,7 @@ export default createHandler({
 					scope: 'pantry',
 					entitlements: ['pantry:use'],
 					roles: ['guest'],
-					// sub: `${data.get('givenName')} ${data.get('familyName')}`,
+					sub: name,
 					given_name: data.get('givenName'),
 					family_name: data.get('familyName'),
 					iat: Math.floor(created.getTime() / 1000),
@@ -338,7 +339,7 @@ export default createHandler({
 
 				const body = new FormData();
 				body.set('id', id);
-				body.set('message', `Your appointment has been scheduled for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${points}. Please bring this QR code with you to check in.`);
+				body.set('message', `${name}, your pantry visit has been created for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${points}. Please bring this QR code with you to check in.`);
 				body.set('date', date.toISOString());
 				body.set('qr', qr);
 

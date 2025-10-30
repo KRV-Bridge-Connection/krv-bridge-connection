@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.3] - 2025-10-30
+
+### Added
+- Add print button for pantry submission
+- Add print styles
+
 ## [v2.0.2] - 2025-10-29
 
 ### Added
