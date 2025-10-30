@@ -25,16 +25,16 @@ const PTS = [
 	30, // 1
 	60, // 2
 	80, // 3
-	100, // 4
-	115, // 5
-	130, // 6
-	140, // 7
-	150, // 8
+	95, // 4
+	110, // 5
+	120, // 6
+	125, // 7
+	130, // 8
 ];
 
 const MAX_HOUSEHOLD = PTS.length;
 
-const MONTHLY_VISITS = 2;
+const MONTHLY_VISITS = 4;
 
 const BASE_POINTS = 5;
 
