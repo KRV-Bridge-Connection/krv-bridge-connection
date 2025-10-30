@@ -1,0 +1,27 @@
+@page {
+	margin: 0;
+	size: letter;
+}
+
+#header, #nav, #sidebar, #footer, button[is="share-button"] {
+	display: none;
+}
+
+:root:has(#pantry-message[open]) {
+	#main > *:not(dialog) {
+		display: none;
+	}
+
+	#pantry-message {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		max-width: 8.5in;
+		width: 100%;
+		height: 100vh;
+		height: 100dvh;
+		margin: 0;
+	}
+}

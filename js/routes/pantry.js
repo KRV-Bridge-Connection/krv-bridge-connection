@@ -10,6 +10,7 @@ import { clearState, setState, changeHandler as change } from '@aegisjsproject/s
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
+import { ROOT_COMMANDS } from '@aegisjsproject/commands';
 
 const style = css`#pantry-message {
 	max-width: min(800px, 95%);
@@ -24,6 +25,42 @@ const style = css`#pantry-message {
 	justify-content: center;
 	gap: 0.8rem;
 }`;
+
+// const print = css`@media print {
+// 	@page {
+// 		margin: 0;
+// 		size: letter;
+// 	}
+
+// 	:root {
+// 		margin: 0;
+// 		max-width: 8.5in;
+// 		width: 100%;
+// 	}
+
+// 	#header, #nav, #sidebar, #footer, #main > *:not(dialog) {
+// 		display: none;
+// 	}
+
+// 	#pantry-message {
+// 		position: fixed;
+// 		top: 0;
+// 		bottom: 0;
+// 		left: 0;
+// 		right: 0;
+// 		max-width: 8.5in;
+// 		width: 100%;
+// 		height: 100vh;
+// 		height: 100dvh;
+// 		margin: 0;
+// 		display: none !important;
+// 	}
+
+// 	#pantry-message p {
+// 		display: none;
+// 		max-width: 6in;
+// 	}
+// }`;
 
 const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
 const CAL_BENEFITS = 'https://benefitscal.com/';
@@ -223,7 +260,9 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 			// const token = body.get('token');
 			const qr = body.get('qr');
 			clearState();
+			// print.disabled = false;
 			await _alert(message, qr);
+			// print.disabled = true;
 			submitter.disabled = false;
 			history.length > 1 ? back() : navigate('/');
 		} else {
@@ -291,6 +330,8 @@ export default function({
 		});
 	}
 
+	// signal.addEventListener('abort', () => print.disabled = true, { once: true });
+
 	return html`<form id="pantry-form" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
 			<h2>
@@ -357,8 +398,8 @@ export default function({
 			</div>
 		</section>
 		<fieldset class="no-border">
-			<legend>Schedule an Appointment</legend>
-			<p>To ensure we can serve you, an appointment is required. Using this form is the only way to see our most up-to-date hours,
+			<legend>Register for your Emergency Choice Pantry Visit</legend>
+			<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
 			as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
 			<p class="status-box info">Fields marked with a <q>*</q> are required</p>
 			<div class="form-group flex wrap space-between">
@@ -421,7 +462,7 @@ export default function({
 				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />
 			</div>
-			<p>Please be aware that scheduling is limited to pantry days and hours, and appointments may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
+			<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
 			${getPantrySchedule()}
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
@@ -459,7 +500,7 @@ export default function({
 				</a>
 			</div>
 		</div>
-		<p class="center">This QR Code is necessary to check-in to your pantry appointment. Please save it and have it available when you arrive.</p>
+		<p class="center qr-message">This QR Code is necessary to check-in to your pantry visit. <strong>Please save it</strong> and have it available when you arrive.</p>
 		<div class="flex row wrap btns">
 			<a id="pantry-qr-download" class="btn btn-success pantry-qr-dl" download="krv-pantry-qr.png">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
@@ -467,6 +508,13 @@ export default function({
 				</svg>
 				<span>Save QR Code</span>
 			</a>
+			<button type="button" class="btn btn-primary" command="${ROOT_COMMANDS.print}" commandfor="doc">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+					<path d="M2 4c-.5 0-1 .5-1 1v4c0 .5.5 1 1 1h1V8h10v2h1c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1zm2-3v2h8V1z"/>
+					<path d="M4 9v5h8V9z"/>
+				</svg>
+				<span>Print</span>
+			</button>
 			<button type="button" class="btn btn-secondary" command="close" commandfor="pantry-message">
 				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
 					<use href="/img/icons.svg#x"></use>
