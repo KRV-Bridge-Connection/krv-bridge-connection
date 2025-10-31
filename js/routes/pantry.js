@@ -372,7 +372,7 @@ export default function({
 				website.
 			</p>
 		</div>
-		<section aria-labelledby="pantry-hud-notice" hidden="">
+		<section aria-labelledby="pantry-hud-notice">
 			<h3 id="pantry-hud-notice">Notice</h3>
 			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
 			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
