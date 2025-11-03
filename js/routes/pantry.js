@@ -12,6 +12,8 @@ import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands';
 
+const ID = 'pantry-form';
+
 const style = css`#pantry-message {
 	max-width: min(800px, 95%);
 }
@@ -298,6 +300,7 @@ const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toS
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
 export default function({
+	url,
 	state: {
 		givenName = getSearch('givenName', ''),
 		additionalName = getSearch('additionalName', ''),
@@ -332,13 +335,22 @@ export default function({
 
 	// signal.addEventListener('abort', () => print.disabled = true, { once: true });
 
-	return html`<form id="pantry-form" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+	return html`<form id="${ID}" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
 			<h2>
 				<span itemprop="name">KRV Bridge Connection</span>
 				<sapn itemprop="contactType">Choice Food Pantry</span>
 			</h2>
 			${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
+			<div class="center">
+				<a href="${url.pathname}#${ID}-fields" class="btn btn-primary btn-big">
+					<svg width="16" height="18" fill="currentColor" class="icon animation-speed-normal animation-infinite animation-ease-in-out animation-alternate trampoline">
+						<use xlink:href="/img/icons.svg#chevron-down"></use>
+					</svg>
+					<span>Register for your Emergency Choice Pantry Visit</span>
+				</a>
+			</div>
+			<br />
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
 					https://i.imgur.com/h68vmgFm.jpeg 160w,
 					https://i.imgur.com/h68vmgFl.jpeg 320w,
@@ -397,7 +409,7 @@ export default function({
 				<meta itemprop="addressCountry" content="US" />
 			</div>
 		</section>
-		<fieldset class="no-border">
+		<fieldset id="${ID}-fields" class="no-border">
 			<legend>Register for your Emergency Choice Pantry Visit</legend>
 			<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
 			as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
