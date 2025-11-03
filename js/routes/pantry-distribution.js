@@ -40,6 +40,7 @@ const QUICK_ITEMS = [
 	{ name: 'Bread', cost: 3, id: 'A9D5D64F-20B5-4946-A466-110F131469D7' },
 	{ name: 'Ground Beef', cost: 5, id: '1D53BCF4-C01D-4D1F-8245-6B78033FAE3C' },
 	{ name: 'Chicken Thighs', cost: 7, id: '81AB625B-009B-4379-AF67-4139428358DE' },
+	{ name: 'Peanut Butter Pack', cost: 0.5, id: '877F7F74-0EA9-4371-A149-3BFFDD004B40' },
 	{ name: 'Frozen Food (Sm)', cost: 1, id: 'CDFB935F-40D1-45C4-8C72-857A5B889ED8' },
 	{ name: 'Small Canned Food', cost: 2, id: '58393A8E-5116-4FE2-B094-EAFC8539CB45' },
 	{ name: 'Large Canned Food', cost: 3, id: 'B0E1D581-D21B-49BC-AF94-13323C57B0B5' },
