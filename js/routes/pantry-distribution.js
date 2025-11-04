@@ -4,7 +4,7 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { navigate } from '@aegisjsproject/router';
-import { onClick, onChange, onSubmit, onReset, onToggle, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
@@ -244,27 +244,35 @@ async function _addProduct(product) {
 	_updateTotal();
 }
 
+async function _incrementItem(id) {
+	const existing = document.querySelector(`tr[data-product-id="${id}"]`);
+
+	if (existing instanceof HTMLTableRowElement) {
+		await scheduler.yield();
+		const items = structuredClone(history.state?.cart ?? []);
+		const itemIndex = items.findIndex(item => item.id === id);
+		const qty = existing.querySelector('input[name="item[qty]"]');
+		items[itemIndex].qty++;
+		qty.value = items[itemIndex].qty;
+		existing.querySelector('input[name="item[total]"]').value = numberFormatter.format(items[itemIndex].qty * items[itemIndex].cost);
+		setCart(items);
+		await scheduler.yield();
+		qty.reportValidity();
+		_updateTotal();
+
+		return true;
+	} else {
+		return false;
+	}
+}
+
 async function _addToCart(id) {
 	try {
-		const existing = document.querySelector(`tr[data-product-id="${id}"]`);
-
 		if (typeof id !== 'string') {
 			throw new TypeError('Invalid product ID.');
 		} else if (id.length < 8) {
 			throw new TypeError(`Invalid product ID length for ${id}.`);
-		} else if (existing instanceof HTMLTableRowElement) {
-			await scheduler.yield();
-			const items = structuredClone(history.state?.cart ?? []);
-			const itemIndex = items.findIndex(item => item.id === id);
-			const qty = existing.querySelector('input[name="item[qty]"]');
-			items[itemIndex].qty++;
-			qty.value = items[itemIndex].qty;
-			existing.querySelector('input[name="item[total]"]').value = numberFormatter.format(items[itemIndex].qty * items[itemIndex].cost);
-			setCart(items);
-			await scheduler.yield();
-			qty.reportValidity();
-			_updateTotal();
-
+		} else if (await _incrementItem(id)) {
 			return true;
 		} else {
 			const product = await _getItem(id);
@@ -322,13 +330,11 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 });
 
 const quickAdd = registerCallback('pantry:distribution:quick-add', async ({ target }) => {
-	const { name, cost: costStr } = target.dataset;
+	const { name, cost: costStr, id = crypto.randomUUID() } = target.dataset;
 	const cost = parseFloat(costStr);
 
-	if (typeof name === 'string' && ! Number.isNaN(cost) && cost > 0) {
-		await _addProduct({
-			name, cost, id: crypto.randomUUID(), qty: 1,
-		});
+	if (! await _incrementItem(id) && typeof name === 'string' && ! Number.isNaN(cost) && cost > 0) {
+		await _addProduct({ name, cost, id, qty: 1 });
 	}
 
 	target.closest('[popover]').hidePopover();
@@ -371,14 +377,6 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 });
 
 const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target }) => target.hidePopover());
-
-const addItemToggle = registerCallback('pantry:distribution:add:toggle', ({ target, newState }) => {
-	if (newState === 'open') {
-		const input = target.querySelector('[autofocus]');
-		input.focus();
-		input.select();
-	}
-});
 
 const focusInput = registerCallback('pantry:distribution:input:focus', ({ target }) => {
 	if (target instanceof HTMLInputElement && ! target.readOnly) {
@@ -621,7 +619,7 @@ export default async function({
 			</button>
 		</div>
 	</form>
-	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${onToggle}="${addItemToggle}" ${signalAttr}="${sig}">
+	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
 		<div>
 			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost, id }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost, id })}>${name}</button>`).join('')}</div>
 			<hr />

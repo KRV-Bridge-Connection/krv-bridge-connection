@@ -50,7 +50,7 @@ export default async ({ signal }) => {
 			<legend>Add Item to Pantry Inventory</legend>
 			<div class="form-group">
 				<label for="panry-inventory-name" class="input-label required">Name</label>
-				<input type="text" name="name" id="pantry-inventory-name" class="input" placeholder="Item Name" required="" />
+				<input type="text" name="name" id="pantry-inventory-name" class="input" placeholder="Item Name" autocomplete="off" required="" />
 			</div>
 			<div class="form-group">
 				<label for="panry-inventory-barcode" class="input-label required">Bacode</label>
