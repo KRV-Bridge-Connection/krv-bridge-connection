@@ -3,7 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { navigate } from '@aegisjsproject/router';
+import { navigate, back } from '@aegisjsproject/router';
 import { onClick, onChange, onSubmit, onReset, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
@@ -378,6 +378,12 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 
 const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target }) => target.hidePopover());
 
+const exit = registerCallback('pantry:distribution:exit', async () => {
+	if (await confirm('Are you sure you wish to leave?')) {
+		await back();
+	}
+});
+
 const focusInput = registerCallback('pantry:distribution:input:focus', ({ target }) => {
 	if (target instanceof HTMLInputElement && ! target.readOnly) {
 		target.select();
@@ -646,6 +652,13 @@ export default async function({
 			<button type="reset" class="btn btn-danger">Cancel</button>
 		</div>
 	</form>
+	<hr />
+	<button type="button" class="btn btn-danger" ${onClick}="${exit}" ${signalAttr}="${sig}">
+		<span>Exit</span>
+		<svg width="16" height="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+			<use href="/img/icons.svg#x"></use>
+		</svg>
+	</button>
 	<button type="button" id="cart-end-btn" class="btn btn-secondary fixed bottom right" ${onClick}="${scrollToEnd}" ${signalAttr}="${sig}" aria-label="Scroll to Cart End">
 		<svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" class="icon" fill="currentColor" aria-hidden="true">
 			<path fill-rule="evenodd" d="M5 11L0 6l1.5-1.5L5 8.25 8.5 4.5 10 6l-5 5z"/>
