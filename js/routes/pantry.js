@@ -398,7 +398,6 @@ export default function({
 				</a>
 			</p>
 		</section>
-
 		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
 			<h3 id="pantry-address">Address</h3>
 			<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
@@ -476,6 +475,15 @@ export default function({
 			</div>
 			<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
 			${getPantrySchedule()}
+			<p>
+				<span>For other KRV Food Distributions, please see the</span>
+				<a href="/food/">
+					<svg class="icon" width="16" height="16" fill="currentColor" role="presentation" aria-hidden="true">
+						<use href="/img/icons.svg#link"></use>
+					</svg>
+					<span>Calendar</span>
+				</a>
+			</p>
 			<div class="form-group">
 				<label for="pantry-date" class="input-label required">Pick a Date</label>
 				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
