@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.4] - 2025-11-13
+
+### Added
+- Add KRV Food Calendar via Google Calendar Embed
+
 ## [v2.0.3] - 2025-10-30
 
 ### Added
