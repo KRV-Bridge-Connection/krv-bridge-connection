@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Bringing multiple nonprofit services into the KRV",
   "private": true,
   "type": "module",
