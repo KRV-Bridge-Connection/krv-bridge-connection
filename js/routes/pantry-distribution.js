@@ -15,7 +15,9 @@ import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indic
 
 export const title = 'KRV Bridge Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
+
 const ADD_ITEM_ID = 'pantry-manual';
+const NON_FOOD_ID = 'pantry-non-food';
 const MAX_PER_ITEM = 99;
 const OTHER_ELS = ['nav', 'sidebar', 'footer'];
 
@@ -34,6 +36,14 @@ const SUGGESTED_ITEMS = [
 	'Snacks',
 	'Cheese',
 	'Divert Item',
+];
+
+const NON_FOOD = [
+	{ name: 'Dog Food', id: '55CC6886-0662-4B20-80AC-6B011692082B' },
+	{ name: 'Cat Food', id: '8F72170D-EA10-42D1-B271-808EE38F841E' },
+	{ name: 'Diapers', id: '8780E8AD-7442-4F15-AA0B-ACF9E26DBE8D' },
+	{ name: 'Baby Wipes', id: 'DAA69B0B-C7DB-440D-84E9-529B4E0781A5' },
+	{ name: 'Misc. Item', id: '056B6DEA-85BD-49AC-A0E1-75C038996707' },
 ];
 
 const QUICK_ITEMS = [
@@ -341,6 +351,33 @@ const quickAdd = registerCallback('pantry:distribution:quick-add', async ({ targ
 	target.closest('[popover]').hidePopover();
 });
 
+const addNonFood = registerCallback('pantry:add:nonfood', async ({ target }) => {
+	const btn = target instanceof HTMLButtonElement ? target : target.closest('button');
+
+	if (btn instanceof HTMLButtonElement) {
+		try {
+			btn.disabled = true;
+
+			const { name, id } = btn.dataset;
+			const url = new URL('/api/giftAndKind', location.origin);
+			url.searchParams.set('name', name);
+			url.searchParams.set('id', id);
+
+			const resp = await fetch(url, { referrerPolicy: 'no-referrer' });
+
+			if (resp.ok) {
+				btn.closest('dialog').requestClose();
+			} else {
+				throw new DOMException(`${resp.url} [${resp.status}]`, 'NetworkError');
+			}
+		} catch(err) {
+			alert(err);
+		} finally {
+			btn.disabled = false;
+		}
+	}
+});
+
 const scrollToEnd = registerCallback('pantry:distribution:scroll-to-end', () => {
 	document.getElementById('pantry-cart').scrollIntoView({ behavior: 'smooth', block: 'end' });
 });
@@ -619,6 +656,7 @@ export default async function({
 			<button type="submit" class="btn btn-success">Submit</button>
 			<!--<button type="reset" class="btn btn-danger">Empty Cart</button>-->
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
+			<button type="button" class="btn btn-secondary" command="show-modal" commandfor="${NON_FOOD_ID}">Add Non-Food Item</button>
 			<button type="button" class="btn btn-secondary" ${onClick}="${lockScreen}" ${signalAttr}="${sig}" aria-label="Lock Orientation" ${attr({ disabled: ! (screen?.orientation?.lock instanceof Function) })}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" class="icon" fill="currentColor" aria-hidden="true">
 					<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
@@ -626,6 +664,16 @@ export default async function({
 			</button>
 		</div>
 	</form>
+	<dialog id="${NON_FOOD_ID}">
+		<div class="flex row wrap" ${onClick}="${addNonFood}" ${signalAttr}="${sig}">
+			${NON_FOOD.map(({ name, id }) => `<button type="button" class="btn btn-primary" ${data({ name, id })}>${name}</button>`).join('\n')}
+		</div>
+		<button type="button" command="close" commandfor="${NON_FOOD_ID}" class="btn btn-danger" aria-label="Close Dialog">
+			<svg class="icon" height="16" width="16" fill="currentColor" role="presentation" aria-hidden="true">
+				<use href="/img/icons.svg#x"></use>
+			</svg>
+		</button>
+	</dialog>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
 		<div>
 			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost, id }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost, id })}>${name}</button>`).join('')}</div>
