@@ -10,6 +10,7 @@
 /pantry/* /dynamic.html 200
 /contact/* /dynamic.html 200!
 /pantry /pantry/ 301
+/food/ /dynamic.html 200
 /pantry?fbclid=:junk /pantry/ 301
 /volunteer /volunteer/ 301
 /resources /resources/ 301

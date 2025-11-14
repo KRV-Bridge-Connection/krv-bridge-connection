@@ -16,6 +16,7 @@ initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
 	'/(partners|resources)/?category=:category': '/js/routes/partners.js',
 	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
+	'/food/': '/js/routes/food-cal.js',
 	'/pantry/': '/js/routes/pantry.js',
 	'/pantry/qr': '/js/routes/pantry-qr.js',
 	'/pantry/inventory': '/js/routes/inventory.js',
