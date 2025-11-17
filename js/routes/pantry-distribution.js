@@ -51,6 +51,9 @@ const QUICK_ITEMS = [
 	{ name: 'Ground Beef', cost: 5, id: '1D53BCF4-C01D-4D1F-8245-6B78033FAE3C' },
 	{ name: 'Ground Pork', cost: 5, id: 'F58C327B-F2C9-4F93-B475-B12FFD737ECB' },
 	{ name: 'Chicken Thighs', cost: 7, id: '81AB625B-009B-4379-AF67-4139428358DE' },
+	{ name: 'Flour Bag', cost: 0.5, id: '72BF4196-AAF4-4872-B064-A448360614D8' },
+	{ name: 'Sugar Bag', cost: 0.5, id: 'E3090354-A786-4183-870B-A8E3EE697DF4' },
+	{ name: 'Rice Bag', cost: 0.5, id: 'E3E783CB-A465-4513-9D45-3B5FA286EFFF' },
 	{ name: 'Peanut Butter Pack', cost: 0.5, id: '877F7F74-0EA9-4371-A149-3BFFDD004B40' },
 	{ name: 'Frozen Food (Sm)', cost: 1, id: 'CDFB935F-40D1-45C4-8C72-857A5B889ED8' },
 	{ name: 'Small Canned Food', cost: 2, id: '58393A8E-5116-4FE2-B094-EAFC8539CB45' },
@@ -61,9 +64,9 @@ const QUICK_ITEMS = [
 	{ name: 'Vegetables', cost: 1, id: 'F270F0C2-C5C4-4C21-BBC7-B26EF0657271' },
 	{ name: 'Snacks', cost: 1, id: '113A4AF0-99E4-4967-B160-2D7FC80872D9' },
 	{ name: 'Granola Bar', cost: 1, id: '2FAD54D7-6C24-444F-BF66-BECF5F581F0F' },
-	{ name: 'Baby Food', cost: 1, id: '1FB8120C-C69C-47AF-8610-B98C7476BFA8' },
+	// { name: 'Baby Food', cost: 1, id: '1FB8120C-C69C-47AF-8610-B98C7476BFA8' },
 	{ name: 'Frozen Meal', cost: 5, id: '04746271-3D97-488B-BA98-01E2B8D4FDAE' },
-	{ name: 'Garden Bag', cost: 3, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
+	// { name: 'Garden Bag', cost: 3, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
 ];
 
 document.adoptedStyleSheets = [
