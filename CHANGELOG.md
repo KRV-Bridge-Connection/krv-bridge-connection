@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.5] - 2025-11-19
+
 ### Added
 - Add "Gift and Kind" item support
+
+### Changed
+- Update polyfills & sanitizer
 
 ## [v2.0.4] - 2025-11-13
 
