@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add handler for daily pantry stats
+
 ## [v2.0.5] - 2025-11-19
 
 ### Added

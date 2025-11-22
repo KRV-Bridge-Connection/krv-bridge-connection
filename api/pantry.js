@@ -172,6 +172,35 @@ export default createHandler({
 					since: new Date().toISOString(),
 				});
 			}
+		} else if (searchParams.has('date')) {
+			const result = await verifyJWT(token, await getPublicKey(), {
+				entitlements: ['pantry-schedule:get'],
+				roles: ['admin'],
+			});
+
+			if (result instanceof Error) {
+				throw new HTTPForbiddenError('Invalid or expired token.', { cause: result });
+			} else {
+				const start = new Date(searchParams.get('date'));
+				const end = new Date(searchParams.get('date'));
+				end.setHours(17);
+				end.setMinutes(0);
+				const appts = await getCollectionItems(COLLECTION, {
+					limit: NaN,
+					filters: [
+						['date', '>', start],
+						['date', '<', end],
+					]
+				});
+
+				return Response.json(appts.map(({ name, date, created, points, household }) => ({
+					name,
+					points,
+					household,
+					date: new Date(date._seconds * 1000).toISOString(),
+					created: new Date(created._seconds * 1000),
+				})));
+			}
 		} else if (! searchParams.has('id')) {
 			const result = await verifyJWT(token, await getPublicKey(), {
 				entitlements: ['pantry-schedule:get'],
