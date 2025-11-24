@@ -491,7 +491,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
-				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} required="" />
+				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} step="900" required="" />
 				<div id="pantry-time-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">

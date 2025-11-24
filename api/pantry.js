@@ -315,7 +315,7 @@ export default createHandler({
 				const nowId = Date.now().toString(34);
 
 				const token = await createJWT({
-					iss: 'krvbridge.org',
+					iss: 'https://krvbridge.org',
 					scope: 'pantry',
 					entitlements: ['pantry:use'],
 					roles: ['guest'],
