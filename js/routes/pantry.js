@@ -79,7 +79,7 @@ const date = getSearch('date', '');
 const OPENING_HOURS = [
 	{ dayOfWeek: 'Sunday', opens: null, closes: null },
 	{ dayOfWeek: 'Monday', opens: '10:30:00', closes: '13:00:00' },
-	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '15:00:00' },
+	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '13:00:00' },
 	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
 	{ dayOfWeek: 'Thursday', opens: null, closes: null },
 	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
