@@ -80,6 +80,13 @@ document.adoptedStyleSheets = [
 		padding: 1.2em 0;
 	}
 
+	#${NON_FOOD_ID}, #${ADD_ITEM_ID} {
+		overflow: auto;
+		max-height: 95dvh;
+		max-width: 95vw;
+		padding: 1.2rem;
+	}
+
 	#scanner input[readonly]:not(.display-text) {
 		background-color: inherit;
 		border: none;

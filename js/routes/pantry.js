@@ -12,7 +12,17 @@ import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands';
 
+const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
 const ID = 'pantry-form';
+const CAL_BENEFITS = 'https://benefitscal.com/';
+const CARES_FORM = '/docs/cares-form.pdf';
+const TIMEZONE_OFFSET = 8 * HOURS;
+const TIME_STEP = 60;
+// Options given on Neighbor Intake
+const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
+const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
+
+const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
 
 const style = css`#pantry-message {
 	max-width: min(800px, 95%);
@@ -63,10 +73,6 @@ const style = css`#pantry-message {
 // 		max-width: 6in;
 // 	}
 // }`;
-
-const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
-const CAL_BENEFITS = 'https://benefitscal.com/';
-const CARES_FORM = '/docs/cares-form.pdf';
 
 const date = getSearch('date', '');
 
@@ -208,13 +214,6 @@ async function _alert(message, qr, { signal } = {}) {
 
 	await promise;
 }
-
-const TIMEZONE_OFFSET = 8 * HOURS;
-// Options given on Neighbor Intake
-const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
-const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
-
-const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
 
 const dateChange = registerCallback('pantry:date:change', ({ target }) => {
 	if (target.value.length !== 10) {
@@ -491,7 +490,7 @@ export default function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-time" class="input-label required">Pick a Time</label>
-				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} step="900" required="" />
+				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} step="${TIME_STEP}" required="" />
 				<div id="pantry-time-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
 			</div>
 			<div class="form-group">
