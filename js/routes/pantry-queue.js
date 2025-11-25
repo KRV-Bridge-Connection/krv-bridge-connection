@@ -14,6 +14,14 @@ const STORE_NAME = 'pantryQueue';
 
 const key = await fetchWellKnownKey(location.origin);
 
+const closeModal = registerCallback('pantry:queue:close-modal', ({ currentTarget }) => currentTarget.closest('dialog').close());
+
+const closeAndRemove = registerCallback('pantry:queue:close-and-remove', async ({ currentTarget }) => {
+	await removeVisit(currentTarget);
+	document.getElementById(`visit-${currentTarget.dataset.txn}`).remove();
+	currentTarget.closest('dialog').close();
+});
+
 const _openDB = async () => await openDB(SCHEMA.name, {
 	version: SCHEMA.version,
 	schema: SCHEMA,
@@ -35,10 +43,11 @@ async function showVisit(btn) {
 				<p>Visit scheduled for ${visit.sub} at <time ${attr({ datetime: visit.date.toISOString() })}>${visit.date.toLocaleTimeString()}</p>
 				${createQRCode(visit.jwt, { size: 480, margin: 7 })}
 				<hr />
-				<button type="button" class="btn btn-danger" command="close" commandfor="modal-${visit.txn}">Close</button>
+				<button type="button" class="btn btn-warning" ${onClick}="${closeModal}">Close</button>
+				<button type="button" class="btn btn-danger" ${onClick}="${closeAndRemove}" ${data({ txn: visit.txn })}>Close &amp; Remove</button>
 			</dialog>`;
 
-			document.body.append(dialog);
+			document.getElementById('main').append(dialog);
 			dialog.showModal();
 		} else {
 			throw new Error(`No results for ${btn.dataset.txn}.`);
@@ -173,6 +182,7 @@ export default async ({ signal: sig }) => {
 
 	const frag = html`<details>
 		<summary class="btn btn-secondary">Show Camera Feed</summary>
+		<br />
 	</details>
 	<table id="${ID}" ${onClick}="${clickHandler}" ${signalAttr}="${signal}">
 		<thead>
