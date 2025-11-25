@@ -12,7 +12,7 @@ import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands';
 
-const MESSAGE = null;//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
+const MESSAGE = 'The Emergency Choice Pantry will be closed on for Thanksgiving on Thursday and Friday.';//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
 const ID = 'pantry-form';
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
@@ -79,10 +79,10 @@ const date = getSearch('date', '');
 const OPENING_HOURS = [
 	{ dayOfWeek: 'Sunday', opens: null, closes: null },
 	{ dayOfWeek: 'Monday', opens: '10:30:00', closes: '13:00:00' },
-	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '13:00:00' },
+	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '15:00:00' },
 	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
 	{ dayOfWeek: 'Thursday', opens: null, closes: null },
-	{ dayOfWeek: 'Friday', opens: '10:30:00', closes: '13:00:00' },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
 	{ dayOfWeek: 'Saturday', opens: null, closes: null },
 ];
 
