@@ -75,3 +75,6 @@ export default async ({ signal }) => {
 
 	return frag;
 };
+
+export const title = 'Pantry Inventory Management';
+export const description = 'Add items to pantry inventory database';
