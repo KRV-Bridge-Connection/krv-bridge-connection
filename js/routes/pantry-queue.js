@@ -191,3 +191,6 @@ export default async ({ signal: sig }) => {
 
 	return frag;
 };
+
+export const title = 'Pantry Queue';
+export const description = 'Sorts pantry queue';
