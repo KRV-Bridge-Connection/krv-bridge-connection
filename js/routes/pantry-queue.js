@@ -108,16 +108,19 @@ async function render() {
 }
 
 async function checkInVisit({ rawValue }) {
+	const now = Math.floor(Date.now() / 1000);
+
 	const {
 		sub,
 		toe,
 		txn,
 		authorization_details: { household },
 	} = await verifyJWT(rawValue, key);
+
 	const db = await _openDB();
 
 	try {
-		const date = new Date(toe * 1000);
+		const date = now > toe ? new Date() : new Date(toe * 1000);
 		await putItem(db, STORE_NAME, { sub, txn, household, date, checkedIn: new Date(), jwt: rawValue });
 		await render();
 	} finally {
