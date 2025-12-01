@@ -14,6 +14,8 @@ import {
 
 const QZONE = 7;
 
+const RESET_DATE = new Date('2025-12-01T00:00');
+
 const FORMAT = {
 	dateStyle: 'medium',
 	timeStyle: 'short',
@@ -34,7 +36,7 @@ const PTS = [
 
 const MAX_HOUSEHOLD = PTS.length;
 
-const MONTHLY_VISITS = 4;
+const MONTHLY_VISITS = 2;
 
 const BASE_POINTS = 5;
 
@@ -84,7 +86,7 @@ async function getRecentVisits(name, date = new Date(), { countExtra = false } =
 		['date', '>', prior],
 		['_name', '==', normalizeName(name)],
 	] : [
-		['date', '>', prior],
+		['date', '>', prior > RESET_DATE ? prior : RESET_DATE],
 		['_name', '==', normalizeName(name)],
 		['extra_trip', '==', false]
 	];
