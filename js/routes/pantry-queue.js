@@ -1,14 +1,15 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { data, attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onChange, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { createQRCode } from '@shgysk8zer0/kazoo/qr.js';
-import { TOWNS, ZIPS } from './pantry.js';
+import { TOWNS, ZIPS, postalCodes } from './pantry.js';
+
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
 const ADD_FORM_ID = 'pantry-queue-form';
@@ -22,6 +23,14 @@ const closeAndRemove = registerCallback('pantry:queue:close-and-remove', async (
 	await removeVisit(currentTarget);
 	document.getElementById(`visit-${currentTarget.dataset.txn}`).remove();
 	currentTarget.closest('dialog').close();
+});
+
+export const updateZip = registerCallback('pantry:queue:zip-update', ({ target: { value, form } }) => {
+	const val = value.toLowerCase().replaceAll(/[^A-Za-z ]/g, '');
+
+	if (typeof postalCodes[val] === 'string') {
+		form.elements.namedItem('postalCode').value = postalCodes[val];
+	}
 });
 
 const submitHandler = registerCallback('pantry:queue:submit', async event => {
@@ -282,12 +291,12 @@ export default async ({ signal: sig }) => {
 					<label for="${ADD_FORM_ID}-street-address" class="input-label">Address</label>
 					<input type="text" name="streetAddress" id="${ADD_FORM_ID}-street-address" class="input" placeholder="Street Address" />
 					<label for="${ADD_FORM_ID}-address-locality" class="input-label required">City</label>
-					<input type="text" name="addressLocality" id="${ADD_FORM_ID}-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" required="" />
+					<input type="text" name="addressLocality" id="${ADD_FORM_ID}-address-locality" class="input" placeholder="Town" list="${ADD_FORM_ID}-towns-list" ${onChange}="${updateZip}" ${signalAttr}="${signal}" required="" />
 					<datalist id="${ADD_FORM_ID}-towns-list">
 						${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
 					</datalist>
 					<label for="${ADD_FORM_ID}-postal-code" class="input-label required">Zip Code</label>
-					<input type="text" name="postalCode" id="${ADD_FORM_ID}-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" list="pantry-postal-list" required="" />
+					<input type="text" name="postalCode" id="${ADD_FORM_ID}-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" list="${ADD_FORM_ID}-postal-list" required="" />
 					<datalist id="${ADD_FORM_ID}-postal-list">
 						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
 					</datalist>
@@ -302,7 +311,7 @@ export default async ({ signal: sig }) => {
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-time" class="input-label required">Pick a Time</label>
-					<input type="time" name="time" id="${ADD_FORM_ID}-time" class="input" required="" />
+					<input type="time" name="time" id="${ADD_FORM_ID}-time" class="input" min="08:00" max="17:00" required="" />
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-comments" class="input-label">

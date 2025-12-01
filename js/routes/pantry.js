@@ -281,7 +281,7 @@ const resetHandler = registerCallback('pantry:form:reset', () => {
 	history.length > 1 ? back() : navigate('/');
 });
 
-const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value, form } }) => {
+export const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value, form } }) => {
 	const val = value.toLowerCase().replaceAll(/[^A-Za-z ]/g, '');
 
 	if (typeof postalCodes[val] === 'string') {
