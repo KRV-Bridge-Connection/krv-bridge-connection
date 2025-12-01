@@ -256,7 +256,7 @@ export default async ({ signal: sig }) => {
 						<input type="text" name="additionalName" id="${ADD_FORM_ID}-additional-name" class="input" placeholder="Middle name" />
 					</span>
 					<span>
-						<label for="${ADD_FORM_ID}-given-name" class="input-label required">Last Name</label>
+						<label for="${ADD_FORM_ID}-family-name" class="input-label required">Last Name</label>
 						<input type="text" name="familyName" id="${ADD_FORM_ID}-family-name" class="input" placeholder="Last name" required="" />
 					</span>
 					<span>

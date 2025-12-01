@@ -421,7 +421,7 @@ export default function({
 					<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" ${attr({ value: additionalName })} />
 				</span>
 				<span>
-					<label for="pantry-given-name" class="input-label required">Last Name</label>
+					<label for="pantry-family-name" class="input-label required">Last Name</label>
 					<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
 				</span>
 				<span>
