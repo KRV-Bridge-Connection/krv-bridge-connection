@@ -19,8 +19,8 @@ const CARES_FORM = '/docs/cares-form.pdf';
 const TIMEZONE_OFFSET = 8 * HOURS;
 const TIME_STEP = 60;
 // Options given on Neighbor Intake
-const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
-const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
+export const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
+export const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
 const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
 
@@ -170,7 +170,7 @@ const _getDate = () => {
 	return ok ? value : new Date();
 };
 
-const postalCodes = {
+export const postalCodes = {
 	'alta sierra': '95949',
 	'weldon': '93283',
 	'bodfish': '93205',
@@ -304,14 +304,13 @@ export default function({
 		givenName = getSearch('givenName', ''),
 		additionalName = getSearch('additionalName', ''),
 		familyName = getSearch('familyName', ''),
-		suffix='',
+		suffix = getSearch('suffix'),
 		email = getSearch('email', ''),
 		telephone = getSearch('telephone', ''),
 		household = getSearch('household', ''),
 		streetAddress = getSearch('streetAddress', ''),
 		addressLocality = getSearch('addressLocality', ''),
 		postalCode = getSearch('postalCode', ''),
-		// date = _getDate(),
 		time = '',
 		comments = '',
 		isAdmin = false,

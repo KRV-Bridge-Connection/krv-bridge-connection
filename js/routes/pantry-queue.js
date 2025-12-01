@@ -1,16 +1,18 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { data, attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { createQRCode } from '@shgysk8zer0/kazoo/qr.js';
-
+import { TOWNS, ZIPS } from './pantry.js';
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
+const ADD_FORM_ID = 'pantry-queue-form';
+const ADD_DIALOG_ID = 'pantry-queue-modal';
 
 const key = await fetchWellKnownKey(location.origin);
 
@@ -20,6 +22,37 @@ const closeAndRemove = registerCallback('pantry:queue:close-and-remove', async (
 	await removeVisit(currentTarget);
 	document.getElementById(`visit-${currentTarget.dataset.txn}`).remove();
 	currentTarget.closest('dialog').close();
+});
+
+const submitHandler = registerCallback('pantry:queue:submit', async event => {
+	event.preventDefault();
+	// Store the submitter, with a default empty object just in case.
+	const submitter = event.submitter ?? {};
+
+	try {
+		submitter.disabled = true;
+		const data = new FormData(event.target);
+		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
+
+		const resp = await fetch('/api/pantry', {
+			method: 'POST',
+			body: data,
+		});
+
+		if (resp.ok) {
+			const body = await resp.formData();
+			const jwt = body.get('jwt');
+			await checkInVisit({ rawValue: jwt });
+			event.target.reset();
+			submitter.disabled = false;
+		} else {
+			const err = await resp.json();
+			throw new Error(err.error.message);
+		}
+	} catch(err) {
+		alert(err.message);
+		submitter.disabled = false;
+	}
 });
 
 const _openDB = async () => await openDB(SCHEMA.name, {
@@ -180,7 +213,8 @@ export default async ({ signal: sig }) => {
 	const db = await _openDB();
 	const visits = await getAllItems(db, STORE_NAME);
 
-	const frag = html`<details>
+	const frag = html`<button type="button" class="btn btn-primary" command="show-modal" commandfor="${ADD_DIALOG_ID}">Check-In</button>
+	<details>
 		<summary class="btn btn-secondary">Show Camera Feed</summary>
 		<br />
 	</details>
@@ -195,7 +229,96 @@ export default async ({ signal: sig }) => {
 		<tbody id="${ID}-body">
 			${visits.sort(_sort).map(createVisitRow).join('')}
 		</tbody>
-	</table>`;
+	</table>
+	<dialog id="${ADD_DIALOG_ID}">
+		<form id="${ADD_FORM_ID}" ${onSubmit}="${submitHandler}" ${signalAttr}="${signal}">
+			<fieldset class="no-border">
+				<legend>Register for your Emergency Choice Pantry Visit</legend>
+				<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
+				as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
+				<p class="status-box info">Fields marked with a <q>*</q> are required</p>
+				<div class="form-group flex wrap space-between">
+					<span>
+						<label for="${ADD_FORM_ID}-given-name" class="input-label required">First Name</label>
+						<input type="text" name="givenName" id="${ADD_FORM_ID}-given-name" class="input" placeholder="First name" required="" />
+					</span>
+					<span>
+						<label for="${ADD_FORM_ID}-additional-name" class="input-label">Middle Name</label>
+						<input type="text" name="additionalName" id="${ADD_FORM_ID}-additional-name" class="input" placeholder="Middle name" />
+					</span>
+					<span>
+						<label for="${ADD_FORM_ID}-given-name" class="input-label required">Last Name</label>
+						<input type="text" name="familyName" id="${ADD_FORM_ID}-family-name" class="input" placeholder="Last name" required="" />
+					</span>
+					<span>
+						<label for="${ADD_FORM_ID}-name-suffix" class="input-label">Suffix</label>
+						<input type="text"
+							name="suffix"
+							id="${ADD_FORM_ID}-name-suffix"
+							class="input"
+							autocomplete="honorific-suffix"
+							list="${ADD_FORM_ID}-suffix-options"
+							size="3"
+							minlength="2"
+							placeholder="Jr., Sr., III, etc." />
+						<datalist id="${ADD_FORM_ID}-suffix-options">
+							<option value="Jr">
+							<option value="Sr">
+							<option value="II">
+							<option value="III">
+							<option value="IV">
+						</datalist>
+					</span>
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-email" class="input-label">Email</label>
+					<input type="email" name="email" id="${ADD_FORM_ID}-email" class="input" placeholder="user@example.com" />
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-phone" class="input-label">Phone</label>
+					<input type="tel" name="telephone" id="${ADD_FORM_ID}-phone" class="input" placeholder="555-555-5555" />
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-street-address" class="input-label">Address</label>
+					<input type="text" name="streetAddress" id="${ADD_FORM_ID}-street-address" class="input" placeholder="Street Address" />
+					<label for="${ADD_FORM_ID}-address-locality" class="input-label required">City</label>
+					<input type="text" name="addressLocality" id="${ADD_FORM_ID}-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" required="" />
+					<datalist id="${ADD_FORM_ID}-towns-list">
+						${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
+					</datalist>
+					<label for="${ADD_FORM_ID}-postal-code" class="input-label required">Zip Code</label>
+					<input type="text" name="postalCode" id="${ADD_FORM_ID}-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" list="pantry-postal-list" required="" />
+					<datalist id="${ADD_FORM_ID}-postal-list">
+						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
+					</datalist>
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-household-size" class="input-label required">How Many People Will This Feed?</label>
+					<input type="number" name="household" id="${ADD_FORM_ID}-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" required="" />
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-date" class="input-label required">Pick a Date</label>
+					<input type="date" name="date" id="${ADD_FORM_ID}-date" class="input" ${attr({ value: new Date().toISOString().split('T')[0]})} required="" />
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-time" class="input-label required">Pick a Time</label>
+					<input type="time" name="time" id="${ADD_FORM_ID}-time" class="input" required="" />
+				</div>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-comments" class="input-label">
+						<span>Additional Resource Request</span>
+						<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
+					</label>
+					<textarea name="comments" id="${ADD_FORM_ID}-comments" class="input" placeholder="Please describe any other needs or support you are looking for." cols="40" rows="5"></textarea>
+				</div>
+			</fieldset>
+			<div class="flex row">
+				<button type="submit" class="btn btn-success">Check-In</button>
+				<button type="reset" class="btn btn-danger">Reset</button>
+				<button type="button" class="btn btn-warning" command="request-close" commandfor="${ADD_DIALOG_ID}">Close</button>
+			</div>
+		</form>
+	</dialog>`;
 
 	frag.querySelector('details').append(video);
 

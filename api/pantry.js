@@ -372,6 +372,7 @@ export default createHandler({
 				body.set('id', id);
 				body.set('message', `${name}, your pantry visit has been created for ${date.toLocaleString('en', FORMAT)}. Your point budget is ${points}. Please bring this QR code with you to check in.`);
 				body.set('date', date.toISOString());
+				body.set('jwt', token);
 				body.set('qr', qr);
 
 				await message.send({ signal: req.signal }).catch(err => console.error(err));
