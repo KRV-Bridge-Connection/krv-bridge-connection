@@ -190,14 +190,18 @@ export const postalCodes = {
 	'keysville': '93240',
 };
 
-async function _alert(message, qr, { signal } = {}) {
+async function _alert(message, qr, { signal, name = '', date = new Date() } = {}) {
 	const { resolve, promise } = Promise.withResolvers();
 	const dialog = document.getElementById('pantry-message');
 	const qrSrc = qr instanceof Blob ? URL.createObjectURL(qr) : null;
 	document.getElementById('pantry-message-content').textContent = message;
 
 	if (typeof qrSrc === 'string') {
-		document.querySelectorAll('.pantry-qr-dl').forEach(a => a.href = qrSrc);
+		document.querySelectorAll('.pantry-qr-dl').forEach(a => {
+			a.download = `${date.toISOString()}-${name.replaceAll(/[^A-Za-z]+/g, '-')} pantry.png`;
+			a.href = qrSrc;
+		});
+
 		document.getElementById('pantry-qr-img').src = qrSrc;
 
 		dialog.addEventListener('close', () => {
@@ -248,7 +252,8 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 	try {
 		submitter.disabled = true;
 		const data = new FormData(event.target);
-		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
+		const date = new Date(data.get('date') + 'T' + data.get('time'));
+		data.set('datetime', date.toISOString());
 
 		const resp = await fetch('/api/pantry', {
 			method: 'POST',
@@ -262,7 +267,7 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 			const qr = body.get('qr');
 			clearState();
 			// print.disabled = false;
-			await _alert(message, qr);
+			await _alert(message, qr, { name: `${data.get('givenName')} ${data.get('familyName')}`, date });
 			// print.disabled = true;
 			submitter.disabled = false;
 			history.length > 1 ? back() : navigate('/');
@@ -543,6 +548,6 @@ export default function({
 	</dialog>`;
 }
 
-export const title = `Food Pantry - ${site.title}`;
+export const title = `Emergency Choice Food Pantry - ${site.title}`;
 
-export const description = 'KRV Bridge Connection Food Pantry - In partnership with CAPK';
+export const description = 'Emergenct Choice Food Pantry - In partnership with CAPK';
