@@ -592,7 +592,13 @@ export default async function({
 					}
 			}
 		}
-	}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video }) => {
+	}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video, wakeLock }) => {
+		if (typeof wakeLock === 'undefined' && 'wakeLock' in navigator) {
+			navigate.wakeLock.request('screen').then(wakeLock => {
+				signal.addEventListener('abort', () => wakeLock.release(), { once: true });
+			}).catch(console.error);
+		}
+
 		const details = document.createElement('details');
 		const summary = document.createElement('summary');
 		summary.classList.add('btn', 'btn-primary');
