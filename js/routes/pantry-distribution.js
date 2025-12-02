@@ -596,7 +596,19 @@ export default async function({
 		if (typeof wakeLock === 'undefined' && 'wakeLock' in navigator) {
 			navigate.wakeLock.request('screen').then(wakeLock => {
 				signal.addEventListener('abort', () => wakeLock.release(), { once: true });
+
+				document.addEventListener('visibilitychange', async ({ target: { visibilityState }}) => {
+					if (visibilityState === 'visible' && wakeLock.released) {
+						wakeLock = await navigate.wakeLock.request('screen');
+					}
+				}, { signal });
 			}).catch(console.error);
+		} else if ('wakeLock' in navigator) {
+			document.addEventListener('visibilitychange', async ({ target: { visibilityState }}) => {
+				if (visibilityState === 'visible' && wakeLock.released) {
+					wakeLock = await navigate.wakeLock.request('screen');
+				}
+			}, { signal });
 		}
 
 		const details = document.createElement('details');
