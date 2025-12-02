@@ -242,10 +242,7 @@ export default async ({ signal: sig }) => {
 	<dialog id="${ADD_DIALOG_ID}">
 		<form id="${ADD_FORM_ID}" ${onSubmit}="${submitHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
-				<legend>Register for your Emergency Choice Pantry Visit</legend>
-				<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
-				as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
-				<p class="status-box info">Fields marked with a <q>*</q> are required</p>
+				<legend>Emergency Choice Pantry Sign-In</legend>
 				<div class="form-group flex wrap space-between">
 					<span>
 						<label for="${ADD_FORM_ID}-given-name" class="input-label required">First Name</label>
