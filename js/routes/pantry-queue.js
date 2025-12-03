@@ -163,7 +163,6 @@ async function checkInVisit({ rawValue }) {
 
 	if (URL.canParse(rawValue)) {
 		const url = new URL(rawValue);
-		alert(url);
 
 		if (url.search.length !== 0 && url.origin === location.origin || url.origin === 'https://krvbridge.org') {
 			/**
