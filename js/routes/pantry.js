@@ -12,7 +12,7 @@ import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands';
 
-const MESSAGE = 'The Emergency Choice Pantry will be closed on for Thanksgiving on Thursday and Friday.';//'Our Emergency Choice Pantry is currently closed due to the canyon having been closed. Please see <a href="https://events.kernvalley.us/2025/09/25/hunger-action-month-pantry-stocking">Hunger Action Month Pantry Stocking</a> if you are able to help.';
+const MESSAGE = null;
 const ID = 'pantry-form';
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
@@ -341,8 +341,8 @@ export default function({
 	return html`<form id="${ID}" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<div>
 			<h2>
-				<span itemprop="name">KRV Bridge Connection</span>
-				<sapn itemprop="contactType">Choice Food Pantry</span>
+				<span itemprop="name" hidden="">KRV Bridge Connection</span>
+				<span itemprop="contactType">Emergency Choice Food Pantry</span>
 			</h2>
 			${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
 			<div class="center">
@@ -370,7 +370,7 @@ export default function({
 				crossorigin="anonymous"
 				itemprop="image"
 				referrerpolicy="no-referrer" />
-			<p itemprop="description">Our Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
+			<p itemprop="description">The Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
 			temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
 			are not enough.</p>
 			<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
@@ -402,6 +402,7 @@ export default function({
 			</p>
 		</section>
 		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
+			<meta itemprop="name" content="KRV Bridge Connection" />
 			<h3 id="pantry-address">Address</h3>
 			<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
 			<div>
