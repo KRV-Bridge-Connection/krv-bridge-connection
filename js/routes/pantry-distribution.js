@@ -5,7 +5,7 @@ import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { navigate, back } from '@aegisjsproject/router';
 import { onClick, onChange, onSubmit, onReset, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
-import { openDB, getItem, putItem } from '@aegisjsproject/idb';
+import { openDB, putAllItems, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E, EAN_13 } from '@aegisjsproject/barcodescanner';
@@ -486,7 +486,10 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 			signal: controller.signal,
 		}).then(resp => resp.json());
 
-		await Promise.all(items.map(item => putItem(db, STORE_NAME, _convertItem(item), { signal: controller.signal })));
+		if (items.length !== 0) {
+			await putAllItems(db, STORE_NAME, items.map(_convertItem), { signal: controller.signal, durability: 'strict' });
+		}
+
 		localStorage.setItem(storageKey, Date.now());
 		controller.abort();
 	} catch(err) {
