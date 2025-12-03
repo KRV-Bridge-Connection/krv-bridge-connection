@@ -39,8 +39,16 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', event => {
 	try {
 		submitter.disabled = true;
 		const params = new URLSearchParams(new FormData(target));
-		const qr = createQRCode(`https://krvbridge.org/pantry/?${params}`);
-		document.getElementById('qr-container').replaceChildren(qr);
+		const qr = createQRCode(`https://krvbridge.org/pantry/?${params}`, { size: 480 });
+		const link = document.createElement('a');
+		link.href = qr.src;
+		link.target = '_blank';
+		link.referrerPolicy = 'no-referrer';
+		link.relList.add('noopener', 'noreferrer', 'external');
+		link.append(qr);
+		link.classList.add('block');
+
+		document.getElementById('qr-container').replaceChildren(link);
 		document.getElementById('popover').showPopover();
 		document.getElementById('popover').addEventListener('toggle', ({ newState }) => {
 			if (newState === 'closed') {
@@ -61,7 +69,7 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', event => {
 
 export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${onSubmit}="${pantryQRSubmit}" ${signalAttr}="${registerSignal(signal)}">
 	<fieldset class="no-border" autocomplete="off">
-		<legend>Schedule an Appointment</legend>
+		<legend>Create Pantry Quick Sign-In QR</legend>
 		<div class="form-group flex wrap space-between">
 			<span>
 				<label for="pantry-given-name" class="input-label required">First Name</label>
@@ -77,23 +85,6 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 			</span>
 		</div>
 		<div class="form-group">
-			<label for="pantry-bday" class="input-label">Birthday</label>
-			<input type="date" name="bDay" id="pantry-bday" class="input" placeholder="yyyy-mm-dd" inputmode="numeric" pattern="\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])" autocomplete="off">
-		</div>
-		<div class="form-group">
-			<label for="pantry-gender required">Gender</label>
-			<select name="gender" id="pantry-gender" class="input" autocomplete="off" required="">
-				<option label="Please select one"></option>
-				<option label="Male" value="Male"></option>
-				<option label="Female" value="Female"></option>
-				<option label="Transgender" value="Transgender"></option>
-				<option label="Trans Female/Trans Woman" value="Trans Female/Trans Woman"></option>
-				<option label="Trans Male/Trans Man" value="Trans Male/Trans Man"></option>
-				<option label="None of these" value="None of these"></option>
-				<option label="Don't Know / Prefer not to answer" value="Don't Know / Prefer not to answer"></option>
-			</select>
-		</div>
-		<div class="form-group">
 			<label for="pantry-email" class="input-label">Email</label>
 			<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="off" />
 		</div>
@@ -103,7 +94,7 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 		</div>
 		<div class="form-group">
 			<label for="pantry-street-address" class="input-label">Address</label>
-			<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="off">
+			<input type="text" name="streetAddress" id="pantry-street-address" class="input" placeholder="123 Some St." autocomplete="off">
 			<label for="pantry-address-locality required" class="input-label required">City</label>
 			<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="off" list="pantry-towns-list" ${onChange}="${pantryQRChange}" required="">
 			<datalist id="pantry-towns-list">
@@ -133,10 +124,6 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 			<label for="pantry-household-size" class="input-label required">Household Size</label>
 			<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" value="1" required="">
 		</div>
-		<div class="form-group">
-			<label for="pantry-household-income" class="input-label">Approximate Annual Household Income</label>
-			<input type="number" name="income" id="pantry-household-income" class="input" placeholder="####" min="0" autocomplete="off" value="0">
-		</div>
 	</fieldset>
 	<div class="flex row">
 		<button type="submit" class="btn btn-success">Create QR</button>
@@ -145,8 +132,8 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 </form>
 <div id="popover" popover="manual">
 	<div id="qr-container"></div>
-	<button type="button" class="btn btn-primary" popovertarget="popover" popovertargetaction="popover">Close Popover</button>
+	<button type="button" class="btn btn-primary" commandfor="popover" command="hide">Close Popover</button>
 </div>`;
 
-export const title = site.title + ' | KRV Pantry Registration QRs' ;
+export const title = site.title + ' | Choice Pantry Registration QRs' ;
 export const description = 'Generate QR codes to more easily register for the pantry';

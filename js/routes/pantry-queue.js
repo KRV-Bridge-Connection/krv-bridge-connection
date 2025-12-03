@@ -161,22 +161,46 @@ async function render() {
 async function checkInVisit({ rawValue }) {
 	const now = Math.floor(Date.now() / 1000);
 
-	const {
-		sub,
-		toe,
-		txn,
-		authorization_details: { household },
-	} = await verifyJWT(rawValue, key);
+	if (URL.canParse(rawValue)) {
+		const url = new URL(rawValue);
+		alert(url);
 
-	const db = await _openDB();
+		if (url.search.length !== 0 && url.origin === location.origin || url.origin === 'https://krvbridge.org') {
+			/**
+			 * @type {HTMLFormElement}
+			*/
+			const form = document.forms[ADD_FORM_ID];
+			const modal = document.getElementById(ADD_DIALOG_ID);
 
-	try {
-		const date = now > toe ? new Date() : new Date(toe * 1000);
-		await putItem(db, STORE_NAME, { sub, txn, household, date, checkedIn: new Date(), jwt: rawValue });
-		await render();
-	} finally {
-		db.close();
+			url.searchParams.entries().forEach(([name, val]) => {
+				const input = form.elements.namedItem(name);
+
+				if (input instanceof HTMLElement) {
+					input.value = val;
+				}
+			});
+
+			modal.showModal();
+		}
+	} else {
+		const {
+			sub,
+			toe,
+			txn,
+			authorization_details: { household },
+		} = await verifyJWT(rawValue, key);
+
+		const db = await _openDB();
+
+		try {
+			const date = now > toe ? new Date() : new Date(toe * 1000);
+			await putItem(db, STORE_NAME, { sub, txn, household, date, checkedIn: new Date(), jwt: rawValue });
+			await render();
+		} finally {
+			db.close();
+		}
 	}
+
 }
 
 preloadRxing();
@@ -240,7 +264,7 @@ export default async ({ signal: sig }) => {
 		</tbody>
 	</table>
 	<dialog id="${ADD_DIALOG_ID}">
-		<form id="${ADD_FORM_ID}" ${onSubmit}="${submitHandler}" ${signalAttr}="${signal}">
+		<form id="${ADD_FORM_ID}" autocomplete="off" ${onSubmit}="${submitHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
 				<legend>Emergency Choice Pantry Sign-In</legend>
 				<div class="form-group flex wrap space-between">
@@ -262,7 +286,6 @@ export default async ({ signal: sig }) => {
 							name="suffix"
 							id="${ADD_FORM_ID}-name-suffix"
 							class="input"
-							autocomplete="honorific-suffix"
 							list="${ADD_FORM_ID}-suffix-options"
 							size="3"
 							minlength="2"

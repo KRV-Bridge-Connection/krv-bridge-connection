@@ -13,7 +13,7 @@ import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
 
-export const title = 'KRV Bridge Pantry Distribution';
+export const title = 'Choice Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
 
 const ADD_ITEM_ID = 'pantry-manual';
