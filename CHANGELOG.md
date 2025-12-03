@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add pantry Queue
 - Add handler for daily pantry stats
 
+### Changed
+- Update syncing IDB for pantry & partners
+
 ## [v2.0.5] - 2025-11-19
 
 ### Added

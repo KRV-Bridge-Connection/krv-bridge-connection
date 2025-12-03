@@ -1,5 +1,5 @@
 import { site, SCHEMA } from '../consts.js';
-import { getAllItems, getItem, getStoreReadWrite, handleIDBRequest, openDB } from '@aegisjsproject/idb';
+import { getAllItems, getItem, putAllItems, openDB } from '@aegisjsproject/idb';
 import { escape } from '@aegisjsproject/core/dom.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
@@ -318,12 +318,10 @@ async function syncDB(db, { signal } = {}) {
 
 			if (resp.ok) {
 				const partners = await resp.json();
-				const store = await getStoreReadWrite(db, STORE_NAME, {});
 
-				await Promise.all(partners.map(partner => {
-					partner.lastUpdated = new Date(partner.lastUpdated);
-					return handleIDBRequest(store.put(partner), { signal });
-				}));
+				if (partners.length !== 0) {
+					await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
+				}
 
 				localStorage.setItem(storageKey, Date.now());
 			} else {
