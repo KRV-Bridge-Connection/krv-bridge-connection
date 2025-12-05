@@ -1,5 +1,15 @@
 export const GA = null;
 
+export const PANTRY_OPENING_HOURS = [
+	{ dayOfWeek: 'Sunday', opens: null, closes: null },
+	{ dayOfWeek: 'Monday', opens: '10:30:00', closes: '13:00:00' },
+	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '13:00:00' },
+	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
+	{ dayOfWeek: 'Thursday', opens: null, closes: null },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '11:00:00' },
+	{ dayOfWeek: 'Saturday', opens: null, closes: null },
+];
+
 export const env = (location.hostname === 'localhost' || location.hostname.endsWith('.netlify.live'))
 	? 'development'
 	: 'production';
