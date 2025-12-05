@@ -14,6 +14,8 @@ import {
 
 const QZONE = 7;
 
+const HOUSEHOLD_MEMBER = 'person[]';
+
 const RESET_DATE = new Date('2025-12-01T00:00');
 
 const FORMAT = {
@@ -263,17 +265,17 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 		const missing = [
-			'givenName', 'familyName', 'household', 'addressLocality', 'postalCode', 'date', 'time',
+			'givenName', 'familyName', 'addressLocality', 'postalCode', 'date', 'time',
 		].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
 			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
-			const household = Math.min(Math.max(parseInt(data.get('household')), 1), MAX_HOUSEHOLD);
+			const household = data.has('household')
+				? Math.min(Math.max(parseInt(data.get(household).length), 1), MAX_HOUSEHOLD)
+				: Math.min(Math.max(data.getAll(HOUSEHOLD_MEMBER).length + 1, 1), MAX_HOUSEHOLD);
 
 			if (Number.isNaN(date.getTime())) {
 				throw new HTTPBadRequestError('Invalid date/time given.');
-			} else if (! Number.isSafeInteger(household) || household < 1 || household > MAX_HOUSEHOLD) {
-				throw new HTTPBadRequestError(`Invalid household size: ${data.get('household')}.`);
 			} else {
 				const key = await getSecretKey();
 				const [store] = await openSecretStoreFile(key, '_data/secrets.json', { signal: req.signal });
@@ -306,7 +308,7 @@ export default createHandler({
 					streetAddress,
 					addressLocality: data.get('addressLocality'),
 					postalCode: data.get('postalCode'),
-					household: parseInt(data.get('household')),
+					household,
 					comments,
 					created,
 					extra_trip: ! normalTrip,
