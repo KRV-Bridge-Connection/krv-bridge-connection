@@ -271,7 +271,7 @@ export default createHandler({
 		if (missing.length === 0) {
 			const date = new Date(data.has('datetime') ? data.get('datetime') : `${data.get('date')}T${data.get('time')}`);
 			const household = data.has('household')
-				? Math.min(Math.max(parseInt(data.get(household).length), 1), MAX_HOUSEHOLD)
+				? Math.min(Math.max(parseInt(data.get('household')), 1), MAX_HOUSEHOLD)
 				: Math.min(Math.max(data.getAll(HOUSEHOLD_MEMBER).length + 1, 1), MAX_HOUSEHOLD);
 
 			if (Number.isNaN(date.getTime())) {
@@ -415,4 +415,6 @@ export default createHandler({
 			}
 		}
 	}
+}, {
+	logger: console.error,
 });
