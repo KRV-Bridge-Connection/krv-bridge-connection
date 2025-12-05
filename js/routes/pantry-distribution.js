@@ -52,6 +52,7 @@ const QUICK_ITEMS = [
 	{ name: 'Ground Pork', cost: 5, id: 'F58C327B-F2C9-4F93-B475-B12FFD737ECB' },
 	{ name: 'Chicken Thighs', cost: 7, id: '81AB625B-009B-4379-AF67-4139428358DE' },
 	{ name: 'Pollock', cost: 5, id: '1DE64D10-66F7-4B8D-B0D0-E387D4A2208B' },
+	{ name: 'School Frozen Lunch', cost: 0.5, id: '9CAAF347-E66B-4A83-91E7-51B1B014DCAB' },
 	{ name: 'Flour Bag', cost: 0.5, id: '72BF4196-AAF4-4872-B064-A448360614D8' },
 	{ name: 'Sugar Bag', cost: 0.5, id: 'E3090354-A786-4183-870B-A8E3EE697DF4' },
 	{ name: 'Rice Bag', cost: 0.5, id: 'E3E783CB-A465-4513-9D45-3B5FA286EFFF' },
