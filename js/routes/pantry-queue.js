@@ -1,7 +1,7 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { data, attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onChange, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onReset, onChange, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
@@ -9,6 +9,7 @@ import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { createQRCode } from '@shgysk8zer0/kazoo/qr.js';
 import { TOWNS, ZIPS, postalCodes } from './pantry.js';
+import { HOUSEHOLD_LIST, getPantryHouseholdTemplate, pantryAddHousehold, HOUSEHOLD_MEMBER_CLASSNAME } from '../components/pantry.js';
 
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
@@ -62,6 +63,10 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 		alert(err.message);
 		submitter.disabled = false;
 	}
+});
+
+const resetHandler = registerCallback('pantry:queue:reset', ({ target }) => {
+	target.querySelectorAll(`.${HOUSEHOLD_MEMBER_CLASSNAME}`).forEach(el => el.remove());
 });
 
 const _openDB = async () => await openDB(SCHEMA.name, {
@@ -186,14 +191,14 @@ async function checkInVisit({ rawValue }) {
 			sub,
 			toe,
 			txn,
-			authorization_details: { household },
+			authorization_details: { household, points },
 		} = await verifyJWT(rawValue, key);
 
 		const db = await _openDB();
 
 		try {
 			const date = now > toe ? new Date() : new Date(toe * 1000);
-			await putItem(db, STORE_NAME, { sub, txn, household, date, checkedIn: new Date(), jwt: rawValue });
+			await putItem(db, STORE_NAME, { sub, txn, household, points, date, checkedIn: new Date(), jwt: rawValue });
 			await render();
 		} finally {
 			db.close();
@@ -263,7 +268,7 @@ export default async ({ signal: sig }) => {
 		</tbody>
 	</table>
 	<dialog id="${ADD_DIALOG_ID}">
-		<form id="${ADD_FORM_ID}" autocomplete="off" ${onSubmit}="${submitHandler}" ${signalAttr}="${signal}">
+		<form id="${ADD_FORM_ID}" autocomplete="off" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
 				<legend>Emergency Choice Pantry Sign-In</legend>
 				<div class="form-group flex wrap space-between">
@@ -320,9 +325,19 @@ export default async ({ signal: sig }) => {
 						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
 					</datalist>
 				</div>
-				<div class="form-group">
+				<!--<div class="form-group">
 					<label for="${ADD_FORM_ID}-household-size" class="input-label required">How Many People Will This Feed?</label>
 					<input type="number" name="household" id="${ADD_FORM_ID}-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" required="" />
+				</div>-->
+				<div>
+					<p>Please provide the names for all of the people other than yourself this will be feeding</p>
+					<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
+					<button type="button" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
+							<path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/>
+						</svg>
+						<span>Add Household Member</span>
+					</button>
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-date" class="input-label required">Pick a Date</label>
@@ -346,7 +361,8 @@ export default async ({ signal: sig }) => {
 				<button type="button" class="btn btn-warning" command="request-close" commandfor="${ADD_DIALOG_ID}">Close</button>
 			</div>
 		</form>
-	</dialog>`;
+	</dialog>
+	${getPantryHouseholdTemplate({ signal })}`;
 
 	frag.querySelector('details').append(video);
 
