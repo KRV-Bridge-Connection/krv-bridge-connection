@@ -1,4 +1,4 @@
-import { site } from '../consts.js';
+import { site, PANTRY_OPENING_HOURS } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
@@ -78,16 +78,6 @@ const style = css`#pantry-message {
 
 const date = getSearch('date', '');
 
-const OPENING_HOURS = [
-	{ dayOfWeek: 'Sunday', opens: null, closes: null },
-	{ dayOfWeek: 'Monday', opens: '10:30:00', closes: '13:00:00' },
-	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '13:00:00' },
-	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
-	{ dayOfWeek: 'Thursday', opens: null, closes: null },
-	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
-	{ dayOfWeek: 'Saturday', opens: null, closes: null },
-];
-
 const CLOSED = [
 	'2025-08-21', // Ran empty
 	'2025-08-22', // Pantry empty until Monday
@@ -131,7 +121,7 @@ const getOpeningHours = (date) => {
 			? { min: null, max: null, disabled: true }
 			: { min: '08:00', max: '17:00', disabled: false };
 	} else {
-		const { opens, closes } = OPENING_HOURS[date.getDay()];
+		const { opens, closes } = PANTRY_OPENING_HOURS[date.getDay()];
 
 		if (typeof opens === 'string' && typeof closes === 'string') {
 			return { min: opens, max: closes, disabled: false };
@@ -145,7 +135,7 @@ const getPantrySchedule = () => `<section class="pantry-general-hours" aria-labe
 	<h3 id="general-pantry-hours">General Pantry Hours</h3>
 	<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
 	<ul>
-		${OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
+		${PANTRY_OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
 			<span itemprop="dayOfWeek">${dayOfWeek}</span>
 			${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
 				? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
