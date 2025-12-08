@@ -2,7 +2,7 @@ import { site, PANTRY_OPENING_HOURS } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onClick, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
@@ -18,6 +18,8 @@ const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
 const TIMEZONE_OFFSET = 8 * HOURS;
 const TIME_STEP = 60;
+const HOUSEHOLD_CLASSNAME = 'household-member';
+const HOUSEHOLD_LIST = 'pantry-household-list';
 // Options given on Neighbor Intake
 export const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
 export const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
@@ -229,6 +231,22 @@ const dateChange = registerCallback('pantry:date:change', ({ target }) => {
 			timeInput.max = max;
 			target.setCustomValidity('');
 		}
+	}
+});
+
+const pantryAddHousehold = registerCallback('pantry:household:add', () => {
+	/**
+	 * @type {HTMLInputElement[]}
+	 */
+	const members = Array.from(document.querySelectorAll('.' + HOUSEHOLD_CLASSNAME));
+
+	if (members.every(member => member.validity.valid)) {
+		const input = document.createElement('input');
+		input.name = 'person[]';
+		input.required = true;
+		input.classList.add(HOUSEHOLD_CLASSNAME, 'input');
+		input.minLength = 4;
+		document.getElementById(HOUSEHOLD_LIST).append(input);
 	}
 });
 
@@ -463,9 +481,16 @@ export default function({
 					${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
 				</datalist>
 			</div>
-			<div class="form-group">
+			<!--<div class="form-group">
 				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />
+			</div>-->
+			<div>
+				<p>Please provide the names for all of the people other than yourself this will be feeding</p>
+				<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
+				<button type="button" class="btn btn-primary" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
+					<span>Add Household Member</span>
+				</button>
 			</div>
 			<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
 			${getPantrySchedule()}
