@@ -11,7 +11,10 @@ import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands';
-import { HOUSEHOLD_LIST, getPantryHouseholdTemplate, pantryAddHousehold } from '../components/pantry.js';
+import {
+	HOUSEHOLD_LIST, HOUSEHOLD_MEMBER_CLASSNAME, getPantryHouseholdTemplate, pantryAddHousehold, getHouseholdSize,
+	isCorrectHouseholdSize, getHouseholdSizeValue, addHouseholdMember, ADD_HOUSEHOLD_MEMBER_ID,
+} from '../components/pantry.js';
 
 const MESSAGE = null;
 const ID = 'pantry-form';
@@ -243,6 +246,12 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 	try {
 		submitter.disabled = true;
 		const data = new FormData(event.target);
+
+		if (! isCorrectHouseholdSize(data)) {
+			addHouseholdMember();
+			requestAnimationFrame(() => document.querySelector(`.${HOUSEHOLD_MEMBER_CLASSNAME}:invalid`).scrollIntoView({ behavior: 'smooth' }));
+			throw new Error(`Please list all ${getHouseholdSizeValue() - 1} other members of your household.`);
+		}
 		const date = new Date(data.get('date') + 'T' + data.get('time'));
 		data.set('datetime', date.toISOString());
 
@@ -267,7 +276,7 @@ const submitHandler = registerCallback('pantry:form:submit', async event => {
 			throw new Error(err.error.message);
 		}
 	} catch(err) {
-		await _alert(err.message);
+		alert(err.message);
 		submitter.disabled = false;
 	}
 });
@@ -464,14 +473,15 @@ export default function({
 					${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
 				</datalist>
 			</div>
-			<!--<div class="form-group">
+			<div class="form-group">
 				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
-				<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />
-			</div>-->
+				${getHouseholdSize(household)}
+				<!--<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />-->
+			</div>
 			<div>
 				<p>Please provide the names for all of the people other than yourself this will be feeding</p>
 				<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
-				<button type="button" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
+				<button type="button" id="${ADD_HOUSEHOLD_MEMBER_ID}" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
 						<path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/>
 					</svg>
