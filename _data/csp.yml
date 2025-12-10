@@ -13,7 +13,7 @@ default:
     - https://unpkg.com/@highlightjs/
     - https://donorbox.org/widget.js
     - https://cdn.kernvalley.us/js/pwa-reset.js
-    - https://unpkg.com/rxing-wasm@0.3.6/rxing_wasm_bg.js
+    - https://unpkg.com/rxing-wasm@0.5.4/rxing_wasm_bg.js
     - "'wasm-unsafe-eval'"
     # - https://www.google-analytics.com
     # - https://www.googletagmanager.com
@@ -58,7 +58,7 @@ default:
     - https://api.openweathermap.org/data/2.5/
     - https://events.kernvalley.us/events.json
     - https://maps.kernvalley.us/places/
-    - https://unpkg.com/rxing-wasm@0.3.6/rxing_wasm_bg.wasm
+    - https://unpkg.com/rxing-wasm@0.5.4/rxing_wasm_bg.wasm
     # - https://www.google-analytics.com/
     # - https://www.googletagmanager.com/gtag/
     # - https://baconipsum.com/api/
