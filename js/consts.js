@@ -6,7 +6,7 @@ export const PANTRY_OPENING_HOURS = [
 	{ dayOfWeek: 'Tuesday', opens: '09:00:00', closes: '13:00:00' },
 	{ dayOfWeek: 'Wednesday', opens: null, closes: null },
 	{ dayOfWeek: 'Thursday', opens: null, closes: null },
-	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '11:00:00' },
+	{ dayOfWeek: 'Friday', opens: '09:00:00', closes: '13:00:00' },
 	{ dayOfWeek: 'Saturday', opens: null, closes: null },
 ];
 
