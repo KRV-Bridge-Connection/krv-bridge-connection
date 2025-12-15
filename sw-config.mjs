@@ -46,16 +46,25 @@ const config = {
 	stale: [
 		/* Scripts */
 		'/js/index.min.js',
+		'/js/consts.js',
+		'/js/functions.js',
 		'{{ importmap.imports["@shgysk8zer0/polyfills"] }}',
 		/* Route handler modules */
 		'{{ importmap.imports["@aegisjsproject/state"] }}',
 		'{{ importmap.imports["@aegisjsproject/router"] }}',
 		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/html.js',
 		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/css.js',
-		'{{ importmap.imports["@aegisjsproject/core/"] }}stringify.js',
 		'{{ importmap.imports["@aegisjsproject/idb"] }}',
 		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}callbacks.js',
 		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}events.js',
+		'{{ importmap.imports["@aegisjsproject/core/"] }}stringify.js',
+		'{{ importmap.imports["@aegisjsproject/core/"] }}dom.js',
+		'{{ importmap.imports["@shgysk8zer0/consts/"] }}date.js',
+		'{{ importmap.imports["@aegisjsproject/attempt"] }}',
+		'{{ importmap.imports["@shgysk8zer0/konami"] }}',
+		'{{ importmap.imports["@shgysk8zer0/kazoo/"] }}geo.js',
+		'{{ importmap.imports["@aegisjsproject/commands"] }}',
+		'{{ importmap.imports["@aegisjsproject/markdown"] }}',
 		'{{ importmap.imports["@aegisjsproject/url/"] }}search.js',
 		/* Images & Icons */
 		'/img/icons.svg',

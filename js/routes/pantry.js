@@ -6,7 +6,7 @@ import { onSubmit, onClick, onReset, onChange, signal as signalAttr, registerSig
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { navigate, back } from '@aegisjsproject/router';
 import { WEEKS, HOURS } from '@shgysk8zer0/consts/date.js';
-import { clearState, setState, changeHandler as change } from '@aegisjsproject/state/state.js';
+import { clearState, setState, changeHandler as change } from '@aegisjsproject/state';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { attemptSync } from '@aegisjsproject/attempt';
 import { konami } from '@shgysk8zer0/konami';
