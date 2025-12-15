@@ -296,8 +296,8 @@ const createPartners = results => results.sort(sortPartners).map(({ name, descri
 </div>`).join('\n');
 
 const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty(storageKey)
-	? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl
-	: navigator.onLine;
+	? navigator.onLine ? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl : false
+	: true;
 
 async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
