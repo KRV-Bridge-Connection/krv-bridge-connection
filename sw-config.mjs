@@ -50,13 +50,13 @@ const config = {
 		/* Route handler modules */
 		'{{ importmap.imports["@aegisjsproject/state"] }}',
 		'{{ importmap.imports["@aegisjsproject/router"] }}',
-		'{{ importmap.imports["@aegisjsproject/core/parsers/html.js"] }}',
-		'{{ importmap.imports["@aegisjsproject/core/parsers/css.js"] }}',
-		'{{ importmap.imports["@aegisjsproject/core/stringify.js"] }}',
+		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/html.js',
+		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/css.js',
+		'{{ importmap.imports["@aegisjsproject/core/"] }}stringify.js',
 		'{{ importmap.imports["@aegisjsproject/idb"] }}',
-		'{{ importmap.imports["@aegisjsproject/callback-registry/callbacks.js"] }}',
-		'{{ importmap.imports["@aegisjsproject/callback-registry/events.js"] }}',
-		'{{ importmap.imports["@aegisjsproject/url/search.js"] }}',
+		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}callbacks.js',
+		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}events.js',
+		'{{ importmap.imports["@aegisjsproject/url/"] }}search.js',
 		/* Images & Icons */
 		'/img/icons.svg',
 		'/img/apple-touch-icon.png',
@@ -103,7 +103,15 @@ const config = {
 			'/webapp.webmanifest',
 		]),
 		'pinned-pages': async () => await updateAssets([
-			'{{ site.pages | where: "pinned", true | map: "url" | join: "', '" }}'
+			'/',
+			'/pantry/',
+			'/contact/',
+			'/partners/',
+			'/resources/',
+			'/about/',
+			'/donate/',
+			'/volunteer/',
+			'/account/',
 		]),
 		'recent-posts': async () => await updateAssets(['{{ site.posts | map: "url" | join: "', '" }}']),
 	}
