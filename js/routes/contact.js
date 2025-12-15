@@ -1,7 +1,7 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
-import { clearState, changeHandler as change } from '@aegisjsproject/state/state.js';
+import { clearState, changeHandler as change } from '@aegisjsproject/state';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from '/js/consts.js';

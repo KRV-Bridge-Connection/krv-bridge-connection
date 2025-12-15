@@ -297,7 +297,7 @@ const createPartners = results => results.sort(sortPartners).map(({ name, descri
 
 const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty(storageKey)
 	? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl
-	: true;
+	: navigator.onLine;
 
 async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
