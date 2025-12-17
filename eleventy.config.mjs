@@ -11,7 +11,6 @@ import { config } from 'dotenv';
 
 const importmap = JSON.parse(JSON.stringify(new Importmap()));
 
-console.log({ importmap });
 if (process.env.ELEVENTY_SOURCE === 'cli'  && ! ('FIREBASE_CERT' in process.env)) {
 	config();
 }

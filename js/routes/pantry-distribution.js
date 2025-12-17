@@ -248,6 +248,8 @@ const _getItem = async id => {
 					await putItem(db, STORE_NAME, result);
 					db.close();
 					return result;
+				} else {
+					throw new DOMException(`<${resp.url}> [${resp.status}]`, 'NetworkError');
 				}
 			}
 		} catch(err) {
