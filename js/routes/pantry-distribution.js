@@ -637,9 +637,9 @@ export default async function({
 		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border overflow-auto" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<legend>KRV Bridge Food Pantry</legend>
-			<div>
+			<!--<div>
 				<a href="/pantry/" class="btn btn-link no-router" target="_blank">Create an Appointment</a>
-			</div>
+			</div>-->
 			<div id="appt-details" ${attr({ hidden: Number.isNaN(parseInt(points)) })}>
 				<input type="hidden" name="appt" id="pantry-appt" class="display-text" />
 				<input type="hidden" name="pantry-token" id="pantry-token" ${attr({ value: token })} />
