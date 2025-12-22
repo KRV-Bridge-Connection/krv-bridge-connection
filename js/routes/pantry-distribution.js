@@ -562,8 +562,9 @@ export default async function({
 									exp,
 									txn: id,
 									toe: timestamp,
-									given_name: givenName,
-									family_name: familyName,
+									sub: name,
+									// given_name: givenName,
+									// family_name: familyName,
 									authorization_details: {
 										household,
 										points,
@@ -583,8 +584,9 @@ export default async function({
 									setState('token', result.rawValue);
 
 									document.getElementById('pantry-appt').value = id;
-									document.getElementById('pantry-given-name').value = givenName;
-									document.getElementById('pantry-family-name').value = familyName;
+									document.getElementById('pantry-full-name').value = name;
+									// document.getElementById('pantry-given-name').value = givenName;
+									// document.getElementById('pantry-family-name').value = familyName;
 									document.getElementById('pantry-points').value = points;
 									document.getElementById('pantry-household').value = household;
 									document.getElementById('appt-details').hidden = false;
@@ -645,8 +647,9 @@ export default async function({
 				<input type="hidden" name="pantry-token" id="pantry-token" ${attr({ value: token })} />
 				<div>
 					<b>Name:</b>
-					<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
-					<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />.
+					<input type="text" id="pantry-full-name" class="display-text" name="name" ${attr({ value: name })} readonly="" />
+					<!--<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
+					<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />-->
 				</div>
 				<div>
 					<b>Points:</b>
