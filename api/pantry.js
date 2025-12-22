@@ -4,7 +4,6 @@ import { deleteCollectionItem, getCollectionItem, getCollectionItems, getPublicK
 import { encrypt, decrypt, BASE64, getSecretKey } from '@shgysk8zer0/aes-gcm';
 import { NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
-import { getSUID } from '@shgysk8zer0/suid';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
@@ -141,6 +140,11 @@ function getQRCodeURL(data, {
 	}
 
 	return url;
+}
+
+function getID(name, date = new Date()) {
+	const ts = Uint8Array.fromHex(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime().toString(16).padStart(16, '0'));
+	return `${ts.toBase64()}:${new TextEncoder().encode(normalizeName(name)).toBase64()}`;
 }
 
 export default createHandler({
@@ -287,7 +291,7 @@ export default createHandler({
 				);
 
 				const created = new Date();
-				const id = getSUID({ date: created, alphabet: 'base64url' });
+				// const id = getSUID({ date: created, alphabet: 'base64url' });
 				const recentVists = await getRecentVisitCount(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
 				const normalTrip = recentVists < MONTHLY_VISITS;
 				const points = normalTrip ? _getPoints(household) : household * BASE_POINTS;
@@ -296,12 +300,16 @@ export default createHandler({
 					.filter(field => typeof field === 'string' && field.length !== 0)
 					.join(' ');
 
+				const _name = normalizeName(name);
+				const id = getID(_name, data);
+
+
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalyName'),
 					familyName: data.get('familyName'),
 					suffix: data.get('suffix'),
-					_name: normalizeName(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`),
+					_name,
 					name,
 					email,
 					telephone,
