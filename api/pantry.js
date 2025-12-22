@@ -298,7 +298,7 @@ export default createHandler({
 				const recentVists = await getRecentVisitCount(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
 				const normalTrip = recentVists < MONTHLY_VISITS;
 				const points = normalTrip ? _getPoints(household) : household * BASE_POINTS;
-				const name = ['givenName', 'additionalName', 'familyName']
+				const name = ['givenName', 'additionalName', 'familyName', 'suffix']
 					.map(field => data.get(field))
 					.filter(field => typeof field === 'string' && field.length !== 0)
 					.join(' ');
@@ -360,7 +360,7 @@ export default createHandler({
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
 					new SlackSectionBlock(new SlackPlainTextElement(`Date: ${date.toLocaleString('en', FORMAT)}`), {
 						fields: [
-							new SlackMarkdownElement(`*Name*: ${data.get('givenName')} ${data.get('familyName')}`),
+							new SlackMarkdownElement(`*Name*: ${name}`),
 							new SlackMarkdownElement(`*Phone*: ${data.has('telephone') ? data.get('telephone') : 'Not given'}`),
 							new SlackMarkdownElement(`*Points*: ${points}`),
 						],
