@@ -16,7 +16,7 @@ import {
 	isCorrectHouseholdSize, getHouseholdSizeValue, addHouseholdMember, ADD_HOUSEHOLD_MEMBER_ID,
 } from '../components/pantry.js';
 
-const MESSAGE = null;
+const MESSAGE = 'The Emergency Choice Pantry will be closed for the Holidays from Wed Dec 26 - Fri Dec 26 and from Wed Dec 31 - Fri Jan 2.';
 const ID = 'pantry-form';
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const CARES_FORM = '/docs/cares-form.pdf';
