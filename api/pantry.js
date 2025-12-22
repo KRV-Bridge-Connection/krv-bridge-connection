@@ -85,9 +85,11 @@ async function getRecentVisits(name, date = new Date(), { countExtra = false } =
 
 	const filters = countExtra ? [
 		['date', '>', prior],
+		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
 		['_name', '==', normalizeName(name)],
 	] : [
 		['date', '>', prior > RESET_DATE ? prior : RESET_DATE],
+		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
 		['_name', '==', normalizeName(name)],
 		['extra_trip', '==', false]
 	];
@@ -143,6 +145,7 @@ function getQRCodeURL(data, {
 }
 
 function getID(name, date = new Date()) {
+	console.log({ date });
 	const ts = Uint8Array.fromHex(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime().toString(16).padStart(16, '0'));
 	return `${ts.toBase64()}:${new TextEncoder().encode(normalizeName(name)).toBase64()}`;
 }
@@ -301,7 +304,7 @@ export default createHandler({
 					.join(' ');
 
 				const _name = normalizeName(name);
-				const id = getID(_name, data);
+				const id = getID(_name, date);
 
 
 				await putCollectionItem(COLLECTION, id, {
