@@ -1,20 +1,10 @@
-import encodeQr from 'qr';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { createGIFFile } from '@aegisjsproject/qr-encoder';
 import { site } from '../consts.js';
 
 const POPOVER_ID = 'pantry-qr-popover';
-
-function createQRCode(input, {
-	ecc = 'medium',
-	border = 4,
-	scale = 12,
-	name = 'pantry-qr.gif',
-} = {}) {
-	const encoded = encodeQr(input, 'gif', { ecc, border, scale });
-	return new File([encoded], name, { type: 'image/gif' });
-}
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -51,13 +41,14 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 	try {
 		submitter.disabled = true;
 		const params = new URLSearchParams(new FormData(target));
-		const qr = createQRCode(`https://krvbridge.org/pantry/?${params}`, {
-			name: ['givenName', 'additionalName', 'familyName', 'suffix']
+		const qr = createGIFFile(
+			`https://krvbridge.org/pantry/?${params}`,
+			['givenName', 'additionalName', 'familyName', 'suffix']
 				.map(field => params.get(field))
 				.filter(field => typeof field === 'string' && field.length !== 0)
 				.map(field => field.trim().toLocaleLowerCase())
 				.join('-') + '-pantry-qr.gif'
-		 });
+		);
 		const img = document.createElement('img');
 		img.width = 480;
 		img.height = img.width;

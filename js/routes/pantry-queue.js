@@ -7,24 +7,9 @@ import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
-import encodeQR from 'qr';
+import { createSVGElement } from '@aegisjsproject/qr-encoder';
 import { TOWNS, ZIPS, postalCodes } from './pantry.js';
 import { HOUSEHOLD_LIST, getPantryHouseholdTemplate, pantryAddHousehold, HOUSEHOLD_MEMBER_CLASSNAME } from '../components/pantry.js';
-
-function createQRCode(input, {
-	ecc = 'medium',
-	size = 480,
-	border = 4,
-	scale = 4,
-} = {}) {
-	const gif = encodeQR(input, 'gif', { ecc, border, scale });
-	const blob = new Blob([gif], { type: 'image/gif' });
-	const img = document.createElement('img');
-	img.height = size;
-	img.width = size;
-	img.src = URL.createObjectURL(blob);
-	return img;
-}
 
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
@@ -100,20 +85,13 @@ async function showVisit(btn) {
 		const visit = await getVisit(btn.dataset.txn);
 
 		if (typeof visit === 'object') {
-			const qr = createQRCode(visit.jwt, { size: 480 });
-			const id = 'qr-' + crypto.randomUUID();
-			const blob = qr.src;
-			qr.id = id;
-
 			const dialog = el`<dialog id="modal-${visit.txn}" ${onClose}="${closeHandler}">
 				<p>Visit scheduled for ${visit.sub} at <time ${attr({ datetime: visit.date.toISOString() })}>${visit.date.toLocaleTimeString()}</p>
-				${qr.outerHTML}
+				${createSVGElement(visit.jwt, { size: 480 })}
 				<hr />
 				<button type="button" class="btn btn-warning" ${onClick}="${closeModal}">Close</button>
 				<button type="button" class="btn btn-danger" ${onClick}="${closeAndRemove}" ${data({ txn: visit.txn })}>Close &amp; Remove</button>
 			</dialog>`;
-
-			dialog.addEventListener('close', () => URL.revokeObjectURL(blob), { once: true });
 
 			document.getElementById('main').append(dialog);
 			dialog.showModal();

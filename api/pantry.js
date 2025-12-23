@@ -10,7 +10,7 @@ import {
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
-import encodeQR from 'qr';
+import { createGIFBlob } from '@aegisjsproject/qr-encoder';
 
 const QZONE = 7;
 
@@ -68,11 +68,6 @@ const normalizeName = name => name.toString()
 	.replaceAll(/[AEIOU]/g, '')
 	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
-
-function createQR(token, { ecc = 'medium', border = 4, scale = 4 } = {}) {
-	const qr = encodeQR(token, 'gif', { ecc, border, scale });
-	return new Blob([qr], { type: 'image/gif' });
-}
 
 function getLastMonth(date = new Date()) {
 	// Avoid using date getter twice
@@ -355,7 +350,7 @@ export default createHandler({
 				}, await getPrivateKey());
 
 				const qrURL = getQRCodeURL(token);
-				const qr = createQR(token);
+				const qr = createGIFBlob(token, { border: 4, scale: 4 });
 				// const qr = await fetch(qrURL, {
 				// 	headers: { Accept: 'image/png' },
 				// 	referrerPolicy: 'no-referrer',
