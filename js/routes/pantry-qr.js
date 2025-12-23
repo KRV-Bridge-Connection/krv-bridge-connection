@@ -1,8 +1,20 @@
-import { createQRCode } from '@shgysk8zer0/kazoo/qr.js';
-import { site } from '../consts.js';
+import encodeQr from 'qr';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { site } from '../consts.js';
+
+const POPOVER_ID = 'pantry-qr-popover';
+
+function createQRCode(input, {
+	ecc = 'medium',
+	border = 4,
+	scale = 12,
+	name = 'pantry-qr.gif',
+} = {}) {
+	const encoded = encodeQr(input, 'gif', { ecc, border, scale });
+	return new File([encoded], name, { type: 'image/gif' });
+}
 
 const postalCodes = {
 	'alta sierra': '95949',
@@ -23,14 +35,14 @@ const postalCodes = {
 };
 
 const pantryQRChange = registerCallback('pantry:qr:locality:change', ({ target: { value, form } }) => {
-	const val = value.toLowerCase().replaceAll(/[^A-Za-z ]/g, '');
+	const val = value.toLowerCase().replaceAll(/[^a-z ]/g, '');
 
 	if (typeof postalCodes[val] === 'string') {
 		form.elements.namedItem('postalCode').value = postalCodes[val];
 	}
 });
 
-const pantryQRSubmit = registerCallback('pantry:qr:submit', event => {
+const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 	event.preventDefault();
 	const { promise, resolve, reject } = Promise.withResolvers();
 	const controller = new AbortController();
@@ -39,21 +51,30 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', event => {
 	try {
 		submitter.disabled = true;
 		const params = new URLSearchParams(new FormData(target));
-		const qr = createQRCode(`https://krvbridge.org/pantry/?${params}`, { size: 480 });
+		const qr = createQRCode(`https://krvbridge.org/pantry/?${params}`, {
+			name: ['givenName', 'additionalName', 'familyName', 'suffix']
+				.map(field => params.get(field))
+				.filter(field => typeof field === 'string' && field.length !== 0)
+				.map(field => field.trim().toLocaleLowerCase())
+				.join('-') + '-pantry-qr.gif'
+		 });
+		const img = document.createElement('img');
+		img.width = 480;
+		img.height = img.width;
+		img.src = URL.createObjectURL(qr);
 		const link = document.createElement('a');
-		link.href = qr.src;
-		link.target = '_blank';
-		link.referrerPolicy = 'no-referrer';
-		link.relList.add('noopener', 'noreferrer', 'external');
-		link.append(qr);
+		link.href = img.src;
+		link.download = qr.name;
+		link.append(img);
 		link.classList.add('block');
 
 		document.getElementById('qr-container').replaceChildren(link);
-		document.getElementById('popover').showPopover();
-		document.getElementById('popover').addEventListener('toggle', ({ newState }) => {
+		document.getElementById(POPOVER_ID).showPopover();
+		document.getElementById(POPOVER_ID).addEventListener('toggle', ({ newState }) => {
 			if (newState === 'closed') {
 				resolve();
 				controller.abort();
+				URL.revokeObjectURL(img.src);
 				target.reset();
 			}
 		}, { signal: controller.signal });
@@ -130,9 +151,9 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 		<button type="reset" class="btn btn-danger">Clear</button>
 	</div>
 </form>
-<div id="popover" popover="manual">
+<div id="${POPOVER_ID}" popover="manual">
 	<div id="qr-container"></div>
-	<button type="button" class="btn btn-primary" commandfor="popover" command="hide">Close Popover</button>
+	<button type="button" class="btn btn-primary" commandfor="${POPOVER_ID}" command="hide-popover">Close Popover</button>
 </div>`;
 
 export const title = site.title + ' | Choice Pantry Registration QRs' ;
