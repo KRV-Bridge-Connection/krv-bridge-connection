@@ -10,6 +10,7 @@ import {
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY, SlackImageBlock,
 } from '@shgysk8zer0/slack';
+import encodeQR from 'qr';
 
 const QZONE = 7;
 
@@ -67,6 +68,11 @@ const normalizeName = name => name.toString()
 	.replaceAll(/[AEIOU]/g, '')
 	.replaceAll(/([A-Z])\1+/g, '$1')
 	.replaceAll(PHONETIC_PATTERN, chars => REPLACEMENTS[chars] || chars);
+
+function createQR(token, { ecc = 'medium', border = 4, scale = 4 } = {}) {
+	const qr = encodeQR(token, 'gif', { ecc, border, scale });
+	return new Blob([qr], { type: 'image/gif' });
+}
 
 function getLastMonth(date = new Date()) {
 	// Avoid using date getter twice
@@ -349,12 +355,13 @@ export default createHandler({
 				}, await getPrivateKey());
 
 				const qrURL = getQRCodeURL(token);
-				const qr = await fetch(qrURL, {
-					headers: { Accept: 'image/png' },
-					referrerPolicy: 'no-referrer',
-					mode: 'cors',
-					signal: req.signal,
-				}).then(resp => resp.blob());
+				const qr = createQR(token);
+				// const qr = await fetch(qrURL, {
+				// 	headers: { Accept: 'image/png' },
+				// 	referrerPolicy: 'no-referrer',
+				// 	mode: 'cors',
+				// 	signal: req.signal,
+				// }).then(resp => resp.blob());
 
 				const message = new SlackMessage(await store.PANTRY_SLACK_URL,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
@@ -389,7 +396,7 @@ export default createHandler({
 				body.set('date', date.toISOString());
 				body.set('jwt', token);
 				body.set('qr', qr);
-				body.set('qr-url', qrURL);
+				body.set('qr-url', `data:${qr.type};base64,${(await qr.bytes().then(bytes => bytes.toBase64({ alphabet: 'base64' })))}`);
 
 				await message.send({ signal: req.signal }).catch(err => console.error(err));
 				return new Response(body);
