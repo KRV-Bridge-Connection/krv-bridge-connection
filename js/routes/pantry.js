@@ -196,7 +196,7 @@ async function _alert(message, qr, { signal, name = '', date = new Date() } = {}
 
 	if (typeof qrSrc === 'string') {
 		document.querySelectorAll('.pantry-qr-dl').forEach(a => {
-			a.download = `${date.toISOString()}-${name.replaceAll(/[^A-Za-z]+/g, '-')} pantry.png`;
+			a.download = `${date.toISOString()}-${name.replaceAll(/[^A-Za-z]+/g, '-')} pantry.gif`;
 			a.href = qrSrc;
 		});
 
