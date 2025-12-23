@@ -17,11 +17,13 @@ function createQRCode(input, {
 	border = 4,
 	scale = 4,
 } = {}) {
-	const gif = encodeQR(input, { ecc, border, scale });
+	const gif = encodeQR(input, 'gif', { ecc, border, scale });
+	const blob = new Blob([gif], { type: 'image/gif' });
 	const img = document.createElement('img');
 	img.height = size;
 	img.width = size;
-	img.src = URL.createObjectURL(gif);
+	img.src = URL.createObjectURL(blob);
+	return img;
 }
 
 const ID = 'pantry-queue';
