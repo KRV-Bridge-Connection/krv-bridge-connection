@@ -71,47 +71,17 @@ async function getPost({ year, month, day, post }, signal) {
 		const url = new URL('/api/posts', location.origin);
 		url.searchParams.set('id', `${year}-${month}-${day}:${post}`);
 		return await _getPost(url.href, { signal });
-		// const { promise, resolve, reject } = Promise.withResolvers();
-		// cache.set(id, promise);
-		// console.log(`Caching & fetching ${id}`);
-
-		// const url = new URL('/api/posts', location.origin);
-		// url.searchParams.set('id', `${year}-${month}-${day}:${post}`);
-
-		// const resp = await fetch(url, {
-		// 	headers: { Accept: 'application/json' },
-		// 	referrerPolicy: 'origin',
-		// 	credentials: 'omit',
-		// 	signal,
-		// }).catch(err => err);
-
-		// if (resp instanceof Error) {
-		// 	reject(resp);
-		// } else if (! resp.ok) {
-		// 	reject(new DOMException(`${resp.url} [${resp.status} ${resp.statusText}]`, 'NetworkError'));
-		// } else {
-		// 	const data = await resp.json();
-		// 	console.log(data);
-		// 	data.created = new Date(data.created);
-		// 	data.updated = new Date(data.updated);
-		// 	cache.set(id, data);
-		// 	resolve(data);
-		// }
-
-		// return promise;
 	}
 }
 
 export default async ({
-	matches: {
-		pathname: {
-			groups: { year, month, day, post }
-		},
-	},
 	url,
 	signal,
+	params: { year, month, day, post } = {},
+	...rest
 }) => {
 	try {
+		console.log(rest);
 		const {
 			title, description, content, created,
 			author: {
@@ -127,7 +97,8 @@ export default async ({
 			} = {}
 		 } = await getPost({ year, month, day, post }, signal);
 
-		return html`<article itemtype="https://schema.org/Article" itemscope="">
+		const result = html`<section itemtype="https://schema.org/Article" itemscope="">
+		 	<article>Test</article>
 			<header>
 		 		<meta itemprop="url" content="${url}" />
 				<h2 itemprop="headline">${title}</h2>
@@ -149,7 +120,10 @@ export default async ({
 				<span>First posted on</span>
 				<time itemprop="dateCreated" datetime="${created.toISOString()}">${created.toLocaleDateString(navigator.language, dateOptions)}</time>
 			</footer>
-		</article>`;
+		</section>`;
+
+		console.log({ result });
+		return result;
 	} catch(err) {
 		return html`<div class="status-box error">${err.message}</div>`;
 	}
