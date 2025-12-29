@@ -23,7 +23,7 @@ initRouter({
 	'/pantry/queue': '/js/routes/pantry-queue.js',
 	'/contact/': '/js/routes/contact.js',
 	'/pantry/distribution': '/js/routes/pantry-distribution.js',
-	'/posts/:year(20\\d{2})/:month(0?\\d|[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
+	'/posts/:year(20\\d{2})/:month(0?\\d|1[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
 	'/event/sign-in/': '/js/routes/sign-in.js',
 	'/account/:page': '@aegisjsproject/firebase-account-routes',
 	'/account/': '@aegisjsproject/firebase-account-routes',
