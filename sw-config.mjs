@@ -38,6 +38,7 @@ const config = {
 		// Routes/modules
 		'/js/routes/partners.js',
 		'/js/routes/pantry.js',
+		'/js/routes/contact.js',
 		'/js/routes/posts.js',
 		'/js/routes/volunteer.js',
 		'/js/routes/pantry-distribution.js',
