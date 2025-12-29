@@ -3,7 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { navigate, back } from '@aegisjsproject/router';
+import { navigate, back, whenLoaded } from '@aegisjsproject/router';
 import { onClick, onChange, onSubmit, onReset, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, putAllItems, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
@@ -15,6 +15,8 @@ import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indic
 
 export const title = 'Choice Pantry Distribution';
 export const description = 'Internal app to record food distribution.';
+
+const VIDEO_ID = 'pantrty-barcode-preview';
 
 const ADD_ITEM_ID = 'pantry-manual';
 const NON_FOOD_ID = 'pantry-non-food';
@@ -538,69 +540,70 @@ export default async function({
 		setCart([]);
 	}
 
-	createBarcodeScanner(async result => {
-		if (typeof result === 'object' && typeof result.rawValue === 'string') {
-			switch (result.format) {
-				case UPC_A:
-				case UPC_E:
-				case EAN_13:
-					await _addToCart(result.rawValue);
-					break;
+	whenLoaded({ signal }).then(async () => {
+		let { wakeLock } = await createBarcodeScanner(async result => {
+			if (typeof result === 'object' && typeof result.rawValue === 'string') {
+				switch (result.format) {
+					case UPC_A:
+					case UPC_E:
+					case EAN_13:
+						await _addToCart(result.rawValue);
+						break;
 
-				case QR_CODE:
-					if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
-						try {
-							const decoded = await verifyJWT(result.rawValue, key, {
-								scope: 'pantry',
-							});
+					case QR_CODE:
+						if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
+							try {
+								const decoded = await verifyJWT(result.rawValue, key, {
+									scope: 'pantry',
+								});
 
-							if (decoded instanceof Error) {
-								throw new Error('Error validating token. It may be invalid or expired.', { cause: decoded });
-							} else {
-								const {
-									nbf,
-									exp,
-									txn: id,
-									toe: timestamp,
-									sub: name,
-									// given_name: givenName,
-									// family_name: familyName,
-									authorization_details: {
-										household,
-										points,
-									} = {}
-								} = decoded;
+								if (decoded instanceof Error) {
+									throw new Error('Error validating token. It may be invalid or expired.', { cause: decoded });
+								} else {
+									const {
+										nbf,
+										exp,
+										txn: id,
+										toe: timestamp,
+										sub: name,
+										// given_name: givenName,
+										// family_name: familyName,
+										authorization_details: {
+											household,
+											points,
+										} = {}
+									} = decoded;
 
-								const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
-								const notBefore = new Date(nbf * 1000);
-								const expires = new Date(exp * 1000);
-								const now = Date.now();
+									const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
+									const notBefore = new Date(nbf * 1000);
+									const expires = new Date(exp * 1000);
+									const now = Date.now();
 
-								if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
-									setState('givenName', givenName);
-									setState('familyName', familyName);
-									setState('points', points);
-									setState('household', household);
-									setState('token', result.rawValue);
+									if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+										setState('givenName', givenName);
+										setState('familyName', familyName);
+										setState('points', points);
+										setState('household', household);
+										setState('token', result.rawValue);
 
-									document.getElementById('pantry-appt').value = id;
-									document.getElementById('pantry-full-name').value = name;
-									// document.getElementById('pantry-given-name').value = givenName;
-									// document.getElementById('pantry-family-name').value = familyName;
-									document.getElementById('pantry-points').value = points;
-									document.getElementById('pantry-household').value = household;
-									document.getElementById('appt-details').hidden = false;
-									document.getElementById('cart-grand-total').dataset.points = points;
-									document.getElementById('pantry-token').value = result.rawValue;
+										document.getElementById('pantry-appt').value = id;
+										document.getElementById('pantry-full-name').value = name;
+										// document.getElementById('pantry-given-name').value = givenName;
+										// document.getElementById('pantry-family-name').value = familyName;
+										document.getElementById('pantry-points').value = points;
+										document.getElementById('pantry-household').value = household;
+										document.getElementById('appt-details').hidden = false;
+										document.getElementById('cart-grand-total').dataset.points = points;
+										document.getElementById('pantry-token').value = result.rawValue;
+									}
 								}
+							} catch(err) {
+								await alert(err);
 							}
-						} catch(err) {
-							await alert(err);
 						}
-					}
+				}
 			}
-		}
-	}, { signal, formats: BARCODE_FORMATS, errorHandler: alert }).then(({ video, wakeLock }) => {
+		}, { signal, formats: BARCODE_FORMATS, errorHandler: alert, video: document.getElementById(VIDEO_ID) });
 		if (typeof wakeLock === 'undefined' && 'wakeLock' in navigator) {
 			navigate.wakeLock.request('screen').then(wakeLock => {
 				signal.addEventListener('abort', () => wakeLock.release(), { once: true });
@@ -618,15 +621,7 @@ export default async function({
 				}
 			}, { signal });
 		}
-
-		const details = document.createElement('details');
-		const summary = document.createElement('summary');
-		summary.classList.add('btn', 'btn-primary');
-		summary.textContent = 'View Camera Feed';
-		video.classList.add('fill-width');
-		details.append(summary, video);
-		document.getElementById('scanner').prepend(details, document.createElement('br'));
-	}).catch(reportError);
+	});
 
 	setTimeout(() => {
 		const status = new HTMLStatusIndicatorElement();
@@ -637,6 +632,11 @@ export default async function({
 
 	return html`
 		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
+		<details>
+			<summary class="btn btn-primary">View Camera Feed</summary>
+			<video id="${VIDEO_ID}" class="full-width"></video>
+		</details>
+		<br />
 		<fieldset class="no-border overflow-auto" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<legend>KRV Bridge Food Pantry</legend>
 			<!--<div>

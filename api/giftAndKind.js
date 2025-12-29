@@ -8,7 +8,7 @@ export default createHandler({
 		const { searchParams } = new URL(req.url);
 
 		if (! (searchParams.has('name') && searchParams.has('id'))) {
-			const start = new Date(searchParams.get('date'));
+			const start = searchParams.has('date') ? new Date(searchParams.get('date')) : new Date();
 			start.setDate(1);
 			start.setHours(0);
 			start.setMinutes(0);
