@@ -24,13 +24,8 @@ const config = {
 	fresh: [
 		/* Pages */
 		'/',
-		'/contact/',
 		'/about/',
 		'/donate/',
-		'/volunteer/',
-		'/pantry/',
-		'/pantry/distribution',
-		'/account/',
 		'/branding/',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
@@ -45,6 +40,11 @@ const config = {
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
 	stale: [
+		'/contact/',
+		'/volunteer/',
+		'/pantry/',
+		'/pantry/distribution',
+		'/account/',
 		/* Scripts */
 		'/js/index.min.js',
 		'/js/consts.js',
