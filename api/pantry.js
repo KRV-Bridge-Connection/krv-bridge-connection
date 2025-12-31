@@ -16,8 +16,6 @@ const QZONE = 7;
 
 const HOUSEHOLD_MEMBER = 'person[]';
 
-const RESET_DATE = new Date('2025-12-01T00:00');
-
 const FORMAT = {
 	dateStyle: 'medium',
 	timeStyle: 'short',
@@ -89,7 +87,7 @@ async function getRecentVisits(name, date = new Date(), { countExtra = false } =
 		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
 		['_name', '==', normalizeName(name)],
 	] : [
-		['date', '>', prior > RESET_DATE ? prior : RESET_DATE],
+		['date', '>', prior],
 		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
 		['_name', '==', normalizeName(name)],
 		['extra_trip', '==', false]
