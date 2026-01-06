@@ -40,6 +40,8 @@ const MONTHLY_VISITS = 2;
 
 const BASE_POINTS = 5;
 
+const getMonthStart = date => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0);
+
 function _getPoints(household) {
 	return PTS[Math.min(Math.max(parseInt(household), 1), MAX_HOUSEHOLD) - 1];
 }
@@ -84,11 +86,11 @@ async function getRecentVisits(name, date = new Date(), { countExtra = false } =
 
 	const filters = countExtra ? [
 		['date', '>', prior],
-		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
+		['date', '<', getMonthStart(date)],
 		['_name', '==', normalizeName(name)],
 	] : [
 		['date', '>', prior],
-		['date', '<', new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0, 0)],
+		['date', '<', getMonthStart(date)],
 		['_name', '==', normalizeName(name)],
 		['extra_trip', '==', false]
 	];
@@ -144,7 +146,6 @@ function getQRCodeURL(data, {
 }
 
 function getID(name, date = new Date()) {
-	console.log({ date });
 	const ts = Uint8Array.fromHex(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime().toString(16).padStart(16, '0'));
 	return `${ts.toBase64()}:${new TextEncoder().encode(normalizeName(name)).toBase64()}`;
 }
@@ -296,7 +297,7 @@ export default createHandler({
 				// const id = getSUID({ date: created, alphabet: 'base64url' });
 				const recentVists = await getRecentVisitCount(`${data.get('givenName')} ${data.get('familyName')} ${data.get('suffix')}`, date);
 				const normalTrip = recentVists < MONTHLY_VISITS;
-				const points = normalTrip ? _getPoints(household) : household * BASE_POINTS;
+				const points = normalTrip ? _getPoints(household) : Math.min(Math.max(household, 1), PTS.length) * BASE_POINTS;
 				const name = ['givenName', 'additionalName', 'familyName', 'suffix']
 					.map(field => data.get(field))
 					.filter(field => typeof field === 'string' && field.length !== 0)
@@ -347,14 +348,8 @@ export default createHandler({
 					}
 				}, await getPrivateKey());
 
-				const qrURL = getQRCodeURL(token);
 				const qr = createGIFBlob(token, { border: 4, scale: 4 });
-				// const qr = await fetch(qrURL, {
-				// 	headers: { Accept: 'image/png' },
-				// 	referrerPolicy: 'no-referrer',
-				// 	mode: 'cors',
-				// 	signal: req.signal,
-				// }).then(resp => resp.blob());
+				const qrURL = getQRCodeURL(token);
 
 				const message = new SlackMessage(await store.PANTRY_SLACK_URL,
 					new SlackHeaderBlock(new SlackPlainTextElement('New Food Pantry Appointment')),
