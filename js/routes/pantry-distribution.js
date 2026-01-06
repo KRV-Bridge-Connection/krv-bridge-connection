@@ -740,6 +740,7 @@ export default async function({
 			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost, id }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost, id })}>${name}</button>`).join('')}</div>
 			<hr />
 		</div>
+		<div class="flex row space-evenly">${colorBtns}</div>
 		<fieldset class="no-border" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<div class="form-group">
 				<label for="pantry-entry-name" class="input-label required">Name</label>
@@ -752,7 +753,6 @@ export default async function({
 				<label for="pantry-entry-cost" class="input-label required">Points</label>
 				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" ${onCommand}="${handleColorCommand}" ${signalAttr}="${sig}" required="" />
 			</div>
-			<div class="flex row">${colorBtns}</div>
 			<div class="form-group">
 				<label for="pantry-entry-qty" class="input-label required">Quantity</label>
 				<input type="number" name="qty" id="pantry-entry-qty" class="input" placeholder="##" min="1" max="${MAX_PER_ITEM}" step="1" value="1" required="" />
