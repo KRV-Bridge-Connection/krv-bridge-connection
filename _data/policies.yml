@@ -7,4 +7,5 @@ trusted:
   - aegis-sanitizer#html
   - pwa-install
   - aegis-router#html
+  - aegis-escape#html
   - lit-html
