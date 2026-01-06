@@ -9,6 +9,7 @@ default:
     - https://unpkg.com/@shgysk8zer0/
     - https://unpkg.com/@kernvalley/
     - https://unpkg.com/@aegisjsproject/
+    - https://unpkg.com/@lit/
     - https://www.gstatic.com/firebasejs/
     - https://unpkg.com/@highlightjs/
     - https://donorbox.org/widget.js
