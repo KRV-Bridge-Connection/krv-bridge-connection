@@ -4,7 +4,7 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { navigate, back, whenLoaded } from '@aegisjsproject/router';
-import { onClick, onChange, onSubmit, onReset, onFocus, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onFocus, onCommand, signal as signalAttr, capture, registerSignal, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, putAllItems, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
@@ -39,6 +39,17 @@ const SUGGESTED_ITEMS = [
 	'Cheese',
 	'Divert Item',
 ];
+
+const COLOR_CODES = [
+	{ label: 'green', fill: '#00ff00', pts: 6 },
+	{ label: 'yellow', fill: '#ffff00', pts: 5 },
+	{ label: 'blue', fill: '#0000ff', pts: 4 },
+	{ label: 'red', fill: '#ff0000', pts: 3 },
+	{ label: 'pink', fill: '#f477ff', pts: 2 },
+	{ label: 'orange', fill: '#ff7777', pts: 1 },
+];
+
+const colorBtns = COLOR_CODES.map(({ label, pts }) => `<button type="button" class="btn btn-custom btn-${label}" command="--set-by-color" commandfor="pantry-entry-cost" data-pts="${pts}" aria-label="${label} - ${pts} points">&nbsp;</button>`).join('\n');
 
 const NON_FOOD = [
 	{ name: 'Dog Food', id: '55CC6886-0662-4B20-80AC-6B011692082B' },
@@ -82,6 +93,12 @@ document.adoptedStyleSheets = [
 
 	#scanner > fieldset {
 		padding: 1.2em 0;
+	}
+
+	#${ADD_ITEM_ID} .btn.btn-custom {
+		width: 3em;
+		height: 3em;
+		${COLOR_CODES.map(({ label, fill }) => `&.btn-${label} {background-color: ${fill};}`).join('\n')}
 	}
 
 	#${NON_FOOD_ID}, #${ADD_ITEM_ID} {
@@ -183,6 +200,12 @@ const lockScreen = registerCallback('pantry:distribution:orientation-lock', asyn
 		if (signal instanceof AbortSignal) {
 			signal.addEventListener('abort', unlock, { once: true });
 		}
+	}
+});
+
+const handleColorCommand = registerCallback('pantry:pts:color:command', ({ currentTarget, command, source }) => {
+	if (command === '--set-by-color' && typeof source.dataset.pts === 'string') {
+		currentTarget.value = parseFloat(source.dataset.pts);
 	}
 });
 
@@ -717,6 +740,7 @@ export default async function({
 			<div class="flex row wrap quick-items" ${onClick}="${quickAdd}" ${signalAttr}="${sig}">${QUICK_ITEMS.map(({ name, cost, id }) => `<button type="button" class="btn btn-seconday" ${data({ name, cost, id })}>${name}</button>`).join('')}</div>
 			<hr />
 		</div>
+		<div class="flex row space-evenly">${colorBtns}</div>
 		<fieldset class="no-border" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<div class="form-group">
 				<label for="pantry-entry-name" class="input-label required">Name</label>
@@ -727,7 +751,7 @@ export default async function({
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-cost" class="input-label required">Points</label>
-				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" required="" />
+				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" ${onCommand}="${handleColorCommand}" ${signalAttr}="${sig}" required="" />
 			</div>
 			<div class="form-group">
 				<label for="pantry-entry-qty" class="input-label required">Quantity</label>
