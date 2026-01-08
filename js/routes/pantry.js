@@ -16,10 +16,19 @@ import {
 	isCorrectHouseholdSize, getHouseholdSizeValue, addHouseholdMember, ADD_HOUSEHOLD_MEMBER_ID,
 } from '../components/pantry.js';
 
-const MESSAGE = null;
+const OASIS_DATE = new Date('2026-02-01T00:00');
+const OASIS_SWITCHED = Date.now() > OASIS_DATE.getTime();
+const MESSAGE = OASIS_SWITCHED
+	? 'Online registration has been disabled due to the new pantry system.'
+	: `Beginning on ${OASIS_DATE.toLocaleDateString(navigator.language, {
+		weekday: 'short',
+		month: 'short',
+		day: 'numeric',
+	})} we will be switching to a new system for the Choice Pantry, which will disable online registration.`;
+
 const ID = 'pantry-form';
 const CAL_BENEFITS = 'https://benefitscal.com/';
-const CARES_FORM = '/docs/cares-form.pdf';
+// const CARES_FORM = '/docs/cares-form.pdf';
 const TIMEZONE_OFFSET = 8 * HOURS;
 const TIME_STEP = 60;
 // Options given on Neighbor Intake
@@ -307,76 +316,28 @@ const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toS
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
-export default function({
-	url,
-	state: {
-		givenName = getSearch('givenName', ''),
-		additionalName = getSearch('additionalName', ''),
-		familyName = getSearch('familyName', ''),
-		suffix = getSearch('suffix'),
-		email = getSearch('email', ''),
-		telephone = getSearch('telephone', ''),
-		household = getSearch('household', ''),
-		streetAddress = getSearch('streetAddress', ''),
-		addressLocality = getSearch('addressLocality', ''),
-		postalCode = getSearch('postalCode', ''),
-		time = '',
-		comments = '',
-		isAdmin = false,
-	},
-	signal,
-}) {
-	const date = _getDate();
-	const sig = registerSignal(signal);
-	const minDate = new Date();
-	const maxDate = new Date(Date.now() + 2 * WEEKS);
-	const { min, max, disabled } = getOpeningHours(date);
-
-	if (! isAdmin) {
-		// Not a great solution, but need something for now...
-		konami({ signal }).then(() => {
-			setState('isAdmin', true);
-			document.getElementById('pantry-date').setCustomValidity('');
-		});
-	}
-
-	// signal.addEventListener('abort', () => print.disabled = true, { once: true });
-
-	return html`<form id="${ID}" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
-		<div>
-			<h2>
-				<span itemprop="name" hidden="">KRV Bridge Connection</span>
-				<span itemprop="contactType">Emergency Choice Food Pantry</span>
-			</h2>
-			${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
-			<div class="center">
-				<a href="${url.pathname}#${ID}-fields" class="btn btn-primary btn-big">
-					<svg width="16" height="18" fill="currentColor" class="icon animation-speed-normal animation-infinite animation-ease-in-out animation-alternate trampoline">
-						<use xlink:href="/img/icons.svg#chevron-down"></use>
-					</svg>
-					<span>Register for your Emergency Choice Pantry Visit</span>
-				</a>
-			</div>
-			<br />
+export default OASIS_SWITCHED
+	? () => html`<section aria-labelledby="pantry-header">
+			<h3>Emergency Choice Pantry</h3>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
-					https://i.imgur.com/h68vmgFm.jpeg 160w,
-					https://i.imgur.com/h68vmgFl.jpeg 320w,
-					https://i.imgur.com/h68vmgFh.jpeg 640w,
-					https://i.imgur.com/h68vmgF.jpeg 2500w"
-				class="full-width"
-				sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
-				width="640"
-				height="482"
-				src="https://i.imgur.com/h68vmgFh.jpeg"
-				alt="KRV Bridge Food Pantry"
-				loading="lazy"
-				decoding="async"
-				crossorigin="anonymous"
-				itemprop="image"
-				referrerpolicy="no-referrer" />
+				https://i.imgur.com/h68vmgFm.jpeg 160w,
+				https://i.imgur.com/h68vmgFl.jpeg 320w,
+				https://i.imgur.com/h68vmgFh.jpeg 640w,
+				https://i.imgur.com/h68vmgF.jpeg 2500w"
+			class="full-width"
+			sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
+			width="640"
+			height="482"
+			src="https://i.imgur.com/h68vmgFh.jpeg"
+			alt="KRV Bridge Food Pantry"
+			loading="lazy"
+			decoding="async"
+			crossorigin="anonymous"
+			itemprop="image"
+			referrerpolicy="no-referrer" />
 			<p itemprop="description">The Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
-			temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
-			are not enough.</p>
+				temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
+				are not enough.</p>
 			<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
 			food that they want rather than a preset box of items.
 			The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
@@ -390,20 +351,6 @@ export default function({
 				</a>
 				website.
 			</p>
-		</div>
-		<section aria-labelledby="pantry-hud-notice">
-			<h3 id="pantry-hud-notice">Notice</h3>
-			<p>As part of a new food program, we are required to collect some information about you and your household.</p>
-			<p>There is a form for the Department of Housing and Urban Development (HUD) that we are required to collect information for.</p>
-			<p>
-				If you have not already done so, please print and fill out the following form and bring it with you to the pantry:
-				<a href="${CARES_FORM}" download="pantry-cares-form.pdf" target="_blank" rel="noopener noreferrer" class="btn btn-outine-primary">
-					<span>Download the CARES Form</span>
-					<svg class="current-color icon" fill="currentColor" viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-						<use xlink:href="/img/icons.svg#file-pdf"></use>
-					</svg>
-				</a>
-			</p>
 		</section>
 		<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
 			<meta itemprop="name" content="KRV Bridge Connection" />
@@ -416,82 +363,7 @@ export default function({
 				<meta itemprop="addressCountry" content="US" />
 			</div>
 		</section>
-		<fieldset id="${ID}-fields" class="no-border">
-			<legend>Register for your Emergency Choice Pantry Visit</legend>
-			<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
-			as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
-			<p class="status-box info">Fields marked with a <q>*</q> are required</p>
-			<div class="form-group flex wrap space-between">
-				<span>
-					<label for="pantry-given-name" class="input-label required">First Name</label>
-					<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name" autocomplete="given-name" ${attr({ value: givenName })} required="" />
-				</span>
-				<span>
-					<label for="pantry-additional-name" class="input-label">Middle Name</label>
-					<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" ${attr({ value: additionalName })} />
-				</span>
-				<span>
-					<label for="pantry-family-name" class="input-label required">Last Name</label>
-					<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
-				</span>
-				<span>
-					<label for="pantry-name-suffix" class="input-label">Suffix</label>
-					<input type="text"
-						name="suffix"
-						id="pantry-name-suffix"
-						class="input"
-						${attr({ value: suffix })}
-						autocomplete="honorific-suffix"
-						list="suffix-options"
-						size="3"
-						minlength="2"
-						placeholder="Jr., Sr., III, etc." />
-					<datalist id="suffix-options">
-						<option value="Jr">
-						<option value="Sr">
-						<option value="II">
-						<option value="III">
-						<option value="IV">
-					</datalist>
-				</span>
-			</div>
-			<div class="form-group">
-				<label for="pantry-email" class="input-label">Email</label>
-				<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="home email" ${attr({ value: email })} />
-			</div>
-			<div class="form-group">
-				<label for="pantry-phone" class="input-label">Phone</label>
-				<input type="tel" name="telephone" id="pantry-phone" class="input" placeholder="555-555-5555" autocomplete="mobile tel" ${attr({ value: telephone })} />
-			</div>
-			<div class="form-group">
-				<label for="pantry-street-address" class="input-label">Address</label>
-				<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" placeholder="Street Address" ${attr({ value: streetAddress })} />
-				<label for="pantry-address-locality" class="input-label required">City</label>
-				<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
-				<datalist id="pantry-towns-list">
-					${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
-				</datalist>
-				<label for="pantry-postal-code" class="input-label required">Zip Code</label>
-				<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" autocomplete="home postal-code" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
-				<datalist id="pantry-postal-list">
-					${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
-				</datalist>
-			</div>
-			<div class="form-group">
-				<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
-				${getHouseholdSize(household)}
-				<!--<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />-->
-			</div>
-			<div>
-				<p>Please provide the names for all of the people other than yourself this will be feeding</p>
-				<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
-				<button type="button" id="${ADD_HOUSEHOLD_MEMBER_ID}" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
-						<path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/>
-					</svg>
-					<span>Add Household Member</span>
-				</button>
-			</div>
+		<section>
 			<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
 			${getPantrySchedule()}
 			<p>
@@ -503,67 +375,250 @@ export default function({
 					<span>Calendar</span>
 				</a>
 			</p>
-			<div class="form-group">
-				<label for="pantry-date" class="input-label required">Pick a Date</label>
-				<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
-				<div id="pantry-date-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
-			</div>
-			<div class="form-group">
-				<label for="pantry-time" class="input-label required">Pick a Time</label>
-				<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} step="${TIME_STEP}" required="" />
-				<div id="pantry-time-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
-			</div>
-			<div class="form-group">
-				<label for="pantry-comments" class="input-label">
-					<span>Additional Resource Request</span>
-					<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
-				</label>
-				<textarea name="comments" id="pantry-comments" class="input" placeholder="Please describe any other needs or support you are looking for." cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
-				<p><b>Note:</b> By adding additional comments about your needs and circumstances, you agree to allow us to share any relevant information with our partners for the purpose of connecting you with resources they may offer you.</p>
+		</section>`
+	: function({
+		url,
+		state: {
+			givenName = getSearch('givenName', ''),
+			additionalName = getSearch('additionalName', ''),
+			familyName = getSearch('familyName', ''),
+			suffix = getSearch('suffix'),
+			email = getSearch('email', ''),
+			telephone = getSearch('telephone', ''),
+			household = getSearch('household', ''),
+			streetAddress = getSearch('streetAddress', ''),
+			addressLocality = getSearch('addressLocality', ''),
+			postalCode = getSearch('postalCode', ''),
+			time = '',
+			comments = '',
+			isAdmin = false,
+		},
+		signal,
+	}) {
+		const date = _getDate();
+		const sig = registerSignal(signal);
+		const minDate = new Date();
+		const maxDate = new Date(Math.min(Date.now() + 2 * WEEKS, OASIS_DATE));
+		const { min, max, disabled } = getOpeningHours(date);
+
+		if (! isAdmin) {
+			// Not a great solution, but need something for now...
+			konami({ signal }).then(() => {
+				setState('isAdmin', true);
+				document.getElementById('pantry-date').setCustomValidity('');
+			});
+		}
+
+		// signal.addEventListener('abort', () => print.disabled = true, { once: true });
+
+		return html`<form id="${ID}" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+			<div>
+				<h2>
+					<span itemprop="name" hidden="">KRV Bridge Connection</span>
+					<span itemprop="contactType">Emergency Choice Food Pantry</span>
+				</h2>
+				${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
+				<div class="center">
+					<a href="${url.pathname}#${ID}-fields" class="btn btn-primary btn-big">
+						<svg width="16" height="18" fill="currentColor" class="icon animation-speed-normal animation-infinite animation-ease-in-out animation-alternate trampoline">
+							<use xlink:href="/img/icons.svg#chevron-down"></use>
+						</svg>
+						<span>Register for your Emergency Choice Pantry Visit</span>
+					</a>
+				</div>
+				<br />
+				<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
+						https://i.imgur.com/h68vmgFm.jpeg 160w,
+						https://i.imgur.com/h68vmgFl.jpeg 320w,
+						https://i.imgur.com/h68vmgFh.jpeg 640w,
+						https://i.imgur.com/h68vmgF.jpeg 2500w"
+					class="full-width"
+					sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
+					width="640"
+					height="482"
+					src="https://i.imgur.com/h68vmgFh.jpeg"
+					alt="KRV Bridge Food Pantry"
+					loading="lazy"
+					decoding="async"
+					crossorigin="anonymous"
+					itemprop="image"
+					referrerpolicy="no-referrer" />
+				<p itemprop="description">The Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
+				temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
+				are not enough.</p>
+				<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
+				food that they want rather than a preset box of items.
+				The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
 				<p>
-					Looking for something specific? Our <a href="/resources/" target="_blank" class="no-router">resources directory <svg class="icon" height="18" width="18" fill="currentColor" role="presentation" aria-hidden="true"><use href="/img/icons.svg#link-external"></use></svg></a> has an extensive list of community partners and services.
+					Apply for food assistance in California through the official
+					<a href="${CAL_BENEFITS}" class="btn btn-link" target="_blank" rel="noopener noreferrer">
+						<span>CalFresh (SNAP/Food Stamps)</span>
+						<svg class="icon" width="18" height="18" fill="currentColor" role="presentation" aria-hidden="true">
+							<use href="/img/icons.svg#link-external"></use>
+						</svg>
+					</a>
+					website.
 				</p>
 			</div>
-		</fieldset>
-		<div class="flex row">
-			<button type="submit" class="btn btn-success btn-lg">Submit</button>
-			<button type="reset" class="btn btn-danger btn-lg">Cancel</button>
-		</div>
-	</form>
-	<dialog id="pantry-message">
-		<p id="pantry-message-content"></p>
-		<div id="pantry-token-qr">
-			<div class="center pantry-qr">
-				<a id="pantry-dl-container" class="pantry-qr-dl" download="krv-pantry-qr.png">
-					<img id="pantry-qr-img" class="card qr-code" decoding="async" />
-				</a>
+			<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
+				<meta itemprop="name" content="KRV Bridge Connection" />
+				<h3 id="pantry-address">Address</h3>
+				<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
+				<div>
+					<span itemprop="addressLocality">Lake Isabella</span>,
+					<span itemprop="addressRegion">CA</span>
+					<meta itemprop="postalCode" content="93240" />
+					<meta itemprop="addressCountry" content="US" />
+				</div>
+			</section>
+			<fieldset id="${ID}-fields" class="no-border">
+				<legend>Register for your Emergency Choice Pantry Visit</legend>
+				<p>To ensure we can serve you, an registration is required. Using this form is the only way to see our most up-to-date hours,
+				as we quickly update it to reflect any unexpected closures, such as those caused by low food inventory or other issues.</p>
+				<p class="status-box info">Fields marked with a <q>*</q> are required</p>
+				<div class="form-group flex wrap space-between">
+					<span>
+						<label for="pantry-given-name" class="input-label required">First Name</label>
+						<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name" autocomplete="given-name" ${attr({ value: givenName })} required="" />
+					</span>
+					<span>
+						<label for="pantry-additional-name" class="input-label">Middle Name</label>
+						<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" ${attr({ value: additionalName })} />
+					</span>
+					<span>
+						<label for="pantry-family-name" class="input-label required">Last Name</label>
+						<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
+					</span>
+					<span>
+						<label for="pantry-name-suffix" class="input-label">Suffix</label>
+						<input type="text"
+							name="suffix"
+							id="pantry-name-suffix"
+							class="input"
+							${attr({ value: suffix })}
+							autocomplete="honorific-suffix"
+							list="suffix-options"
+							size="3"
+							minlength="2"
+							placeholder="Jr., Sr., III, etc." />
+						<datalist id="suffix-options">
+							<option value="Jr">
+							<option value="Sr">
+							<option value="II">
+							<option value="III">
+							<option value="IV">
+						</datalist>
+					</span>
+				</div>
+				<div class="form-group">
+					<label for="pantry-email" class="input-label">Email</label>
+					<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="home email" ${attr({ value: email })} />
+				</div>
+				<div class="form-group">
+					<label for="pantry-phone" class="input-label">Phone</label>
+					<input type="tel" name="telephone" id="pantry-phone" class="input" placeholder="555-555-5555" autocomplete="mobile tel" ${attr({ value: telephone })} />
+				</div>
+				<div class="form-group">
+					<label for="pantry-street-address" class="input-label">Address</label>
+					<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" placeholder="Street Address" ${attr({ value: streetAddress })} />
+					<label for="pantry-address-locality" class="input-label required">City</label>
+					<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
+					<datalist id="pantry-towns-list">
+						${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
+					</datalist>
+					<label for="pantry-postal-code" class="input-label required">Zip Code</label>
+					<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" autocomplete="home postal-code" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
+					<datalist id="pantry-postal-list">
+						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
+					</datalist>
+				</div>
+				<div class="form-group">
+					<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
+					${getHouseholdSize(household)}
+					<!--<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />-->
+				</div>
+				<div>
+					<p>Please provide the names for all of the people other than yourself this will be feeding</p>
+					<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
+					<button type="button" id="${ADD_HOUSEHOLD_MEMBER_ID}" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
+							<path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/>
+						</svg>
+						<span>Add Household Member</span>
+					</button>
+				</div>
+				<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
+				${getPantrySchedule()}
+				<p>
+					<span>For other KRV Food Distributions, please see the</span>
+					<a href="/food/">
+						<svg class="icon" width="16" height="16" fill="currentColor" role="presentation" aria-hidden="true">
+							<use href="/img/icons.svg#link"></use>
+						</svg>
+						<span>Calendar</span>
+					</a>
+				</p>
+				<div class="form-group">
+					<label for="pantry-date" class="input-label required">Pick a Date</label>
+					<input type="date" name="date" id="pantry-date" class="input" min="${getDateString(minDate)}" max="${getDateString(maxDate)}" ${onChange}="${dateChange}" ${signalAttr}="${sig}" ${attr({ value: disabled && ! isAdmin ? null : date.toISOString().split('T')[0] })} required="" />
+					<div id="pantry-date-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
+				</div>
+				<div class="form-group">
+					<label for="pantry-time" class="input-label required">Pick a Time</label>
+					<input type="time" name="time" id="pantry-time" class="input" ${attr({ value: time, min, max, disabled })} step="${TIME_STEP}" required="" />
+					<div id="pantry-time-invalid">Please check <a href="${location.pathname}#general-pantry-hours" class="btn btn-link">Pantry Schedule</a></div>
+				</div>
+				<div class="form-group">
+					<label for="pantry-comments" class="input-label">
+						<span>Additional Resource Request</span>
+						<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
+					</label>
+					<textarea name="comments" id="pantry-comments" class="input" placeholder="Please describe any other needs or support you are looking for." cols="40" rows="5">${comments.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')}</textarea>
+					<p><b>Note:</b> By adding additional comments about your needs and circumstances, you agree to allow us to share any relevant information with our partners for the purpose of connecting you with resources they may offer you.</p>
+					<p>
+						Looking for something specific? Our <a href="/resources/" target="_blank" class="no-router">resources directory <svg class="icon" height="18" width="18" fill="currentColor" role="presentation" aria-hidden="true"><use href="/img/icons.svg#link-external"></use></svg></a> has an extensive list of community partners and services.
+					</p>
+				</div>
+			</fieldset>
+			<div class="flex row">
+				<button type="submit" class="btn btn-success btn-lg">Submit</button>
+				<button type="reset" class="btn btn-danger btn-lg">Cancel</button>
 			</div>
-		</div>
-		<p class="center qr-message">This QR Code is necessary to check-in to your pantry visit. <strong>Please save it</strong> and have it available when you arrive.</p>
-		<div class="flex row wrap btns">
-			<a id="pantry-qr-download" class="btn btn-success pantry-qr-dl" download="krv-pantry-qr.png">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
-					<path fill-rule="evenodd" d="M9 12h2l-3 3-3-3h2V7h2v5zm3-8c0-.44-.91-3-4.5-3C5.08 1 3 2.92 3 5 1.02 5 0 6.52 0 8c0 1.53 1 3 3 3h3V9.7H3C1.38 9.7 1.3 8.28 1.3 8c0-.17.05-1.7 1.7-1.7h1.3V5c0-1.39 1.56-2.7 3.2-2.7 2.55 0 3.13 1.55 3.2 1.8v1.2H12c.81 0 2.7.22 2.7 2.2 0 2.09-2.25 2.2-2.7 2.2h-2V11h2c2.08 0 4-1.16 4-3.5C16 5.06 14.08 4 12 4z"/>
-				</svg>
-				<span>Save QR Code</span>
-			</a>
-			<button type="button" class="btn btn-primary" command="${ROOT_COMMANDS.print}" commandfor="doc">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
-					<path d="M2 4c-.5 0-1 .5-1 1v4c0 .5.5 1 1 1h1V8h10v2h1c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1zm2-3v2h8V1z"/>
-					<path d="M4 9v5h8V9z"/>
-				</svg>
-				<span>Print</span>
-			</button>
-			<button type="button" class="btn btn-secondary" command="close" commandfor="pantry-message">
-				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
-					<use href="/img/icons.svg#x"></use>
-				</svg>
-				<span>Close</span>
-			</button>
-		</div>
-	</dialog>
-	${getPantryHouseholdTemplate({ signal: sig })}`;
-}
+		</form>
+		<dialog id="pantry-message">
+			<p id="pantry-message-content"></p>
+			<div id="pantry-token-qr">
+				<div class="center pantry-qr">
+					<a id="pantry-dl-container" class="pantry-qr-dl" download="krv-pantry-qr.png">
+						<img id="pantry-qr-img" class="card qr-code" decoding="async" />
+					</a>
+				</div>
+			</div>
+			<p class="center qr-message">This QR Code is necessary to check-in to your pantry visit. <strong>Please save it</strong> and have it available when you arrive.</p>
+			<div class="flex row wrap btns">
+				<a id="pantry-qr-download" class="btn btn-success pantry-qr-dl" download="krv-pantry-qr.png">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+						<path fill-rule="evenodd" d="M9 12h2l-3 3-3-3h2V7h2v5zm3-8c0-.44-.91-3-4.5-3C5.08 1 3 2.92 3 5 1.02 5 0 6.52 0 8c0 1.53 1 3 3 3h3V9.7H3C1.38 9.7 1.3 8.28 1.3 8c0-.17.05-1.7 1.7-1.7h1.3V5c0-1.39 1.56-2.7 3.2-2.7 2.55 0 3.13 1.55 3.2 1.8v1.2H12c.81 0 2.7.22 2.7 2.2 0 2.09-2.25 2.2-2.7 2.2h-2V11h2c2.08 0 4-1.16 4-3.5C16 5.06 14.08 4 12 4z"/>
+					</svg>
+					<span>Save QR Code</span>
+				</a>
+				<button type="button" class="btn btn-primary" command="${ROOT_COMMANDS.print}" commandfor="doc">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+						<path d="M2 4c-.5 0-1 .5-1 1v4c0 .5.5 1 1 1h1V8h10v2h1c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1zm2-3v2h8V1z"/>
+						<path d="M4 9v5h8V9z"/>
+					</svg>
+					<span>Print</span>
+				</button>
+				<button type="button" class="btn btn-secondary" command="close" commandfor="pantry-message">
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon" fill="currentColor" aria-hidden="true">
+						<use href="/img/icons.svg#x"></use>
+					</svg>
+					<span>Close</span>
+				</button>
+			</div>
+		</dialog>
+		${getPantryHouseholdTemplate({ signal: sig })}`;
+	};
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
 
