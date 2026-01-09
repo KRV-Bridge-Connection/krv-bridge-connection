@@ -145,9 +145,9 @@ function getQRCodeURL(data, {
 	return url;
 }
 
-function getID(name, date = new Date()) {
+function getID(name, date = new Date(), { alphabet = 'base64url' } = {}) {
 	const ts = Uint8Array.fromHex(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime().toString(16).padStart(16, '0'));
-	return `${ts.toBase64()}:${new TextEncoder().encode(normalizeName(name)).toBase64()}`;
+	return `${ts.toBase64({ alphabet })}:${new TextEncoder().encode(normalizeName(name)).toBase64({ alphabet })}`;
 }
 
 export default createHandler({
@@ -305,7 +305,6 @@ export default createHandler({
 
 				const _name = normalizeName(name);
 				const id = getID(_name, date);
-
 
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
