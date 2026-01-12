@@ -389,6 +389,7 @@ export default OASIS_SWITCHED
 			streetAddress = getSearch('streetAddress', ''),
 			addressLocality = getSearch('addressLocality', ''),
 			postalCode = getSearch('postalCode', ''),
+			bDay = '',
 			time = '',
 			comments = '',
 			isAdmin = false,
@@ -479,7 +480,7 @@ export default OASIS_SWITCHED
 				<div class="form-group flex wrap space-between">
 					<span>
 						<label for="pantry-given-name" class="input-label required">First Name</label>
-						<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name" autocomplete="given-name" ${attr({ value: givenName })} required="" />
+						<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name *" autocomplete="given-name" ${attr({ value: givenName })} required="" />
 					</span>
 					<span>
 						<label for="pantry-additional-name" class="input-label">Middle Name</label>
@@ -487,7 +488,7 @@ export default OASIS_SWITCHED
 					</span>
 					<span>
 						<label for="pantry-family-name" class="input-label required">Last Name</label>
-						<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="family-name" ${attr({ value: familyName })} required="" />
+						<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name *" autocomplete="family-name" ${attr({ value: familyName })} required="" />
 					</span>
 					<span>
 						<label for="pantry-name-suffix" class="input-label">Suffix</label>
@@ -511,6 +512,10 @@ export default OASIS_SWITCHED
 					</span>
 				</div>
 				<div class="form-group">
+					<label for="pantry-bday" class="input-label required">Birthdate</label>
+					<input type="date" name="bDay" id="pantry-bday" class="input" autocomplete="bday" placeholder="YYYY-MM-DD *" ${attr({ value: bDay })} required="" />
+				</div>
+				<div class="form-group">
 					<label for="pantry-email" class="input-label">Email</label>
 					<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="home email" ${attr({ value: email })} />
 				</div>
@@ -522,12 +527,12 @@ export default OASIS_SWITCHED
 					<label for="pantry-street-address" class="input-label">Address</label>
 					<input type="text" name="streetAddress" id="pantry-street-address" class="input" autocomplete="street-address" placeholder="Street Address" ${attr({ value: streetAddress })} />
 					<label for="pantry-address-locality" class="input-label required">City</label>
-					<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
+					<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town/City *" autocomplete="address-level2" list="pantry-towns-list" ${attr({ value: addressLocality })} ${onChange}="${updateZip}" required="" />
 					<datalist id="pantry-towns-list">
 						${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
 					</datalist>
 					<label for="pantry-postal-code" class="input-label required">Zip Code</label>
-					<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" autocomplete="home postal-code" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
+					<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="##### *" autocomplete="home postal-code" list="pantry-postal-list" ${attr({ value: postalCode })} required="" />
 					<datalist id="pantry-postal-list">
 						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
 					</datalist>
@@ -535,7 +540,7 @@ export default OASIS_SWITCHED
 				<div class="form-group">
 					<label for="pantry-household-size" class="input-label required">How Many People Will This Feed?</label>
 					${getHouseholdSize(household)}
-					<!--<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />-->
+					<!--<input type="number" name="household" id="pantry-household-size" class="input" placeholder="## *" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />-->
 				</div>
 				<div>
 					<p>Please provide the names for all of the people other than yourself this will be feeding</p>

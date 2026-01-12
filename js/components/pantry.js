@@ -45,7 +45,7 @@ export const pantryHouseholdSizeChange = registerCallback('pantry:household_size
 	}
 });
 
-export const getHouseholdSize = household => `<input type="number" name="household" id="${HOUSEHOLD_SIZE_ID}" class="input" placeholder="##" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />`;
+export const getHouseholdSize = household => `<input type="number" name="household" id="${HOUSEHOLD_SIZE_ID}" class="input" placeholder="## *" min="1" max="8" inputmode="numeric" autocomplete="off" ${attr({ value: household })} required="" />`;
 
 export const getPantryHouseholdTemplate = ({ signal }) => `<template id="${HOUSEHOLD_TEMPLATE_ID}">
 	<li class="flex row ${HOUSEHOLD_MEMBER_CLASSNAME}">
