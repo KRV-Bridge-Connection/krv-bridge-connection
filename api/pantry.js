@@ -310,6 +310,7 @@ export default createHandler({
 				const people = data.getAll('person[]');
 				const bDays = data.getAll('bDay[]');
 				await putCollectionItem(COLLECTION, id, {
+					id,
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalName')?.trim?.(),
 					birthday: data.has('bDay') ? new Date(data.get('bDay') + 'T00:00') : null,
