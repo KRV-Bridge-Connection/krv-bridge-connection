@@ -32,6 +32,8 @@ const PTS = [
 	120, // 6
 	125, // 7
 	130, // 8
+	135, // 9
+	140, //10
 ];
 
 const MAX_HOUSEHOLD = PTS.length;
@@ -305,7 +307,8 @@ export default createHandler({
 
 				const _name = normalizeName(name);
 				const id = getID(_name, date);
-
+				const people = data.getAll('person[]');
+				const bDays = data.getAll('bDay[]');
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalyName'),
@@ -320,6 +323,7 @@ export default createHandler({
 					addressLocality: data.get('addressLocality'),
 					postalCode: data.get('postalCode'),
 					household,
+					householdMembers: people.map((name, i) => ({ name, birthday: new Date(bDays[i] + 'T00:00') })),
 					comments,
 					created,
 					extra_trip: ! normalTrip,
