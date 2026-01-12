@@ -303,6 +303,10 @@ export default async ({ signal: sig }) => {
 					</span>
 				</div>
 				<div class="form-group">
+					<label for="pantry-bday" class="input-label required">Birthdate</label>
+					<input type="date" name="bDay" id="pantry-bday" class="input" autocomplete="bday" placeholder="YYYY-MM-DD *" required="" />
+				</div>
+				<div class="form-group">
 					<label for="${ADD_FORM_ID}-email" class="input-label">Email</label>
 					<input type="email" name="email" id="${ADD_FORM_ID}-email" class="input" placeholder="user@example.com" />
 				</div>

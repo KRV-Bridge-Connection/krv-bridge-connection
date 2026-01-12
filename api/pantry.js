@@ -272,7 +272,7 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 		const missing = [
-			'givenName', 'familyName', 'addressLocality', 'postalCode', 'date', 'time',
+			'givenName', 'familyName', 'addressLocality', 'postalCode', 'date', 'time'
 		].filter(field => ! data.has(field));
 
 		if (missing.length === 0) {
@@ -309,6 +309,7 @@ export default createHandler({
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
 					additionalName: data.get('additionalyName'),
+					birthday: data.has('bDay') ? new Date(data.get('bDay') + 'T00:00') : null,
 					familyName: data.get('familyName'),
 					suffix: data.get('suffix'),
 					_name,
