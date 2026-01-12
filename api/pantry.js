@@ -301,7 +301,7 @@ export default createHandler({
 				const normalTrip = recentVists < MONTHLY_VISITS;
 				const points = normalTrip ? _getPoints(household) : Math.min(Math.max(household, 1), PTS.length) * BASE_POINTS;
 				const name = ['givenName', 'additionalName', 'familyName', 'suffix']
-					.map(field => data.get(field))
+					.map(field => data.has(field) ? data.get(field).trim() : null)
 					.filter(field => typeof field === 'string' && field.length !== 0)
 					.join(' ');
 
@@ -311,10 +311,10 @@ export default createHandler({
 				const bDays = data.getAll('bDay[]');
 				await putCollectionItem(COLLECTION, id, {
 					givenName: data.get('givenName'),
-					additionalName: data.get('additionalyName'),
+					additionalName: data.get('additionalName')?.trim?.(),
 					birthday: data.has('bDay') ? new Date(data.get('bDay') + 'T00:00') : null,
 					familyName: data.get('familyName'),
-					suffix: data.get('suffix'),
+					suffix: data.get('suffix')?.trim?.(),
 					_name,
 					name,
 					email,
