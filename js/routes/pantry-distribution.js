@@ -209,6 +209,28 @@ const handleColorCommand = registerCallback('pantry:pts:color:command', ({ curre
 	}
 });
 
+/**
+ * @async
+ * @param {object} appt
+ * @param {string} appt.id
+ * @param {string} appt.name
+ * @param {string} appt.givenName
+ * @param {string} appt.familyName
+ * @param {number} appt.points
+ * @param {number} appt.household
+ */
+async function setAppt({ id, name, givenName, familyName, points, household}) {
+	await scheduler?.yield?.();
+	document.getElementById('pantry-appt').value = id;
+	document.getElementById('pantry-full-name').value = name;
+	document.getElementById('pantry-given-name').value = givenName;
+	document.getElementById('pantry-family-name').value = familyName;
+	document.getElementById('pantry-points').value = points;
+	document.getElementById('pantry-household').value = household;
+	document.getElementById('appt-details').hidden = false;
+	document.getElementById('cart-grand-total').dataset.points = points;
+}
+
 const storageKey = '_lastSync:pantry:inventory';
 const STORE_NAME = 'inventory';
 const BARCODE_FORMATS = [UPC_A, UPC_E, QR_CODE, EAN_13];
@@ -608,15 +630,7 @@ export default async function({
 										setState('points', points);
 										setState('household', household);
 										setState('token', result.rawValue);
-
-										document.getElementById('pantry-appt').value = id;
-										document.getElementById('pantry-full-name').value = name;
-										document.getElementById('pantry-given-name').value = givenName;
-										document.getElementById('pantry-family-name').value = familyName;
-										document.getElementById('pantry-points').value = points;
-										document.getElementById('pantry-household').value = household;
-										document.getElementById('appt-details').hidden = false;
-										document.getElementById('cart-grand-total').dataset.points = points;
+										setAppt({ id, name, givenName, familyName, points, household });
 										document.getElementById('pantry-token').value = result.rawValue;
 									}
 								}
@@ -644,14 +658,12 @@ export default async function({
 				}
 			}, { signal });
 		}
-	});
 
-	setTimeout(() => {
 		const status = new HTMLStatusIndicatorElement();
 		status.id = STATUS_ID;
 		status.idle = true;
 		document.querySelector('#scanner .btn-success').append(status);
-	}, 2000);
+	});
 
 	return html`
 		<form id="scanner" ${onSubmit}="${submitHandler}" ${onChange}="${changeHandler}" ${onClick}="${clickHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
