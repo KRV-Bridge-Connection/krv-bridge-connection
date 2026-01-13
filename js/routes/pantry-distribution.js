@@ -589,8 +589,8 @@ export default async function({
 										txn: id,
 										toe: timestamp,
 										sub: name,
-										// given_name: givenName,
-										// family_name: familyName,
+										given_name: givenName,
+										family_name: familyName,
 										authorization_details: {
 											household,
 											points,
@@ -611,8 +611,8 @@ export default async function({
 
 										document.getElementById('pantry-appt').value = id;
 										document.getElementById('pantry-full-name').value = name;
-										// document.getElementById('pantry-given-name').value = givenName;
-										// document.getElementById('pantry-family-name').value = familyName;
+										document.getElementById('pantry-given-name').value = givenName;
+										document.getElementById('pantry-family-name').value = familyName;
 										document.getElementById('pantry-points').value = points;
 										document.getElementById('pantry-household').value = household;
 										document.getElementById('appt-details').hidden = false;
@@ -671,8 +671,10 @@ export default async function({
 				<div>
 					<b>Name:</b>
 					<input type="text" id="pantry-full-name" class="display-text" name="name" ${attr({ value: name })} readonly="" />
-					<!--<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
-					<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />-->
+					<div hidden="">
+						<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
+						<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />
+					</div>
 				</div>
 				<div>
 					<b>Points:</b>

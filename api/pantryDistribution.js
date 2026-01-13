@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadRequestError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, getCollectionItem, getCollectionItems, getCollectionItemsWhere } from './utils.js';
+import { addCollectionItem, getCollectionItem, getCollectionItems, getCollectionItemsWhere, getDocumentRef } from './utils.js';
 
 const INVENTORY = 'pantry_inventory';
 const TRANSACTIONS = 'pantry_checkout';
@@ -45,13 +45,15 @@ export default createHandler({
 			const name = cart.getAll('item[name]');
 			const qty = cart.getAll('item[qty]');
 			const items = id.map((id, i) => ({ id, name: name[i], qty: parseInt(qty[i]) }));
+			const appt = cart.has('appt') ? await getDocumentRef('pantry_schedule', cart.get('appt')?.trim?.()) : null;
 			const result = await addCollectionItem(TRANSACTIONS, {
 				orderId,
 				created,
 				items,
-				appt: cart.get('appt'),
-				givenName: cart.get('givenName'),
-				familyName: cart.get('familyName'),
+				appt,
+				name: cart.get('name')?.trim?.() ?? '',
+				givenName: cart.get('givenName')?.trim?.() ?? '',
+				familyName: cart.get('familyName')?.trim?.() ?? '',
 			});
 
 			return new Response(null, {
