@@ -340,9 +340,17 @@ export default createHandler({
 					entitlements: ['pantry:use'],
 					roles: ['guest'],
 					sub: name,
-					given_name: data.get('givenName'),
-					family_name: data.get('familyName'),
+					given_name: data.get('givenName').trim(),
+					middle_name: data.get('additionalName')?.trim?.(),
+					family_name: data.get('familyName').trim(),
+					// birthdate: data.get('bDay'),
+					// phone_number: data.get('telephone'),
+					// email: data.get('email'),
 					iat: Math.floor(created.getTime() / 1000),
+					locale: req.headers.get('Accept-Language')
+						?.split(',')[0]   // Get first preference
+						?.split(';')[0]   // Strip any parameters (like ;q=1.0)
+						?.trim() ?? 'en-US',         // Clean up whitespace,
 					nbf: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime() / 1000),
 					exp: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59).getTime() / 1000),
 					toe: Math.floor(date.getTime() / 1000),

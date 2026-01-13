@@ -1,6 +1,6 @@
 import { site, PANTRY_OPENING_HOURS } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
-import { css } from '@aegisjsproject/core/parsers/css.js';
+import { css, useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onClick, onReset, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
@@ -314,11 +314,20 @@ export const updateZip = registerCallback('pantry:form:zip-update', ({ target: {
  */
 const getDateString = date => `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 
-document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
+const [sheet, c] = useScopedStyle();
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, style, sheet];
 
 export default OASIS_SWITCHED
 	? () => html`<section aria-labelledby="pantry-header">
-			<h3>Emergency Choice Pantry</h3>
+			<h3 class="${c`
+				color: white;
+				background-color: rgba(0, 0, 0, 0.7);
+				backdrop-filter: blur(4px);
+				transition: background-color 400ms ease-in-out;
+				&:hover {
+					background-color: red;
+				}
+			`}">Emergency Choice Pantry</h3>
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
 				https://i.imgur.com/h68vmgFm.jpeg 160w,
 				https://i.imgur.com/h68vmgFl.jpeg 320w,
@@ -414,7 +423,15 @@ export default OASIS_SWITCHED
 
 		return html`<form id="${ID}" itemtype="https://schema.org/ContactPoint" itemscope="" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 			<div>
-				<h2>
+				<h2 class="${c`
+				color: white;
+				background-color: rgba(0, 0, 0, 0.7);
+				backdrop-filter: blur(4px);
+				transition: background-color 400ms ease-in-out;
+				&:hover {
+					background-color: red;
+				}
+			`}">
 					<span itemprop="name" hidden="">KRV Bridge Connection</span>
 					<span itemprop="contactType">Emergency Choice Food Pantry</span>
 				</h2>
