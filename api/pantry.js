@@ -333,6 +333,10 @@ export default createHandler({
 				});
 
 				const nowId = Date.now().toString(34);
+				const locale = req.headers.get('Accept-Language')
+					?.split(',')[0]
+					?.split(';')[0]
+					?.trim() ?? 'en-US';
 
 				const token = await createJWT({
 					iss: 'https://krvbridge.org',
@@ -340,9 +344,14 @@ export default createHandler({
 					entitlements: ['pantry:use'],
 					roles: ['guest'],
 					sub: name,
-					given_name: data.get('givenName'),
-					family_name: data.get('familyName'),
+					given_name: data.get('givenName').trim(),
+					middle_name: data.get('additionalName')?.trim?.(),
+					family_name: data.get('familyName').trim(),
+					// birthdate: data.get('bDay'),
+					// phone_number: data.get('telephone'),
+					// email: data.get('email'),
 					iat: Math.floor(created.getTime() / 1000),
+					locale,         // Clean up whitespace,
 					nbf: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime() / 1000),
 					exp: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59).getTime() / 1000),
 					toe: Math.floor(date.getTime() / 1000),
@@ -367,6 +376,7 @@ export default createHandler({
 					}),
 					new SlackDividerBlock(),
 					new SlackContextBlock({ elements: [
+						new SlackPlainTextElement(`Language: ${locale}`),
 						new SlackPlainTextElement(data.get('comments') || 'No Comments'),
 					]}),
 					new SlackImageBlock(qrURL.href, { alt: 'QR Code for JWT'}),
