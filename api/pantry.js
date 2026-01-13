@@ -351,7 +351,7 @@ export default createHandler({
 					// phone_number: data.get('telephone'),
 					// email: data.get('email'),
 					iat: Math.floor(created.getTime() / 1000),
-					locale,         // Clean up whitespace,
+					locale,
 					nbf: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime() / 1000),
 					exp: Math.floor(new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59).getTime() / 1000),
 					toe: Math.floor(date.getTime() / 1000),

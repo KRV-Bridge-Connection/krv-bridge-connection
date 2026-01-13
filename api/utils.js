@@ -45,6 +45,11 @@ export async function getCollection(collection, { envName = ENV_CERT_NAME } = {}
 	return firestore.collection(collection);
 }
 
+export async function getDocumentRef(name, id, { envName = ENV_CERT_NAME } = {}) {
+	const collection = await getCollection(name, { envName });
+	return collection.doc(id);
+}
+
 export async function getCollectionItems(name, {
 	limit = 10,
 	page = 1,
@@ -124,8 +129,8 @@ export async function getCollectionItemsWhere(name, field, operator, value) {
 }
 
 export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
-	const doc = await collection.doc(id).get();
+	const ref = await getDocumentRef(name, id, { envName });
+	const doc = await ref.get();
 
 	if (doc.exists) {
 		return { id, ...doc.data() };
@@ -135,9 +140,9 @@ export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = 
 }
 
 export async function putCollectionItem(name, id, data, { envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
+	const doc = await getDocumentRef(name, id, { envName });
 
-	return await collection.doc(id).set(data);
+	return await doc.set(data);
 }
 
 export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME } = {}) {
@@ -146,8 +151,8 @@ export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME } 
 }
 
 export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
-	await collection.doc(id).delete();
+	const doc = await getDocumentRef(name, id, { envName });
+	await doc.delete();
 	// Not sure how to tell if anything was actually deleted
 	return true;
 }
