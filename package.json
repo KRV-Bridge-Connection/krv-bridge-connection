@@ -82,7 +82,7 @@
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
     "firebase-admin": "^13.6.0",
-    "qr": "^0.5.3"
+    "qr": "^0.5.4"
   },
   "devDependencies": {
     "@shgysk8zer0/eslint-config": "^1.0.4",
