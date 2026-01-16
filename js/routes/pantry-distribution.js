@@ -475,6 +475,17 @@ const addItemSubmit = registerCallback('pantry:distribution:add:submit', async e
 	}
 });
 
+const nuScanSubmit = registerCallback('pantry:nuscan:submit', async event => {
+	event.preventDefault();
+	try {
+		const data = new FormData(event.target);
+		await _addToCart(data.get('barcode'));
+		event.target.reset();
+	} catch(err) {
+		alert(err);
+	}
+});
+
 const addItemReset = registerCallback('pantry:distribution:add:reset', ({ target }) => target.hidePopover());
 
 const exit = registerCallback('pantry:distribution:exit', async () => {
@@ -732,6 +743,7 @@ export default async function({
 			<!--<button type="reset" class="btn btn-danger">Empty Cart</button>-->
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 			<button type="button" class="btn btn-secondary" command="show-modal" commandfor="${NON_FOOD_ID}">Add Non-Food Item</button>
+			<!--<button type="button" class="btn btn-primary" command="show-modal" commandfor="nuscan-modal">Scanner</button>-->
 			<button type="button" class="btn btn-secondary" ${onClick}="${lockScreen}" ${signalAttr}="${sig}" aria-label="Lock Orientation" ${attr({ disabled: ! (screen?.orientation?.lock instanceof Function) })}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" class="icon" fill="currentColor" aria-hidden="true">
 					<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
@@ -739,6 +751,19 @@ export default async function({
 			</button>
 		</div>
 	</form>
+	<details>
+		<summary>Barcode Scanner (NuScan)</summary>
+		<form id="nuscan-form" ${onSubmit}="${nuScanSubmit}" ${signalAttr}="${sig}">
+			<fieldset class="no-border">
+				<legend>Use NuScan</legend>
+				<div class="form-group">
+					<label for="nuscan-barcode" class="input-label required">Barcode</label>
+					<input type="text" name="barcode" id="nuscan-barcode" class="input" placeholder="${'#'.repeat(12)}" minlength="12" pattern="[0-9]{12,}" autofocus="" required="" />
+				</div>
+			</fieldset>
+			<!--<button type="button" command="request-close" commandfor="nuscan-modal" class="btn btn-danger">Close</button>-->
+		</form>
+	</details>
 	<dialog id="${NON_FOOD_ID}">
 		<div class="flex row wrap" ${onClick}="${addNonFood}" ${signalAttr}="${sig}">
 			${NON_FOOD.map(({ name, id }) => `<button type="button" class="btn btn-primary" ${data({ name, id })}>${name}</button>`).join('\n')}
