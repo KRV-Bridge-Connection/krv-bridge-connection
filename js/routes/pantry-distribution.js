@@ -79,6 +79,7 @@ const QUICK_ITEMS = [
 	{ name: 'Vegetables', cost: 1, id: 'F270F0C2-C5C4-4C21-BBC7-B26EF0657271' },
 	{ name: 'Snacks', cost: 1, id: '113A4AF0-99E4-4967-B160-2D7FC80872D9' },
 	{ name: 'Granola Bar', cost: 1, id: '2FAD54D7-6C24-444F-BF66-BECF5F581F0F' },
+	{ name: 'Turkey Mini Sticks', cost: 0.25, id: '695288FB-4F56-412E-8700-F8D3C725C530' },
 	// { name: 'Baby Food', cost: 1, id: '1FB8120C-C69C-47AF-8610-B98C7476BFA8' },
 	{ name: 'Frozen Meal', cost: 5, id: '04746271-3D97-488B-BA98-01E2B8D4FDAE' },
 	// { name: 'Garden Bag', cost: 3, id: '82653B3E-18AC-4DCE-815D-B3016DCEB46C' },
