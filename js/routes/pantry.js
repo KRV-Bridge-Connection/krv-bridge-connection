@@ -110,7 +110,7 @@ const CLOSED = [
 	'2025-12-31', // New Year's Eve
 	'2026-01-01', // New Year's Day
 	'2026-01-02', // Day after New Year's
-	'2026-01-19', // Martin Luther King Jr. Day
+	// '2026-01-19', // Martin Luther King Jr. Day // Salvation Army decided to be open
 	'2026-02-16', // Presidents' Day
 	'2026-05-25', // Memorial Day
 	'2026-07-04', // Independence Day
