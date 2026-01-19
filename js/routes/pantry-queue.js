@@ -67,6 +67,7 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 
 const resetHandler = registerCallback('pantry:queue:reset', ({ target }) => {
 	target.querySelectorAll(`.${HOUSEHOLD_MEMBER_CLASSNAME}`).forEach(el => el.remove());
+	target.requestClose();
 });
 
 const _openDB = async () => await openDB(SCHEMA.name, {
