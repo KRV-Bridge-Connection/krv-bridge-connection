@@ -41,7 +41,11 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 
 	try {
 		submitter.disabled = true;
-		const data = new FormData(event.target);
+		/**
+		 * @type HTMLFormElement
+		 */
+		const target = event.target;
+		const data = new FormData(target);
 		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
 
 		const resp = await fetch('/api/pantry', {
@@ -55,6 +59,12 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 			await checkInVisit({ rawValue: jwt });
 			event.target.reset();
 			submitter.disabled = false;
+
+			if (submitter?.dataset?.close === 'true') {
+				document.getElementById(ADD_DIALOG_ID).requestClose();
+			} else {
+				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
 		} else {
 			const err = await resp.json();
 			throw new Error(err.error.message);
@@ -359,7 +369,8 @@ export default async ({ signal: sig }) => {
 				</div>
 			</fieldset>
 			<div class="flex row">
-				<button type="submit" class="btn btn-success">Check-In</button>
+				<button type="submit" class="btn btn-success" data-close="true">Check-In &amp; Close</button>
+				<button type="submit" class="btn btn-secondary">Check-In</button>
 				<button type="reset" class="btn btn-danger">Reset</button>
 				<button type="button" class="btn btn-warning" command="request-close" commandfor="${ADD_DIALOG_ID}">Close</button>
 			</div>

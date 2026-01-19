@@ -144,7 +144,6 @@ export default ({
 	} = history.state ?? {},
 	signal: sig,
 } = {}) => {
-	/* eslint-disable indent */
 	const signal = registerSignal(sig);
 
 	return `
