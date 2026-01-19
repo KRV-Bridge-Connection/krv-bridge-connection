@@ -38,7 +38,6 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 	event.preventDefault();
 	// Store the submitter, with a default empty object just in case.
 	const submitter = event.submitter ?? {};
-	const target = event.target;
 
 	try {
 		submitter.disabled = true;
