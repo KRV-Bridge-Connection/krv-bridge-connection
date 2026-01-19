@@ -41,7 +41,11 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 
 	try {
 		submitter.disabled = true;
-		const data = new FormData(event.target);
+		/**
+		 * @type HTMLFormElement
+		 */
+		const target = event.target;
+		const data = new FormData(target);
 		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
 
 		const resp = await fetch('/api/pantry', {
@@ -58,6 +62,8 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 
 			if (submitter?.dataset?.close === 'true') {
 				document.getElementById(ADD_DIALOG_ID).requestClose();
+			} else {
+				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			}
 		} else {
 			const err = await resp.json();
