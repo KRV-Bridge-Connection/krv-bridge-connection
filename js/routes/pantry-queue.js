@@ -364,8 +364,8 @@ export default async ({ signal: sig }) => {
 				</div>
 			</fieldset>
 			<div class="flex row">
-				<button type="submit" class="btn btn-success">Check-In</button>
 				<button type="submit" class="btn btn-success" data-close="true">Check-In &amp; Close</button>
+				<button type="submit" class="btn btn-secondary">Check-In</button>
 				<button type="reset" class="btn btn-danger">Reset</button>
 				<button type="button" class="btn btn-warning" command="request-close" commandfor="${ADD_DIALOG_ID}">Close</button>
 			</div>
