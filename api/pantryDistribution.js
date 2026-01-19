@@ -49,7 +49,7 @@ export default createHandler({
 			const apptId = cart.get('appt');
 			const items = id.map((id, i) => ({ id, name: name[i], qty: parseInt(qty[i]) }));
 			const appt = typeof apptId === 'string' && apptId.length !== 0 ? await getDocumentRef('pantry_schedule', apptId.trim()) : null;
-			const succeeded = await putCollectionItem(TRANSACTIONS, '', {
+			const succeeded = await putCollectionItem(TRANSACTIONS, orderId, {
 				orderId,
 				created,
 				items,
