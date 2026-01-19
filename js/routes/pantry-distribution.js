@@ -372,12 +372,14 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 	const body = new FormData(target);
 
 	try {
-		status.reset({ idle: false });
-		submitter.disabled = true;
-
 		if (! body.has('item[id]')) {
 			throw new Error('No items in cart.');
 		} else  if (await confirm('Complete checkout?')) {
+			if (submitter instanceof HTMLButtonElement) {
+				submitter.disabled = true;
+			}
+
+			status.reset({ idle: false });
 			const resp = await fetch(PANTRY_ENDPOINT, {
 				method: 'POST',
 				body: new FormData(target),
@@ -398,7 +400,10 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 		alert(err);
 	} finally {
 		setTimeout(() => status.idle = true, 3000);
-		submitter.disabled = false;
+
+		if (submitter instanceof HTMLButtonElement) {
+			submitter.disabled = false;
+		}
 	}
 });
 
@@ -567,6 +572,7 @@ preloadRxing();
 export default async function({
 	state: {
 		token = '',
+		name = '',
 		givenName = '',
 		familyName = '',
 		household = '',
@@ -637,6 +643,7 @@ export default async function({
 									const now = Date.now();
 
 									if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
+										setState('name', name);
 										setState('givenName', givenName);
 										setState('familyName', familyName);
 										setState('points', points);

@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadRequestError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, getCollectionItem, getCollectionItems, getCollectionItemsWhere, getDocumentRef } from './utils.js';
+import { getCollectionItem, getCollectionItems, getCollectionItemsWhere, getDocumentRef, putCollectionItem } from './utils.js';
 
 const INVENTORY = 'pantry_inventory';
 const TRANSACTIONS = 'pantry_checkout';
@@ -38,15 +38,18 @@ export default createHandler({
 		const orderId = crypto.randomUUID();
 		const created = new Date();
 		const id = cart.getAll('item[id]');
+		const name = cart.getAll('item[name]');
+		const qty = cart.getAll('item[qty]');
 
 		if (id.length === 0) {
 			throw new HTTPBadRequestError('Invalid empty request.');
+		} else if (! (id.length === name.length && id.length === qty.length)) {
+			throw new Error('Mistmatch of size of item id/name/qty.');
 		} else {
-			const name = cart.getAll('item[name]');
-			const qty = cart.getAll('item[qty]');
+			const apptId = cart.get('appt');
 			const items = id.map((id, i) => ({ id, name: name[i], qty: parseInt(qty[i]) }));
-			const appt = cart.has('appt') ? await getDocumentRef('pantry_schedule', cart.get('appt')?.trim?.()) : null;
-			const result = await addCollectionItem(TRANSACTIONS, {
+			const appt = typeof apptId === 'string' && apptId.length !== 0 ? await getDocumentRef('pantry_schedule', apptId.trim()) : null;
+			const succeeded = await putCollectionItem(TRANSACTIONS, '', {
 				orderId,
 				created,
 				items,
@@ -54,12 +57,17 @@ export default createHandler({
 				name: cart.get('name')?.trim?.() ?? '',
 				givenName: cart.get('givenName')?.trim?.() ?? '',
 				familyName: cart.get('familyName')?.trim?.() ?? '',
-			});
+			}).then(() => true).catch(() => false);
+
+			console.log(succeeded);
+
+			const url = new URL('https://krvbridge.org/api/pantry');
+			url.searchParams.set('order', orderId);
 
 			return new Response(null, {
-				status: 201,
-				headers: { location: `${req.url}?id=${result.id}` },
+				status: succeeded ? 201 : 502,
+				headers: { location: url.href },
 			});
 		}
 	}
-});
+}, { logger: console.error });
