@@ -38,6 +38,7 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 	event.preventDefault();
 	// Store the submitter, with a default empty object just in case.
 	const submitter = event.submitter ?? {};
+	const target = event.target;
 
 	try {
 		submitter.disabled = true;
@@ -55,6 +56,10 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 			await checkInVisit({ rawValue: jwt });
 			event.target.reset();
 			submitter.disabled = false;
+
+			if (submitter?.dataset?.close === 'true') {
+				document.getElementById(ADD_DIALOG_ID).requestClose();
+			}
 		} else {
 			const err = await resp.json();
 			throw new Error(err.error.message);
@@ -67,7 +72,6 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 
 const resetHandler = registerCallback('pantry:queue:reset', ({ target }) => {
 	target.querySelectorAll(`.${HOUSEHOLD_MEMBER_CLASSNAME}`).forEach(el => el.remove());
-	target.requestClose();
 });
 
 const _openDB = async () => await openDB(SCHEMA.name, {
@@ -361,6 +365,7 @@ export default async ({ signal: sig }) => {
 			</fieldset>
 			<div class="flex row">
 				<button type="submit" class="btn btn-success">Check-In</button>
+				<button type="submit" class="btn btn-success" data-close="true">Check-In &amp; Close</button>
 				<button type="reset" class="btn btn-danger">Reset</button>
 				<button type="button" class="btn btn-warning" command="request-close" commandfor="${ADD_DIALOG_ID}">Close</button>
 			</div>
