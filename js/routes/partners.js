@@ -242,7 +242,7 @@ const search211 = () => `<search>
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
-const createPartner = result => {
+export const createPartner = result => {
 	const page = html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 		<h2>
 			<span itemprop="name">${result.name}</span>
@@ -281,7 +281,7 @@ const createPartner = result => {
 	return page;
 };
 
-const createPartners = results => results.sort(sortPartners).map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
+export const createPartners = results => results.sort(sortPartners).map(({ name, description, image, partner = false, id }) => `<div id="${id}" class="card org-card" ${data({ orgName: name })}>
 	<b class="block partner-name">${name}</b>
 	${typeof image?.src === 'string'
 		? `<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
@@ -299,7 +299,7 @@ const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty(storageKey)
 	? navigator.onLine ? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl : false
 	: true;
 
-async function syncDB(db, { signal } = {}) {
+export async function syncDB(db, { signal } = {}) {
 	if (needsSync(DB_TTL)) {
 		try {
 			const url = new URL('/api/partners', location.origin);

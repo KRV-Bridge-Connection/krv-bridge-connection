@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.8] - 2026-01-21
+
+### Added
+- Add page for digital displays (TVs)
+- Add physical scanner support to pantry ditribution
+
+### Changed
+- Update pantry forms
+- Disable pantry form starting Feb 1, 2026
+
+### Changed
+- Up
+
 ## [v2.0.7] - 2025-12-10
 
 ### Changed
