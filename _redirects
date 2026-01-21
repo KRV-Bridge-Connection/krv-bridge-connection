@@ -18,4 +18,5 @@
 /event/ /dynamic.html 200
 /event/* /dynamic.html 200
 /account/* /dynamic.html 200
+/tv-display /dynamic.html 200
 /* /404.html

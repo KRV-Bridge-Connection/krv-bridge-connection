@@ -1,4 +1,5 @@
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
+
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
 import { registerRootCommand, initRootCommands } from '@aegisjsproject/commands';
@@ -27,6 +28,7 @@ initRouter({
 	'/event/sign-in/': '/js/routes/sign-in.js',
 	'/account/:page': '@aegisjsproject/firebase-account-routes',
 	'/account/': '@aegisjsproject/firebase-account-routes',
+	'/tv-display': '/js/routes/digital-signage.js',
 }, {
 	rootEl: document.getElementById('main'),
 	notFound: '/js/routes/404.js',

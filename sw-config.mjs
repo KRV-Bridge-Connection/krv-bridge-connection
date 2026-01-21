@@ -37,6 +37,7 @@ const config = {
 		'/js/routes/posts.js',
 		'/js/routes/volunteer.js',
 		'/js/routes/pantry-distribution.js',
+		'/js/routes/digital-signage.js',
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
 	stale: [
