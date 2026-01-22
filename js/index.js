@@ -18,6 +18,7 @@ initRouter({
 	'/(partners|resources)/?category=:category': '/js/routes/partners.js',
 	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
 	'/food/': '/js/routes/food-cal.js',
+	'/admin/directory': '/js/routes/directory.js',
 	'/pantry/': '/js/routes/pantry.js',
 	'/pantry/qr': '/js/routes/pantry-qr.js',
 	'/pantry/inventory': '/js/routes/inventory.js',

@@ -8,7 +8,6 @@ import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
 
 const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
-
 const [sheet, css] = useScopedStyle();
 const STORE_NAME = 'partners';
 const delay = 10_000;
@@ -205,7 +204,6 @@ export default async ({ signal }) => {
 		label.textContent = 'KRV Bridge Connection Events';
 		cal.tags = ['krv-bridge'];
 		scrollSnap.id = '_' + crypto.randomUUID();
-		// scrollSnap.registerCommand(COMMANDS.toggleFullscreen, console.log);
 		scrollSnap.classList.add(snapClass);
 		scrollSnap.delay = delay;
 		scrollSnap.addEventListener('command', ({ currentTarget, command }) => {
