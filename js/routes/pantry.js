@@ -16,7 +16,7 @@ import {
 	isCorrectHouseholdSize, getHouseholdSizeValue, addHouseholdMember, ADD_HOUSEHOLD_MEMBER_ID,
 } from '../components/pantry.js';
 
-const OASIS_DATE = new Date('2026-02-01T00:00');
+const OASIS_DATE = new Date('2026-01-23T00:00');
 const OASIS_SWITCHED = Date.now() > OASIS_DATE.getTime();
 const MESSAGE = OASIS_SWITCHED
 	? 'Online registration has been disabled due to the new pantry system.'
@@ -319,6 +319,7 @@ document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 export default OASIS_SWITCHED
 	? () => html`<section aria-labelledby="pantry-header">
 			<h3>Emergency Choice Pantry</h3>
+			${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
 			<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
 				https://i.imgur.com/h68vmgFm.jpeg 160w,
 				https://i.imgur.com/h68vmgFl.jpeg 320w,
