@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v2.0.10] - 2026-01-15
+## [v2.0.10] - 2026-01-25
 
 ### Added
 - Add basic pantry sign-in on distribution page
