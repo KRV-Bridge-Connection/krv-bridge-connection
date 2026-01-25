@@ -1,8 +1,7 @@
 import { createHandler, HTTPBadRequestError, HTTPNotFoundError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
-import { getCollectionItem, getCollectionItems, getCollectionItemsWhere, getDocumentRef, putCollectionItem } from './utils.js';
+import { getCollectionItem, getCollectionItems, getCollectionItemsWhere } from './utils.js';
 
 const INVENTORY = 'pantry_inventory';
-const TRANSACTIONS = 'pantry_checkout';
 
 export default createHandler({
 	async get(req) {
