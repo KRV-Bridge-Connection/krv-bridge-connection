@@ -14,7 +14,7 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 
 	try {
 		submitter.disabled = true;
-		const url = new URL('/pantry/queue', location.origin);
+		const url = new URL('/pantry/', location.origin);
 		const data = new FormData(target);
 		url.search = new URLSearchParams(data);
 

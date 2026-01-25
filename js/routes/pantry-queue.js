@@ -82,7 +82,7 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 		const data = new FormData(target);
 		const date = new Date();
 		const id = '_' + crypto.randomUUID();
-		const url = new URL('/pantry/', location.origin);
+		const url = new URL('/pantry/distribution', location.origin);
 		const params = new URLSearchParams(data);
 		const name = ['givenName', 'additionalName', 'familyName', 'suffix']
 			.map(field => data.has(field) ? data.get(field).trim() : null)
