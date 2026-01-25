@@ -1,5 +1,4 @@
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
-
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
 import { registerRootCommand, initRootCommands } from '@aegisjsproject/commands';
