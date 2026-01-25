@@ -73,7 +73,7 @@ export const updateZip = registerCallback('pantry:queue:zip-update', ({ target: 
 const submitHandler = registerCallback('pantry:queue:submit', async event => {
 	event.preventDefault();
 	// Store the submitter, with a default empty object just in case.
-	const { submitter, target } = event;
+	const { submitter = {}, target } = event;
 	const db = await _openDB();
 
 	try {
@@ -104,6 +104,7 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 			target.closest('dialog')?.requestClose?.();
 		}
 		await render();
+		target.reset();
 	} catch(err) {
 		alert(err.message);
 	} finally {
