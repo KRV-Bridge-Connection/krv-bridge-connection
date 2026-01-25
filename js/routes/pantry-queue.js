@@ -1,20 +1,38 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { data, attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onReset, onChange, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onReset, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { createSVGElement } from '@aegisjsproject/qr-encoder';
-import { TOWNS, ZIPS, postalCodes } from './pantry.js';
-import { HOUSEHOLD_LIST, getPantryHouseholdTemplate, pantryAddHousehold, HOUSEHOLD_MEMBER_CLASSNAME } from '../components/pantry.js';
+import { getPantryHouseholdTemplate, HOUSEHOLD_MEMBER_CLASSNAME } from '../components/pantry.js';
 
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
 const ADD_FORM_ID = 'pantry-queue-form';
 const ADD_DIALOG_ID = 'pantry-queue-modal';
+const postalCodes = {
+	'alta sierra': '95949',
+	'weldon': '93283',
+	'bodfish': '93205',
+	'south lake': '93240',
+	'mt mesa': '93240',
+	'mountain mesa': '93240',
+	'wofford heights': '93285',
+	'lake isabella': '93240',
+	'kernville': '93238',
+	'onyx': '93255',
+	'canebrake': '93255',
+	'havilah': '93518',
+	'caliente': '93518',
+	'squirrel mountain valley': '93240',
+	'squirrel valley': '93240',
+	'keyesville': '93240',
+	'keysville': '93240',
+};
 
 const key = await fetchWellKnownKey(location.origin);
 
@@ -34,6 +52,9 @@ export const updateZip = registerCallback('pantry:queue:zip-update', ({ target: 
 	}
 });
 
+/**
+ * @todo Rewrite to generate JWT here instead of POSTing
+ */
 const submitHandler = registerCallback('pantry:queue:submit', async event => {
 	event.preventDefault();
 	// Store the submitter, with a default empty object just in case.
@@ -313,52 +334,8 @@ export default async ({ signal: sig }) => {
 					</span>
 				</div>
 				<div class="form-group">
-					<label for="pantry-bday" class="input-label required">Birthdate</label>
-					<input type="date" name="bDay" id="pantry-bday" class="input" autocomplete="bday" placeholder="YYYY-MM-DD *" required="" />
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-email" class="input-label">Email</label>
-					<input type="email" name="email" id="${ADD_FORM_ID}-email" class="input" placeholder="user@example.com" />
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-phone" class="input-label">Phone</label>
-					<input type="tel" name="telephone" id="${ADD_FORM_ID}-phone" class="input" placeholder="555-555-5555" />
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-street-address" class="input-label">Address</label>
-					<input type="text" name="streetAddress" id="${ADD_FORM_ID}-street-address" class="input" placeholder="Street Address" />
-					<label for="${ADD_FORM_ID}-address-locality" class="input-label required">City</label>
-					<input type="text" name="addressLocality" id="${ADD_FORM_ID}-address-locality" class="input" placeholder="Town" list="${ADD_FORM_ID}-towns-list" ${onChange}="${updateZip}" ${signalAttr}="${signal}" required="" />
-					<datalist id="${ADD_FORM_ID}-towns-list">
-						${TOWNS.map(town => `<option label="${town}" value="${town}"></option>`).join('\n')}
-					</datalist>
-					<label for="${ADD_FORM_ID}-postal-code" class="input-label required">Zip Code</label>
-					<input type="text" name="postalCode" id="${ADD_FORM_ID}-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" list="${ADD_FORM_ID}-postal-list" required="" />
-					<datalist id="${ADD_FORM_ID}-postal-list">
-						${ZIPS.map(code => `<option value="${code}" label="${code}"></option>`).join('\n')}
-					</datalist>
-				</div>
-				<!--<div class="form-group">
-					<label for="${ADD_FORM_ID}-household-size" class="input-label required">How Many People Will This Feed?</label>
-					<input type="number" name="household" id="${ADD_FORM_ID}-household-size" class="input" placeholder="##" min="1" max="8" inputmode="numeric" required="" />
-				</div>-->
-				<div>
-					<p>Please provide the names for all of the people other than yourself this will be feeding</p>
-					<ol id="${HOUSEHOLD_LIST}" class="form-group"></ol>
-					<button type="button" class="btn btn-primary btn-lg" ${onClick}="${pantryAddHousehold}" ${signalAttr}="${sig}">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
-							<path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/>
-						</svg>
-						<span>Add Household Member</span>
-					</button>
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-date" class="input-label required">Pick a Date</label>
-					<input type="date" name="date" id="${ADD_FORM_ID}-date" class="input" ${attr({ value: new Date().toISOString().split('T')[0]})} required="" />
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-time" class="input-label required">Pick a Time</label>
-					<input type="time" name="time" id="${ADD_FORM_ID}-time" class="input" min="08:00" max="17:00" required="" />
+					<label for="${ADD_FORM_ID}-household" class="input-label required">Household Size</label>
+					<input type="number" name="household" id="${ADD_FORM_ID}-household" class="input" placeholder="##" min="1" max="10" required="" />
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-comments" class="input-label">
