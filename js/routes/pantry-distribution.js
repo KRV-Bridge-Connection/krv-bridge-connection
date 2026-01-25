@@ -236,7 +236,7 @@ const handleColorCommand = registerCallback('pantry:pts:color:command', ({ curre
  * @param {number} appt.points
  * @param {number} appt.household
  */
-async function setAppt({ id, name, points, household}) {
+async function setAppt({ id = '_' + crypto.randomUUID(), name, points, household}) {
 	await scheduler?.yield?.();
 	document.getElementById('pantry-appt').value = id;
 	document.getElementById('pantry-full-name').value = name;
@@ -252,7 +252,11 @@ async function setAppt({ id, name, points, household}) {
 async function setApptFromParams(url) {
 	if (typeof url === 'string') {
 		await setApptFromParams(URL.parse(url));
-	} else if (url instanceof URL) {
+	} else if (! (url instanceof URL)) {
+		return false;
+	} else if (url.origin !== location.origin) {
+		return false;
+	} else {
 		if (['id', 'name', 'household', 'points'].every(param => url.searchParams.has(param))) {
 			setAppt({
 				id: url.searchParams.get('id'),
@@ -266,8 +270,6 @@ async function setApptFromParams(url) {
 		} else {
 			return false;
 		}
-	} else {
-		return false;
 	}
 }
 
