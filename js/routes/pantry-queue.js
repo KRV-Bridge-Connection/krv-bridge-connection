@@ -5,11 +5,24 @@ import { onClick, onSubmit, onReset, onClose, signal as signalAttr, registerSign
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
-import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
-import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { createSVGElement } from '@aegisjsproject/qr-encoder';
 import { getPantryHouseholdTemplate, HOUSEHOLD_MEMBER_CLASSNAME } from '../components/pantry.js';
 
+const PTS = [
+	30, // 1
+	60, // 2
+	80, // 3
+	95, // 4
+	110, // 5
+	120, // 6
+	125, // 7
+	130, // 8
+	135, // 9
+	140, //10
+];
+
+const MAX_HOUSEHOLD = PTS.length;
+const BASE_POINTS = 5;
 const ID = 'pantry-queue';
 const STORE_NAME = 'pantryQueue';
 const ADD_FORM_ID = 'pantry-queue-form';
@@ -34,13 +47,15 @@ const postalCodes = {
 	'keysville': '93240',
 };
 
-const key = await fetchWellKnownKey(location.origin);
-
 const closeModal = registerCallback('pantry:queue:close-modal', ({ currentTarget }) => currentTarget.closest('dialog').close());
+
+function _getPoints(household) {
+	return PTS[Math.min(Math.max(parseInt(household), 1), MAX_HOUSEHOLD) - 1];
+}
 
 const closeAndRemove = registerCallback('pantry:queue:close-and-remove', async ({ currentTarget }) => {
 	await removeVisit(currentTarget);
-	document.getElementById(`visit-${currentTarget.dataset.txn}`).remove();
+	document.getElementById(`visit-${currentTarget.dataset.id}`).remove();
 	currentTarget.closest('dialog').close();
 });
 
@@ -58,41 +73,42 @@ export const updateZip = registerCallback('pantry:queue:zip-update', ({ target: 
 const submitHandler = registerCallback('pantry:queue:submit', async event => {
 	event.preventDefault();
 	// Store the submitter, with a default empty object just in case.
-	const submitter = event.submitter ?? {};
+	const { submitter, target } = event;
+	const db = await _openDB();
 
 	try {
 		submitter.disabled = true;
-		/**
-		 * @type HTMLFormElement
-		 */
-		const target = event.target;
 		const data = new FormData(target);
-		data.set('datetime', new Date(data.get('date') + 'T' + data.get('time')).toISOString());
+		const date = new Date();
+		const id = '_' + crypto.randomUUID();
+		const url = new URL('/pantry/distribution', location.origin);
+		const params = new URLSearchParams(data);
+		const name = ['givenName', 'additionalName', 'familyName', 'suffix']
+			.map(field => data.has(field) ? data.get(field).trim() : null)
+			.filter(field => typeof field === 'string' && field.length !== 0)
+			.join(' ');
 
-		const resp = await fetch('/api/pantry', {
-			method: 'POST',
-			body: data,
-		});
+		const household = parseInt(data.get('household'));
+		const normalTrip = ! data.has('extraTrip');
+		const points = normalTrip ? _getPoints(household) : Math.min(Math.max(household, 1), PTS.length) * BASE_POINTS;
+		params.set('name', name);
+		params.set('time', date.toISOString());
+		params.set('points', points);
+		params.set('household', household);
+		params.set('id', id);
+		url.search = params;
 
-		if (resp.ok) {
-			const body = await resp.formData();
-			const jwt = body.get('jwt');
-			await checkInVisit({ rawValue: jwt });
-			event.target.reset();
-			submitter.disabled = false;
+		await putItem(db, STORE_NAME, { sub: name, txn: id, household, points, date });
 
-			if (submitter?.dataset?.close === 'true') {
-				document.getElementById(ADD_DIALOG_ID).requestClose();
-			} else {
-				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			}
-		} else {
-			const err = await resp.json();
-			throw new Error(err.error.message);
+		if (typeof submitter.dataset.close === 'string') {
+			target.closest('dialog')?.requestClose?.();
 		}
+		await render();
 	} catch(err) {
 		alert(err.message);
+	} finally {
 		submitter.disabled = false;
+		db.close();
 	}
 });
 
@@ -116,18 +132,26 @@ async function showVisit(btn) {
 		const visit = await getVisit(btn.dataset.txn);
 
 		if (typeof visit === 'object') {
+			const url = new URL('/pantry/distribution', location.origin);
+			const params = new URLSearchParams();
+			params.set('name', visit.sub);
+			params.set('id', visit.txn);
+			params.set('household', visit.household);
+			params.set('points', visit.points);
+			params.set('date', visit.date.toISOString());
+			url.search = params;
 			const dialog = el`<dialog id="modal-${visit.txn}" ${onClose}="${closeHandler}">
 				<p>Visit scheduled for ${visit.sub} at <time ${attr({ datetime: visit.date.toISOString() })}>${visit.date.toLocaleTimeString()}</p>
-				${createSVGElement(visit.jwt, { size: 480 })}
+				${createSVGElement(url.href, { size: 480 })}
 				<hr />
 				<button type="button" class="btn btn-warning" ${onClick}="${closeModal}">Close</button>
-				<button type="button" class="btn btn-danger" ${onClick}="${closeAndRemove}" ${data({ txn: visit.txn })}>Close &amp; Remove</button>
+				<button type="button" class="btn btn-danger" ${onClick}="${closeAndRemove}" ${data({ id: visit.txn })}>Close &amp; Remove</button>
 			</dialog>`;
 
 			document.getElementById('main').append(dialog);
 			dialog.showModal();
 		} else {
-			throw new Error(`No results for ${btn.dataset.txn}.`);
+			throw new Error(`No results for ${btn.dataset.id}.`);
 		}
 	} catch(err) {
 		reportError(err);
@@ -143,7 +167,7 @@ async function removeVisit(btn) {
 
 	try {
 		const row = btn.closest('tr');
-		await deleteItem(db, STORE_NAME, btn.dataset.txn);
+		await deleteItem(db, STORE_NAME, btn.dataset.id ?? btn.dataset.txn);
 		row.remove();
 	} catch(err) {
 		reportError(err);
@@ -167,11 +191,11 @@ const clickHandler = registerCallback('pantry:queue:show', async event => {
 	}
 });
 
-async function getVisit(txn) {
+async function getVisit(id) {
 	const db = await _openDB();
 
 	try {
-		const visit = await getItem(db, STORE_NAME, txn);
+		const visit = await getItem(db, STORE_NAME, id);
 		db.close();
 		return visit;
 	} catch (err) {
@@ -185,7 +209,7 @@ async function render() {
 
 	try {
 		const visits = await getAllItems(db, STORE_NAME);
-		const rows = visits.sort(_sort).map(v => createVisitRow(v, { parse: true }));
+		const rows = visits.sort(_sort).map(({ sub: name, txn: id, household, points, date}) => createVisitRow({ name, id, household, points, date}, { parse: true }));
 
 		document.getElementById(ID).tBodies.item(0).replaceChildren(...rows);
 	} finally {
@@ -194,8 +218,6 @@ async function render() {
 }
 
 async function checkInVisit({ rawValue }) {
-	const now = Math.floor(Date.now() / 1000);
-
 	if (URL.canParse(rawValue)) {
 		const url = new URL(rawValue);
 
@@ -216,58 +238,34 @@ async function checkInVisit({ rawValue }) {
 
 			modal.showModal();
 		}
-	} else {
-		const {
-			sub,
-			toe,
-			txn,
-			authorization_details: { household, points },
-		} = await verifyJWT(rawValue, key);
-
-		const db = await _openDB();
-
-		try {
-			const date = now > toe ? new Date() : new Date(toe * 1000);
-			await putItem(db, STORE_NAME, { sub, txn, household, points, date, checkedIn: new Date(), jwt: rawValue });
-			await render();
-		} finally {
-			db.close();
-		}
 	}
-
 }
 
 preloadRxing();
 
-function createVisitRow({ sub, txn, household, date, checkedIn }, { parse = false } = {}) {
+function createVisitRow({ name, id, household, date }, { parse = false } = {}) {
 	if (parse) {
-		return html`<tr id="visit-${txn}" ${data({ txn })}>
-			<td class="visit-name">${sub}</td>
+		return html`<tr id="visit-${id}" ${data({ id })}>
+			<td class="visit-name">${name}</td>
 			<td class="visit-time">
 				<time ${attr({ datetime: date.toISOString() })}>${date.toLocaleTimeString()}</time>
 			</td>
-			<td class="visit-check-in">
-				<time ${attr({ datetime: checkedIn.toISOString() })}>${checkedIn.toLocaleTimeString()}</time>
-			</td>
 			<td>${household}</td>
 			<th>
-				<button type="button" class="btn btn-primary" ${data({ txn })} data-queue-action="show">Show QR</button>
-				<button type="button" class="btn btn-danger" ${data({ txn })} data-queue-action="remove">Remove</button>
+				<button type="button" class="btn btn-primary" ${data({ txn: id })} data-queue-action="show">Show QR</button>
+				<button type="button" class="btn btn-danger" ${data({ txn: id })} data-queue-action="remove">Remove</button>
 			</th>
 		</tr>`;
 	} else {
-		return `<tr id="visit-${txn}" ${data({ txn })}>
-			<td class="visit-name">${sub}</td>
+		return `<tr id="visit-${id}" ${data({ id })}>
+			<td class="visit-name">${name}</td>
 			<td class="visit-time">
 				<time ${attr({ datetime: date.toISOString() })}>${date.toLocaleTimeString()}</time>
 			</td>
-			<td class="visit-check-in">
-				<time ${attr({ datetime: checkedIn.toISOString() })}>${checkedIn.toLocaleTimeString()}</time>
-			</td>
 			<td>${household}</td>
 			<th>
-				<button type="button" class="btn btn-primary" ${data({ txn })} data-queue-action="show">Show QR</button>
-				<button type="button" class="btn btn-danger" ${data({ txn })} data-queue-action="remove">Remove</button>
+				<button type="button" class="btn btn-primary" ${data({ txn: id })} data-queue-action="show">Show QR</button>
+				<button type="button" class="btn btn-danger" ${data({ txn: id })} data-queue-action="remove">Remove</button>
 			</th>
 		</tr>`;
 	}
@@ -289,12 +287,11 @@ export default async ({ signal: sig }) => {
 		<thead>
 			<th>Name</th>
 			<th>Time</th>
-			<th>Check-In</th>
 			<th>Household</th>
 			<th>Actions</th>
 		</thead>
 		<tbody id="${ID}-body">
-			${visits.sort(_sort).map(createVisitRow).join('')}
+			${visits.sort(_sort).map(({ sub: name, txn: id, household, points, date }) => createVisitRow({ name, id, household, points, date })).join('')}
 		</tbody>
 	</table>
 	<dialog id="${ADD_DIALOG_ID}">
@@ -335,7 +332,11 @@ export default async ({ signal: sig }) => {
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-household" class="input-label required">Household Size</label>
-					<input type="number" name="household" id="${ADD_FORM_ID}-household" class="input" placeholder="##" min="1" max="10" required="" />
+					<input type="number" name="household" id="${ADD_FORM_ID}-household" class="input" placeholder="##" min="1" max="${MAX_HOUSEHOLD}" required="" />
+				</div>
+				<div>
+					<label for="${ADD_FORM_ID}-extra">Extra Trip</label>
+					<input type="checkbox" name="extraTrip" />
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-comments" class="input-label">

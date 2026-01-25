@@ -1,4 +1,4 @@
-import { manageState, setState } from '@aegisjsproject/state';
+import { manageState } from '@aegisjsproject/state';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
@@ -9,8 +9,6 @@ import { openDB, putAllItems, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E, EAN_13 } from '@aegisjsproject/barcodescanner';
-import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
-import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
 
 export const title = 'Choice Pantry Distribution';
@@ -40,10 +38,8 @@ const BASE_POINTS = 5;
 const SIGN_UP_ID = 'pantry-sign-up-dialog';
 
 const numberClass = 'small-numeric';
-const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 const STATUS_ID = 'pantry-submit-status';
 const ORIENTATION = 'portrait';
-const key = await fetchWellKnownKey(location.origin);
 
 const SUGGESTED_ITEMS = [
 	'Eggs',
@@ -240,17 +236,39 @@ const handleColorCommand = registerCallback('pantry:pts:color:command', ({ curre
  * @param {number} appt.points
  * @param {number} appt.household
  */
-async function setAppt({ id, name, givenName, familyName, points, household}) {
+async function setAppt({ id, name, points, household}) {
 	await scheduler?.yield?.();
 	document.getElementById('pantry-appt').value = id;
 	document.getElementById('pantry-full-name').value = name;
-	document.getElementById('pantry-given-name').value = givenName;
-	document.getElementById('pantry-family-name').value = familyName;
+	// document.getElementById('pantry-given-name').value = givenName;
+	// document.getElementById('pantry-family-name').value = familyName;
 	document.getElementById('pantry-points').value = points;
 	document.getElementById('pantry-household').value = household;
 	document.getElementById('appt-details').hidden = false;
 	document.getElementById('cart-grand-total').dataset.points = points;
-	history.replaceState({...history.state ?? {}, id, name, givenName, familyName, points, household }, '', location.href);
+	history.replaceState({...history.state ?? {}, id, name, points, household }, '', location.href);
+}
+
+async function setApptFromParams(url) {
+	if (typeof url === 'string') {
+		await setApptFromParams(URL.parse(url));
+	} else if (url instanceof URL) {
+		if (['id', 'name', 'household', 'points'].every(param => url.searchParams.has(param))) {
+			setAppt({
+				id: url.searchParams.get('id'),
+				name: url.searchParams.get('name'),
+				points: parseInt(url.searchParams.get('points')),
+				household: parseInt(url.searchParams.get('household')),
+			});
+
+			history.replaceState(history.state ?? {}, '', new URL(location.pathname, location.origin));
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
 }
 
 const storageKey = '_lastSync:pantry:inventory';
@@ -617,6 +635,7 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 preloadRxing();
 
 export default async function({
+	url,
 	state: {
 		token = '',
 		name = '',
@@ -626,7 +645,9 @@ export default async function({
 		points = '',
 	},
 	signal,
+	...rest
 } = {}) {
+	console.log(rest);
 	const sig = registerSignal(signal);
 	const closeWatcher = new CloseWatcher({ signal });
 	OTHER_ELS.forEach(id => document.getElementById(id).inert = true);
@@ -651,6 +672,10 @@ export default async function({
 	}
 
 	whenLoaded({ signal }).then(async () => {
+		if (url.searchParams.size !== 0) {
+			setApptFromParams(url);
+		}
+
 		let { wakeLock } = await createBarcodeScanner(async result => {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				switch (result.format) {
@@ -661,48 +686,8 @@ export default async function({
 						break;
 
 					case QR_CODE:
-						if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
-							try {
-								const decoded = await verifyJWT(result.rawValue, key, {
-									scope: 'pantry',
-								});
-
-								if (decoded instanceof Error) {
-									throw new Error('Error validating token. It may be invalid or expired.', { cause: decoded });
-								} else {
-									const {
-										nbf,
-										exp,
-										txn: id,
-										toe: timestamp,
-										sub: name,
-										given_name: givenName,
-										family_name: familyName,
-										authorization_details: {
-											household,
-											points,
-										} = {}
-									} = decoded;
-
-									const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
-									const notBefore = new Date(nbf * 1000);
-									const expires = new Date(exp * 1000);
-									const now = Date.now();
-
-									if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
-										setState('name', name);
-										setState('givenName', givenName);
-										setState('familyName', familyName);
-										setState('points', points);
-										setState('household', household);
-										setState('token', result.rawValue);
-										setAppt({ id, name, givenName, familyName, points, household });
-										document.getElementById('pantry-token').value = result.rawValue;
-									}
-								}
-							} catch(err) {
-								await alert(err);
-							}
+						if (URL.canParse(result.rawValue)) {
+							await setApptFromParams(new URL(result.rawValue));
 						}
 				}
 			}
