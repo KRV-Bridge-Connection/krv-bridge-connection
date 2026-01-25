@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.10] - 2026-01-25
+
+### Added
+- Add basic pantry sign-in on distribution page
+
+### Changed
+- Change all pantry QR/JWT handling
+
+### Removed
+- Remove online pantry sign-in API (POST gives an HTTP Not Implemented)
+
 ## [v2.0.8] - 2026-01-21
 
 ### Added

@@ -1,4 +1,4 @@
-import { manageState, setState } from '@aegisjsproject/state';
+import { manageState } from '@aegisjsproject/state';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
@@ -9,8 +9,6 @@ import { openDB, putAllItems, getItem, putItem } from '@aegisjsproject/idb';
 import { alert, confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE, UPC_A, UPC_E, EAN_13 } from '@aegisjsproject/barcodescanner';
-import { fetchWellKnownKey } from '@shgysk8zer0/jwk-utils/jwk.js';
-import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
 import { HTMLStatusIndicatorElement } from '@shgysk8zer0/components/status-indicator.js';
 
 export const title = 'Choice Pantry Distribution';
@@ -22,12 +20,26 @@ const ADD_ITEM_ID = 'pantry-manual';
 const NON_FOOD_ID = 'pantry-non-food';
 const MAX_PER_ITEM = 99;
 const OTHER_ELS = ['nav', 'sidebar', 'footer'];
+const PTS = [
+	30, // 1
+	60, // 2
+	80, // 3
+	95, // 4
+	110, // 5
+	120, // 6
+	125, // 7
+	130, // 8
+	135, // 9
+	140, //10
+];
+
+const MAX_HOUSEHOLD = PTS.length;
+const BASE_POINTS = 5;
+const SIGN_UP_ID = 'pantry-sign-up-dialog';
 
 const numberClass = 'small-numeric';
-const JWT_EXP = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_=]*$/;
 const STATUS_ID = 'pantry-submit-status';
 const ORIENTATION = 'portrait';
-const key = await fetchWellKnownKey(location.origin);
 
 const SUGGESTED_ITEMS = [
 	'Eggs',
@@ -190,6 +202,10 @@ const numberFormatter = new Intl.NumberFormat('en', {
 	minimumIntegerDigits: 1,
 });
 
+function _getPoints(household) {
+	return PTS[Math.min(Math.max(parseInt(household), 1), MAX_HOUSEHOLD) - 1];
+}
+
 const unlock = () => screen.orientation.unlock();
 const lockScreen = registerCallback('pantry:distribution:orientation-lock', async ({ currentTarget }) => {
 	await document.getElementById('main').requestFullscreen();
@@ -220,16 +236,41 @@ const handleColorCommand = registerCallback('pantry:pts:color:command', ({ curre
  * @param {number} appt.points
  * @param {number} appt.household
  */
-async function setAppt({ id, name, givenName, familyName, points, household}) {
+async function setAppt({ id = '_' + crypto.randomUUID(), name, points, household}) {
 	await scheduler?.yield?.();
 	document.getElementById('pantry-appt').value = id;
 	document.getElementById('pantry-full-name').value = name;
-	document.getElementById('pantry-given-name').value = givenName;
-	document.getElementById('pantry-family-name').value = familyName;
+	// document.getElementById('pantry-given-name').value = givenName;
+	// document.getElementById('pantry-family-name').value = familyName;
 	document.getElementById('pantry-points').value = points;
 	document.getElementById('pantry-household').value = household;
 	document.getElementById('appt-details').hidden = false;
 	document.getElementById('cart-grand-total').dataset.points = points;
+	history.replaceState({...history.state ?? {}, id, name, points, household }, '', location.href);
+}
+
+async function setApptFromParams(url) {
+	if (typeof url === 'string') {
+		await setApptFromParams(URL.parse(url));
+	} else if (! (url instanceof URL)) {
+		return false;
+	} else if (url.origin !== location.origin) {
+		return false;
+	} else {
+		if (['id', 'name', 'household', 'points'].every(param => url.searchParams.has(param))) {
+			setAppt({
+				id: url.searchParams.get('id'),
+				name: url.searchParams.get('name'),
+				points: parseInt(url.searchParams.get('points')),
+				household: parseInt(url.searchParams.get('household')),
+			});
+
+			history.replaceState(history.state ?? {}, '', new URL(location.pathname, location.origin));
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 const storageKey = '_lastSync:pantry:inventory';
@@ -380,19 +421,9 @@ const submitHandler = registerCallback('pantry:distribution:submit', async event
 			}
 
 			status.reset({ idle: false });
-			const resp = await fetch(PANTRY_ENDPOINT, {
-				method: 'POST',
-				body: new FormData(target),
-			}).catch(() => Response.error());
-
-			if (resp.ok) {
-				setCart([]);
-				target.reset();
-				status.resolve();
-			} else {
-				alert('Error completing transaction.');
-				status.reject();
-			}
+			setCart([]);
+			target.reset();
+			status.resolve();
 		}
 	} catch(err) {
 		status.reject();
@@ -444,6 +475,42 @@ const addNonFood = registerCallback('pantry:add:nonfood', async ({ target }) => 
 		}
 	}
 });
+
+const signUpSubmit = registerCallback('pantry:distribution:sign-up:submit', async event => {
+	event.preventDefault();;
+	const { target, submitter } = event;
+
+	try {
+		submitter.disabled = true;
+		const data = new FormData(target);
+		const name = ['givenName', 'additionalName', 'familyName', 'suffix']
+			.map(field => data.has(field) ? data.get(field).trim() : null)
+			.filter(field => typeof field === 'string' && field.length !== 0)
+			.join(' ');
+
+		const household = parseInt(data.get('household'));
+		const normalTrip = ! data.has('extraTrip');
+		const points = normalTrip ? _getPoints(household) : Math.min(Math.max(household, 1), PTS.length) * BASE_POINTS;
+
+		await setAppt({
+			id: crypto.randomUUID(),
+			name,
+			givenName: data.get('givenName'),
+			additionalName: data.get('additionalName'),
+			familyName: data.get('familyName'),
+			household,
+			points,
+		});
+
+		target.reset();
+	} catch(err) {
+		alert(err);
+	} finally {
+		submitter.disabled = false;
+	}
+});
+
+const signUpRest = registerCallback('pantry:distribution:sign-up:reset', event => event.target.closest('dialog').requestClose());
 
 const scrollToEnd = registerCallback('pantry:distribution:scroll-to-end', () => {
 	document.getElementById('pantry-cart').scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -570,6 +637,7 @@ if (! localStorage.hasOwnProperty(storageKey) || parseInt(localStorage.getItem(s
 preloadRxing();
 
 export default async function({
+	url,
 	state: {
 		token = '',
 		name = '',
@@ -579,7 +647,9 @@ export default async function({
 		points = '',
 	},
 	signal,
+	...rest
 } = {}) {
+	console.log(rest);
 	const sig = registerSignal(signal);
 	const closeWatcher = new CloseWatcher({ signal });
 	OTHER_ELS.forEach(id => document.getElementById(id).inert = true);
@@ -604,6 +674,10 @@ export default async function({
 	}
 
 	whenLoaded({ signal }).then(async () => {
+		if (url.searchParams.size !== 0) {
+			setApptFromParams(url);
+		}
+
 		let { wakeLock } = await createBarcodeScanner(async result => {
 			if (typeof result === 'object' && typeof result.rawValue === 'string') {
 				switch (result.format) {
@@ -614,48 +688,8 @@ export default async function({
 						break;
 
 					case QR_CODE:
-						if (result.rawValue.length > 50 && JWT_EXP.test(result.rawValue)) {
-							try {
-								const decoded = await verifyJWT(result.rawValue, key, {
-									scope: 'pantry',
-								});
-
-								if (decoded instanceof Error) {
-									throw new Error('Error validating token. It may be invalid or expired.', { cause: decoded });
-								} else {
-									const {
-										nbf,
-										exp,
-										txn: id,
-										toe: timestamp,
-										sub: name,
-										given_name: givenName,
-										family_name: familyName,
-										authorization_details: {
-											household,
-											points,
-										} = {}
-									} = decoded;
-
-									const date = new Date(typeof timestamp === 'string' ? timestamp : timestamp * 1000);
-									const notBefore = new Date(nbf * 1000);
-									const expires = new Date(exp * 1000);
-									const now = Date.now();
-
-									if ((now < expires.getTime() && now > notBefore.getTime()) || await confirm(`This appt was scheduled for ${date.toLocaleString()}. Allow it?`)) {
-										setState('name', name);
-										setState('givenName', givenName);
-										setState('familyName', familyName);
-										setState('points', points);
-										setState('household', household);
-										setState('token', result.rawValue);
-										setAppt({ id, name, givenName, familyName, points, household });
-										document.getElementById('pantry-token').value = result.rawValue;
-									}
-								}
-							} catch(err) {
-								await alert(err);
-							}
+						if (URL.canParse(result.rawValue)) {
+							await setApptFromParams(new URL(result.rawValue));
 						}
 				}
 			}
@@ -752,6 +786,7 @@ export default async function({
 			<button type="button" class="btn btn-secondary" popovertarget="${ADD_ITEM_ID}" popovertargetaction="show">Add Item</button>
 			<button type="button" class="btn btn-secondary" command="show-modal" commandfor="${NON_FOOD_ID}">Add Non-Food Item</button>
 			<!--<button type="button" class="btn btn-primary" command="show-modal" commandfor="nuscan-modal">Scanner</button>-->
+			<button type="button" class="btn btn-primary" command="show-modal" commandfor="${SIGN_UP_ID}">Sign-In</button>
 			<button type="button" class="btn btn-secondary" ${onClick}="${lockScreen}" ${signalAttr}="${sig}" aria-label="Lock Orientation" ${attr({ disabled: ! (screen?.orientation?.lock instanceof Function) })}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16" class="icon" fill="currentColor" aria-hidden="true">
 					<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
@@ -781,6 +816,61 @@ export default async function({
 				<use href="/img/icons.svg#x"></use>
 			</svg>
 		</button>
+	</dialog>
+	<dialog id="${SIGN_UP_ID}">
+		<form ${onSubmit}="${signUpSubmit}" ${onReset}="${signUpRest}" ${signalAttr}="${sig}">
+			<fieldset>
+				<legend>Sign-In Guest</legend>
+				<div class="form-group flex wrap space-between">
+					<span>
+						<label for="pantry-given-name" class="input-label required">First Name</label>
+						<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name *" autocomplete="given-name" required="" />
+					</span>
+					<span>
+						<label for="pantry-additional-name" class="input-label">Middle Name</label>
+						<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" />
+					</span>
+					<span>
+						<label for="pantry-family-name" class="input-label required">Last Name</label>
+						<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name *" autocomplete="family-name" required="" />
+					</span>
+					<span>
+						<label for="pantry-name-suffix" class="input-label">Suffix</label>
+						<input type="text"
+							name="suffix"
+							id="pantry-name-suffix"
+							class="input"
+							autocomplete="honorific-suffix"
+							list="suffix-options"
+							size="3"
+							minlength="2"
+							placeholder="Jr., Sr., III, etc." />
+						<datalist id="suffix-options">
+							<option value="Jr">
+							<option value="Sr">
+							<option value="II">
+							<option value="III">
+							<option value="IV">
+						</datalist>
+					</span>
+				</div>
+				<div class="form-group">
+					<label for="pantry-household" class="input-label required">Household Size</label>
+					<input type="number" name="household" id="pantry-household" class="input" min="1" max="${MAX_HOUSEHOLD}" placeholder="##" required="" />
+				</div>
+			</legend>
+			<div>
+				<button type="submit" class="btn btn-success">
+					<span>Sign-In</span>
+				</button>
+				<button type="button" class="btn btn-secondary" command="request-close" commandfor="${SIGN_UP_ID}">
+					<span>Close</span>
+				</button>
+				<button type="reset" class="btn btn-danger">
+					<span>Cancel</span>
+				</button>
+			</div>
+		</form>
 	</dialog>
 	<form id="${ADD_ITEM_ID}" popover="manual" ${onSubmit}="${addItemSubmit}" ${onReset}="${addItemReset}" ${signalAttr}="${sig}">
 		<div>

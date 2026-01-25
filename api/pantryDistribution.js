@@ -1,8 +1,7 @@
-import { createHandler, HTTPBadRequestError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
-import { getCollectionItem, getCollectionItems, getCollectionItemsWhere, getDocumentRef, putCollectionItem } from './utils.js';
+import { createHandler, HTTPBadRequestError, HTTPNotFoundError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
+import { getCollectionItem, getCollectionItems, getCollectionItemsWhere } from './utils.js';
 
 const INVENTORY = 'pantry_inventory';
-const TRANSACTIONS = 'pantry_checkout';
 
 export default createHandler({
 	async get(req) {
@@ -33,41 +32,7 @@ export default createHandler({
 			return Response.json(inventory);
 		}
 	},
-	async post(req) {
-		const cart = await req.formData();
-		const orderId = crypto.randomUUID();
-		const created = new Date();
-		const id = cart.getAll('item[id]');
-		const name = cart.getAll('item[name]');
-		const qty = cart.getAll('item[qty]');
-
-		if (id.length === 0) {
-			throw new HTTPBadRequestError('Invalid empty request.');
-		} else if (! (id.length === name.length && id.length === qty.length)) {
-			throw new Error('Mistmatch of size of item id/name/qty.');
-		} else {
-			const apptId = cart.get('appt');
-			const items = id.map((id, i) => ({ id, name: name[i], qty: parseInt(qty[i]) }));
-			const appt = typeof apptId === 'string' && apptId.length !== 0 ? await getDocumentRef('pantry_schedule', apptId.trim()) : null;
-			const succeeded = await putCollectionItem(TRANSACTIONS, orderId, {
-				orderId,
-				created,
-				items,
-				appt,
-				name: cart.get('name')?.trim?.() ?? '',
-				givenName: cart.get('givenName')?.trim?.() ?? '',
-				familyName: cart.get('familyName')?.trim?.() ?? '',
-			}).then(() => true).catch(() => false);
-
-			console.log(succeeded);
-
-			const url = new URL('https://krvbridge.org/api/pantry');
-			url.searchParams.set('order', orderId);
-
-			return new Response(null, {
-				status: succeeded ? 201 : 502,
-				headers: { location: url.href },
-			});
-		}
+	async post() {
+		throw new HTTPNotImplementedError('Pantry distribution submission has been disabled.');
 	}
-}, { logger: console.error });
+});

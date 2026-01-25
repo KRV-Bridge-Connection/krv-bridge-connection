@@ -1,36 +1,10 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { createGIFFile } from '@aegisjsproject/qr-encoder';
 import { site } from '../consts.js';
 
 const POPOVER_ID = 'pantry-qr-popover';
-
-const postalCodes = {
-	'alta sierra': '95949',
-	'weldon': '93240',
-	'bodfish': '93205',
-	'south lake': '93240',
-	'mt mesa': '93240',
-	'mountain mesa': '93240',
-	'wofford heights': '93285',
-	'lake isabella': '93240',
-	'kernville': '93238',
-	'onyx': '93255',
-	'canebrake': '93255',
-	'havilah': '93518',
-	'caliente': '93518',
-	'squirrel mountain valley': '93240',
-	'squirrel valley': '93240',
-};
-
-const pantryQRChange = registerCallback('pantry:qr:locality:change', ({ target: { value, form } }) => {
-	const val = value.toLowerCase().replaceAll(/[^a-z ]/g, '');
-
-	if (typeof postalCodes[val] === 'string') {
-		form.elements.namedItem('postalCode').value = postalCodes[val];
-	}
-});
 
 const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 	event.preventDefault();
@@ -40,11 +14,15 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 
 	try {
 		submitter.disabled = true;
-		const params = new URLSearchParams(new FormData(target));
+		const url = new URL('/pantry/', location.origin);
+		const data = new FormData(target);
+		url.search = new URLSearchParams(data);
+
+		// const params = new URLSearchParams(new FormData(target));
 		const qr = createGIFFile(
-			`https://krvbridge.org/pantry/?${params}`,
+			url.href,
 			['givenName', 'additionalName', 'familyName', 'suffix']
-				.map(field => params.get(field))
+				.map(field => data.get(field))
 				.filter(field => typeof field === 'string' && field.length !== 0)
 				.map(field => field.trim().toLocaleLowerCase())
 				.join('-') + '-pantry-qr.gif'
@@ -95,46 +73,28 @@ export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${on
 				<label for="pantry-given-name" class="input-label required">Last Name</label>
 				<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="off" required="">
 			</span>
-		</div>
-		<div class="form-group">
-			<label for="pantry-email" class="input-label">Email</label>
-			<input type="email" name="email" id="pantry-email" class="input" placeholder="user@example.com" autocomplete="off" />
-		</div>
-		<div class="form-group">
-			<label for="pantry-phone" class="input-label">Phone</label>
-			<input type="tel" name="telephone" id="pantry-phone" class="input" placeholder="555-555-5555" autocomplete="off">
-		</div>
-		<div class="form-group">
-			<label for="pantry-street-address" class="input-label">Address</label>
-			<input type="text" name="streetAddress" id="pantry-street-address" class="input" placeholder="123 Some St." autocomplete="off">
-			<label for="pantry-address-locality required" class="input-label required">City</label>
-			<input type="text" name="addressLocality" id="pantry-address-locality" class="input" placeholder="Town" autocomplete="off" list="pantry-towns-list" ${onChange}="${pantryQRChange}" required="">
-			<datalist id="pantry-towns-list">
-				<option label="South Lake" value="South Lake"></option>
-				<option label="Weldon" value="Weldon"></option>
-				<option label="Mt Mesa" value="Mt Mesa"></option>
-				<option label="Lake Isabella" value="Lake Isabella"></option>
-				<option label="Bodfish" value="Bodfish"></option>
-				<option label="Wofford Heights" value="Wofford Heights"></option>
-				<option label="Kernville" value="Kernville"></option>
-				<option label="Havilah" value="Havilah"></option>
-			</datalist>
-			<label for="pantry-postal-code" class="input-label required">Zip Code</label>
-			<input type="text" name="postalCode" id="pantry-postal-code" class="input" pattern="\d{5}" inputmode="numeric" minlength="5" maxlength="5" placeholder="#####" autocomplete="off" list="pantry-postal-list" required="">
-			<datalist id="pantry-postal-list">
-				<option value="95949" label="95949"></option>
-				<option value="93240" label="93240"></option>
-				<option value="93283" label="93283"></option>
-				<option value="93205" label="93205"></option>
-				<option value="93285" label="93285"></option>
-				<option value="93238" label="93238"></option>
-				<option value="93255" label="93255"></option>
-				<option value="93518" label="93518"></option>
-			</datalist>
+			<span>
+				<label for="${POPOVER_ID}-name-suffix" class="input-label">Suffix</label>
+				<input type="text"
+					name="suffix"
+					id="${POPOVER_ID}-name-suffix"
+					class="input"
+					list="${POPOVER_ID}-suffix-options"
+					size="3"
+					minlength="2"
+					placeholder="Jr., Sr., III, etc." />
+				<datalist id="${POPOVER_ID}-suffix-options">
+					<option value="Jr">
+					<option value="Sr">
+					<option value="II">
+					<option value="III">
+					<option value="IV">
+				</datalist>
+			</span>
 		</div>
 		<div class="form-group">
 			<label for="pantry-household-size" class="input-label required">Household Size</label>
-			<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="8" autocomplete="off" value="1" required="">
+			<input type="number" name="household" id="pantry-household-size" class="input" placeholder="##" min="1" max="10" autocomplete="off" value="1" required="">
 		</div>
 	</fieldset>
 	<div class="flex row">
