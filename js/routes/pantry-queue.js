@@ -3,6 +3,7 @@ import { data, attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onSubmit, onReset, onClose, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getItem, getAllItems, deleteItem, putItem } from '@aegisjsproject/idb';
+import { whenLoaded } from '@aegisjsproject/router';
 import { SCHEMA } from '../consts.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { createSVGElement } from '@aegisjsproject/qr-encoder';
@@ -272,7 +273,7 @@ function createVisitRow({ name, id, household, date }, { parse = false } = {}) {
 	}
 }
 
-export default async ({ signal: sig }) => {
+export default async ({ signal: sig, url }) => {
 	const signal = registerSignal(sig);
 
 	const { video } = await createBarcodeScanner(checkInVisit, { signal: sig, formats: [QR_CODE] });
@@ -358,6 +359,20 @@ export default async ({ signal: sig }) => {
 	${getPantryHouseholdTemplate({ signal })}`;
 
 	frag.querySelector('details').append(video);
+
+	if (url.searchParams.size !== 0) {
+		whenLoaded({ signal: sig }).then(() => {
+			/**
+			 * @type {HTMLFormElement}
+			 */
+			const form = document.getElementById(ADD_FORM_ID);
+			const fields = form.elements;
+
+			url.searchParams.entries().forEach(([name, value]) => Promise.try(() => fields.namedItem(name).value = value));
+			document.getElementById(ADD_DIALOG_ID).showModal();
+			history.replaceState(history.state ?? {}, '', new URL(location.pathname, location.origin));
+		});
+	}
 
 	return frag;
 };
