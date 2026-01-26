@@ -84,10 +84,7 @@ const submitHandler = registerCallback('pantry:queue:submit', async event => {
 		const id = '_' + crypto.randomUUID();
 		const url = new URL('/pantry/distribution', location.origin);
 		const params = new URLSearchParams(data);
-		const name = ['givenName', 'additionalName', 'familyName', 'suffix']
-			.map(field => data.has(field) ? data.get(field).trim() : null)
-			.filter(field => typeof field === 'string' && field.length !== 0)
-			.join(' ');
+		const name = data.get('name')?.trim?.();
 
 		const household = parseInt(data.get('household'));
 		const normalTrip = ! data.has('extraTrip');
@@ -300,37 +297,9 @@ export default async ({ signal: sig, url }) => {
 		<form id="${ADD_FORM_ID}" autocomplete="off" ${onSubmit}="${submitHandler}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
 				<legend>Emergency Choice Pantry Sign-In</legend>
-				<div class="form-group flex wrap space-between">
-					<span>
-						<label for="${ADD_FORM_ID}-given-name" class="input-label required">First Name</label>
-						<input type="text" name="givenName" id="${ADD_FORM_ID}-given-name" class="input" placeholder="First name" required="" />
-					</span>
-					<span>
-						<label for="${ADD_FORM_ID}-additional-name" class="input-label">Middle Name</label>
-						<input type="text" name="additionalName" id="${ADD_FORM_ID}-additional-name" class="input" placeholder="Middle name" />
-					</span>
-					<span>
-						<label for="${ADD_FORM_ID}-family-name" class="input-label required">Last Name</label>
-						<input type="text" name="familyName" id="${ADD_FORM_ID}-family-name" class="input" placeholder="Last name" required="" />
-					</span>
-					<span>
-						<label for="${ADD_FORM_ID}-name-suffix" class="input-label">Suffix</label>
-						<input type="text"
-							name="suffix"
-							id="${ADD_FORM_ID}-name-suffix"
-							class="input"
-							list="${ADD_FORM_ID}-suffix-options"
-							size="3"
-							minlength="2"
-							placeholder="Jr., Sr., III, etc." />
-						<datalist id="${ADD_FORM_ID}-suffix-options">
-							<option value="Jr">
-							<option value="Sr">
-							<option value="II">
-							<option value="III">
-							<option value="IV">
-						</datalist>
-					</span>
+				<div class="form-group">
+					<label for="${ADD_FORM_ID}-name" class="input-label required">Name</label>
+					<input type="text" name="name" id="${ADD_FORM_ID}-name" class="input" placeholder="Name" required="" />
 				</div>
 				<div class="form-group">
 					<label for="${ADD_FORM_ID}-household" class="input-label required">Household Size</label>
@@ -339,13 +308,6 @@ export default async ({ signal: sig, url }) => {
 				<div>
 					<label for="${ADD_FORM_ID}-extra">Extra Trip</label>
 					<input type="checkbox" name="extraTrip" />
-				</div>
-				<div class="form-group">
-					<label for="${ADD_FORM_ID}-comments" class="input-label">
-						<span>Additional Resource Request</span>
-						<p>Are there any other resouces that you may be seeking? Any circumstances that our network of partners may be able to assist you with?</p>
-					</label>
-					<textarea name="comments" id="${ADD_FORM_ID}-comments" class="input" placeholder="Please describe any other needs or support you are looking for." cols="40" rows="5"></textarea>
 				</div>
 			</fieldset>
 			<div class="flex row">
