@@ -61,7 +61,7 @@ const COLOR_CODES = [
 	{ label: 'orange', fill: '#ff7777', pts: 1 },
 ];
 
-const colorBtns = COLOR_CODES.map(({ label, pts }) => `<button type="button" class="btn btn-custom btn-${label}" command="--set-by-color" commandfor="pantry-entry-cost" data-pts="${pts}" aria-label="${label} - ${pts} points">&nbsp;</button>`).join('\n');
+const colorBtns = COLOR_CODES.map(({ label, pts }) => `<button type="button" class="btn btn-custom btn-${label}" command="--set-by-color" commandfor="${SIGN_UP_ID}-entry-cost" data-pts="${pts}" aria-label="${label} - ${pts} points">&nbsp;</button>`).join('\n');
 
 const NON_FOOD = [
 	{ name: 'Dog Food', id: '55CC6886-0662-4B20-80AC-6B011692082B' },
@@ -151,7 +151,7 @@ document.adoptedStyleSheets = [
 		color: inherit;
 	}
 
-	#pantry-manual .quick-items {
+	#${SIGN_UP_ID}-manual .quick-items {
 		gap: 0.7rem;
 	}
 
@@ -166,12 +166,12 @@ document.adoptedStyleSheets = [
 		}
 	}
 
-	#pantry-cart {
+	#${SIGN_UP_ID}-cart {
 		width: 100%;
 		border-collapse: collapse;
 	}
 
-	#pantry-cart-foot {
+	#${SIGN_UP_ID}-cart-foot {
 		position: sticky;
 		bottom: 0;
 	}
@@ -181,7 +181,7 @@ document.adoptedStyleSheets = [
 		bottom: 1em;
 	}
 
-	:root:has(#pantry-cart) {
+	:root:has(#${SIGN_UP_ID}-cart) {
 		body > button[is="share-button"] {
 			display: none;
 		}
@@ -238,12 +238,10 @@ const handleColorCommand = registerCallback('pantry:pts:color:command', ({ curre
  */
 async function setAppt({ id = '_' + crypto.randomUUID(), name, points, household}) {
 	await scheduler?.yield?.();
-	document.getElementById('pantry-appt').value = id;
-	document.getElementById('pantry-full-name').value = name;
-	// document.getElementById('pantry-given-name').value = givenName;
-	// document.getElementById('pantry-family-name').value = familyName;
-	document.getElementById('pantry-points').value = points;
-	document.getElementById('pantry-household').value = household;
+	document.getElementById(`${SIGN_UP_ID}-appt`).value = id;
+	document.getElementById(`${SIGN_UP_ID}-full-name`).value = name;
+	document.getElementById(`${SIGN_UP_ID}-points`).value = points;
+	document.getElementById(`${SIGN_UP_ID}-household`).value = household;
 	document.getElementById('appt-details').hidden = false;
 	document.getElementById('cart-grand-total').dataset.points = points;
 	history.replaceState({...history.state ?? {}, id, name, points, household }, '', location.href);
@@ -353,7 +351,7 @@ async function _addProduct(product) {
 	const row = _createItemRow(product);
 	items.push(product);
 	await scheduler.yield();
-	document.getElementById('pantry-cart').tBodies.item(0).append(row);
+	document.getElementById(`${SIGN_UP_ID}-cart`).tBodies.item(0).append(row);
 	setCart(items);
 	_updateTotal();
 }
@@ -483,11 +481,7 @@ const signUpSubmit = registerCallback('pantry:distribution:sign-up:submit', asyn
 	try {
 		submitter.disabled = true;
 		const data = new FormData(target);
-		const name = ['givenName', 'additionalName', 'familyName', 'suffix']
-			.map(field => data.has(field) ? data.get(field).trim() : null)
-			.filter(field => typeof field === 'string' && field.length !== 0)
-			.join(' ');
-
+		const name = data.get('name')?.trim?.();
 		const household = parseInt(data.get('household'));
 		const normalTrip = ! data.has('extraTrip');
 		const points = normalTrip ? _getPoints(household) : Math.min(Math.max(household, 1), PTS.length) * BASE_POINTS;
@@ -495,9 +489,6 @@ const signUpSubmit = registerCallback('pantry:distribution:sign-up:submit', asyn
 		await setAppt({
 			id: crypto.randomUUID(),
 			name,
-			givenName: data.get('givenName'),
-			additionalName: data.get('additionalName'),
-			familyName: data.get('familyName'),
 			household,
 			points,
 		});
@@ -513,7 +504,7 @@ const signUpSubmit = registerCallback('pantry:distribution:sign-up:submit', asyn
 const signUpRest = registerCallback('pantry:distribution:sign-up:reset', event => event.target.closest('dialog').requestClose());
 
 const scrollToEnd = registerCallback('pantry:distribution:scroll-to-end', () => {
-	document.getElementById('pantry-cart').scrollIntoView({ behavior: 'smooth', block: 'end' });
+	document.getElementById(`${SIGN_UP_ID}-cart`).scrollIntoView({ behavior: 'smooth', block: 'end' });
 });
 
 const resetHandler = registerCallback('pantry:distribution:reset', event => {
@@ -521,7 +512,7 @@ const resetHandler = registerCallback('pantry:distribution:reset', event => {
 		event.preventDefault();
 	} else {
 		history.replaceState({ cart: [] }, '', location.href);
-		document.querySelector('#pantry-cart tbody').replaceChildren();
+		document.querySelector('#${SIGN_UP_ID}-cart tbody').replaceChildren();
 		document.getElementById('appt-details').hidden = true;
 		_updateTotal();
 	}
@@ -641,8 +632,6 @@ export default async function({
 	state: {
 		token = '',
 		name = '',
-		givenName = '',
-		familyName = '',
 		household = '',
 		points = '',
 	},
@@ -731,26 +720,22 @@ export default async function({
 				<a href="/pantry/" class="btn btn-link no-router" target="_blank">Create an Appointment</a>
 			</div>-->
 			<div id="appt-details" ${attr({ hidden: Number.isNaN(parseInt(points)) })}>
-				<input type="hidden" name="appt" id="pantry-appt" class="display-text" />
-				<input type="hidden" name="pantry-token" id="pantry-token" ${attr({ value: token })} />
+				<input type="hidden" name="appt" id="${SIGN_UP_ID}-appt" class="display-text" />
+				<input type="hidden" name="pantry-token" id="${SIGN_UP_ID}-token" ${attr({ value: token })} />
 				<div>
 					<b>Name:</b>
-					<input type="text" id="pantry-full-name" class="display-text" name="name" ${attr({ value: name })} readonly="" />
-					<div hidden="">
-						<input type="text" id="pantry-given-name" class="display-text" name="givenName" ${attr({ value: givenName })} readonly="" />
-						<input type="text" id="pantry-family-name" class="display-text" name="familyName" ${attr({ value: familyName })} readonly="" />
-					</div>
+					<input type="text" id="${SIGN_UP_ID}-full-name" class="display-text" name="name" ${attr({ value: name })} readonly="" />
 				</div>
 				<div>
 					<b>Points:</b>
-					<input type="text" id="pantry-points" class="display-text" name="budget" ${attr({ value: points })} readonly="" />
+					<input type="text" id="${SIGN_UP_ID}-points" class="display-text" name="budget" ${attr({ value: points })} readonly="" />
 				</div>
 				<div>
 					<b>Household Size:</b>
-					<input type="text" id="pantry-household" class="display-text" name="household" ${attr({ value: household })} readonly="" />
+					<input type="text" id="${SIGN_UP_ID}-household" class="display-text" name="household" ${attr({ value: household })} readonly="" />
 				</div>
 			</div>
-			<table id="pantry-cart" class="full-width overflow-auto">
+			<table id="${SIGN_UP_ID}-cart" class="full-width overflow-auto">
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -771,7 +756,7 @@ export default async function({
 						<td class="mobile-hidden"><input type="text" name="item[id]" ${attr({ value: item.id })} readonly="" required="" /></td>
 					</tr>
 				`).join('')}</tbody>
-				<tfoot id="pantry-cart-foot">
+				<tfoot id="${SIGN_UP_ID}-cart-foot">
 					<tr>
 						<th colspan="2">Grand Total</th>
 						<td id="cart-grand-total" colspan="3" ${attr({ 'data-points': typeof points === 'number' ? points : null })}>${numberFormatter.format(_calcTotal())}</td>
@@ -821,42 +806,17 @@ export default async function({
 		<form ${onSubmit}="${signUpSubmit}" ${onReset}="${signUpRest}" ${signalAttr}="${sig}">
 			<fieldset>
 				<legend>Sign-In Guest</legend>
-				<div class="form-group flex wrap space-between">
-					<span>
-						<label for="pantry-given-name" class="input-label required">First Name</label>
-						<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name *" autocomplete="given-name" required="" />
-					</span>
-					<span>
-						<label for="pantry-additional-name" class="input-label">Middle Name</label>
-						<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="additional-name" />
-					</span>
-					<span>
-						<label for="pantry-family-name" class="input-label required">Last Name</label>
-						<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name *" autocomplete="family-name" required="" />
-					</span>
-					<span>
-						<label for="pantry-name-suffix" class="input-label">Suffix</label>
-						<input type="text"
-							name="suffix"
-							id="pantry-name-suffix"
-							class="input"
-							autocomplete="honorific-suffix"
-							list="suffix-options"
-							size="3"
-							minlength="2"
-							placeholder="Jr., Sr., III, etc." />
-						<datalist id="suffix-options">
-							<option value="Jr">
-							<option value="Sr">
-							<option value="II">
-							<option value="III">
-							<option value="IV">
-						</datalist>
-					</span>
+				<div class="form-group">
+					<label for="${SIGN_UP_ID}-name" class="input-label required">Name</label>
+					<input type="text" name="name" id="${SIGN_UP_ID}-name" class="input" placeholder="Name" required="" />
 				</div>
 				<div class="form-group">
-					<label for="pantry-household" class="input-label required">Household Size</label>
-					<input type="number" name="household" id="pantry-household" class="input" min="1" max="${MAX_HOUSEHOLD}" placeholder="##" required="" />
+					<label for="${SIGN_UP_ID}-household" class="input-label required">Household Size</label>
+					<input type="number" name="household" id="${SIGN_UP_ID}-household" class="input" min="1" max="${MAX_HOUSEHOLD}" placeholder="##" required="" />
+				</div>
+				<div>
+					<label for="${SIGN_UP_ID}-extra-trip">Extra Trip?</label>
+					<input type="checkbox" name="extraTrip" id="${SIGN_UP_ID}-extra-trip" />
 				</div>
 			</legend>
 			<div>
@@ -880,19 +840,19 @@ export default async function({
 		<div class="flex row space-evenly">${colorBtns}</div>
 		<fieldset class="no-border" ${onFocus}="${focusInput}" ${signalAttr}="${sig}" ${capture}>
 			<div class="form-group">
-				<label for="pantry-entry-name" class="input-label required">Name</label>
-				<input type="text" name="name" id="pantry-entry-name" class="input" placeholder="Product Name" autocomplete="off" list="pantry-add-item-names" autofocus="" required="" />
-				<datalist id="pantry-add-item-names">
+				<label for="${SIGN_UP_ID}-entry-name" class="input-label required">Name</label>
+				<input type="text" name="name" id="${SIGN_UP_ID}-entry-name" class="input" placeholder="Product Name" autocomplete="off" list="pantry-add-item-names" autofocus="" required="" />
+				<datalist id="${SIGN_UP_ID}-add-item-names">
 					${SUGGESTED_ITEMS.map(item => `<option ${attr({ label: item, value: item })}></option>`).join('')}
 				</datalist>
 			</div>
 			<div class="form-group">
-				<label for="pantry-entry-cost" class="input-label required">Points</label>
-				<input type="number" name="cost" id="pantry-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" ${onCommand}="${handleColorCommand}" ${signalAttr}="${sig}" required="" />
+				<label for="${SIGN_UP_ID}-entry-cost" class="input-label required">Points</label>
+				<input type="number" name="cost" id="${SIGN_UP_ID}-entry-cost" class="input" placeholder="##" min="0" value="1" max="30" step="0.01" ${onCommand}="${handleColorCommand}" ${signalAttr}="${sig}" required="" />
 			</div>
 			<div class="form-group">
-				<label for="pantry-entry-qty" class="input-label required">Quantity</label>
-				<input type="number" name="qty" id="pantry-entry-qty" class="input" placeholder="##" min="1" max="${MAX_PER_ITEM}" step="1" value="1" required="" />
+				<label for="${SIGN_UP_ID}-entry-qty" class="input-label required">Quantity</label>
+				<input type="number" name="qty" id="${SIGN_UP_ID}-entry-qty" class="input" placeholder="##" min="1" max="${MAX_PER_ITEM}" step="1" value="1" required="" />
 			</div>
 		</fieldset>
 		<div class="flex row">

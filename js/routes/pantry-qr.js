@@ -21,11 +21,7 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 		// const params = new URLSearchParams(new FormData(target));
 		const qr = createGIFFile(
 			url.href,
-			['givenName', 'additionalName', 'familyName', 'suffix']
-				.map(field => data.get(field))
-				.filter(field => typeof field === 'string' && field.length !== 0)
-				.map(field => field.trim().toLocaleLowerCase())
-				.join('-') + '-pantry-qr.gif'
+			data.get('name').toLowerCase().trim().replaceAll(/[a-z]/g, '-') + '-pantry-qr.gif'
 		);
 		const img = document.createElement('img');
 		img.width = 480;
@@ -60,37 +56,9 @@ const pantryQRSubmit = registerCallback('pantry:qr:submit', async event => {
 export default ({ signal }) => html`<form id="pantry-qr" autocomplete="off" ${onSubmit}="${pantryQRSubmit}" ${signalAttr}="${registerSignal(signal)}">
 	<fieldset class="no-border" autocomplete="off">
 		<legend>Create Pantry Quick Sign-In QR</legend>
-		<div class="form-group flex wrap space-between">
-			<span>
-				<label for="pantry-given-name" class="input-label required">First Name</label>
-				<input type="text" name="givenName" id="pantry-given-name" class="input" placeholder="First name" autocomplete="off" required="">
-			</span>
-			<span>
-				<label for="pantry-additional-name" class="input-label">Middle Name</label>
-				<input type="text" name="additionalName" id="pantry-additional-name" class="input" placeholder="Middle name" autocomplete="off">
-			</span>
-			<span>
-				<label for="pantry-given-name" class="input-label required">Last Name</label>
-				<input type="text" name="familyName" id="pantry-family-name" class="input" placeholder="Last name" autocomplete="off" required="">
-			</span>
-			<span>
-				<label for="${POPOVER_ID}-name-suffix" class="input-label">Suffix</label>
-				<input type="text"
-					name="suffix"
-					id="${POPOVER_ID}-name-suffix"
-					class="input"
-					list="${POPOVER_ID}-suffix-options"
-					size="3"
-					minlength="2"
-					placeholder="Jr., Sr., III, etc." />
-				<datalist id="${POPOVER_ID}-suffix-options">
-					<option value="Jr">
-					<option value="Sr">
-					<option value="II">
-					<option value="III">
-					<option value="IV">
-				</datalist>
-			</span>
+		<div class="form-group">
+			<label for="${POPOVER_ID}-name" class="input-label required">Name</label>
+			<input type="text" name="name" id="${POPOVER_ID}-name" class="input" placeholder="Name" required="" />
 		</div>
 		<div class="form-group">
 			<label for="pantry-household-size" class="input-label required">Household Size</label>
