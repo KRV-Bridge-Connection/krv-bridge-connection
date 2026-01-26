@@ -3,6 +3,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 const pages = [
 	{ name: 'Home', url: '/' },
 	{ name: 'Pantry Distribution', url: '/pantry/distribution' },
+	{ name: 'Pantry Queue', url: '/pantry/queue' },
 	{ name: 'Pantry Management', url: '/pantry/inventory' },
 	{ name: 'Pantry QR Pass', url: '/pantry/qr' },
 	{ name: 'Event Sign-In', url: '/event/sign-in/' },
