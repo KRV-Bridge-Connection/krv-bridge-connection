@@ -3,8 +3,10 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 
-const MESSAGE = 'Online registration has been disabled due to the new pantry system.';
 const CAL_BENEFITS = 'https://benefitscal.com/';
+const OASIS_KIOSK = 'https://capkfoodbank.oasisinsight.net/kiosk/87a403e6d6edce481daca0e7a65478f93f78b84a110c3e69e1d0eb7123167f67/';
+const OASIS_ID = 'oasis-dialog';
+const MESSAGE = `Online registration has been disabled due to the <button type="btn" class="btn btn-link" command="show-modal" commandfor="${OASIS_ID}">new pantry system</button>.`;
 // const CARES_FORM = '/docs/cares-form.pdf';
 // Options given on Neighbor Intake
 export const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
@@ -117,7 +119,7 @@ export default () => html`<section aria-labelledby="pantry-header">
 	</div>
 </section>
 <section>
-	<p>Please be aware that scheduling is limited to pantry days and hours, and visits may not be made when pantry is closed or low on food. See the <a href="${location.pathname}#general-pantry-hours">Schedule.</a></p>
+	<p>To register in the new Oasis Platform used throughout Kern County, <button type="button" class="btn btn-outline-secondary" command="show-modal" commandfor="${OASIS_ID}">Click here</button></p>
 	${getPantrySchedule()}
 	<p>
 		<span>For other KRV Food Distributions, please see the</span>
@@ -128,7 +130,24 @@ export default () => html`<section aria-labelledby="pantry-header">
 			<span>Calendar</span>
 		</a>
 	</p>
-</section>`;
+</section>
+<dialog id="${OASIS_ID}">
+	<p>All CAPK associated food programs are now using the Oasis Platform.
+	<div class="center">
+		<a href="${OASIS_KIOSK}" class="btn btn-primary" rel="noopener noreferrer" target="_blank">
+			<span>Sign-Up</span>
+			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
+				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+			 </svg>
+		</a>
+		<button type="button" class="btn btn-danger" command="request-close" commandfor="${OASIS_ID}">
+			<span>Dismiss</span>
+			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
+				<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+			</svg>
+		</button>
+	</div>
+</dialog>`;
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
 
