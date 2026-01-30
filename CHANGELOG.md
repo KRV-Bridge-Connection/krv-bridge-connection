@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.11] - 2026-01-30
+
+### Added
+- Add Volunteer list page (requires JWT)
+
+### Removed
+- Remove most custom pantry handlers
+
 ## [v2.0.10] - 2026-01-25
 
 ### Added

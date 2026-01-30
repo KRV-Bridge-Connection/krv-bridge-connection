@@ -8,6 +8,7 @@ const pages = [
 	{ name: 'Pantry QR Pass', url: '/pantry/qr' },
 	{ name: 'Event Sign-In', url: '/event/sign-in/' },
 	{ name: 'Admin Sign-In', url: '/account/sign-in' },
+	{ name: 'Volunteer List', url: '/volunteer/list' },
 	{ name: 'Presentation', url: '/tv-display' },
 ];
 
