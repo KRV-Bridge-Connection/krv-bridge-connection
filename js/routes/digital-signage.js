@@ -99,7 +99,7 @@ const snapClass = scoped`
 		& > * img {
 			background-color: #fafafa;
 			padding: 0.8em;
-			broder-radius: 6px;
+			border-radius: 6px;
 			color: #202020;
 		}
 	}
