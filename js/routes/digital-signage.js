@@ -2,13 +2,13 @@ import { getAllItems, openDB } from '@aegisjsproject/idb';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
-import { COMMANDS } from '@aegisjsproject/commands/commands.js';
+import { COMMANDS, ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
 
 const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
-const [sheet, css] = useScopedStyle();
+const [sheet, scoped] = useScopedStyle();
 const STORE_NAME = 'partners';
 const delay = 10_000;
 
@@ -21,10 +21,10 @@ const imgUrls = [
 	'https://i.imgur.com/wSTP041h.webp',
 	'https://i.imgur.com/Gt6EsGAh.webp',
 	'https://i.imgur.com/xi7ggBY.webp',
-	'https://i.imgur.com/R7sxbi9h.webp',
-	'https://i.imgur.com/ZrNwAxYh.webp',
+	// 'https://i.imgur.com/R7sxbi9h.webp',
+	// 'https://i.imgur.com/ZrNwAxYh.webp',
 	'https://i.imgur.com/TSeM5aUh.webp',
-	'https://i.imgur.com/1e5kBLTh.webp',
+	// 'https://i.imgur.com/1e5kBLTh.webp',
 	'https://i.imgur.com/ddVuSlQh.webp',
 	'https://i.imgur.com/EIDSMj5h.webp',
 ];
@@ -66,7 +66,7 @@ await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(asyn
 	}
 });
 
-const orgCard = css`
+const orgCard = scoped`
 	padding: 0.8em;
 
 	& a.btn {
@@ -84,7 +84,7 @@ const orgCard = css`
 	}
 `;
 
-const snapClass = css`
+const snapClass = scoped`
 	width: 100%;
 	height: 100dvh;
 	overflow: auto;
@@ -96,7 +96,7 @@ const snapClass = css`
 		max-width: 100dvw;
 		font-size: 2.5vmin;
 
-		& img {
+		& > * img {
 			background-color: #fafafa;
 			padding: 0.8em;
 			broder-radius: 6px;
@@ -111,9 +111,16 @@ const snapClass = css`
 		content-visibility: auto;
 		contain-intrinsic-size: auto 100dvw 100dvh;
 	}
+
+	weather-forecast {
+		--background: #000;
+		--color: #fafafa;
+		background-color: #000;
+		color: #fafafa;
+	}
 `;
 
-const partnerFlex = css`
+const partnerFlex = scoped`
 	display: flex;
 	flex-wrap: nowrap;
 	gap: 1.2em;
@@ -184,22 +191,33 @@ const createPartners = results => results.map(({ name, description, image, id, t
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 
+if (typeof customElements.get('weather-forecast') === 'undefined') {
+	import('@shgysk8zer0/components/weather/forecast.js');
+}
+
 export default async ({ signal }) => {
-	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+	const [db, HTMLScrollSnapElement, KRVEvents, WeatherForecast] = await Promise.all([
+		openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }),
+		customElements.whenDefined('scroll-snap'),
+		customElements.whenDefined('krv-events'),
+		customElements.whenDefined('weather-forecast'),
+	]);
 
 	try {
-		const [HTMLScrollSnapElement, KRVEvents] = await Promise.all([
-			customElements.whenDefined('scroll-snap'),
-			customElements.whenDefined('krv-events'),
-		]);
-
 		const partners = await getAllItems(db, STORE_NAME, null, { signal });
 		db.close();
 		const scrollSnap = new HTMLScrollSnapElement();
 		const cal = new KRVEvents();
 		const frag = document.createDocumentFragment();
-		const btn = document.createElement('button');
+		const fullscreen = document.createElement('button');
+		const reload = document.createElement('button');
 		const label = document.createElement('b');
+		const forecast = new WeatherForecast({
+			appId: document.querySelector('weather-current').appId,
+			postalCode: 93240,
+		 });
+		cal.theme = 'dark';
+		forecast.theme = 'dark';
 		label.slot = 'title';
 		label.textContent = 'KRV Bridge Connection Events';
 		cal.tags = ['krv-bridge'];
@@ -219,21 +237,44 @@ export default async ({ signal }) => {
 		cal.append(label);
 		scrollSnap.append(
 			cal,
+			forecast,
 			createGoogleCalendar(CAL, {
 				credentialless: true,
 				title: 'KRV Food Calendar',
 				showPrint: false,
 			}),
+			html`<div>
+				<h3>Bridge to Well-being</h3>
+				<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
+				<div class="flex row space-around">
+					<a href="/partners/krv-bridge-connection">
+						<img src="/img/branding/krv-bridge-logo-wide.svg" alt="KRV Bridge Connection" width="340" loading="lazy" decoding="lazy" />
+					</a>
+					<a href="/resources/kern-family-health-care">
+						<img src="/img/partners/kern-family-health-care.png" alt="Kern Family Health Care" width="340" loading="lazy" decoding="lazy" />
+					</a>
+				</div>
+			</div>`,
 			...imgs,
 			html`${createPartners(partners.filter(result => result.partner))}`,
 		);
 
-		btn.type = 'button';
-		btn.classList.add('btn', 'btn-primary');
-		btn.command = COMMANDS.toggleFullscreen;
-		btn.commandForElement = scrollSnap;
-		btn.textContent = 'Toggle Fullscreen';
-		frag.append(scrollSnap, btn);
+		fullscreen.type = 'button';
+		fullscreen.classList.add('btn', 'btn-primary');
+		fullscreen.command = COMMANDS.toggleFullscreen;
+		fullscreen.commandForElement = scrollSnap;
+		fullscreen.textContent = 'Toggle Fullscreen';
+		fullscreen.accessKey = 'f';
+
+		reload.type = 'button';
+		reload.classList.add('btn', 'btn-warning');
+		reload.command = ROOT_COMMANDS.reload;
+		reload.commandForElement = document.documentElement;
+		reload.textContent = 'Reload';
+		reload.accessKey = 'r';
+
+		frag.append(scrollSnap, fullscreen, reload);
+
 		return frag;
 	} catch(err) {
 		db.close();
