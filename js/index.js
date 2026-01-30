@@ -14,6 +14,7 @@ import '@shgysk8zer0/components/youtube/player.js';
 
 initRouter({
 	'/volunteer/': '/js/routes/volunteer.js',
+	'/volunteer/list': '/js/routes/volunteer-list.js',
 	'/(partners|resources)/?category=:category': '/js/routes/partners.js',
 	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
 	'/food/': '/js/routes/food-cal.js',
