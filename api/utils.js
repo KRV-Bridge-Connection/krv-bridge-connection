@@ -50,6 +50,21 @@ export async function getDocumentRef(name, id, { envName = ENV_CERT_NAME } = {})
 	return collection.doc(id);
 }
 
+/**
+ * @typedef {[key: string, operator: ('=='|'>'|'<'|'>='|'<='|'!='|'in', 'not-in', 'array-contains', 'array-contains-any'), value: any]} FilterTuple
+ * A tuple representing a filter: [key, operator, value].
+ */
+
+/**
+ *
+ * @param {string} name
+ * @param {object} options
+ * @param {number} [options.limit=10] How many items per "page"
+ * @param {number} [options.page=1] For pageination
+ * @param {string} [options.envName="FIREBASE_CERT"] Env var name to import Firebase credentials from
+ * @param {FilterTuple[]} [options.filters]
+ * @returns {Promise<object[]>}
+ */
 export async function getCollectionItems(name, {
 	limit = 10,
 	page = 1,
