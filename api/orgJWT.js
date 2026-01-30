@@ -50,12 +50,14 @@ export default createHandler({
 			const doc = await db.collection('users').doc(uid).get();
 
 			if (doc.exists) {
-				const { org: sub_id = null, entitlements = [], roles = [] } = doc.data();
+				const { org: orgRef = null, entitlements = [], roles = [] } = doc.data();
 				const key = await getPrivateKey();
 				const now = Math.floor(Date.now() / 1000);
 				const origin = URL.parse(`${req.protocol}//${req.hostname}`)?.origin;
 				const jti = crypto.randomUUID();
 				const expires = new Date(Date.now() + 1_800_000).getTime();
+				const subId = (await orgRef?.get?.())?.data?.()?.id;
+
 				const token = await createJWT({
 					iss: origin,
 					aud: origin,
@@ -64,7 +66,7 @@ export default createHandler({
 					nbf: now,
 					exp: Math.floor(expires / 1000),
 					jti,
-					sub_id,
+					sub_id: subId,
 					name,
 					email,
 					email_verified,
