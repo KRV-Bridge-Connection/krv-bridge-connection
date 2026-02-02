@@ -1,59 +1,38 @@
 import { getAllItems, openDB } from '@aegisjsproject/idb';
-import { html } from '@aegisjsproject/core/parsers/html.js';
+import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { COMMANDS, ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
+import { whenLoaded } from '@aegisjsproject/router';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
+import imgData from '/img/gallery.json' with { type: 'json' };
 
 const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
 const [sheet, scoped] = useScopedStyle();
 const STORE_NAME = 'partners';
 const delay = 10_000;
 
-const imgUrls = [
-	'https://i.imgur.com/ym7h2wph.webp',
-	'https://i.imgur.com/8gxA4Ooh.webp',
-	'https://i.imgur.com/xpbJcQyh.webp',
-	'https://i.imgur.com/DHxc9MBh.webp',
-	'https://i.imgur.com/AuO9fIMh.webp',
-	'https://i.imgur.com/wSTP041h.webp',
-	'https://i.imgur.com/Gt6EsGAh.webp',
-	'https://i.imgur.com/xi7ggBY.webp',
-	// 'https://i.imgur.com/R7sxbi9h.webp',
-	// 'https://i.imgur.com/ZrNwAxYh.webp',
-	'https://i.imgur.com/TSeM5aUh.webp',
-	// 'https://i.imgur.com/1e5kBLTh.webp',
-	'https://i.imgur.com/ddVuSlQh.webp',
-	'https://i.imgur.com/EIDSMj5h.webp',
-];
-
-const imgs = imgUrls.map((url, index) => {
-	const img = document.createElement('img');
-	const controller = new AbortController();
-	const signal = controller.signal;
-	const once = true;
-	img.alt = `Image ${index + 1}`;
-	img.addEventListener('load', ({ target }) => {
-		target.width = target.naturalWidth;
-		target.height = target.naturalHeight;
-		controller.abort();
-	}, { once, signal });
-
-	img.addEventListener('error', ({ target }) => {
-		const err = new DOMException(`Error loading image "${target.src}".`, 'NetworkError');
-		controller.abort(err);
-		target.remove();
-	}, { once, signal });
-
-	img.loading = 'lazy';
-	img.decoding = 'async';
-	img.fetchPriority = 'low';
-	img.crossOrigin = 'anonymous';
-	img.referrerPolicy = 'no-referrer';
-	img.src = url;
-	return img;
+const imgs = imgData.map(({ link, width, height, id, description }) => {
+	const ext = link.split('.').pop();
+	return el`<figure id="img-${id}">
+		<img
+			src="${link}"
+			alt="${description || id}"
+			width="${width.toString()}"
+			height="${height.toString()}"
+			srcset="
+				https://i.imgur.com/${id}l.${ext} 640w,
+				https://i.imgur.com/${id}h.${ext} 1024w,
+				${link} ${width.toString()}w"
+			sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, ${width.toString()}px"
+			referrerpolicy="no-referrer"
+			decoding="async"
+			loading="lazy"
+		>
+		${description ? `<figcaption>${description}</figcaption>` : ''}
+	</figure>`;
 });
 
 await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(async db => {
@@ -88,6 +67,37 @@ const snapClass = scoped`
 	width: 100%;
 	height: 100dvh;
 	overflow: auto;
+	position: relative;
+
+	& figure {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+
+		& img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+			padding: 0;
+			background-color: none;
+		}
+
+		& figcaption:not(:empty) {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			width: 100%;
+			min-height: 3rem;
+			padding: 0.7rem 1.2rem;
+			color: #fafafa;
+			background-color: rgba(0, 0, 0, 0.7);
+			backdrop-filter: blur(4px);
+			text-decoration: none;
+			text-align: center;
+		}
+	}
 
 	&:fullscreen {
 		background-color: #000;
@@ -95,8 +105,9 @@ const snapClass = scoped`
 		color-scheme: dark;
 		max-width: 100dvw;
 		font-size: 2.5vmin;
+		cursor: none;
 
-		& > * img {
+		& > *:not(figure) img {
 			background-color: #fafafa;
 			padding: 0.8em;
 			border-radius: 6px;
@@ -203,6 +214,7 @@ export default async ({ signal }) => {
 			appId: document.querySelector('weather-current').appId,
 			postalCode: 93240,
 		 });
+
 		cal.theme = 'dark';
 		forecast.theme = 'dark';
 		label.slot = 'title';
@@ -261,6 +273,7 @@ export default async ({ signal }) => {
 		reload.accessKey = 'r';
 
 		frag.append(scrollSnap, fullscreen, reload);
+		whenLoaded({ signal }).then(() => scrollSnap.requestFullscreen().catch(reportError));
 
 		return frag;
 	} catch(err) {
