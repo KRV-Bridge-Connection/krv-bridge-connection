@@ -73,6 +73,7 @@ const snapClass = scoped`
 		margin: 0;
 		width: 100%;
 		height: 100%;
+		overflow-x: hidden;
 
 		& img {
 			width: 100%;
