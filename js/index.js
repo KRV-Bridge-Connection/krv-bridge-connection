@@ -20,6 +20,7 @@ initRouter({
 	'/food/': '/js/routes/food-cal.js',
 	'/admin/directory': '/js/routes/directory.js',
 	'/pantry/': '/js/routes/pantry.js',
+	'/pantry/oasis': '/js/routes/oasis.js',
 	'/pantry/qr': '/js/routes/pantry-qr.js',
 	'/pantry/inventory': '/js/routes/inventory.js',
 	'/pantry/queue': '/js/routes/pantry-queue.js',
