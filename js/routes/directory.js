@@ -2,6 +2,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 
 const pages = [
 	{ name: 'Home', url: '/' },
+	{ name: 'Oasis Scanner', url: '/pantry/oasis' },
 	{ name: 'Pantry Distribution', url: '/pantry/distribution' },
 	{ name: 'Pantry Queue', url: '/pantry/queue' },
 	{ name: 'Pantry Management', url: '/pantry/inventory' },
