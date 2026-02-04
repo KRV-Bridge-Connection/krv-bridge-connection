@@ -1,4 +1,4 @@
-import { html } from '@aegisjsproject/core/parsers/html.js';
+import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onSubmit, onReset, onBlur, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
@@ -7,33 +7,68 @@ const ID_PATTERN = /^\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}$/;
 const PATTERN_STR = ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const NAME = 'barcode';
 const INPUT_ID = 'oasis-barcode';
-const ERROR_DURATION = 2000;
+const ERROR_DURATION = 5_000;
 const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elements.namedItem(NAME).focus());
 const submitOnBlur = registerCallback('oasis:blur', ({ target }) => target.validity.valid && target.form.requestSubmit());
-const submitHandler = registerCallback('oasis:submit', event => {
+
+async function showError(message, { timeout = ERROR_DURATION } = {}) {
+	const id = '_' + crypto.randomUUID();
+	const { resolve, promise } = Promise.withResolvers();
+	const popover = el`<div class="status-box error oasis-error" id="${id}" popover="auto">
+		<button type="button" class="btn btn-outline-danger absolute top right" command="hide-popover" commandfor="${id}" aria-label="Close Popove">X</button>
+		<p class="clearfix">${message}</p>
+	</div>`;
+
+	popover.addEventListener('toggle', ({ target, newState }) => {
+		if (newState === 'closed') {
+			target.remove();
+			resolve();
+		}
+	});
+
+	document.body.append(popover);
+	popover.showPopover();
+	setTimeout(() => {
+		if (popover.isConnected) {
+			popover.hidePopover();
+		}
+	}, timeout);
+
+	return promise;
+}
+const submitHandler = registerCallback('oasis:submit', async event => {
 	event.preventDefault();
 	const target = event.target;
+	const submitter = event?.submitter;
 	const data = new FormData(target);
 	const { type, id } = data.get(NAME)?.trim()?.match(ID_PATTERN)?.groups ?? {};
 
 	if (typeof type === 'string' && typeof id === 'string') {
-		const input = target.elements.namedItem(NAME);
+		try {
+			if (submitter instanceof HTMLButtonElement) {
+				submitter.disabled = true;
+			}
+			switch(type) {
+				case 'C':
+					globalThis.open(
+						url`https://capkfoodbank.oasisinsight.net/cases/${parseInt(id)}/case_barcode_lookup/`,
+						'_blank',
+						'noopener,noreferrer'
+					);
 
-		switch(type) {
-			case 'C':
-				globalThis.open(
-					url`https://capkfoodbank.oasisinsight.net/cases/${parseInt(id)}/case_barcode_lookup/`,
-					'_blank',
-					'noopener,noreferrer'
-				);
+					target.reset();
+					break;
 
-				target.reset();
-				break;
-
-			default:
-				input.after(html`<div class="status-box error">Unsupported type [${type}] with ID <q>${id}</q></div>`);
-				setTimeout(input.nextElementSibling?.remove?.bind(input.nextElementSibling), ERROR_DURATION);
-				target.reset();
+				default:
+					await showError(`Unsupported type [${type}] with ID <q>${id}</q>`);
+					target.reset();
+			}
+		} catch(err) {
+			await showError(err);
+		} finally {
+			if (submitter instanceof HTMLButtonElement) {
+				submitter.disabled = false;
+			}
 		}
 	} else {
 		target.reset();
