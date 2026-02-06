@@ -81,7 +81,7 @@
     "@shgysk8zer0/netlify-func-utils": "^1.1.0",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
-    "firebase-admin": "^13.6.0",
+    "firebase-admin": "^13.6.1",
     "qr": "^0.5.4"
   },
   "devDependencies": {
