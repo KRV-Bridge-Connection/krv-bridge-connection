@@ -206,7 +206,7 @@ export default async ({ signal, stack }) => {
 	]);
 
 	const partners = await getAllItems(db, STORE_NAME, null, { signal });
-	const scrollSnap = stack.use(new HTMLScrollSnapElement());
+	const scrollSnap = new HTMLScrollSnapElement();
 	const cal = new KRVEvents();
 	const frag = document.createDocumentFragment();
 	const fullscreen = document.createElement('button');
