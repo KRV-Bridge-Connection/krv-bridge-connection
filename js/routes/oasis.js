@@ -36,6 +36,7 @@ async function showError(message, { timeout = ERROR_DURATION } = {}) {
 
 	return promise;
 }
+
 const submitHandler = registerCallback('oasis:submit', async event => {
 	event.preventDefault();
 	const target = event.target;

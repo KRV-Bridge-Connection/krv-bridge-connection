@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.13] - 2026-02-08
+
+### Added
+- Add redirect support on resources
+- Require authentication on admin directory
+
+### Fixed
+- Fix misc visual issues in TV presentation route
+
 ## [v2.0.12] - 2026-02-03
 
 ### Added

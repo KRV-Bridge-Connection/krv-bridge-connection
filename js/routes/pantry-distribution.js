@@ -636,9 +636,7 @@ export default async function({
 		points = '',
 	},
 	signal,
-	...rest
 } = {}) {
-	console.log(rest);
 	const sig = registerSignal(signal);
 	const closeWatcher = new CloseWatcher({ signal });
 	OTHER_ELS.forEach(id => document.getElementById(id).inert = true);
