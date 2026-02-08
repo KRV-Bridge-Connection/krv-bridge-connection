@@ -2,9 +2,9 @@ import { getAllItems, openDB } from '@aegisjsproject/idb';
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
-import { COMMANDS, ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
+import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
-import { whenLoaded } from '@aegisjsproject/router';
+// import { whenLoaded } from '@aegisjsproject/router';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
 import imgData from '/img/gallery.json' with { type: 'json' };
@@ -65,7 +65,7 @@ const orgCard = scoped`
 
 const snapClass = scoped`
 	width: 100%;
-	height: 100dvh;
+	aspect-ratio: 16/9;
 	overflow: auto;
 	position: relative;
 
@@ -194,93 +194,82 @@ if (typeof customElements.get('weather-forecast') === 'undefined') {
 	import('@shgysk8zer0/components/weather/forecast.js');
 }
 
-export default async ({ signal }) => {
+export default async ({ signal, stack }) => {
+	/**
+	 * @type {[IDBDatabase, HTMLElement, HTMLElement, HTMLElement]}
+	 */
 	const [db, HTMLScrollSnapElement, KRVEvents, WeatherForecast] = await Promise.all([
-		openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }),
+		openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack }),
 		customElements.whenDefined('scroll-snap'),
 		customElements.whenDefined('krv-events'),
 		customElements.whenDefined('weather-forecast'),
 	]);
 
-	try {
-		const partners = await getAllItems(db, STORE_NAME, null, { signal });
-		db.close();
-		const scrollSnap = new HTMLScrollSnapElement();
-		const cal = new KRVEvents();
-		const frag = document.createDocumentFragment();
-		const fullscreen = document.createElement('button');
-		const reload = document.createElement('button');
-		const label = document.createElement('b');
-		const forecast = new WeatherForecast({
-			appId: document.querySelector('weather-current').appId,
-			postalCode: 93240,
-		 });
+	const partners = await getAllItems(db, STORE_NAME, null, { signal });
+	const scrollSnap = stack.use(new HTMLScrollSnapElement());
+	const cal = new KRVEvents();
+	const frag = document.createDocumentFragment();
+	const fullscreen = document.createElement('button');
+	const reload = document.createElement('button');
+	const label = document.createElement('b');
+	const forecast = new WeatherForecast({
+		appId: document.querySelector('weather-current').appId,
+		postalCode: 93240,
+	 });
 
-		cal.theme = 'dark';
-		forecast.theme = 'dark';
-		label.slot = 'title';
-		label.textContent = 'KRV Bridge Connection Events';
-		cal.tags = ['krv-bridge'];
-		scrollSnap.id = '_' + crypto.randomUUID();
-		scrollSnap.classList.add(snapClass);
-		scrollSnap.delay = delay;
-		scrollSnap.addEventListener('command', ({ currentTarget, command }) => {
-			if (command !== COMMANDS.toggleFullscreen) {
-				return;
-			} else if (currentTarget.isSameNode(document.fullscreenElement)) {
-				document.exitFullscreen();
-			} else {
-				currentTarget.requestFullscreen();
-			}
-		}, { passive: true, signal });
+	cal.theme = 'dark';
+	forecast.theme = 'dark';
+	label.slot = 'title';
+	label.textContent = 'KRV Bridge Connection Events';
+	cal.tags = ['krv-bridge'];
+	scrollSnap.id = '_' + crypto.randomUUID();
+	scrollSnap.classList.add(snapClass);
+	scrollSnap.delay = delay;
 
-		cal.append(label);
-		scrollSnap.append(
-			cal,
-			forecast,
-			createGoogleCalendar(CAL, {
-				credentialless: true,
-				title: 'KRV Food Calendar',
-				showPrint: false,
-			}),
-			html`<div>
-				<h3>Bridge to Well-being</h3>
-				<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
-				<div class="flex row space-around">
-					<a href="/partners/krv-bridge-connection">
-						<img src="/img/branding/krv-bridge-logo-wide.svg" alt="KRV Bridge Connection" width="340" loading="lazy" decoding="lazy" />
-					</a>
-					<a href="/resources/kern-family-health-care">
-						<img src="/img/partners/kern-family-health-care.png" alt="Kern Family Health Care" width="340" loading="lazy" decoding="lazy" />
-					</a>
-				</div>
-			</div>`,
-			...imgs,
-			html`${createPartners(partners.filter(result => result.partner))}`,
-		);
+	cal.append(label);
+	scrollSnap.append(
+		cal,
+		forecast,
+		createGoogleCalendar(CAL, {
+			credentialless: true,
+			title: 'KRV Food Calendar',
+			showPrint: false,
+		}),
+		html`<div>
+			<h3>Bridge to Well-being</h3>
+			<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
+			<div class="flex row space-around">
+				<a href="/partners/krv-bridge-connection">
+					<img src="/img/branding/krv-bridge-logo-wide.svg" alt="KRV Bridge Connection" width="340" loading="lazy" decoding="lazy" />
+				</a>
+				<a href="/resources/kern-family-health-care">
+					<img src="/img/partners/kern-family-health-care.png" alt="Kern Family Health Care" width="340" loading="lazy" decoding="lazy" />
+				</a>
+			</div>
+		</div>`,
+		...imgs,
+		html`${createPartners(partners.filter(result => result.partner))}`,
+	);
 
-		fullscreen.type = 'button';
-		fullscreen.classList.add('btn', 'btn-primary');
-		fullscreen.command = COMMANDS.toggleFullscreen;
-		fullscreen.commandForElement = scrollSnap;
-		fullscreen.textContent = 'Toggle Fullscreen';
-		fullscreen.accessKey = 'f';
+	fullscreen.type = 'button';
+	fullscreen.classList.add('btn', 'btn-primary');
+	fullscreen.command = '--fullscreen';
+	fullscreen.commandForElement = scrollSnap;
+	fullscreen.textContent = 'Toggle Fullscreen';
+	fullscreen.accessKey = 'f';
 
-		reload.type = 'button';
-		reload.classList.add('btn', 'btn-warning');
-		reload.command = ROOT_COMMANDS.reload;
-		reload.commandForElement = document.documentElement;
-		reload.textContent = 'Reload';
-		reload.accessKey = 'r';
+	reload.type = 'button';
+	reload.classList.add('btn', 'btn-warning');
+	reload.command = ROOT_COMMANDS.reload;
+	reload.commandForElement = document.documentElement;
+	reload.textContent = 'Reload';
+	reload.accessKey = 'r';
 
-		frag.append(scrollSnap, fullscreen, reload);
-		whenLoaded({ signal }).then(() => scrollSnap.requestFullscreen().catch(reportError));
+	frag.append(scrollSnap, fullscreen, reload);
+	// whenLoaded({ signal }).then(() => scrollSnap.requestFullscreen().catch(reportError));
+	// stack.defer(() => scrollSnap.requestFullscreen().catch(reportError));
 
-		return frag;
-	} catch(err) {
-		db.close();
-		throw err;
-	}
+	return frag;
 };
 
 export const title = 'KRV Bridge Connection Digital Display';

@@ -13,6 +13,122 @@ const MEDIUM = 'referrer';
 const CONTENT = 'resource-directory';
 const CAMPAIGN = 'resource-directory';
 
+export const ORG_CATEGORIES = [
+	'Housing & Rental Assistance',
+	'Mental Health',
+	'Behavioral Health',
+	'Substance Abuse',
+	'Suicide Prevention',
+	'Domestic Violence',
+	'Sexual Assault',
+	'Human Trafficking',
+	'Child Abuse',
+	'Post-Incarceration Support',
+	'Animal Services',
+	'Veterans Services',
+	'Senior Services',
+	'Disabled Services',
+	'Legal Assistance',
+	'Family & Pregnancy Resources',
+	'Transportation',
+	'Food',
+	'Clothing',
+	'Financial Services',
+	'Emergency Services',
+	'Healthcare',
+	'Utility Assistance',
+	'Disaster Relief & Recovery',
+	'Employment',
+	'Education',
+	'Business',
+	'Entrepreneurship',
+	'Insurance',
+	'Borel Fire',
+	'Homelessness',
+	'Elected Officials',
+	'Public Safety',
+].sort();
+
+const REDIRECTS = new Map([
+	['taxes', 'Financial Services'],
+	['addiction', 'Substance Abuse'],
+	['drug addiction', 'Substance Abuse'],
+	['minor abuse', 'Child Abuse'],
+	['disability', 'Disabled Services'],
+	['senior', 'Senior Services'],
+	['elderly', 'Senior Services'],
+	['medical', 'Healthcare'],
+	['pregnancy', 'Family & Pregnancy Resources'],
+	['job', 'Employment'],
+	['jobs', 'Employment'],
+	['work', 'Employment'],
+	['housing', 'Housing & Rental Assistance'],
+	['rent', 'Housing & Rental Assistance'],
+	['rental', 'Housing & Rental Assistance'],
+	['suicide', 'Suicide Prevention'],
+	['bus', 'Transportation'],
+	['pets', 'Animal Services'],
+	['animal', 'Animal Services'],
+	['bills', 'Utility Assistance'],
+	['utilities', 'Utility Assistance'],
+	['sce', 'Utility Assistance'],
+	['electric', 'Utility Assistance'],
+	['water', 'Utility Assistance'],
+	['propane', 'Utility Assistance'],
+	['finance', 'Financial Services'],
+	['veterans', 'Veterans Services'],
+	['veteran', 'Veterans Services'],
+	['vet', 'Veterans Services'],
+	['felony', 'Post-Incarceration Support'],
+	['dv', 'Domestic Violence'],
+	['sa', 'Sexual Assault'],
+	['rape', 'Sexual Assault'],
+	['doctor', 'Healthcare'],
+	['therapy', 'Mental Health'],
+	['counseling', 'Mental Health'],
+	['rehab', 'Substance Abuse'],
+	['detox', 'Substance Abuse'],
+	['food stamps', 'Food'],
+	['ebt', 'Food'],
+	['snap', 'Food'],
+	['pantry', 'Food'],
+	['eviction', 'Housing & Rental Assistance'],
+	['lawyer', 'Legal Assistance'],
+	['court', 'Legal Assistance'],
+	['parole', 'Post-Incarceration Support'],
+	['probation', 'Post-Incarceration Support'],
+	['abuse', 'Domestic Violence'],
+	['startup', 'Entrepreneurship'],
+	['payee', 'Financial Services'],
+	['services', 'Financial Services'],
+	['911', 'Emergency Services'],
+	['emergency', 'Emergency Services'],
+	['sheriff', 'Emergency Services'],
+	['animal shelter', 'Animal Services'],
+	['restraining order', 'Legal Assistance'],
+	['shelter', 'Homelessness'],
+	['homeless', 'Homelessness'],
+	['section 8', 'Housing & Rental Assistance'],
+	['clothes', 'Clothing'],
+	['shoes', 'Clothing'],
+	['soup kitchen', 'Food'],
+	['liheap', 'Utility Assistance'],
+	['heap', 'Utility Assistance'],
+	['medi-cal', 'Insurance'],
+	['medicare', 'Insurance'],
+	['unemployment', 'Employment'],
+	['ged', 'Education'],
+	['cps', 'Child Abuse'],
+	['wic', 'Family & Pregnancy Resources'],
+	['trafficking', 'Human Trafficking'],
+	['fema', 'Disaster Relief & Recovery'],
+	['psychiatrist', 'Mental Health'],
+	['warrant', 'Legal Assistance'],
+	['custody', 'Legal Assistance'],
+	['divorce', 'Legal Assistance'],
+	['child support', 'Legal Assistance'],
+]);
+
 function _addUTM(url) {
 	if (typeof url === 'string') {
 		return _addUTM(URL.parse(url));
@@ -67,42 +183,6 @@ const ONE_DAY = 86400000;
 const DB_TTL = ONE_DAY;
 const storageKey = '_lastSync:partners';
 const category = getSearch('category', '');
-
-export const ORG_CATEGORIES = [
-	'Housing & Rental Assistance',
-	'Mental Health',
-	'Behavioral Health',
-	'Substance Abuse',
-	'Suicide Prevention',
-	'Domestic Violence',
-	'Sexual Assault',
-	'Human Trafficking',
-	'Child Abuse',
-	'Post-Incarceration Support',
-	'Animal Services',
-	'Veterans Services',
-	'Senior Services',
-	'Disabled Services',
-	'Legal Assistance',
-	'Family & Pregnancy Resources',
-	'Transportation',
-	'Food',
-	'Clothing',
-	'Financial Services',
-	'Emergency Services',
-	'Healthcare',
-	'Utility Assistance',
-	'Disaster Relief & Recovery',
-	'Employment',
-	'Education',
-	'Business',
-	'Entrepreneurship',
-	'Insurance',
-	'Borel Fire',
-	'Homelessness',
-	'Elected Officials',
-	'Public Safety',
-].sort();
 
 // const ALIASES = {
 // 	'medical': 'healthcare',
@@ -364,6 +444,7 @@ async function getPartnerInfo({
 		groups: { partner = null } = {},
 	} = {},
 }, { signal }) {
+	const stack = new DisposableStack();
 	const { promise, resolve, reject } = Promise.withResolvers();
 
 	if (typeof partner !== 'string') {
@@ -372,7 +453,7 @@ async function getPartnerInfo({
 		resolve(cache.get(partner));
 	} else {
 		cache.set(partner, promise);
-		const db = await openDB(SCHEMA.name, { version: SCHEMA.version });
+		const db = stack.adopt(await openDB(SCHEMA.name, { version: SCHEMA.version }), db => db.close());
 
 		getItem(db, STORE_NAME, partner, { signal })
 			.then(result => typeof result === 'undefined'
@@ -380,7 +461,7 @@ async function getPartnerInfo({
 				: resolve(result)
 			)
 			.catch(cause => reject(new Error(`Error getting ${partner}`, { cause })))
-			.finally(db.close.bind(db));
+			.finally(stack.dispose.bind(stack));
 	}
 
 	return promise;
@@ -396,16 +477,17 @@ await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(asyn
 	}
 });
 
-export default async function ({ matches, signal, url, params: { partner, category } = {} } = {}) {
-	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+export default async function ({ matches, signal, stack, url, params: { partner, category } = {} } = {}) {
+	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack });
 
 	try {
 		if (typeof partner === 'string' && partner.length !== 0) {
-			db.close();
 			const result = await getPartnerInfo(matches, { signal }).catch(err => err);
 
 			if (result instanceof Error) {
 				return html`<div class="status-box error">${result.message}</div>`;
+			} else if (result instanceof URL) {
+				return result;
 			} else if (typeof result === 'object') {
 				return createPartner(result);
 			} else {
@@ -413,10 +495,10 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			}
 		} else if (typeof category === 'string' && category.length !== 0) {
 			const { searchParams } = new URL(url);
+			const normalized = searchParams.get('category').toLowerCase().trim().replaceAll(/[^a-z0-9&\- ]/g, '').replaceAll(/\s{2,}/g, ' ');
 
 			try {
-				const results = await getAllItems(db, STORE_NAME, searchParams.get('category').toLowerCase().trim(), { indexName: 'keywords', signal });
-				db.close();
+				const results = await getAllItems(db, STORE_NAME, normalized, { indexName: 'keywords', signal });
 
 				if (Array.isArray(results) && results.length !== 0) {
 					const frag = html`
@@ -435,6 +517,10 @@ export default async function ({ matches, signal, url, params: { partner, catego
 					frag.getElementById('search-211').action = 'https://www.211ca.org/search';
 
 					return frag;
+				} else if (REDIRECTS.has(normalized)) {
+					const url = new URL(location.pathname, location.origin);
+					url.searchParams.set('category', REDIRECTS.get(normalized));
+					return url;
 				} else {
 					const frag = html`
 						<h2 class="status-box error">No Results found for <q>${escape(searchParams.get('category'))}</q></h2>
@@ -449,7 +535,6 @@ export default async function ({ matches, signal, url, params: { partner, catego
 				}
 			} catch (err) {
 				reportError(err);
-				db.close();
 
 				const frag = html`
 					${searchForm({ autoFocus: true })}
@@ -462,7 +547,6 @@ export default async function ({ matches, signal, url, params: { partner, catego
 			}
 		} else {
 			const results = await getAllItems(db, STORE_NAME, null, { signal });
-			db.close();
 
 			const frag = html`
 				${searchForm({ autoFocus: false })}
@@ -480,7 +564,6 @@ export default async function ({ matches, signal, url, params: { partner, catego
 		}
 	} catch(err) {
 		reportError(err);
-		db.close();
 
 		return html`
 			${searchForm({ autoFocus: true })}
