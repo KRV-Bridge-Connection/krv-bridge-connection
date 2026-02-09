@@ -1,5 +1,4 @@
 'use strict';
-/* eslint-env serviceworker */
 /* global init: readonly, config: readonly */
 /* {{ app.version | default: pkg.version }} */
 const CDN = 'https://cdn.kernvalley.us/';

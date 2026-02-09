@@ -1,4 +1,3 @@
-/* eslint-env node */
 import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';

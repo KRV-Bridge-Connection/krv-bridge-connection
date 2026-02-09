@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-env node */
 /* global process */
 import { load } from 'js-yaml';
 import * as filters from '@shgysk8zer0/11ty-filters';
