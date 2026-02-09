@@ -1,4 +1,3 @@
-/* eslint-env node */
 import { rollupImport, rollupImportMeta } from '@shgysk8zer0/rollup-import';
 import { importmap } from '@shgysk8zer0/importmap';
 import terser from '@rollup/plugin-terser';
