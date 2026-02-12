@@ -67,7 +67,10 @@ const snapClass = scoped`
 	aspect-ratio: 16 / 9;
 	overflow: auto;
 	position: relative;
-	will-change: scroll-position;
+
+	&::part(container) {
+		will-change: scroll-position;
+	}
 
 	& figure {
 		margin: 0;
