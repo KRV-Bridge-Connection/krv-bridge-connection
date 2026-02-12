@@ -4,7 +4,6 @@ import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
-// import { whenLoaded } from '@aegisjsproject/router';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
 import imgData from '/img/gallery.json' with { type: 'json' };
@@ -65,9 +64,10 @@ const orgCard = scoped`
 
 const snapClass = scoped`
 	width: 100%;
-	aspect-ratio: 16/9;
+	aspect-ratio: 16 / 9;
 	overflow: auto;
 	position: relative;
+	will-change: scroll-position;
 
 	& figure {
 		margin: 0;
@@ -122,6 +122,10 @@ const snapClass = scoped`
 		object-position: center;
 		content-visibility: auto;
 		contain-intrinsic-size: auto 100dvw 100dvh;
+	}
+
+	& > .current > + {
+		content-visibility: visible;
 	}
 
 	weather-forecast {
@@ -266,8 +270,6 @@ export default async ({ signal, stack }) => {
 	reload.accessKey = 'r';
 
 	frag.append(scrollSnap, fullscreen, reload);
-	// whenLoaded({ signal }).then(() => scrollSnap.requestFullscreen().catch(reportError));
-	// stack.defer(() => scrollSnap.requestFullscreen().catch(reportError));
 
 	return frag;
 };
