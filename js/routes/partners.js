@@ -47,6 +47,7 @@ export const ORG_CATEGORIES = [
 	'Homelessness',
 	'Elected Officials',
 	'Public Safety',
+	'Home Improvement & Safety',
 ].sort();
 
 const REDIRECTS = new Map([
@@ -127,6 +128,20 @@ const REDIRECTS = new Map([
 	['custody', 'Legal Assistance'],
 	['divorce', 'Legal Assistance'],
 	['child support', 'Legal Assistance'],
+	['roof', 'Home Improvement & Safety'],
+	['roofing', 'Home Improvement & Safety'],
+	['home repair', 'Home Improvement & Safety'],
+	['usda', 'Home Improvement & Safety'],
+	['rural development', 'Home Improvement & Safety'],
+	['weatherization', 'Home Improvement & Safety'],
+	['insulation', 'Home Improvement & Safety'],
+	['fire safe', 'Home Improvement & Safety'],
+	['brush clearing', 'Home Improvement & Safety'],
+	['defensible space', 'Home Improvement & Safety'],
+	['chipping', 'Home Improvement & Safety'],
+	['weed abatement', 'Home Improvement & Safety'],
+	['hvac', 'Home Improvement & Safety'],
+	['mold', 'Home Improvement & Safety'],
 ]);
 
 function _addUTM(url) {
