@@ -32,6 +32,21 @@ permalink: /_headers
   Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
   Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} {{ importmap.imports.qr }} {{ importmap.imports.lit }} {{ importmap.imports['lit/'] }} {{ importmap.imports['lit-html/'] }} {{ importmap.imports['lit-element/'] }} {{ importmap.imports['@awesome.me/webawesome/'] }}  '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }}; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
 
+  /pantry/oasis
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  {% comment %}Cross-Origin-Resource-Policy: cross-origin{% endcomment %}
+  Cross-Origin-Opener-Policy: same-origin{% comment %}
+  Cross-Origin-Embedder-Policy: require-corp{% endcomment %}
+  Permissions-Policy: {% comment %}cross-origin-isolated=(self), {% endcomment %}web-share=(self), camera=(self), storage-acces=(self), screen-wake-lock=(self), geolocation=(self)
+  X-XSS-Protection: 1; mode=block
+  Link: <https://fonts.gstatic.com>; rel=preconnect; crossorigin=anonymous;
+  Link: <{{ importmap.imports['@shgysk8zer0/polyfills'] }}>; rel=preload; as=script; referrerpolicy=no-referrer; crossorigin=anonymous;
+  {% comment %} Link: </js/index.min.js>; rel=preload; as=script; referrerpolicy=no-referrer; {% endcomment %}
+  Link: </css/index.min.css>; rel=preload; as=style; referrerpolicy=no-referrer;
+  Content-Security-Policy: default-src {{ csp.default.default-src | join: ' ' }}; base-uri {{ csp.default.base-uri | join: ' ' }}; img-src {{ csp.default.img-src | join: ' ' }}; script-src {{ csp.default.script-src | join: ' ' }} {{ importmap.imports.qr }} {{ importmap.imports.lit }} {{ importmap.imports['lit/'] }} {{ importmap.imports['lit-html/'] }} {{ importmap.imports['lit-element/'] }} {{ importmap.imports['@awesome.me/webawesome/'] }}  '{{ importmap | jsonify | sri }}'; style-src {{ csp.default.style-src | join: ' ' }}; connect-src {{ csp.default.connect-src | join: ' ' }}; font-src {{ csp.default.font-src | join: ' ' }}; media-src {{ csp.default.media-src | join: ' ' }}; frame-src {{ csp.default.frame-src | join: ' ' }}; form-action {{ csp.default.form-action | join: ' ' }} https://capkfoodbank.oasisinsight.net/search/advanced/; manifest-src {{ csp.default.manifest-src | join: ' ' }}; worker-src {{ csp.default.worker-src | join: ' ' }}; upgrade-insecure-requests; block-all-mixed-content; trusted-types {{ policies.trusted | join: ' '}}; require-trusted-types-for 'script';
+
 /.netlify/functions/*
   Content-Security-Policy: default-src 'none'
 

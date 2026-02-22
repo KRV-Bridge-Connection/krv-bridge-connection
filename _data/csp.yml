@@ -66,3 +66,4 @@ default:
   form-action:
     - "'self'"
     - https://www.211ca.org/search
+    - https://capkfoodbank.oasisinsight.net/search/advanced/
