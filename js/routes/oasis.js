@@ -234,6 +234,6 @@ export default ({ signal, stack }) => {
 		<hr />
 		<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="o">Scan Oasis ID</button>
 		<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="i">Scan Other ID</button>
-		<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg">Advanced Search</button>
+		<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="a">Advanced Search</button>
 	</div>`;
 };
