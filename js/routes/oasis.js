@@ -71,8 +71,7 @@ async function showError(message, { timeout = ERROR_DURATION } = {}) {
 
 const submitHandler = registerCallback('oasis:id:submit', async event => {
 	event.preventDefault();
-	const target = event.target;
-	const submitter = event?.submitter;
+	const { target, submitter } = event;
 	const data = new FormData(target);
 	const { type, id } = data.get(NAME)?.trim()?.match(ID_PATTERN)?.groups ?? {};
 
@@ -89,7 +88,6 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 						'noopener,noreferrer'
 					);
 
-					target.reset();
 					break;
 
 				default:
@@ -108,18 +106,31 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 	}
 });
 
-const submitLicense = registerCallback('oasis:license:submit', event => {
+const submitLicense = registerCallback('oasis:license:submit', async event => {
 	event.preventDefault();
-	const data = new FormData(event.target);
-	const barcode = data.get(NAME).trim();
-	globalThis.open(
-		url`${OASIS_ORIGIN}cases/barcode/scan/?associated_barcode_name=${barcode}`,
-		OASIS_NAME,
-		'noopener,noreferrer'
-	);
+	const { target, submitter } = event;
 
-	event.target.reset();
-	event.target.elements.namedItem('barcode').focus();
+	try {
+		if (submitter instanceof HTMLButtonElement) {
+			submitter.disabled = true;
+		}
+
+		const data = new FormData(target);
+		const barcode = data.get(NAME).trim();
+		globalThis.open(
+			url`${OASIS_ORIGIN}cases/barcode/scan/?associated_barcode_name=${barcode}`,
+			OASIS_NAME,
+			'noopener,noreferrer'
+		);
+	} catch(err) {
+		await showError(err);
+	} finally {
+		if (submitter instanceof HTMLButtonElement) {
+			submitter.disabled = false;
+		}
+
+		target.reset();
+	}
 });
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
@@ -142,7 +153,7 @@ export default ({ signal }) => html`<div id="${SCANNER_ID}">
 			<legend>Scan Driver's License</legend>
 			<div class="form-group">
 				<label for="license" class="input-label required">Driver's License</label>
-				<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" autofocus="" required="" />
+				<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" autocomplete="off" minlength="8" autofocus="" required="" />
 			</div>
 		</fieldset>
 		<button type="submit" class="btn btn-success btn-lg">Submit</button>
@@ -158,8 +169,8 @@ export default ({ signal }) => html`<div id="${SCANNER_ID}">
 		<strong>This is a temporary fix.</strong> We set this up because the barcode scanner feature inside the Oasis Platform is currently broken. We are using this as a workaround until they fix the bug on their end.
 	</p>
 	</div>
-	<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noferrer external" class="btn btn-secondary">Login on Oasis</a>
+	<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noferrer external" class="btn btn-secondary" accesskey="s">Sign-in on Oasis</a>
 	<hr />
-	<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg">Scan License</button>
-	<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg">Scan Oasis ID</button>
+	<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="o">Scan Oasis ID</button>
+	<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="i">Scan Other ID</button>
 </div>`;
