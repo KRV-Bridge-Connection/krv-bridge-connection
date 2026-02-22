@@ -126,6 +126,8 @@ const submitLicense = registerCallback('oasis:license:submit', async event => {
 
 		const data = new FormData(target);
 		const barcode = data.get(NAME).trim();
+		// Save barcode/ID to clipboard to create to paste into profile if not found
+		await navigator.clipboard.writeText(barcode);
 		globalThis.open(
 			url`${OASIS_ORIGIN}cases/barcode/scan/?associated_barcode_name=${barcode}`,
 			OASIS_NAME,
