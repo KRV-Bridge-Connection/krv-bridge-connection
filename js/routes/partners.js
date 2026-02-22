@@ -357,8 +357,8 @@ export const createPartner = result => {
 
 		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
 			<h3>${typeof contact.name === 'string'
-		? `<span itemprop="name">${contact.name}</span> &mdash; <span itemprop="contactType">${contact.contactType}</span>`
-		: `<span itemprop="contactType">${contact.contactType}</span>`}</h3>
+			? `<span itemprop="name">${contact.name}</span> &mdash; <span itemprop="contactType">${contact.contactType}</span>`
+			: `<span itemprop="contactType">${contact.contactType}</span>`}</h3>
 			${typeof contact.description === 'string' ? `<p itemprop="description">${escape(contact.description)}</p>` : ''}
 			${getPhoneLink(contact)}
 			${getEmailLink(contact)}
