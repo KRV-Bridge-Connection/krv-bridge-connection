@@ -1,7 +1,7 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onReset, onBlur, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onReset, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
@@ -15,10 +15,17 @@ const OASIS_NAME = 'Oasis';
 const OASIS_SEARCH_ID = 'oasis-search-form';
 const ERROR_DURATION = 5_000;
 const SCANNER_ID = '_' + crypto.randomUUID();
-const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elements.namedItem(NAME).focus());
-const submitOnBlur = registerCallback('oasis:blur', ({ target }) => target.validity.valid && target.form.requestSubmit());
+const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elements.namedItem(NAME)?.focus());
 const useScanner = new Signal.State(false);
 const formats = [CODE_128];
+
+const check = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" class="icon check-icon" viewBox="0 0 12 16" fill="currentColor" role="presentation">
+	<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+</svg>`;
+
+const x = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon x-icon" fill="currentColor" role="presentation">
+	<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+</svg>`;
 
 const sheet = css`#${SCANNER_ID} {
 	& .scanner-notice {
@@ -26,6 +33,12 @@ const sheet = css`#${SCANNER_ID} {
 		padding: 15px;
 		border-radius: 8px;
 		margin: 20px 0;
+	}
+
+	&:not(:has(.btn.scanner-active)) {
+		details.scanner-preview {
+			display: none;
+		}
 	}
 
 	& .scanner-notice h3 {
@@ -47,10 +60,35 @@ const sheet = css`#${SCANNER_ID} {
 		border-top: 2px solid #fafafa;
 	}
 
+	& .flex > .btn {
+		margin-top: 0.8em;
+	}
+
+	& .scanner-toggle {
+		&.scanner-active {
+			& .check-icon {
+				display: none;
+			}
+		}
+
+		&:not(.scanner-active ){
+			& .x-icon {
+				display: none;
+			}
+		}
+	}
+
 	& [popover] {
-		min-width: max(80%, 600px);
+		width: min(95%, 800px);
 		max-height: 90dvh;
 		overflow-y: auto;
+		border-width: 1px;
+		border-radius: 6px;
+
+		&::backdrop {
+			background-color: rgba(0, 0, 0, 0.8);
+			backdrop-filter: blur(3px);
+		}
 	}
 }`;
 
@@ -182,13 +220,13 @@ const toggleScanner = registerCallback('oasis:scanner:toggle', ({ currentTarget 
 	if (useScanner.get()) {
 		useScanner.set(false);
 		currentTarget.classList.add('btn-info');
+		currentTarget.classList.remove('scanner-active');
 		currentTarget.classList.remove('btn-warning');
-		// history.replaceState({ ...history.state ?? {}, useScanner: false });
 	} else {
 		useScanner.set(true);
 		currentTarget.classList.add('btn-warning');
+		currentTarget.classList.add('scanner-active');
 		currentTarget.classList.remove('btn-info');
-		// history.replaceState({ ...history.state ?? {}, useScanner: true });
 	}
 });
 
@@ -205,16 +243,16 @@ export default ({ signal, stack }) => {
 		<form ${onSubmit}="${submitHandler}" id="oasis-scanner" popover="auto" ${onBeforetoggle}="${beforeToggle}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border" autocomplete="off">
 				<legend>Oasis Case Scanner</legend>
-				<details class="center">
+				<details class="center scanner-preview">
 					<summary class="btn btn-primary btn-block">Use Barcode Scanner</summary>
-					<video id="${INPUT_ID}-preview" data-preview-for="${NAME}"></video>
+					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
 				</details>
 				<div class="form-group">
 					<label for="${INPUT_ID}" class="input-label">Barcode</label>
-					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${onBlur}="${submitOnBlur}" ${signalAttr}="${signal}" autofocus="" required="" />
+					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
 			</fieldset>
-			<div class="flex row space-evenly">
+			<div class="flex row wrap space-evenly">
 				<button type="submit" class="btn btn-success btn-lg">Submit</button>
 				<button type="reset" class="btn btn-danger btn-lg">Reset</button>
 				<button type="button" command="hide-popover" commandfor="oasis-scanner" class="btn btn-warning btn-lg">Dismiss</button>
@@ -228,9 +266,9 @@ export default ({ signal, stack }) => {
 		<form id="license-scanner" popover="auto" ${onSubmit}="${submitLicense}" ${onBeforetoggle}="${beforeToggle}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
 				<legend>Scan Driver's License</legend>
-				<details class="center">
+				<details class="center scanner-preview">
 					<summary class="btn btn-primary btn-block">Use Barcode Scanner</summary>
-					<video id="${INPUT_ID}-preview" data-preview-for="${NAME}"></video>
+					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
 				</details>
 				<div class="form-group">
 					<label for="license" class="input-label required">Driver's License</label>
@@ -288,7 +326,7 @@ export default ({ signal, stack }) => {
 					<input type="email" name="email" id="${OASIS_SEARCH_ID}-email" class="input" placeholder="Email Address" autocomplete="off" />
 				</div>
 			</fieldset>
-			<div class="flex row space-evenly sticky bottom full-width btn-container">
+			<div class="flex row wrap space-evenly sticky bottom full-width btn-container">
 				<button type="submit" class="btn btn-success btn-lg">Submit</button>
 				<button type="reset" class="btn btn-danger btn-lg">Reset</button>
 				<button type="button" command="hide-popover" commandfor="oasis-search" class="btn btn-warning btn-lg">Dismiss</button>
@@ -309,10 +347,15 @@ export default ({ signal, stack }) => {
 		</p>
 		</div>
 		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-secondary" accesskey="0">Sign-in on Oasis</a>
-		<button type="button" class="btn btn-info" ${onClick}="${toggleScanner}" ${signalAttr}="${signal}">Toggle Camera</button>
+		<button type="button" class="btn btn-info scanner-toggle" ${onClick}="${toggleScanner}" ${signalAttr}="${signal}">
+			<span>Toggle Camera</span>
+			${x}${check}
+		</button>
 		<hr />
-		<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">Scan Oasis ID</button>
-		<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="2">Scan Other ID</button>
-		<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="3">Advanced Search</button>
+		<div class="flex row wrap space-evenly">
+			<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">Scan Oasis ID</button>
+			<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="2">Scan Other ID</button>
+			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="3">Advanced Search</button>
+		</div>
 	</div>`;
 };
