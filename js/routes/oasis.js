@@ -21,12 +21,28 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elem
 const useScanner = new Signal.State(false);
 const formats = [CODE_128];
 
+const scannerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="icon" fill="currentColor" viewBox="0 0 24 24" role="presentation">
+	<path d="M2 5h2v14H2zm4 0h1v14H6zm3 0h3v14H9zm5 0h1v14h-1zm3 0h2v14h-2zm4 0h1v14h-1z"/>
+</svg>`;
+
 const check = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" class="icon check-icon" viewBox="0 0 12 16" fill="currentColor" role="presentation">
 	<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
 </svg>`;
 
 const x = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16" class="icon x-icon" fill="currentColor" role="presentation">
 	<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+</svg>`;
+
+const searchIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="icon" fill="currentColor" viewBox="0 0 16 16" role="presenttion">
+	<path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/>
+</svg>`;
+
+const helpIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" class="icon" fill="currentColor" viewBox="0 0 14 16" role="presentation">
+	<path fill-rule="evenodd" d="M6 10h2v2H6v-2zm4-3.5C10 8.64 8 9 8 9H6c0-.55.45-1 1-1h.5c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5h-1c-.28 0-.5.22-.5.5V7H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7z"/>
+</svg>`;
+
+const signInIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" class="icon" fill="currentColor" viewBox="0 0 14 16" role="presentation">
+	<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"/>
 </svg>`;
 
 const sheet = css`#${SCANNER_ID} {
@@ -252,42 +268,72 @@ export default ({ signal, stack }) => {
 					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
 				</details>
 				<div class="form-group">
-					<label for="${INPUT_ID}" class="input-label">Barcode</label>
+					<label for="${INPUT_ID}" class="input-label">Oasis Barcode ${scannerIcon}</label>
 					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${OASIS_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
-				<button type="submit" class="btn btn-success btn-lg">Submit</button>
-				<button type="reset" class="btn btn-danger btn-lg">Reset</button>
-				<button type="button" command="hide-popover" commandfor="oasis-scanner" class="btn btn-warning btn-lg">Dismiss</button>
+				<button type="submit" class="btn btn-success btn-lg">
+					<span>Submit</span>
+					${check}
+				</button>
+				<button type="reset" class="btn btn-danger btn-lg">
+					<span>Reset</span>
+					${x}
+				</button>
+				<button type="button" command="hide-popover" commandfor="oasis-scanner" class="btn btn-warning btn-lg">
+					<span>Dismiss</span>
+					${x}
+				</button>
 			</div>
 			<br />
 			<div>
-				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info">Scan Other ID</button>
-				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">Advanced Search</button>
+				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info">
+					<span>Scan Other ID</span>
+					${scannerIcon}
+				</button>
+				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
+					<span>Advanced Search</span>
+					${searchIcon}
+				</button>
 			</div>
 		</form>
 		<form id="license-scanner" popover="auto" ${onSubmit}="${submitLicense}" ${onBeforetoggle}="${beforeToggle}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
-				<legend>Scan Driver's License</legend>
+				<legend>Scan Other ID Barcode</legend>
 				<details class="center scanner-preview">
 					<summary class="btn btn-primary btn-block">Use Barcode Scanner</summary>
 					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
 				</details>
 				<div class="form-group">
-					<label for="license" class="input-label required">Driver's License</label>
+					<label for="license" class="input-label required">Other ID Barcode ${scannerIcon}</label>
 					<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" pattern="${BARCODE_PATTERN_STR}" autocomplete="off" minlength="13" maxlength="17" autofocus="" required="" />
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
-				<button type="submit" class="btn btn-success btn-lg">Submit</button>
-				<button type="reset" class="btn btn-danger btn-lg">Reset</button>
-				<button type="button" command="hide-popover" commandfor="license-scanner" class="btn btn-warning btn-lg">Dismiss</button>
+				<button type="submit" class="btn btn-success btn-lg">
+					<span>Submit</span>
+					${check}
+				</button>
+				<button type="reset" class="btn btn-danger btn-lg">
+					<span>Reset</span>
+					${x}
+				</button>
+				<button type="button" command="hide-popover" commandfor="license-scanner" class="btn btn-warning btn-lg">
+					<span>Dismiss</span>
+					${x}
+				</button>
 			</div>
 			<br />
 			<div>
-				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info">Scan Oasis ID</button>
-				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">Advanced Search</button>
+				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info">
+					<span>Scan Oasis ID</span>
+					${scannerIcon}
+				</button>
+				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
+					<span>Advanced Search</span>
+					${searchIcon}
+				</button>
 			</div>
 		</form>
 		<form id="oasis-search" popover="auto" action="${OASIS_ORIGIN}search/advanced/" method="POST" rel="noopener noreferrer external" target="${OASIS_NAME}" class="no-router" ${onBeforetoggle}="${beforeToggle}" ${signalAttr}="${signal}">
@@ -331,14 +377,29 @@ export default ({ signal, stack }) => {
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly sticky bottom full-width btn-container">
-				<button type="submit" class="btn btn-success btn-lg">Submit</button>
-				<button type="reset" class="btn btn-danger btn-lg">Reset</button>
-				<button type="button" command="hide-popover" commandfor="oasis-search" class="btn btn-warning btn-lg">Dismiss</button>
+				<button type="submit" class="btn btn-success btn-lg">
+					<span>Submit</span>
+					${check}
+				</button>
+				<button type="reset" class="btn btn-danger btn-lg">
+					<span>Reset</span>
+					${x}
+				</button>
+				<button type="button" command="hide-popover" commandfor="oasis-search" class="btn btn-warning btn-lg">
+					<span>Dismiss</span>
+					${x}
+				</button>
 			</div>
 			<br />
 			<div>
-				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info btn-lg">Scan Oasis ID</button>
-				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info btn-lg">Scan Other ID</button>
+				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info btn-lg">
+					<span>Scan Oasis ID</span>
+					${scannerIcon}
+				</button>
+				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info btn-lg">
+					<span>Scan Other ID</span>
+					${scannerIcon}
+				</button>
 			</div>
 		</form>
 		<div class="scanner-notice">
@@ -350,16 +411,119 @@ export default ({ signal, stack }) => {
 			<strong>This is a temporary fix.</strong> We set this up because the barcode scanner feature inside the Oasis Platform is currently broken. We are using this as a workaround until they fix the bug on their end.
 		</p>
 		</div>
-		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-secondary" accesskey="0">Sign-in on Oasis</a>
-		<button type="button" class="btn btn-info scanner-toggle" ${onClick}="${toggleScanner}" ${signalAttr}="${signal}">
+		<dialog id="oasis-help">
+			<div class="help-content relative">
+				<button type="button" class="btn btn-danger sticky top right" command="request-close" commandfor="oasis-help" aria-label="Dismiss Dialog">${x}</button>
+				<h1>How to use this Scanner Tool</h1>
+				<p>This tool helps you sign volunteers into the Oasis platform quickly. You can use a handheld barcode scanner, your device's camera, or type manually.</p>
+
+				<hr>
+
+				<h2>1. Important: Sign In First!</h2>
+				<p>
+					Before you start scanning badges or licenses, please click the <strong>Sign-in on Oasis</strong> button (top left).
+					<br>
+					<em>Note: If you are not signed in and try to scan a Driver's License, the system may open a blank page. If that happens, close that tab, sign in here, and try again.</em>
+				</p>
+
+				<hr>
+
+				<h2>2. Ways to Scan</h2>
+				<p>There are three main blue buttons to choose from depending on what the volunteer hands you:</p>
+
+				<h3>🔹 Scan Oasis ID (Button 1)</h3>
+				<p>Use this if the volunteer has their official printed ID card. Click the button, then scan the barcode.</p>
+
+				<h3>🔹 Scan Other ID / Driver's License (Button 2)</h3>
+				<p>Use this to scan the barcode on the back of a Driver's License.</p>
+				<p><strong>Helpful Tip:</strong> When you scan a license, this tool automatically copies the barcode number to your computer's "Clipboard." If the search doesn't find them, you can go to Advanced Search and <strong>Paste</strong> the number to try looking it up manually.</p>
+
+				<h3>🔹 Advanced Search (Button 3)</h3>
+				<p>If they forgot their ID, use this button to search by Name, Birthday, or Address.</p>
+
+				<hr>
+
+				<h2>3. Using the Camera</h2>
+				<p><strong>Do you have a handheld barcode scanner gun?</strong><br>
+				Great! You don't need to change any settings. Just click a blue button and scan.</p>
+
+				<p><strong>No scanner? Use your Webcam:</strong><br>
+				You can use your laptop or tablet camera to scan barcodes.</p>
+				<ul>
+					<li>
+						<strong>To Turn ON:</strong> Click the <span class="btn btn-info">Toggle Camera &#10003;</span> button. A video preview will appear.
+					</li>
+					<li>
+						<strong>To Turn OFF:</strong> Click the <span class="btn btn-warning">Toggle Camera &#10005;</span> button.
+					</li>
+				</ul>
+
+				<hr>
+				<h2>4. Keyboard Shortcuts</h2>
+				<p>If you prefer using the keyboard, you can use "Access Keys." <br><em>(Note: Depending on your browser/computer, you usually hold <strong>Alt</strong> or <strong>Alt + Shift</strong> while pressing the key).</em></p>
+
+				<table border="1" cellpadding="10">
+					<thead>
+						<tr>
+							<th>Key</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><strong>0</strong></td>
+							<td>Go to Login</td>
+						</tr>
+						<tr>
+							<td><strong>1</strong></td>
+							<td>Scan Oasis ID</td>
+						</tr>
+						<tr>
+							<td><strong>2</strong></td>
+							<td>Scan Driver's License / Other</td>
+						</tr>
+						<tr>
+							<td><strong>3</strong></td>
+							<td>Advanced Search</td>
+						</tr>
+						<tr>
+							<td><strong>C</strong></td>
+							<td>Toggle Camera On/Off</td>
+						</tr>
+						<tr>
+							<td><strong>H</strong></td>
+							<td>Open this Help menu</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</dialog>
+		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-secondary" accesskey="0">
+			<span>Sign-in on Oasis</span>
+			${signInIcon}
+		</a>
+		<button type="button" class="btn btn-info scanner-toggle" ${onClick}="${toggleScanner}" ${signalAttr}="${signal}" accesskey="C">
 			<span>Toggle Camera</span>
 			${x}${check}
 		</button>
+		<button type-"button" class="btn btn-info" command="show-modal" commandfor="oasis-help" accesskey="h">
+			<span>Help</span>
+			${helpIcon}
+		</button>
 		<hr />
 		<div class="flex row wrap space-evenly">
-			<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">Scan Oasis ID</button>
-			<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="2">Scan Other ID</button>
-			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="3">Advanced Search</button>
+			<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">
+				Scan Oasis ID
+				${scannerIcon}
+			</button>
+			<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="2">
+				<span>Scan Other ID</span>
+				${scannerIcon}
+			</button>
+			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="3">
+				<span>Advanced Search</span>
+				${searchIcon}
+			</button>
 		</div>
 	</div>`;
 };
