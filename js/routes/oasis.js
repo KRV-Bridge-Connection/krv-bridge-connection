@@ -527,3 +527,7 @@ export default ({ signal, stack }) => {
 		</div>
 	</div>`;
 };
+
+export const title = 'Oasis Scanner Tool - KRV Bridge Connection';
+
+export const description = 'A temporary utility to help scan barcodes for the Oasis Platform';
