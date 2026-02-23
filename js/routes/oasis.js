@@ -7,7 +7,9 @@ import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/ba
 import { Signal } from '@shgysk8zer0/signals';
 
 const OASIS_ID_PATTERN = /^\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}$/;
-const PATTERN_STR = OASIS_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
+const BARCODE_ID_PATTERN = /^[A-Z0-9]{12,17}$/;
+const BARCODE_PATTERN_STR = BARCODE_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
+const OASIS_PATTERN_STR = OASIS_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const NAME = 'barcode';
 const INPUT_ID = 'oasis-barcode';
 const OASIS_ORIGIN = 'https://capkfoodbank.oasisinsight.net/';
@@ -149,6 +151,8 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 			if (submitter instanceof HTMLButtonElement) {
 				submitter.disabled = false;
 			}
+
+			target.reset();
 		}
 	} else {
 		target.reset();
@@ -249,7 +253,7 @@ export default ({ signal, stack }) => {
 				</details>
 				<div class="form-group">
 					<label for="${INPUT_ID}" class="input-label">Barcode</label>
-					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
+					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${OASIS_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
@@ -272,7 +276,7 @@ export default ({ signal, stack }) => {
 				</details>
 				<div class="form-group">
 					<label for="license" class="input-label required">Driver's License</label>
-					<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" autocomplete="off" minlength="8" autofocus="" required="" />
+					<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" pattern="${BARCODE_PATTERN_STR}" autocomplete="off" minlength="13" maxlength="17" autofocus="" required="" />
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
