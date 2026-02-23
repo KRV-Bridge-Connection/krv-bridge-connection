@@ -3,7 +3,7 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onSubmit, onReset, onBlur, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
-import { createBarcodeScanner, preloadRxing } from '@aegisjsproject/barcodescanner';
+import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
 
 const OASIS_ID_PATTERN = /^\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}$/;
@@ -18,6 +18,7 @@ const SCANNER_ID = '_' + crypto.randomUUID();
 const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elements.namedItem(NAME).focus());
 const submitOnBlur = registerCallback('oasis:blur', ({ target }) => target.validity.valid && target.form.requestSubmit());
 const useScanner = new Signal.State(false);
+const formats = [CODE_128];
 
 const sheet = css`#${SCANNER_ID} {
 	& .scanner-notice {
@@ -158,7 +159,7 @@ const beforeToggle = registerCallback('oasis:form:beforeToggle', ({ target, newS
 			createBarcodeScanner(result => {
 				target.elements.namedItem(video.dataset.previewFor).value = result.rawValue;
 				// target.requestSubmit();
-			}, { video, signal });
+			}, { video, signal, formats });
 
 			target.addEventListener('toggle', ({ newState }) => {
 				if (newState === 'closed') {
