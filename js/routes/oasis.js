@@ -1,7 +1,7 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onReset, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onReset, onBeforetoggle, onCommand, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
@@ -250,7 +250,16 @@ const toggleScanner = registerCallback('oasis:scanner:toggle', ({ currentTarget 
 	}
 });
 
-window.useScanner = useScanner;
+const handleCommand = registerCallback('oasis:command', ({ target, source, command }) => {
+	switch(command) {
+		case '--copy':
+			if (target.validity.valid) {
+				navigator.clipboard.writeText(target.value).catch(() => source.disabled = true);
+			}
+			break;
+	}
+});
+
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 
 preloadRxing();
@@ -307,7 +316,14 @@ export default ({ signal, stack }) => {
 				</details>
 				<div class="form-group">
 					<label for="license" class="input-label required">Other ID Barcode ${scannerIcon}</label>
-					<input type="text" name="${NAME}" id="license" class="input" placeholder="#########" pattern="${BARCODE_PATTERN_STR}" autocomplete="off" minlength="13" maxlength="17" autofocus="" required="" />
+					<div class="flex row">
+						<input type="text" name="${NAME}" id="license" class="input grow-1" placeholder="#########" pattern="${BARCODE_PATTERN_STR}" autocomplete="off" minlength="13" maxlength="17" ${onCommand}="${handleCommand}" ${signalAttr}="${signal}" autofocus="" required="" />
+						<button type="button" command="--copy" commandfor="license" class="btn btn-outline-secondary btn-small" aria-label="Copy">
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="icon" viewBox="0 0 14 16" role="presentation">
+								<path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"/>
+							</svg>
+						</button>
+					</div>
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
@@ -334,6 +350,12 @@ export default ({ signal, stack }) => {
 					<span>Advanced Search</span>
 					${searchIcon}
 				</button>
+				<a href="${OASIS_ORIGIN}bulletins/" target="${OASIS_NAME}" class="btn btn-link" rel="noreferrer noopener external">
+					<span>Open Oasis</span>
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" fill="currentColor" class="icon" viewBox="0 0 12 16" role="presentation">
+						<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+					</svg>
+				</a>
 			</div>
 		</form>
 		<form id="oasis-search" popover="auto" action="${OASIS_ORIGIN}search/advanced/" method="POST" rel="noopener noreferrer external" target="${OASIS_NAME}" class="no-router" ${onBeforetoggle}="${beforeToggle}" ${signalAttr}="${signal}">
@@ -498,7 +520,7 @@ export default ({ signal, stack }) => {
 				</table>
 			</div>
 		</dialog>
-		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-secondary" accesskey="0">
+		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-link" accesskey="0">
 			<span>Sign-in on Oasis</span>
 			${signInIcon}
 		</a>
