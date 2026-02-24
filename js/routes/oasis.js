@@ -515,7 +515,49 @@ export default ({ signal, stack }) => {
 				<hr>
 				<h2>Keyboard Shortcuts</h2>
 				<p>If you prefer using the keyboard, you can use "Access Keys." <br><em>(Note: Depending on your browser/computer, you usually hold <strong>Alt</strong> or <strong>Alt + Shift</strong> while pressing the key).</em></p>
-
+				<!-- Copied from MDN for accesskey -->
+				<table border="1" cellpadding="10">
+					<tbody>
+						<tr>
+							<th></th>
+							<th>Windows</th>
+							<th>Linux</th>
+							<th>Mac</th>
+						</tr>
+						<tr>
+							<th>Firefox</th>
+							<td colspan="2"><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd><em>key</em></kbd></td>
+							<td>
+								<kbd>Control</kbd> + <kbd>Option</kbd> +
+								<kbd><em>key</em></kbd> or <kbd>Control</kbd> + <kbd>Alt</kbd> +
+								<kbd><em>key</em></kbd>
+							</td>
+						</tr>
+						<tr>
+						<th>MS Edge</th>
+							<td rowspan="2"><kbd>Alt</kbd> + <kbd><em>key</em></kbd></td>
+							<td rowspan="2">
+								<kbd>Control</kbd> + <kbd>Option</kbd> + <kbd><em>key</em></kbd><br>or <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Shift</kbd> +
+								<kbd><em>key</em></kbd>
+							</td>
+							<td rowspan="2"><kbd>Control</kbd> + <kbd>Option</kbd> + <kbd><em>key</em></kbd></td>
+						</tr>
+						<tr>
+						<th>Google Chrome</th>
+						</tr>
+						<tr>
+							<th>Safari</th>
+							<td colspan="2">n/a</td>
+							<td><kbd>Control</kbd> + <kbd>Option</kbd> + <kbd><em>key</em></kbd></td>
+						</tr>
+						<tr>
+							<th>Opera</th>
+							<td colspan="2"><kbd>Alt</kbd> + <kbd><em>key</em></kbd></td>
+							<td><kbd>Control</kbd> + <kbd>Alt</kbd> + <kbd><em>key</em></kbd></td>
+						</tr>
+					</tbody>
+				</table>
+				<br />
 				<table border="1" cellpadding="10">
 					<thead>
 						<tr>
