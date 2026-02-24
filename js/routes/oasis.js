@@ -275,7 +275,9 @@ const handleCommand = registerCallback('oasis:command', ({ target, source, comma
 
 document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 
-preloadRxing();
+if (! ('BarcodeDetector' in globalThis)) {
+	preloadRxing();
+}
 
 export default ({ signal, stack }) => {
 	// Need to do this because `<form action>` is stripped by sanitizer
