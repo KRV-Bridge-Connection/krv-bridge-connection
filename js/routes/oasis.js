@@ -21,6 +21,9 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elem
 const useScanner = new Signal.State(false);
 const formats = [CODE_128];
 
+const idCardBtnScreenshot = 'https://i.imgur.com/07ISr9K.png';
+const idCardScreenshot = 'https://i.imgur.com/N983kQSh.png';
+
 const scannerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="icon" fill="currentColor" viewBox="0 0 24 24" role="presentation">
 	<path d="M2 5h2v14H2zm4 0h1v14H6zm3 0h3v14H9zm5 0h1v14h-1zm3 0h2v14h-2zm4 0h1v14h-1z"/>
 </svg>`;
@@ -94,6 +97,16 @@ const sheet = css`#${SCANNER_ID} {
 				display: none;
 			}
 		}
+	}
+
+	& figure {
+		border: 1px solid currentColor;
+		border-radius: 4px;
+		padding: 1.2em;
+	}
+
+	& figcaption {
+		color: inherit;
 	}
 
 	& [popover] {
@@ -441,7 +454,7 @@ export default ({ signal, stack }) => {
 
 				<hr>
 
-				<h2>1. Important: Sign In First!</h2>
+				<h2>Important: Sign In First!</h2>
 				<p>
 					Before you start scanning badges or licenses, please click the <strong>Sign-in on Oasis</strong> button (top left).
 					<br>
@@ -450,7 +463,26 @@ export default ({ signal, stack }) => {
 
 				<hr>
 
-				<h2>2. Ways to Scan</h2>
+				<h2>Linking an Oasis Profile with an ID</h2>
+
+				<p>To link a new ID to a case, following these steps:</p>
+				<ol>
+					<li>Scan the barcode on their ID in the Other ID scanner</li>
+					<li>Hit the copy button to copy the results</li>
+					<li>Either lookup in existing case in <q>Advanced Search</q> or create a new case on Oasis.</li>
+					<li>Once you are on their case profile, find the <q>ID Card</q> button at the bottom of the sidebar <i>(See screenshot below)</i></li>
+					<li>In the ID Cards popup, click the <q>Add Barcode</q> button <i>(See Screenshot)</i></li>
+				</ol>
+				<figure class="block">
+					<img src="${idCardBtnScreenshot}" alt="ID Card in Sidebar" width="438" height="230" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" decoding="async" />
+					<figcaption class="current-inherit">In the Sidebar on a Profile / Case Page, you will find a link to ID Cards at the bottom.</figcaption>
+				</figure>
+				<figure>
+					<img src="${idCardScreenshot}" alt="ID Card Dialog" width="1024" height="560" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" decoding="async" />
+					<figcaption class="current-inherit">In the ID Cards, you will see a button to add an ID Card on the right side. Click this button and paste in the scanned ID to link it to the case.</figcaption>
+				</figure>
+
+				<h2>Ways to Scan</h2>
 				<p>There are three main blue buttons to choose from depending on what the volunteer hands you:</p>
 
 				<h3>🔹 Scan Oasis ID (Button 1)</h3>
@@ -458,14 +490,14 @@ export default ({ signal, stack }) => {
 
 				<h3>🔹 Scan Other ID / Driver's License (Button 2)</h3>
 				<p>Use this to scan the barcode on the back of a Driver's License.</p>
-				<p><strong>Helpful Tip:</strong> When you scan a license, this tool automatically copies the barcode number to your computer's "Clipboard." If the search doesn't find them, you can go to Advanced Search and <strong>Paste</strong> the number to try looking it up manually.</p>
+				<p><strong>Helpful Tip:</strong> When you scan a license and submit to look-up, this tool automatically copies the barcode number to your computer's "Clipboard." If the search doesn't find them, you can go to Advanced Search and <strong>Paste</strong> the number to try looking it up manually.</p>
 
 				<h3>🔹 Advanced Search (Button 3)</h3>
 				<p>If they forgot their ID, use this button to search by Name, Birthday, or Address.</p>
 
 				<hr>
 
-				<h2>3. Using the Camera</h2>
+				<h2>Using the Camera</h2>
 				<p><strong>Do you have a handheld barcode scanner gun?</strong><br>
 				Great! You don't need to change any settings. Just click a blue button and scan.</p>
 
@@ -481,7 +513,7 @@ export default ({ signal, stack }) => {
 				</ul>
 
 				<hr>
-				<h2>4. Keyboard Shortcuts</h2>
+				<h2>Keyboard Shortcuts</h2>
 				<p>If you prefer using the keyboard, you can use "Access Keys." <br><em>(Note: Depending on your browser/computer, you usually hold <strong>Alt</strong> or <strong>Alt + Shift</strong> while pressing the key).</em></p>
 
 				<table border="1" cellpadding="10">
