@@ -35,7 +35,7 @@ const config = {
 		'/js/routes/contact.js',
 		'/js/routes/posts.js',
 		'/js/routes/volunteer.js',
-		'/js/routes/pantry-distribution.js',
+		'/js/routes/oasis.js',
 		'/js/routes/digital-signage.js',
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
@@ -43,8 +43,8 @@ const config = {
 		'/contact/',
 		'/volunteer/',
 		'/pantry/',
-		'/pantry/distribution',
 		'/account/',
+		'/pantry/oasis',
 		/* Scripts */
 		'/js/index.min.js',
 		'/js/consts.js',
@@ -67,6 +67,9 @@ const config = {
 		'{{ importmap.imports["@aegisjsproject/commands"] }}',
 		'{{ importmap.imports["@aegisjsproject/markdown"] }}',
 		'{{ importmap.imports["@aegisjsproject/url/"] }}search.js',
+		'{{ importmap.imports["@aegisjsproject/url/"] }}url.min.js',
+		'{{ importmap.imports["@aegisjsproject/barcodescanner"] }}',
+		'{{ importmap.imports["@shgysk8zer0/signals"] }}',
 		/* Images & Icons */
 		'/img/icons.svg',
 		'/img/apple-touch-icon.png',
