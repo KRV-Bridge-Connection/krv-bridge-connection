@@ -18,7 +18,7 @@ const imgs = imgData.map(({ link, width, height, id, description }) => {
 	return el`<figure id="img-${id}">
 		<img
 			src="${link}"
-			alt="${description || id}"
+			${attr({ alt: description || id })}
 			width="${width.toString()}"
 			height="${height.toString()}"
 			srcset="
@@ -26,6 +26,7 @@ const imgs = imgData.map(({ link, width, height, id, description }) => {
 				https://i.imgur.com/${id}h.${ext} 1024w,
 				${link} ${width.toString()}w"
 			sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, ${width.toString()}px"
+			crossorigin="anonymous"
 			referrerpolicy="no-referrer"
 			decoding="async"
 			loading="lazy"

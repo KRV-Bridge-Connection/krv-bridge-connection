@@ -4,11 +4,10 @@
 @import url("./main.css");
 @import url("./footer.css");
 
-/* Quick and dirty way to change layout... Will do better later */
 #top.grid {
 	grid-template-areas: 'nav nav nav' '. main sidebar' 'footer footer footer';
 	grid-template-rows: var(--nav-height, 4rem) minmax(var(--main-height, 75vh), auto) minmax(var(--footer-height, 300px), auto);
-	grid-template-columns: auto minmax(var(--main-min-width, 320px), var(--main-max-width, 1200px)) minmax(var(--sidebar-min-width, 300px), var(--sidebar-max-width, 400px));
+	grid-template-columns: minmax(1.2em, 1fr) auto minmax(400px, 25vw);
 	grid-column-gap: 1.2em;
 
 	@media (max-width: 800px) {

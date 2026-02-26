@@ -4,9 +4,9 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 
 const CAL_BENEFITS = 'https://benefitscal.com/';
-const OASIS_KIOSK = 'https://capkfoodbank.oasisinsight.net/kiosk/87a403e6d6edce481daca0e7a65478f93f78b84a110c3e69e1d0eb7123167f67/';
-const OASIS_ID = 'oasis-dialog';
-const MESSAGE = `Online registration has been disabled due to the <button type="btn" class="btn btn-link" command="show-modal" commandfor="${OASIS_ID}">new pantry system</button>.`;
+// const OASIS_KIOSK = 'https://capkfoodbank.oasisinsight.net/kiosk/87a403e6d6edce481daca0e7a65478f93f78b84a110c3e69e1d0eb7123167f67/';
+// const OASIS_ID = 'oasis-dialog';
+const MESSAGE = null;
 // const CARES_FORM = '/docs/cares-form.pdf';
 // Options given on Neighbor Intake
 export const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
@@ -95,7 +95,7 @@ export default () => html`<section aria-labelledby="pantry-header">
 		are not enough.</p>
 	<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
 	food that they want rather than a preset box of items.
-	The Choice Pantry is available up to twice within a rolling one-month period and provides food based on household size.</p>
+	The Choice Pantry is available up to twice per month (every two weeks) and provides food based on household size.</p>
 	<p>
 		Apply for food assistance in California through the official
 		<a href="${CAL_BENEFITS}" class="btn btn-link" target="_blank" rel="noopener noreferrer">
@@ -119,10 +119,9 @@ export default () => html`<section aria-labelledby="pantry-header">
 	</div>
 </section>
 <section>
-	<p>To register in the new Oasis Platform used throughout Kern County, <button type="button" class="btn btn-outline-secondary" command="show-modal" commandfor="${OASIS_ID}">Click here</button></p>
 	${getPantrySchedule()}
 	<p>
-		<span>For other KRV Food Distributions, please see the</span>
+		<span>For other KRV Food Distributions, please see the Calendar</span>
 		<a href="/food/">
 			<svg class="icon" width="16" height="16" fill="currentColor" role="presentation" aria-hidden="true">
 				<use href="/img/icons.svg#link"></use>
@@ -130,24 +129,7 @@ export default () => html`<section aria-labelledby="pantry-header">
 			<span>Calendar</span>
 		</a>
 	</p>
-</section>
-<dialog id="${OASIS_ID}">
-	<p>All CAPK associated food programs are now using the Oasis Platform.
-	<div class="center">
-		<a href="${OASIS_KIOSK}" class="btn btn-primary" rel="noopener noreferrer" target="_blank">
-			<span>Sign-Up</span>
-			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
-				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
-			 </svg>
-		</a>
-		<button type="button" class="btn btn-danger" command="request-close" commandfor="${OASIS_ID}">
-			<span>Dismiss</span>
-			<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" class="icon" role="presentation" aria-hidden="true">
-				<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
-			</svg>
-		</button>
-	</div>
-</dialog>`;
+</section>`;
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
 
