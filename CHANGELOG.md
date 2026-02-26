@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.15] - 2026-02-26
+
+### Fixed
+- Fix layout bug on large displays
+
 ## [v2.0.14] - 2026-02-26
 
 ### Changed
