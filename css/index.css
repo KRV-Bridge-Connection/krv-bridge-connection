@@ -50,38 +50,63 @@ img.avatar {
 
 .gallery {
 	width: 100%;
-	height: 35vh;
+	aspect-ratio: 16 / 9;
+	overflow: auto;
+	position: relative;
 
-	&:fullscreen > .gallery-item {
-		display: contents;
-	}
-
-	.gallery-item {
+	& figure {
 		margin: 0;
-		overflow: hidden;
+		width: 100%;
+		height: 100%;
+		overflow-x: hidden;
 
-		.gallery-img {
+		& img {
+			width: 100%;
 			height: 100%;
-			width: auto;
 			object-fit: cover;
-			object-position: center;
+			display: block;
+			padding: 0;
+			background-color: none;
 		}
 
-		.caption {
+		& figcaption:not(:empty) {
 			position: absolute;
 			bottom: 0;
 			left: 0;
 			right: 0;
 			width: 100%;
-			z-index: 1;
+			min-height: 3rem;
+			padding: 0.7rem 1.2rem;
 			color: #fafafa;
-			padding: 0.3rem;
-			text-align: center;
-			background-color: rgba(0, 0, 0, 0.6);
-			backdrop-filter: blur(3px);
-			font-family: system-ui;
+			background-color: rgba(0, 0, 0, 0.7);
+			backdrop-filter: blur(4px);
 			text-decoration: none;
+			text-align: center;
 		}
+	}
+
+	&:fullscreen {
+		background-color: #000;
+		color: #e1e1e1;
+		color-scheme: dark;
+		max-width: 100dvw;
+		font-size: 2.5vmin;
+		cursor: none;
+
+		& > *:not(figure) img {
+			background-color: #fafafa;
+			padding: 0.8em;
+			border-radius: 6px;
+			color: #202020;
+		}
+	}
+
+	& > * {
+		width: 100%;
+		object-fit: cover;
+		object-position: center;
+		content-visibility: auto;
+		contain-intrinsic-size: auto 100dvw 100dvh;
 	}
 }
 
