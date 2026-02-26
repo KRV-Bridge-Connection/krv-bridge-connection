@@ -4,7 +4,6 @@
 @import url("./main.css");
 @import url("./footer.css");
 
-/* Quick and dirty way to change layout... Will do better later */
 #top.grid {
 	grid-template-areas: 'nav nav nav' '. main sidebar' 'footer footer footer';
 	grid-template-rows: var(--nav-height, 4rem) minmax(var(--main-height, 75vh), auto) minmax(var(--footer-height, 300px), auto);
