@@ -87,6 +87,7 @@ export default function(eleventyConfig) {
 	// {{ environment }} -> 'production' | 'development'
 	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
 	eleventyConfig.addGlobalData('partners', getCollection('partners', db));
+	eleventyConfig.addGlobalData('referrer', 'origin-when-cross-origin');
 	eleventyConfig.addGlobalData('importmap', importmap);
 	eleventyConfig.addGlobalData('environment',
 		process.env.ELEVENTY_RUN_MODE === 'build'
