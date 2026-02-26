@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.14] - 2026-02-26
+
+### Changed
+- Update several dependencies
+- Remove Oasis links in pantry
+- Update FAQ and other content
+
 ## [v2.0.13] - 2026-02-08
 
 ### Added
