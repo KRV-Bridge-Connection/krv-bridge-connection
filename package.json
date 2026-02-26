@@ -88,6 +88,6 @@
     "@shgysk8zer0/eslint-config": "^1.0.5",
     "@shgysk8zer0/squish": "^1.0.2",
     "dotenv": "^17.3.1",
-    "eslint-plugin-frontmatter2": "^1.0.0"
+    "eslint-plugin-frontmatter2": "^1.0.1"
   }
 }
