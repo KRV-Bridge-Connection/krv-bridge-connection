@@ -196,8 +196,6 @@ const createPartners = results => results.map(({ name, description, image, id, t
 	</div>
 </div>`).join('\n');
 
-document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
-
 if (typeof customElements.get('weather-forecast') === 'undefined') {
 	import('@shgysk8zer0/components/weather/forecast.js');
 }
@@ -281,3 +279,5 @@ export default async ({ signal, stack }) => {
 export const title = 'KRV Bridge Connection Digital Display';
 
 export const description = 'Informational material for KRV Bridge Connection for digital displays';
+
+export const styles = sheet;

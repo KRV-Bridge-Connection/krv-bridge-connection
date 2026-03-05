@@ -4,13 +4,7 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 
 const CAL_BENEFITS = 'https://benefitscal.com/';
-// const OASIS_KIOSK = 'https://capkfoodbank.oasisinsight.net/kiosk/87a403e6d6edce481daca0e7a65478f93f78b84a110c3e69e1d0eb7123167f67/';
-// const OASIS_ID = 'oasis-dialog';
 const MESSAGE = null;
-// const CARES_FORM = '/docs/cares-form.pdf';
-// Options given on Neighbor Intake
-export const TOWNS = ['South Lake', 'Weldon', 'Mt Mesa', 'Lake Isabella', 'Bodfish', 'Wofford Heights', 'Kernville'];
-export const ZIPS = [95949, 93240, 93283, 93205, 93285, 93238, 93255, 93518];
 
 const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
 
