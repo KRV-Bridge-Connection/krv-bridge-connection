@@ -18,7 +18,16 @@ const OASIS_NAME = 'Oasis';
 const OASIS_SEARCH_ID = 'oasis-search-form';
 const ERROR_DURATION = 5_000;
 const SCANNER_ID = '_' + crypto.randomUUID();
-const resetHandler = registerCallback('oasis:reset', ({ target }) => target.elements.namedItem(NAME)?.focus());
+const resetHandler = registerCallback('oasis:reset', ({ target }) => {
+	const elements = target.elements;
+	if (target.id === 'oasis-search') {
+		['phone_0', 'phone_1', 'phone_2', 'date_of_birth_0', 'date_of_birth_1', 'date_of_birth_2'].forEach(field => {
+			elements.namedItem(field).value = null;
+		});
+	} else {
+		elements.namedItem(NAME)?.focus();
+	}
+});
 const useScanner = new Signal.State(false);
 const formats = [CODE_128];
 
