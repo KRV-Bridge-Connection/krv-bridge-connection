@@ -1,13 +1,14 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onReset, onBeforetoggle, onCommand, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onBeforetoggle, onCommand, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
 
 const OASIS_ID_PATTERN = /^\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}$/;
 const BARCODE_ID_PATTERN = /^[A-Z0-9]{12,17}$/;
+const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
 const BARCODE_PATTERN_STR = BARCODE_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const OASIS_PATTERN_STR = OASIS_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const NAME = 'barcode';
@@ -48,7 +49,7 @@ const signInIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="1
 	<path fill-rule="evenodd" d="M7 6.75V12h4V8h1v4c0 .55-.45 1-1 1H7v3l-5.45-2.72c-.33-.17-.55-.52-.55-.91V1c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v3h-1V1H3l4 2v2.25L10 3v2h4v2h-4v2L7 6.75z"/>
 </svg>`;
 
-const sheet = css`#${SCANNER_ID} {
+export const styles = css`#${SCANNER_ID} {
 	& .scanner-notice {
 		border: 1px solid #dee2e6;
 		padding: 15px;
@@ -217,26 +218,30 @@ const submitLicense = registerCallback('oasis:license:submit', async event => {
 	}
 });
 
-const beforeToggle = registerCallback('oasis:form:beforeToggle', ({ target, newState }) => {
+const beforeToggle = registerCallback('oasis:form:beforeToggle', async ({ target, newState }) => {
 	if (newState === 'open') {
 		document.querySelector(':popover-open')?.hidePopover();
 		const video = target.querySelector('video');
 
 		if (useScanner.get() && video instanceof HTMLVideoElement && video.hasAttribute('data-preview-for')) {
+			const { promise, resolve } = Promise.withResolvers();
 			const controller = new AbortController();
-			const signal = AbortSignal.any([getSignal(target.getAttribute(signalAttr)), controller.signal]);
+			const signal = getSignal(target.getAttribute(signalAttr));
 			target.querySelector('details').open = true;
 
-			createBarcodeScanner(result => {
+			using scanner = await createBarcodeScanner(result => {
 				target.elements.namedItem(video.dataset.previewFor).value = result.rawValue;
-				// target.requestSubmit();
 			}, { video, signal, formats });
 
 			target.addEventListener('toggle', ({ newState }) => {
 				if (newState === 'closed') {
+					resolve();
 					controller.abort();
 				}
-			}, { signal });
+			}, { signal: AbortSignal.any([signal, controller.signal ]) });
+			console.log(scanner);
+
+			await promise;
 		}
 
 		target.animate([
@@ -273,7 +278,41 @@ const handleCommand = registerCallback('oasis:command', ({ target, source, comma
 	}
 });
 
-document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+const updateBirthdayFields = registerCallback('oasis:birthdate:change', ({ target }) => {
+	/**
+	 * @type {HTMLCollection}
+	 */
+	const elements = target.form.elements;
+
+	if (target.value.length !== 0 && target.validity.valid) {
+		const [year, month, day] = target.value.split('-');
+		elements.namedItem('date_of_birth_0').value = month;
+		elements.namedItem('date_of_birth_1').value = day;
+		elements.namedItem('date_of_birth_2').value = year;
+	} else {
+		elements.namedItem('date_of_birth_0').value = null;
+		elements.namedItem('date_of_birth_1').value = null;
+		elements.namedItem('date_of_birth_2').value = null;
+	}
+});
+
+const updatePhoneFields = registerCallback('oasis:phone:change', ({ target }) => {
+	/**
+	 * @type {HTMLCollection}
+	 */
+	const elements = target.form.elements;
+
+	if (target.validity.valid && target.value.length !== 0) {
+		const result = PHONE_PATTERN.exec(target.value.trim().replaceAll(/\D/g, '').slice(-10));
+		elements.namedItem('phone_0').value = result?.groups?.phone_0;
+		elements.namedItem('phone_1').value = result?.groups?.phone_1;
+		elements.namedItem('phone_2').value = result?.groups?.phone_2;
+	} else {
+		elements.namedItem('phone_0').value = null;
+		elements.namedItem('phone_1').value = null;
+		elements.namedItem('phone_2').value = null;
+	}
+});
 
 if (! ('BarcodeDetector' in globalThis)) {
 	preloadRxing();
@@ -386,7 +425,10 @@ export default ({ signal, stack }) => {
 				</div>
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-date_of_birth" class="input-label">Date of Birth</label>
-					<input type="date" name="date_of_birth" id="${OASIS_SEARCH_ID}-date_of_birth" class="input" placeholder="YYYY-MM-DD" autocomplete="off" />
+					<input type="date" id="${OASIS_SEARCH_ID}-date_of_birth" class="input" placeholder="YYYY-MM-DD" ${onChange}="${updateBirthdayFields}" autocomplete="off" ${signalAttr}="${signal}" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_year" name="date_of_birth_2" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_month" name="date_of_birth_0" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_day" name="date_of_birth_1" />
 				</div>
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-street_address" class="input-label">Street Address</label>
@@ -406,7 +448,10 @@ export default ({ signal, stack }) => {
 				</div>
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-phone" class="input-label">Phone</label>
-					<input type="tel" name="phone" id="${OASIS_SEARCH_ID}-phone" class="input" placeholder="Phone Number" autocomplete="off" />
+					<input type="tel" id="${OASIS_SEARCH_ID}-phone" class="input" minlength="10" maxlength="17" placeholder="Phone Number" ${onChange}="${updatePhoneFields}" autocomplete="off" ${signalAttr}="${signal}" />
+					<input type="hidden" name="phone_0" />
+					<input type="hidden" name="phone_1" />
+					<input type="hidden" name="phone_2" />
 				</div>
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-email" class="input-label">Email</label>
