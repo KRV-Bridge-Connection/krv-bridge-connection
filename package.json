@@ -70,7 +70,7 @@
   },
   "homepage": "https://krvbridge.org",
   "dependencies": {
-    "@aegisjsproject/attempt": "^1.0.5",
+    "@aegisjsproject/attempt": "^1.0.7",
     "@aegisjsproject/qr-encoder": "^1.0.1",
     "@aegisjsproject/secret-store": "^1.0.1",
     "@shgysk8zer0/11ty-netlify": "^1.1.30",
