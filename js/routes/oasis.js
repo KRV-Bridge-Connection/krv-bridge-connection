@@ -1,10 +1,10 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onChange, onSubmit, onReset, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onChange, onSubmit, onReset, onToggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
-import { Signal } from '@shgysk8zer0/signals';
+// import { Signal } from '@shgysk8zer0/signals';
 
 const SCANNER_PATTERN = /^(?:\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}|(?<barcode>[A-Z0-9]{12,17}))$/;
 const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
@@ -27,7 +27,7 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 		elements.namedItem(NAME)?.focus();
 	}
 });
-const useScanner = new Signal.State(false);
+// const useScanner = new Signal.State(false);
 const formats = [CODE_128];
 
 const idCardBtnScreenshot = 'https://i.imgur.com/07ISr9K.png';
@@ -65,12 +65,6 @@ export const styles = css`#${SCANNER_ID} {
 		margin: 20px 0;
 	}
 
-	&:not(:has(.btn.scanner-active)) {
-		details.scanner-preview {
-			display: none;
-		}
-	}
-
 	& .scanner-notice h3 {
 		margin-top: 0;
 	}
@@ -92,20 +86,6 @@ export const styles = css`#${SCANNER_ID} {
 
 	& .flex > .btn {
 		margin-top: 0.8em;
-	}
-
-	& .scanner-toggle {
-		&.scanner-active {
-			& .check-icon {
-				display: none;
-			}
-		}
-
-		&:not(.scanner-active ){
-			& .x-icon {
-				display: none;
-			}
-		}
 	}
 
 	& figure {
@@ -218,54 +198,26 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 	}
 });
 
+const toggleOasisScanner = registerCallback('oasis:scanner:toggle', async ({ currentTarget }) => {
+	if (currentTarget.open) {
+		const { promise, resolve } = Promise.withResolvers();
+		const disposable = new DisposableStack();
+		const controller = disposable.adopt(new AbortController(), controller => controller.abort());
+		const video = disposable.adopt(currentTarget.querySelector('video'), video => video.srcObject = null);
+		const signal = getSignal(currentTarget.getAttribute(signalAttr));
 
-const beforeToggle = registerCallback('oasis:form:beforeToggle', async ({ target, newState }) => {
-	if (newState === 'open') {
-		document.querySelector(':popover-open')?.hidePopover();
-		const video = target.querySelector('video');
+		disposable.use(await createBarcodeScanner(result => {
+			currentTarget.closest('form').elements.namedItem(NAME).value = result.rawValue;
+		}, { video, signal, formats, stack: disposable }));
 
-		if (useScanner.get() && video instanceof HTMLVideoElement && video.hasAttribute('data-preview-for')) {
-			const { promise, resolve } = Promise.withResolvers();
-			const controller = new AbortController();
-			const signal = getSignal(target.getAttribute(signalAttr));
-			target.querySelector('details').open = true;
+		currentTarget.addEventListener('toggle', ({ target }) => {
+			if (! target.open) {
+				resolve();
+				disposable.dispose();
+			}
+		}, { signal: AbortSignal.any([signal, controller.signal ]) });
 
-			using scanner = await createBarcodeScanner(result => {
-				target.elements.namedItem(video.dataset.previewFor).value = result.rawValue;
-			}, { video, signal, formats });
-
-			target.addEventListener('toggle', ({ newState }) => {
-				if (newState === 'closed') {
-					resolve();
-					controller.abort();
-				}
-			}, { signal: AbortSignal.any([signal, controller.signal ]) });
-			console.log(scanner);
-
-			await promise;
-		}
-
-		target.animate([
-			{ opacity: 0, transform: 'scale(0.2)' },
-			{ opacity: 1, transform: 'none' },
-		], {
-			duration: 400,
-			easing: 'ease-out',
-		});
-	}
-});
-
-const toggleScanner = registerCallback('oasis:scanner:toggle', ({ currentTarget }) => {
-	if (useScanner.get()) {
-		useScanner.set(false);
-		currentTarget.classList.add('btn-info');
-		currentTarget.classList.remove('scanner-active');
-		currentTarget.classList.remove('btn-warning');
-	} else {
-		useScanner.set(true);
-		currentTarget.classList.add('btn-warning');
-		currentTarget.classList.add('scanner-active');
-		currentTarget.classList.remove('btn-info');
+		await promise;
 	}
 });
 
@@ -314,17 +266,26 @@ export default ({ signal, stack }) => {
 	stack.defer(() => document.forms['oasis-search'].action = `${OASIS_ORIGIN}search/advanced/`);
 
 	return html`<div id="${SCANNER_ID}">
-		<form ${onSubmit}="${submitHandler}" id="oasis-scanner" popover="auto" ${onBeforetoggle}="${beforeToggle}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
+		<form ${onSubmit}="${submitHandler}" id="oasis-scanner" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
 			<fieldset class="no-border" autocomplete="off">
 				<legend>Oasis Case Scanner</legend>
-				<details class="center scanner-preview">
-					<summary class="btn btn-primary btn-block">Use Barcode Scanner</summary>
-					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
-				</details>
+				<div class="scanner-notice">
+					<h3>A Quick Note About This Scanner</h3>
+					<p>
+						<strong>Your information is safe and private.</strong> When you scan an ID here, absolutely nothing is saved, recorded, or sent to us. This page just acts as a bridge to pass your scan directly into the Oasis system.
+					</p>
+					<p>
+						<strong>This is a temporary fix.</strong> We set this up because the barcode scanner feature inside the Oasis Platform is currently broken. We are using this as a workaround until they fix the bug on their end.
+					</p>
+				</div>
 				<div class="form-group">
 					<label for="${INPUT_ID}" class="input-label">Oasis Barcode ${scannerIcon}</label>
 					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${SCANNER_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
+				<details class="center scanner-preview" ${onToggle}="${toggleOasisScanner}" ${signalAttr}="${signal}">
+					<summary class="btn btn-primary">Toggle Barcode Scanner (Camera)</summary>
+					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
+				</details>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
 				<button type="submit" class="btn btn-success btn-lg">
@@ -335,20 +296,13 @@ export default ({ signal, stack }) => {
 					<span>Reset</span>
 					${x}
 				</button>
-				<button type="button" command="hide-popover" commandfor="oasis-scanner" class="btn btn-warning btn-lg">
-					<span>Dismiss</span>
-					${x}
-				</button>
-			</div>
-			<br />
-			<div>
 				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
 					<span>Advanced Search</span>
 					${searchIcon}
 				</button>
 			</div>
 		</form>
-		<form id="oasis-search" popover="auto" action="${OASIS_ORIGIN}search/advanced/" method="POST" rel="noopener noreferrer external" target="${OASIS_NAME}" class="no-router" ${onBeforetoggle}="${beforeToggle}" ${signalAttr}="${signal}">
+		<form id="oasis-search" popover="auto" action="${OASIS_ORIGIN}search/advanced/" method="POST" rel="noopener noreferrer external" target="${OASIS_NAME}" class="no-router" ${signalAttr}="${signal}">
 			<fieldset class="no-border">
 				<legend>Oasis Advanced Search</legend>
 				<div class="form-group">
@@ -408,23 +362,7 @@ export default ({ signal, stack }) => {
 					${x}
 				</button>
 			</div>
-			<br />
-			<div>
-				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info btn-lg">
-					<span>Scan Oasis ID</span>
-					${scannerIcon}
-				</button>
-			</div>
 		</form>
-		<div class="scanner-notice">
-		<h3>A Quick Note About This Scanner</h3>
-		<p>
-			<strong>Your information is safe and private.</strong> When you scan an ID here, absolutely nothing is saved, recorded, or sent to us. This page just acts as a bridge to pass your scan directly into the Oasis system.
-		</p>
-		<p>
-			<strong>This is a temporary fix.</strong> We set this up because the barcode scanner feature inside the Oasis Platform is currently broken. We are using this as a workaround until they fix the bug on their end.
-		</p>
-		</div>
 		<dialog id="oasis-help">
 			<div class="help-content relative">
 				<button type="button" class="btn btn-danger sticky top right" command="request-close" commandfor="oasis-help" aria-label="Dismiss Dialog">${x}</button>
@@ -581,25 +519,10 @@ export default ({ signal, stack }) => {
 			<span>Sign-in on Oasis</span>
 			${signInIcon}
 		</a>
-		<button type="button" class="btn btn-info scanner-toggle" ${onClick}="${toggleScanner}" ${signalAttr}="${signal}" accesskey="C">
-			<span>Toggle Camera</span>
-			${x}${check}
-		</button>
 		<button type-"button" class="btn btn-info" command="show-modal" commandfor="oasis-help" accesskey="h">
 			<span>Help</span>
 			${helpIcon}
 		</button>
-		<hr />
-		<div class="flex row wrap space-evenly">
-			<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">
-				<span>Scan Barcode</span>
-				${scannerIcon}
-			</button>
-			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="2">
-				<span>Advanced Search</span>
-				${searchIcon}
-			</button>
-		</div>
 	</div>`;
 };
 
