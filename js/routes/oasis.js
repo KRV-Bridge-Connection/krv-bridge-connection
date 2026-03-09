@@ -4,7 +4,7 @@ import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js
 import { onChange, onSubmit, onReset, onToggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
-// import { Signal } from '@shgysk8zer0/signals';
+import { Signal } from '@shgysk8zer0/signals';
 
 const SCANNER_PATTERN = /^(?:\{?\[?(?<type>[A-Za-z])\]?(?<id>\d{5,13})\}?|(?<barcode>[A-Z0-9]{12,17}))$/;
 const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
@@ -13,14 +13,26 @@ const NAME = 'barcode';
 const INPUT_ID = 'oasis-barcode';
 const OASIS_ORIGIN = 'https://capkfoodbank.oasisinsight.net/';
 const PAIRING = 'https://i.imgur.com/S1v2MbT.webp';
+// const ASSISTANCE_BARCODES = 'https://i.imgur.com/UfAweCi.png';
+const ASSISTANCE_ENTRIES = [
+	{ label: '(Choice) Pantry Shopping', id: '27' },
+	{ label: 'Pantry Food Assistance - Non-TEFAP', id: '25' },
+	{ label: 'TEFAP - 1 Box', id: '4' },
+];
+
 const OASIS_NAME = 'Oasis';
 const OASIS_SEARCH_ID = 'oasis-search-form';
 const ERROR_DURATION = 5_000;
 const SCANNER_ID = '_' + crypto.randomUUID();
 const FOCUS_OPTS = { preventScroll: false, focusvisible: true };
+const formats = [CODE_128];
+const client = new Signal.State(NaN);
+
 const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 	const elements = target.elements;
 	if (target.id === 'oasis-search') {
+		client.set(NaN);
+
 		['phone_0', 'phone_1', 'phone_2', 'date_of_birth_0', 'date_of_birth_1', 'date_of_birth_2'].forEach(field => {
 			elements.namedItem(field).value = null;
 		});
@@ -28,8 +40,6 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 		elements.namedItem(NAME)?.focus(FOCUS_OPTS);
 	}
 });
-
-const formats = [CODE_128];
 
 const idCardBtnScreenshot = 'https://i.imgur.com/07ISr9K.png';
 const idCardScreenshot = 'https://i.imgur.com/N983kQSh.png';
@@ -155,12 +165,36 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 				submitter.disabled = true;
 			}
 			switch(type.toUpperCase()) {
+				case 'A':
+					if (Number.isNaN(client.get())) {
+						throw new TypeError('Have not yet selected a client.');
+					} else {
+						// A -> https://capkfoodbank.oasisinsight.net/cases/barcode/scan/?barcode_case_id=:client_id&barcode_id=:id&next_url=/cases/:client_id/
+						globalThis.open(
+							url`${OASIS_ORIGIN}cases/barcode/scan/?barcode_case_id=${client.get()}&barcode_id=${parseInt(id)}&next_url=/cases/${client.get()}/`,
+							OASIS_NAME,
+							'noopener,noreferrer'
+						);
+						client.set(NaN);
+					}
+					break;
+
 				case 'C':
-					globalThis.open(
-						url`${OASIS_ORIGIN}cases/${parseInt(id)}/case_barcode_lookup/`,
-						OASIS_NAME,
-						'noopener,noreferrer'
-					);
+					client.set(parseInt(id));
+
+					if (data.has('assistance') && data.get('assistance').length !== 0) {
+						globalThis.open(
+							url`${OASIS_ORIGIN}cases/barcode/scan/?barcode_case_id=${parseInt(id)}&barcode_id=${parseInt(data.get('assistance'))}&next_url=/cases/${parseInt(id)}/`,
+							OASIS_NAME,
+							'noopener,noreferrer'
+						);
+					} else {
+						globalThis.open(
+							url`${OASIS_ORIGIN}cases/${parseInt(id)}/case_barcode_lookup/`,
+							OASIS_NAME,
+							'noopener,noreferrer'
+						);
+					}
 
 					break;
 
@@ -294,6 +328,13 @@ export default ({ signal, stack }) => {
 				<div class="form-group">
 					<label for="${INPUT_ID}" class="input-label">Oasis Barcode ${scannerIcon}</label>
 					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${SCANNER_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
+				</div>
+				<div class="form-group">
+					<label for="oasis-assistance" class="input-label">Assistance Provided</label>
+					<select id="oasis-assistance" name="assistance" class="input">
+						<option label="Omit"></option>
+						${ASSISTANCE_ENTRIES.map(({ label, id }) => `<option label="${label}" value="${id}"></option>`).join('')}
+					</select>
 				</div>
 				<details class="center scanner-preview" ${onToggle}="${toggleOasisScanner}" ${signalAttr}="${signal}">
 					<summary class="btn btn-primary" accesskey="c">
