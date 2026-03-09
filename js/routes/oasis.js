@@ -27,7 +27,7 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 		elements.namedItem(NAME)?.focus();
 	}
 });
-// const useScanner = new Signal.State(false);
+
 const formats = [CODE_128];
 
 const idCardBtnScreenshot = 'https://i.imgur.com/07ISr9K.png';
@@ -49,7 +49,7 @@ const x = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBo
 	<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
 </svg>`;
 
-const searchIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="icon" fill="currentColor" viewBox="0 0 16 16" role="presenttion">
+const searchIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="icon" fill="currentColor" viewBox="0 0 16 16" role="presentation">
 	<path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/>
 </svg>`;
 
@@ -329,9 +329,9 @@ export default ({ signal, stack }) => {
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-date_of_birth" class="input-label">Date of Birth</label>
 					<input type="date" id="${OASIS_SEARCH_ID}-date_of_birth" class="input" placeholder="YYYY-MM-DD" ${onChange}="${updateBirthdayFields}" autocomplete="off" ${signalAttr}="${signal}" />
-					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_year" name="date_of_birth_2" />
-					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_month" name="date_of_birth_0" />
-					<input type="hidden" id="${OASIS_SEARCH_ID}-data_of_birth_day" name="date_of_birth_1" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-date_of_birth_year" name="date_of_birth_2" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-date_of_birth_month" name="date_of_birth_0" />
+					<input type="hidden" id="${OASIS_SEARCH_ID}-date_of_birth_day" name="date_of_birth_1" />
 				</div>
 				<div class="form-group">
 					<label for="${OASIS_SEARCH_ID}-street_address" class="input-label">Street Address</label>
@@ -527,7 +527,7 @@ export default ({ signal, stack }) => {
 			<span>Sign-in on Oasis</span>
 			${signInIcon}
 		</a>
-		<button type-"button" class="btn btn-info" command="show-modal" commandfor="oasis-help" accesskey="h">
+		<button type="button" class="btn btn-info" command="show-modal" commandfor="oasis-help" accesskey="h">
 			<span>Help</span>
 			${helpIcon}
 		</button>
