@@ -14,6 +14,7 @@ const OASIS_PATTERN_STR = OASIS_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g,
 const NAME = 'barcode';
 const INPUT_ID = 'oasis-barcode';
 const OASIS_ORIGIN = 'https://capkfoodbank.oasisinsight.net/';
+const PAIRING = 'https://i.imgur.com/S1v2MbT.webp';
 const OASIS_NAME = 'Oasis';
 const OASIS_SEARCH_ID = 'oasis-search-form';
 const ERROR_DURATION = 5_000;
@@ -519,6 +520,18 @@ export default ({ signal, stack }) => {
 
 				<hr>
 
+				<h2>Pairing your Nuscan Device</h2>
+				<ol>
+					<li>Pull the trigger to power-on the device</li>
+					<li>Scan the barcode labeled <q>2.4GHz Mode</q> to set the correct mode</li>
+					<li>Scan the <q>2.4GHz or Bluetooth Pairing</q> barcode to pair</li>
+					<li>Within 15 seconds, remove the dongle from the device's handle and plug it into a USB port on a device</li>
+					<li>The status light will turn blue if it is successful</li>
+				</ol>
+				<img src="${PAIRING}" alt="Pairing Barcodes" loading="lazy" decoding="async" width="730" height="738" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+				<hr />
+
 				<h2>Linking an Oasis Profile with an ID</h2>
 
 				<p>To link a new ID to a case, following these steps:</p>
@@ -650,7 +663,7 @@ export default ({ signal, stack }) => {
 				</table>
 			</div>
 		</dialog>
-		<a href="${OASIS_ORIGIN}logged_out/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-link" accesskey="0">
+		<a href="${OASIS_ORIGIN}login/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-link" accesskey="0">
 			<span>Sign-in on Oasis</span>
 			${signInIcon}
 		</a>
