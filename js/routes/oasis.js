@@ -1,16 +1,14 @@
 import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onChange, onSubmit, onReset, onBeforetoggle, onCommand, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onChange, onSubmit, onReset, onBeforetoggle, signal as signalAttr, getSignal } from '@aegisjsproject/callback-registry/events.js';
 import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
 
-const OASIS_ID_PATTERN = /^\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}$/;
-const BARCODE_ID_PATTERN = /^[A-Z0-9]{12,17}$/;
+const SCANNER_PATTERN = /^(?:\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}|(?<barcode>[A-Z0-9]{12,17}))$/;
 const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
-const BARCODE_PATTERN_STR = BARCODE_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
-const OASIS_PATTERN_STR = OASIS_ID_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
+const SCANNER_PATTERN_STR = SCANNER_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const NAME = 'barcode';
 const INPUT_ID = 'oasis-barcode';
 const OASIS_ORIGIN = 'https://capkfoodbank.oasisinsight.net/';
@@ -164,7 +162,7 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 	event.preventDefault();
 	const { target, submitter } = event;
 	const data = new FormData(target);
-	const { type, id } = data.get(NAME)?.trim()?.match(OASIS_ID_PATTERN)?.groups ?? {};
+	const { type, id, barcode } = data.get(NAME)?.trim()?.match(SCANNER_PATTERN)?.groups ?? {};
 
 	if (typeof type === 'string' && typeof id === 'string') {
 		try {
@@ -194,39 +192,32 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 
 			target.reset();
 		}
+	} else if (typeof barcode === 'string') {
+		try {
+			if (submitter instanceof HTMLButtonElement) {
+				submitter.disabled = true;
+			}
+
+			await navigator.clipboard.writeText(barcode).catch(reportError);
+			globalThis.open(
+				url`${OASIS_ORIGIN}cases/barcode/scan/?associated_barcode_name=${barcode}`,
+				OASIS_NAME,
+				'noopener,noreferrer'
+			);
+		} catch(err) {
+			await showError(err);
+		} finally {
+			if (submitter instanceof HTMLButtonElement) {
+				submitter.disabled = false;
+			}
+
+			target.reset();
+		}
 	} else {
 		target.reset();
 	}
 });
 
-const submitLicense = registerCallback('oasis:license:submit', async event => {
-	event.preventDefault();
-	const { target, submitter } = event;
-
-	try {
-		if (submitter instanceof HTMLButtonElement) {
-			submitter.disabled = true;
-		}
-
-		const data = new FormData(target);
-		const barcode = data.get(NAME).trim();
-		// Save barcode/ID to clipboard to create to paste into profile if not found
-		await navigator.clipboard.writeText(barcode).catch(reportError);
-		globalThis.open(
-			url`${OASIS_ORIGIN}cases/barcode/scan/?associated_barcode_name=${barcode}`,
-			OASIS_NAME,
-			'noopener,noreferrer'
-		);
-	} catch(err) {
-		await showError(err);
-	} finally {
-		if (submitter instanceof HTMLButtonElement) {
-			submitter.disabled = false;
-		}
-
-		target.reset();
-	}
-});
 
 const beforeToggle = registerCallback('oasis:form:beforeToggle', async ({ target, newState }) => {
 	if (newState === 'open') {
@@ -275,16 +266,6 @@ const toggleScanner = registerCallback('oasis:scanner:toggle', ({ currentTarget 
 		currentTarget.classList.add('btn-warning');
 		currentTarget.classList.add('scanner-active');
 		currentTarget.classList.remove('btn-info');
-	}
-});
-
-const handleCommand = registerCallback('oasis:command', ({ target, source, command }) => {
-	switch(command) {
-		case '--copy':
-			if (target.validity.valid) {
-				navigator.clipboard.writeText(target.value).catch(() => source.disabled = true);
-			}
-			break;
 	}
 });
 
@@ -342,7 +323,7 @@ export default ({ signal, stack }) => {
 				</details>
 				<div class="form-group">
 					<label for="${INPUT_ID}" class="input-label">Oasis Barcode ${scannerIcon}</label>
-					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${OASIS_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
+					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${SCANNER_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
 			</fieldset>
 			<div class="flex row wrap space-evenly">
@@ -361,65 +342,10 @@ export default ({ signal, stack }) => {
 			</div>
 			<br />
 			<div>
-				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info">
-					<span>Scan Other ID</span>
-					${scannerIcon}
-				</button>
 				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
 					<span>Advanced Search</span>
 					${searchIcon}
 				</button>
-			</div>
-		</form>
-		<form id="license-scanner" popover="auto" ${onSubmit}="${submitLicense}" ${onBeforetoggle}="${beforeToggle}" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
-			<fieldset class="no-border">
-				<legend>Scan Other ID Barcode</legend>
-				<details class="center scanner-preview">
-					<summary class="btn btn-primary btn-block">Use Barcode Scanner</summary>
-					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
-				</details>
-				<div class="form-group">
-					<label for="license" class="input-label required">Other ID Barcode ${scannerIcon}</label>
-					<div class="flex row">
-						<input type="text" name="${NAME}" id="license" class="input grow-1" placeholder="#########" pattern="${BARCODE_PATTERN_STR}" autocomplete="off" minlength="13" maxlength="17" ${onCommand}="${handleCommand}" ${signalAttr}="${signal}" autofocus="" required="" />
-						<button type="button" command="--copy" commandfor="license" class="btn btn-outline-secondary btn-small" aria-label="Copy">
-							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="icon" viewBox="0 0 14 16" role="presentation">
-								<path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"/>
-							</svg>
-						</button>
-					</div>
-				</div>
-			</fieldset>
-			<div class="flex row wrap space-evenly">
-				<button type="submit" class="btn btn-success btn-lg">
-					<span>Submit</span>
-					${check}
-				</button>
-				<button type="reset" class="btn btn-danger btn-lg">
-					<span>Reset</span>
-					${x}
-				</button>
-				<button type="button" command="hide-popover" commandfor="license-scanner" class="btn btn-warning btn-lg">
-					<span>Dismiss</span>
-					${x}
-				</button>
-			</div>
-			<br />
-			<div>
-				<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-info">
-					<span>Scan Oasis ID</span>
-					${scannerIcon}
-				</button>
-				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
-					<span>Advanced Search</span>
-					${searchIcon}
-				</button>
-				<a href="${OASIS_ORIGIN}bulletins/" target="${OASIS_NAME}" class="btn btn-link" rel="noreferrer noopener external">
-					<span>Open Oasis</span>
-					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" fill="currentColor" class="icon" viewBox="0 0 12 16" role="presentation">
-						<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
-					</svg>
-				</a>
 			</div>
 		</form>
 		<form id="oasis-search" popover="auto" action="${OASIS_ORIGIN}search/advanced/" method="POST" rel="noopener noreferrer external" target="${OASIS_NAME}" class="no-router" ${onBeforetoggle}="${beforeToggle}" ${signalAttr}="${signal}">
@@ -488,10 +414,6 @@ export default ({ signal, stack }) => {
 					<span>Scan Oasis ID</span>
 					${scannerIcon}
 				</button>
-				<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-info btn-lg">
-					<span>Scan Other ID</span>
-					${scannerIcon}
-				</button>
 			</div>
 		</form>
 		<div class="scanner-notice">
@@ -551,18 +473,14 @@ export default ({ signal, stack }) => {
 					<figcaption class="current-inherit">In the ID Cards, you will see a button to add an ID Card on the right side. Click this button and paste in the scanned ID to link it to the case.</figcaption>
 				</figure>
 
-				<h2>Ways to Scan</h2>
-				<p>There are three main blue buttons to choose from depending on what the volunteer hands you:</p>
+				<h2>Scanning and Searching</h2>
+				<p>There are two main blue buttons to choose from depending on what the volunteer hands you:</p>
 
-				<h3>🔹 Scan Oasis ID (Button 1)</h3>
-				<p>Use this if the volunteer has their official printed ID card. Click the button, then scan the barcode.</p>
+				<h3>🔹 Scan Barcode (Button 1)</h3>
+				<p>Use this if the volunteer has their official printed ID card or ID with barcode. Click the button, then scan the barcode. If you scan a barcode such as a Driver's License, it will be copied to your clipboard and ready to paste if you need to link it to a client.</p>
 
-				<h3>🔹 Scan Other ID / Driver's License (Button 2)</h3>
-				<p>Use this to scan the barcode on the back of a Driver's License.</p>
-				<p><strong>Helpful Tip:</strong> When you scan a license and submit to look-up, this tool automatically copies the barcode number to your computer's "Clipboard." If the search doesn't find them, you can go to Advanced Search and <strong>Paste</strong> the number to try looking it up manually.</p>
-
-				<h3>🔹 Advanced Search (Button 3)</h3>
-				<p>If they forgot their ID, use this button to search by Name, Birthday, or Address.</p>
+				<h3>🔹 Advanced Search (Button 2)</h3>
+				<p>If they forgot their ID, use this button to search by Name, Birthday, Address, etc..</p>
 
 				<hr>
 
@@ -641,14 +559,10 @@ export default ({ signal, stack }) => {
 						</tr>
 						<tr>
 							<td><strong>1</strong></td>
-							<td>Scan Oasis ID</td>
+							<td>Scan Oasis ID or Driver's License</td>
 						</tr>
 						<tr>
 							<td><strong>2</strong></td>
-							<td>Scan Driver's License / Other</td>
-						</tr>
-						<tr>
-							<td><strong>3</strong></td>
 							<td>Advanced Search</td>
 						</tr>
 						<tr>
@@ -678,14 +592,10 @@ export default ({ signal, stack }) => {
 		<hr />
 		<div class="flex row wrap space-evenly">
 			<button type="button" command="show-popover" commandfor="oasis-scanner" class="btn btn-primary btn-lg" accesskey="1">
-				Scan Oasis ID
+				<span>Scan Barcode</span>
 				${scannerIcon}
 			</button>
-			<button type="button" command="show-popover" commandfor="license-scanner" class="btn btn-primary btn-lg" accesskey="2">
-				<span>Scan Other ID</span>
-				${scannerIcon}
-			</button>
-			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="3">
+			<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-primary btn-lg" accesskey="2">
 				<span>Advanced Search</span>
 				${searchIcon}
 			</button>
