@@ -11,6 +11,7 @@
 /resources/* /dynamic.html 200
 /posts/* /dynamic.html 200
 /pantry/* /dynamic.html 200
+/oasis /pantry/oasis
 /contact/* /dynamic.html 200!
 /pantry /pantry/ 301
 /food/ /dynamic.html 200

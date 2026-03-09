@@ -6,7 +6,7 @@ import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 // import { Signal } from '@shgysk8zer0/signals';
 
-const SCANNER_PATTERN = /^(?:\{\[(?<type>[A-Z])\](?<id>\d{6,13})\}|(?<barcode>[A-Z0-9]{12,17}))$/;
+const SCANNER_PATTERN = /^(?:\{?\[?(?<type>[A-Za-z])\]?(?<id>\d{5,13})\}?|(?<barcode>[A-Z0-9]{12,17}))$/;
 const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
 const SCANNER_PATTERN_STR = SCANNER_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
 const NAME = 'barcode';
@@ -153,7 +153,7 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 			if (submitter instanceof HTMLButtonElement) {
 				submitter.disabled = true;
 			}
-			switch(type) {
+			switch(type.toUpperCase()) {
 				case 'C':
 					globalThis.open(
 						url`${OASIS_ORIGIN}cases/${parseInt(id)}/case_barcode_lookup/`,
