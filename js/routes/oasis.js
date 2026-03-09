@@ -37,6 +37,10 @@ const scannerIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
 	<path d="M2 5h2v14H2zm4 0h1v14H6zm3 0h3v14H9zm5 0h1v14h-1zm3 0h2v14h-2zm4 0h1v14h-1z"/>
 </svg>`;
 
+const cameraIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" version="1" viewBox="0 0 16 16" fill="currentColor" role="presentation">
+    <path d="M6 2c-.55 0-1 .45-1 1v1H2c-.552 0-1 .45-1 1v8c0 .55.448 1 1 1h12c.552 0 1-.45 1-1V5c0-.55-.448-1-1-1h-3V3c0-.55-.45-1-1-1H6zm2 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" overflow="visible"/>
+</svg>`;
+
 const check = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" class="icon check-icon" viewBox="0 0 12 16" fill="currentColor" role="presentation">
 	<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
 </svg>`;
@@ -199,12 +203,15 @@ const submitHandler = registerCallback('oasis:id:submit', async event => {
 });
 
 const toggleOasisScanner = registerCallback('oasis:scanner:toggle', async ({ currentTarget }) => {
+	const summary = currentTarget.firstElementChild;
 	if (currentTarget.open) {
 		const { promise, resolve } = Promise.withResolvers();
 		const disposable = new DisposableStack();
 		const controller = disposable.adopt(new AbortController(), controller => controller.abort());
 		const video = disposable.adopt(currentTarget.querySelector('video'), video => video.srcObject = null);
 		const signal = getSignal(currentTarget.getAttribute(signalAttr));
+		summary.classList.add('btn-warning');
+		summary.classList.remove('btn-primary');
 
 		disposable.use(await createBarcodeScanner(result => {
 			currentTarget.closest('form').elements.namedItem(NAME).value = result.rawValue;
@@ -218,6 +225,9 @@ const toggleOasisScanner = registerCallback('oasis:scanner:toggle', async ({ cur
 		}, { signal: AbortSignal.any([signal, controller.signal ]) });
 
 		await promise;
+	} else {
+		summary.classList.remove('btn-warning');
+		summary.classList.add('btn-primary');
 	}
 });
 
@@ -283,7 +293,10 @@ export default ({ signal, stack }) => {
 					<input type="text" name="${NAME}" id="${INPUT_ID}" class="input" pattern="${SCANNER_PATTERN_STR}" placeholder="{[X]########}" autocomplete="off" ${signalAttr}="${signal}" autofocus="" required="" />
 				</div>
 				<details class="center scanner-preview" ${onToggle}="${toggleOasisScanner}" ${signalAttr}="${signal}">
-					<summary class="btn btn-primary">Toggle Barcode Scanner (Camera)</summary>
+					<summary class="btn btn-primary" accesskey="c">
+						<span>Toggle Barcode Scanner (Camera)</span>
+						${cameraIcon}
+					</summary>
 					<video id="${INPUT_ID}-preview" class="full-width" data-preview-for="${NAME}"></video>
 				</details>
 			</fieldset>
@@ -296,7 +309,7 @@ export default ({ signal, stack }) => {
 					<span>Reset</span>
 					${x}
 				</button>
-				<button type="button" command="show-popover" commandfor="oasis-search" class="btn btn-info">
+				<button type="button" command="show-popover" commandfor="oasis-search" accesskey="s" class="btn btn-info">
 					<span>Advanced Search</span>
 					${searchIcon}
 				</button>
@@ -412,13 +425,12 @@ export default ({ signal, stack }) => {
 				</figure>
 
 				<h2>Scanning and Searching</h2>
-				<p>There are two main blue buttons to choose from depending on what the volunteer hands you:</p>
-
-				<h3>🔹 Scan Barcode (Button 1)</h3>
+				<h3>🔹 Scan Barcode</h3>
 				<p>Use this if the volunteer has their official printed ID card or ID with barcode. Click the button, then scan the barcode. If you scan a barcode such as a Driver's License, it will be copied to your clipboard and ready to paste if you need to link it to a client.</p>
 
-				<h3>🔹 Advanced Search (Button 2)</h3>
-				<p>If they forgot their ID, use this button to search by Name, Birthday, Address, etc..</p>
+				<h3>🔹 Advanced Search</h3>
+				<p>If they forgot their ID, use this button to search by Name, Birthday, Address, etc...</p>
+				<p><strong>Note</strong>: The date picker may vary by device. On devices that show a popover date picker, you may have to tap on the year to quickly select the year.</p>
 
 				<hr>
 
@@ -430,10 +442,10 @@ export default ({ signal, stack }) => {
 				You can use your laptop or tablet camera to scan barcodes.</p>
 				<ul>
 					<li>
-						<strong>To Turn ON:</strong> Click the <span class="btn btn-info">Toggle Camera &#10003;</span> button. A video preview will appear.
+						<strong>To Turn ON:</strong> Click the <span class="btn btn-primary">Toggle Barcode Scanner (Camera)</span> button. A video preview will appear.
 					</li>
 					<li>
-						<strong>To Turn OFF:</strong> Click the <span class="btn btn-warning">Toggle Camera &#10005;</span> button.
+						<strong>To Turn OFF:</strong> Click the <span class="btn btn-warning">Toggle Barcode Scanner (Camera)</span> button.
 					</li>
 				</ul>
 
@@ -492,30 +504,26 @@ export default ({ signal, stack }) => {
 					</thead>
 					<tbody>
 						<tr>
-							<td><strong>0</strong></td>
+							<td><strong><kbd>L</kbd></strong>ogin</td>
 							<td>Go to Login</td>
 						</tr>
 						<tr>
-							<td><strong>1</strong></td>
-							<td>Scan Oasis ID or Driver's License</td>
-						</tr>
-						<tr>
-							<td><strong>2</strong></td>
+							<td><strong><kbd>S</kbd></strong>earch</td>
 							<td>Advanced Search</td>
 						</tr>
 						<tr>
-							<td><strong>C</strong></td>
+							<td><strong><kbd>C</kbd></strong>amera</td>
 							<td>Toggle Camera On/Off</td>
 						</tr>
 						<tr>
-							<td><strong>H</strong></td>
+							<td><strong><kbd>H</kbd></strong>elp</td>
 							<td>Open this Help menu</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</dialog>
-		<a href="${OASIS_ORIGIN}login/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-link" accesskey="0">
+		<a href="${OASIS_ORIGIN}login/" target="${OASIS_NAME}" rel="noopener noreferrer external" class="btn btn-link" accesskey="l">
 			<span>Sign-in on Oasis</span>
 			${signInIcon}
 		</a>
