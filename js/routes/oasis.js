@@ -6,6 +6,8 @@ import { url } from '@aegisjsproject/url/url.min.js';
 import { createBarcodeScanner, preloadRxing, CODE_128 } from '@aegisjsproject/barcodescanner';
 import { Signal } from '@shgysk8zer0/signals';
 
+// POST /cases/:client_id/assistance/add/init_form=&amount=:qty&unit=:item_id&category=24&agency=:agency_id&description=:desc&date_0=:month&date_1=:day&date_2=:year&date_3=:hours&date_4=:minutes&date_5=:am_pm&group=1
+
 const SCANNER_PATTERN = /^(?:\{?\[?(?<type>[A-Za-z])\]?(?<id>\d{5,13})\}?|(?<barcode>[A-Z0-9]{12,17}))$/;
 const PHONE_PATTERN = /^(?<phone_0>\d{3})(?<phone_1>\d{3})(?<phone_2>\d{4})$/;
 const SCANNER_PATTERN_STR = SCANNER_PATTERN.source.replaceAll(/[\^$]|\?<[^>]+>/g, '');
