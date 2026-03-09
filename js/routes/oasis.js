@@ -17,6 +17,7 @@ const OASIS_NAME = 'Oasis';
 const OASIS_SEARCH_ID = 'oasis-search-form';
 const ERROR_DURATION = 5_000;
 const SCANNER_ID = '_' + crypto.randomUUID();
+const FOCUS_OPTS = { preventScroll: false, focusvisible: true };
 const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 	const elements = target.elements;
 	if (target.id === 'oasis-search') {
@@ -24,7 +25,7 @@ const resetHandler = registerCallback('oasis:reset', ({ target }) => {
 			elements.namedItem(field).value = null;
 		});
 	} else {
-		elements.namedItem(NAME)?.focus();
+		elements.namedItem(NAME)?.focus(FOCUS_OPTS);
 	}
 });
 
@@ -214,7 +215,9 @@ const toggleOasisScanner = registerCallback('oasis:scanner:toggle', async ({ cur
 		summary.classList.remove('btn-primary');
 
 		disposable.use(await createBarcodeScanner(result => {
-			currentTarget.closest('form').elements.namedItem(NAME).value = result.rawValue;
+			const input = currentTarget.closest('form').elements.namedItem(NAME);
+			input.value = result.rawValue;
+			input.focus(FOCUS_OPTS);
 		}, { video, signal, formats, stack: disposable }));
 
 		currentTarget.addEventListener('toggle', ({ target }) => {
@@ -305,7 +308,7 @@ export default ({ signal, stack }) => {
 					<span>Submit</span>
 					${check}
 				</button>
-				<button type="reset" class="btn btn-danger btn-lg">
+				<button type="reset" class="btn btn-danger btn-lg" accesskey="r">
 					<span>Reset</span>
 					${x}
 				</button>
@@ -504,19 +507,23 @@ export default ({ signal, stack }) => {
 					</thead>
 					<tbody>
 						<tr>
-							<td><strong><kbd>L</kbd></strong>ogin</td>
+							<td><strong>(<kbd>L</kbd>)</strong>ogin</td>
 							<td>Go to Login</td>
 						</tr>
 						<tr>
-							<td><strong><kbd>S</kbd></strong>earch</td>
+							<td><strong>(<kbd>S</kbd>)</strong>earch</td>
 							<td>Advanced Search</td>
 						</tr>
 						<tr>
-							<td><strong><kbd>C</kbd></strong>amera</td>
+							<td><strong>(<kbd>C</kbd>)</strong>amera</td>
 							<td>Toggle Camera On/Off</td>
 						</tr>
 						<tr>
-							<td><strong><kbd>H</kbd></strong>elp</td>
+							<td><strong>(<kbd>R</kbd>)</strong>eset</td>
+							<td>Clear/Reset the barcode form</td>
+						</tr>
+						<tr>
+							<td><strong>(<kbd>H</kbd>)</strong>elp</td>
 							<td>Open this Help menu</td>
 						</tr>
 					</tbody>
