@@ -39,7 +39,7 @@
 	}
 }
 
-article p:first-letter {
+article p::first-letter {
 	margin-left: 2em;
 }
 
