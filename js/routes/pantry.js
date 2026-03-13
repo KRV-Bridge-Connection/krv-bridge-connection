@@ -1,14 +1,12 @@
 import { site, PANTRY_OPENING_HOURS } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const MESSAGE = null;
-
 const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
 
-const style = css`#pantry-message {
+export const styles = css`#pantry-message {
 	max-width: min(800px, 95%);
 }
 
@@ -21,49 +19,6 @@ const style = css`#pantry-message {
 	justify-content: center;
 	gap: 0.8rem;
 }`;
-
-const getPantrySchedule = () => `<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
-	<h3 id="general-pantry-hours">General Pantry Hours</h3>
-	<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
-	<ul>
-		${PANTRY_OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
-			<span itemprop="dayOfWeek">${dayOfWeek}</span>
-			${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
-				? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
-				: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
-		</li>`).join('')}
-	</ul>
-</section>`;
-
-export const postalCodes = {
-	'alta sierra': '95949',
-	'weldon': '93283',
-	'bodfish': '93205',
-	'south lake': '93240',
-	'mt mesa': '93240',
-	'mountain mesa': '93240',
-	'wofford heights': '93285',
-	'lake isabella': '93240',
-	'kernville': '93238',
-	'onyx': '93255',
-	'canebrake': '93255',
-	'havilah': '93518',
-	'caliente': '93518',
-	'squirrel mountain valley': '93240',
-	'squirrel valley': '93240',
-	'keyesville': '93240',
-	'keysville': '93240',
-};
-
-export const updateZip = registerCallback('pantry:form:zip-update', ({ target: { value, form } }) => {
-	const val = value.toLowerCase().replaceAll(/[^A-Za-z ]/g, '');
-
-	if (typeof postalCodes[val] === 'string') {
-		form.elements.namedItem('postalCode').value = postalCodes[val];
-	}
-});
-
-document.adoptedStyleSheets = [...document.adoptedStyleSheets, style];
 
 export default () => html`<section aria-labelledby="pantry-header">
 	<h3>Emergency Choice Pantry</h3>
@@ -87,7 +42,7 @@ export default () => html`<section aria-labelledby="pantry-header">
 	<p itemprop="description">The Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
 		temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
 		are not enough.</p>
-	<p>As a choice pantry, it offers an experience more like shipping where guests are allowed to pick out their own
+	<p>As a choice pantry, it offers an experience more like shopping where guests are allowed to pick out their own
 	food that they want rather than a preset box of items.
 	The Choice Pantry is available up to twice per month (every two weeks) and provides food based on household size.</p>
 	<p>
@@ -113,7 +68,18 @@ export default () => html`<section aria-labelledby="pantry-header">
 	</div>
 </section>
 <section>
-	${getPantrySchedule()}
+	<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
+		<h3 id="general-pantry-hours">General Pantry Hours</h3>
+		<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
+		<ul>
+			${PANTRY_OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
+				<span itemprop="dayOfWeek">${dayOfWeek}</span>
+				${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
+					? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
+					: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
+			</li>`).join('')}
+		</ul>
+	</section>
 	<p>
 		<span>For other KRV Food Distributions, please see the Calendar</span>
 		<a href="/food/">
