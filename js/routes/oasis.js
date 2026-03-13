@@ -276,7 +276,19 @@ if (! ('BarcodeDetector' in globalThis)) {
 
 export default ({ signal, stack }) => {
 	// Need to do this because `<form action>` is stripped by sanitizer
-	stack.defer(() => document.forms['oasis-search'].action = `${OASIS_ORIGIN}search/advanced/`);
+	stack.defer(() => {
+		document.forms['oasis-search'].action = `${OASIS_ORIGIN}search/advanced/`;
+
+		if (location.hash.length > 1) {
+			const target = document.getElementById(location.hash.substring(1));
+
+			if (target instanceof HTMLDialogElement) {
+				target.showModal();
+			} else if (typeof target?.popover === 'string') {
+				target.showPopover();
+			}
+		}
+	});
 
 	return html`<div id="${SCANNER_ID}">
 		<form ${onSubmit}="${submitHandler}" id="oasis-scanner" ${onReset}="${resetHandler}" ${signalAttr}="${signal}">
