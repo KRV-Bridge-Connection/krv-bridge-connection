@@ -1,26 +1,22 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
+import { url } from '@aegisjsproject/url';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { onClick, onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state';
 import { attr } from '@aegisjsproject/core/stringify.js';
+import { escapeHTML } from '@aegisjsproject/escape/html.js';
 import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from '/js/consts.js';
 
-const escapeHtml = str => typeof str === 'string'
-	? str.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('"', '&quot;')
-	: '';
-
 const changeHandler = registerCallback('contact:change', change);
 
-const getIcon = (icon, {
+const useIcon = (icon, {
 	width = 18,
 	height = 18,
 	fill = 'currentColor',
+	base = location.origin,
 } = {}) => `<svg width="${width}" height="${height}" fill="${fill}" class="icon" role="presentation" aria-hidden="true">
-	<use href="/img/icons.svg#${icon}"></use>
+	<use href="${url`${base}/img/icons.svg#${icon}`}"></use>
 </svg>`;
 
 const geo = registerCallback('contact:geo', async ({ currentTarget }) => {
@@ -151,21 +147,21 @@ export default ({
 		<fieldset class="no-border">
 			<div class="form-group">
 				<label for="contact-name" class="input-label required">
-					${getIcon('avatar-default')}
+					${useIcon('avatar-default')}
 					<span class="label-text">Name</span>
 				</label>
 				<input type="text" id="contact-name" class="input" name="name" placeholder="Firstname Lastname" autocomplete="name" ${attr({ value: name })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="contact-email" class="input-label required">
-					${getIcon('mail')}
+					${useIcon('mail')}
 					<span class="label-text">Email</span>
 				</label>
 				<input type="email" id="contact-email" class="input" name="email" placeholder="user@example.com" autocomplete="email" ${attr({ value: email })} required="" />
 			</div>
 			<div class="form-group">
 				<label for="contact-phone" class="input-label">
-					${getIcon('call-start')}
+					${useIcon('call-start')}
 					<span class="label-text">Phone</span>
 				</label>
 				<input type="tel" id="contact-phone" class="input" name="telephone" placeholder="555-555-5555" autocomplete="tel" ${attr({ value: telephone })} />
@@ -214,15 +210,15 @@ export default ({
 			</div>
 			<div class="form-group">
 				<label for="contact-body" class="input-label required">
-					${getIcon('comment')}
+					${useIcon('comment')}
 					<span class="label-text">Message</span>
 				</label>
-				<textarea id="contact-body" name="body" class="input" rows="5" placeholder="Enter your Message" required="">${escapeHtml(body ?? params.get('body'))}</textarea>
+				<textarea id="contact-body" name="body" class="input" rows="5" placeholder="Enter your Message" required="">${escapeHTML(body ?? params.get('body'))}</textarea>
 			</div>
 		</fieldset>
 		<div class="flex row">
 			<button type="submit" class="btn btn-accept">
-				${getIcon('check')}
+				${useIcon('check')}
 				<span>Send</span>
 			</button>
 		</div>
