@@ -4,10 +4,6 @@ import { genOrgToken, hasValidOrgToken } from '/js/firebase/user.js';
 const pages = [
 	{ name: 'Home', url: '/' },
 	{ name: 'Oasis Scanner', url: '/pantry/oasis' },
-	{ name: 'Pantry Distribution', url: '/pantry/distribution' },
-	{ name: 'Pantry Queue', url: '/pantry/queue' },
-	{ name: 'Pantry Management', url: '/pantry/inventory' },
-	{ name: 'Pantry QR Pass', url: '/pantry/qr' },
 	{ name: 'Event Sign-In', url: '/event/sign-in/' },
 	{ name: 'Admin Sign-In', url: '/account/sign-in' },
 	{ name: 'Volunteer List', url: '/volunteer/list' },
