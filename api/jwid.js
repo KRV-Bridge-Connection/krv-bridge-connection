@@ -100,7 +100,7 @@ export default createHandler({
 						postalCode: data.get('address[postalCode]'),
 						addressCountry: data.get('address[addressCountry]'),
 					},
-					birthDate: new Date(data.get('birthDate')),
+					birthDate: new Date(data.get('birthDate') + 'T00:00'),
 				});
 
 				const file = createSVGFile(token);
