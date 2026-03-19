@@ -18,11 +18,11 @@ export default ({ signal }) => html`<form id="jwid" popover="manual" ${onSubmit}
 
 		if (resp.ok) {
 			img.src = URL.createObjectURL(await resp.blob());
-			img.decode().finally(() => URL.revokeObjectURL(img.src));
 			img.popover = 'auto';
 			img.addEventListener('toggle', ({ target, newState }) => {
 				if (newState === 'closed') {
 					target.remove();
+					URL.revokeObjectURL(img.src);
 					resolve();
 				}
 			});
