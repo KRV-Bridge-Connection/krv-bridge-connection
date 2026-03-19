@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.16] - 2026-03-19
+
+### Added
+- Add JWID (SmartID) form & API
+
 ## [v2.0.15] - 2026-02-26
 
 ### Fixed
