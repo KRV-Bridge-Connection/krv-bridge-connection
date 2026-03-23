@@ -1,6 +1,6 @@
 import { importJWK, MIME_TYPE } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
-import { createHandler, HTTPInternalServerError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPInternalServerError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
@@ -19,5 +19,11 @@ export default createHandler({
 		} else {
 			throw new HTTPInternalServerError('Could not access public JWK.');
 		}
+	},
+	async post() {
+		throw new HTTPNotImplementedError('Posting keys not yet supported');
+	},
+	async delete() {
+		throw new HTTPNotImplementedError('Deleting keys not yet supported');
 	}
 });
