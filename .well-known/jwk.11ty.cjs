@@ -13,7 +13,6 @@ module.exports.render = async () => {
 	const db = firebase.firestore();
 	const snapshot = await db.collection('jwks').get();
 	const keys = await Promise.all(snapshot.docs.map(doc => importJWK(doc.data())));
-	console.log({ kid: await getKid(keys[0]) });
 
 	return JSON.stringify({
 		keys: await Promise.all(keys.map(async publicKey => exportAsRFC7517JWK({ publicKey }, { kid: await getKid(publicKey) })))
