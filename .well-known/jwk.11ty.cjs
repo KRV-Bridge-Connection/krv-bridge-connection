@@ -1,5 +1,5 @@
 require('@shgysk8zer0/polyfills');
-const { exportAsRFC7517JWK, importJWK, getKid } = require('@shgysk8zer0/jwk-utils');
+const { exportAsRFC7517JWKSet, importJWK } = require('@shgysk8zer0/jwk-utils');
 const firebase = require('firebase-admin');
 
 module.exports.data = () => ({ permalink: '/.well-known/jwks.json' });
@@ -12,9 +12,8 @@ module.exports.render = async () => {
 
 	const db = firebase.firestore();
 	const snapshot = await db.collection('jwks').get();
-	const keys = await Promise.all(snapshot.docs.map(doc => importJWK(doc.data())));
+	const jwks = snapshot.docs.map(doc => doc.data());
+	const keys = await Promise.all(jwks.map(jwk => importJWK(jwk)));
 
-	return JSON.stringify({
-		keys: await Promise.all(keys.map(async publicKey => exportAsRFC7517JWK({ publicKey }, { kid: await getKid(publicKey) })))
-	});
+	return JSON.stringify(await exportAsRFC7517JWKSet(...keys));
 };
