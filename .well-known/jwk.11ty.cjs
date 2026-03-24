@@ -1,4 +1,3 @@
-require('@shgysk8zer0/polyfills');
 const { exportAsRFC7517JWKSet, importJWK } = require('@shgysk8zer0/jwk-utils');
 const firebase = require('firebase-admin');
 
