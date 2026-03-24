@@ -3,8 +3,10 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 import { onSubmit, onCommand, onClose, signal as sig } from '@aegisjsproject/callback-registry/events.js';
 import { createBarcodeScanner, preloadRxing, QR_CODE } from '@aegisjsproject/barcodescanner';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils/jwt.js';
+import { importJWK } from '@shgysk8zer0/jwk-utils/jwk.js';
+import keyData from '../../js/jwk.json' with { type: 'json' };
 
-import keyData from '/js/jwk.json' with { type: 'json' };
+const handleError = globalThis.reportError;
 
 const JWT_PATTERN = /^[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}$/;
 
@@ -13,18 +15,9 @@ async function showScanner() {
 	const stack = new AsyncDisposableStack();
 	const controller = stack.adopt(new AbortController(), c => c.abort(new DOMException('Disposed', 'AbortError')));
 
-	const dialog = document.getElementById('jwid-scanner');
+	const dialog = stack.adopt(document.getElementById('jwid-scanner'), el => el.close());
 	dialog.addEventListener('close', () => resolve(), { once: true, signal: controller.signal });
-	const publicKey = await crypto.subtle.importKey(
-		'jwk',
-		keyData,
-		{
-			name: 'ECDSA',
-			namedCurve: keyData.crv,
-		},
-		keyData.ext,
-		keyData.key_ops,
-	);
+	const publicKey = await importJWK(keyData);
 
 	await createBarcodeScanner(async ({ rawValue, format }) => {
 		if (format === QR_CODE && typeof rawValue === 'string' && JWT_PATTERN.test(rawValue)) {
@@ -32,10 +25,8 @@ async function showScanner() {
 				claims: ['given_name', 'family_name', 'iss', 'birthdate'],
 			}).catch(err => err);
 
-			console.log(payload);
-
 			if (payload instanceof Error) {
-				reportError(payload);
+				handleError(payload);
 			} else {
 				const { promise, resolve } = Promise.withResolvers();
 				const {
@@ -53,9 +44,10 @@ async function showScanner() {
 					} = {}
 				} = payload;
 
-				const dialog = stack.adopt(el`<dialog id="_${identifier}-modal" class="jwid-result-dialog" ${onClose}="${({ target }) => {
+				const modal = stack.adopt(el`<dialog id="_${identifier}-modal" class="jwid-result-dialog" ${onClose}="${({ target }) => {
 					target.remove();
 					resolve();
+					dialog.close();
 				}}">
 					<div class="jwid-result-card">
 						<header class="jwid-result-header flex row">
@@ -116,14 +108,13 @@ async function showScanner() {
 							<button type="button" class="btn btn-danger" command="request-close" commandfor="_${identifier}-modal">Close</button>
 						</footer>
 					</div>
-				</dialog>`, d => d.close());
+				</dialog>`, d => d.remove());
 
-				document.body.append(dialog);
-				dialog.showModal();
+				document.body.append(modal);
+				modal.showModal();
 				await promise;
+				dialog.close();
 			}
-		} else {
-			console.log({ format, rawValue });
 		}
 	}, {
 		video: 'jwid-preview',
@@ -186,7 +177,7 @@ export default ({ signal }) => html`<form id="jwid" popover="manual" ${onSubmit}
 					break;
 			}
 		} catch(err) {
-			reportError(err);
+			handleError(err);
 		} finally {
 			source.disabled = false;
 		}
