@@ -16,7 +16,7 @@ export default createHandler({
 			const key = await getCollectionItem('jwks', searchParams.get('kid').trim());
 
 			if (typeof key?.kty === 'string') {
-				return Response.json(key);
+				return Response.json(key, { headers: { 'Content-Type': MIME_TYPE }});
 			} else {
 				throw new HTTPNotFoundError(`Not key found with id ${searchParams.get('kid')}`);
 			}
@@ -50,9 +50,16 @@ export default createHandler({
 			} else {
 				const keyData = await req.json();
 				const publicKey = await importJWK(keyData);
-				const kid = await getKid(publicKey);
-				await putCollectionItem('jwks', kid, keyData);
-				return Response.json({ kid }, { status: 201 });
+
+				if (publicKey instanceof Error) {
+					throw new HTTPBadRequestError('Invalid key data.', { cause: publicKey });
+				} else if (publicKey.type !== 'public') {
+					throw new HTTPBadRequestError(`Invalid JWK type: "${publicKey.type}".`);
+				} else {
+					const kid = await getKid(publicKey);
+					await putCollectionItem('jwks', kid, await crypto.subtle.exportKey('jwk', publicKey));
+					return Response.json({ kid }, { status: 201 });
+				}
 			}
 		}
 	},
