@@ -12,23 +12,7 @@ import '@shgysk8zer0/components/app/stores.js';
 import '@shgysk8zer0/components/scroll-snap.js';
 import '@shgysk8zer0/components/youtube/player.js';
 
-initRouter({
-	'/volunteer/': '/js/routes/volunteer.js',
-	'/volunteer/list': '/js/routes/volunteer-list.js',
-	'/(partners|resources)/?category=:category': '/js/routes/partners.js',
-	'/(partners|resources)/:partner([\\w\\-]*)': '/js/routes/partners.js',
-	'/food/': '/js/routes/food-cal.js',
-	'/admin/directory': '/js/routes/directory.js',
-	'/pantry/': '/js/routes/pantry.js',
-	'/pantry/oasis': '/js/routes/oasis.js',
-	'/jwid': '/js/routes/jwid.js',
-	'/contact/': '/js/routes/contact.js',
-	'/posts/:year(20\\d{2})/:month(0?\\d|1[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])': '/js/routes/posts.js',
-	'/event/sign-in/': '/js/routes/sign-in.js',
-	'/account/:page': '@aegisjsproject/firebase-account-routes',
-	'/account/': '@aegisjsproject/firebase-account-routes',
-	'/tv-display': '/js/routes/digital-signage.js',
-}, {
+initRouter(document.scripts.namedItem('aegis-routes'), {
 	rootEl: document.getElementById('main'),
 	notFound: '/js/routes/404.js',
 	observePreloads: true,
@@ -49,8 +33,6 @@ if (! CSS.supports('height', '1dvh')) {
 
 document.documentElement.classList.add('js');
 document.documentElement.classList.remove('no-js');
-// For use with Invoker Commands
-document.documentElement.id = 'doc';
 
 document.addEventListener(NAV_EVENT, event => {
 	event.waitUntil(async () => {
@@ -90,7 +72,16 @@ Promise.all([
 	initializeFirebaseApp(config);
 
 	registerRootCommand('--logout', async ({ source }) => {
-		source.disabled = true;
-		logout().finally(() => source.disabled = false);
+		if (source instanceof HTMLButtonElement) {
+			source.disabled = true;
+		}
+
+		fetch('/api/logout').then(resp => {
+			if (resp.ok) {
+				localStorage.setItem('token:expires', 0);
+			}
+		});
+
+		logout();
 	});
 }).catch(reportError);
