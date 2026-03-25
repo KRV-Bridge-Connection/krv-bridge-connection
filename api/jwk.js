@@ -14,7 +14,7 @@ export default createHandler({
 
 		if (searchParams.has('kid')) {
 			const key = await getCollectionItem('jwks', searchParams.get('kid').trim());
-			console.log(key);
+
 			if (typeof key?.kty === 'string') {
 				return Response.json(key);
 			} else {
