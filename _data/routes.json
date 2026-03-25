@@ -1,0 +1,18 @@
+{
+  "/volunteer/": "/js/routes/volunteer.js",
+  "/volunteer/list": "/js/routes/volunteer-list.js",
+  "/volunteer/reg": "/js/routes/volunteer-reg.js",
+  "/(partners|resources)/?category=:category": "/js/routes/partners.js",
+  "/(partners|resources)/:partner([\\w\\-]*)": "/js/routes/partners.js",
+  "/food/": "/js/routes/food-cal.js",
+  "/admin/directory": "/js/routes/directory.js",
+  "/pantry/": "/js/routes/pantry.js",
+  "/pantry/oasis": "/js/routes/oasis.js",
+  "/jwid": "/js/routes/jwid.js",
+  "/contact/": "/js/routes/contact.js",
+  "/posts/:year(20\\d{2})/:month(0?\\d|1[0-2])/:day(0?[1-9]|[12]\\d|3[01])/:post([a-z0-9\\-]+[a-z0-9])": "/js/routes/posts.js",
+  "/event/sign-in/": "/js/routes/sign-in.js",
+  "/account/:page": "@aegisjsproject/firebase-account-routes",
+  "/account/": "@aegisjsproject/firebase-account-routes",
+  "/tv-display": "/js/routes/digital-signage.js"
+}

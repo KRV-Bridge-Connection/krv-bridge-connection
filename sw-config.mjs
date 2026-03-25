@@ -26,6 +26,11 @@ const config = {
 		'/about/',
 		'/donate/',
 		'/branding/',
+		'/contact/',
+		'/volunteer/',
+		'/pantry/',
+		'/account/',
+		'/pantry/oasis',
 		'/webapp.webmanifest',
 		'https://apps.kernvalley.us/apps.json',
 		'https://cdn.kernvalley.us/img/markers.svg',
@@ -40,11 +45,6 @@ const config = {
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
 	stale: [
-		'/contact/',
-		'/volunteer/',
-		'/pantry/',
-		'/account/',
-		'/pantry/oasis',
 		/* Scripts */
 		'/js/index.min.js',
 		'/js/consts.js',
@@ -65,6 +65,8 @@ const config = {
 		'{{ importmap.imports["@shgysk8zer0/konami"] }}',
 		'{{ importmap.imports["@shgysk8zer0/kazoo/"] }}geo.js',
 		'{{ importmap.imports["@aegisjsproject/commands"] }}',
+		'{{ importmap.imports["@aegisjsproject/jwk-utils/"] }}jwk.js',
+		'{{ importmap.imports["@aegisjsproject/jwk-utils/"] }}jwt.js',
 		'{{ importmap.imports["@aegisjsproject/markdown"] }}',
 		'{{ importmap.imports["@aegisjsproject/url/"] }}search.js',
 		'{{ importmap.imports["@aegisjsproject/url/"] }}url.min.js',
