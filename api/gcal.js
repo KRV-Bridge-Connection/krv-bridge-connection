@@ -50,7 +50,11 @@ export default createHandler({
 			if (err instanceof HTTPError) {
 				throw err;
 			} else {
-				throw new HTTPInternalServerError(err.message, { details: err.stack });
+				throw new HTTPInternalServerError('An unknown error occured', {
+					details: {
+						hasSecretKey: typeof process.env.SECRET_KEY === 'string',
+					}
+				});
 			}
 		}
 	}
