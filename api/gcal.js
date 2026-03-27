@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPBadRequestError, HTTPError, HTTPInternalServerError } from '@shgysk8zer0/lambda-http';
 import { url } from '@aegisjsproject/url';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { getSecretKey } from '@shgysk8zer0/aes-gcm';
@@ -40,10 +40,18 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 
 export default createHandler({
 	async get(req) {
-		if (req.searchParams.has('cal')) {
-			return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
-		} else {
-			return await getCal('pantry', { signal: req.signal });
+		try {
+			if (req.searchParams.has('cal')) {
+				return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
+			} else {
+				return await getCal('pantry', { signal: req.signal });
+			}
+		} catch(err) {
+			if (err instanceof HTTPError) {
+				throw err;
+			} else {
+				throw new HTTPInternalServerError(err.message);
+			}
 		}
 	}
 }, {
