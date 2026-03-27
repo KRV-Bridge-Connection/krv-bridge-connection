@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
 import { url } from '@aegisjsproject/url';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { getSecretKey } from '@shgysk8zer0/aes-gcm';
@@ -31,23 +31,22 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 					url: htmlLink,
 				})) };
 		} else {
-			throw new DOMException(`No calendar for ${cal}.`, 'NetworkError');
+			throw new HTTPBadGatewayError(`${url.origin} [${resp.status}]`);
 		}
+	} else {
+		throw new HTTPBadRequestError(`No calendar for "${cal}".`);
 	}
 }
 
 export default createHandler({
 	async get(req) {
-		try {
-			if (req.searchParams.has('cal')) {
-				return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
-			} else {
-				return await getCal('pantry', { signal: req.signal });
-			}
-		} catch(err) {
-			throw new HTTPBadGatewayError('Error requesting calendar', { cause: err });
+		if (req.searchParams.has('cal')) {
+			return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
+		} else {
+			return await getCal('pantry', { signal: req.signal });
 		}
 	}
 }, {
 	allowOrigins: ['*'],
+	logger: console.error,
 });
