@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
-import { url } from '@aegisjsproject/url/parser.js';
+import { url } from '@aegisjsproject/url';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { getSecretKey } from '@shgysk8zer0/aes-gcm';
 
