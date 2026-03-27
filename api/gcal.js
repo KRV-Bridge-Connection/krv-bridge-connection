@@ -50,7 +50,7 @@ export default createHandler({
 			if (err instanceof HTTPError) {
 				throw err;
 			} else {
-				throw new HTTPInternalServerError(err.message);
+				throw new HTTPInternalServerError(err.message, { details: err.stack });
 			}
 		}
 	}
