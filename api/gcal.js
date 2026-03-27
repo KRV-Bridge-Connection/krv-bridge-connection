@@ -44,4 +44,6 @@ export default createHandler({
 			throw new HTTPBadGatewayError('Error requesting calendar', { cause: err });
 		}
 	}
+}, {
+	allowOrigins: ['*'],
 });
