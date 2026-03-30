@@ -51,6 +51,7 @@ export default createHandler({
 				throw err;
 			} else {
 				throw new HTTPInternalServerError('An unknown error occured', {
+					cause: err,
 					details: {
 						hasSecretKey: typeof process.env.SECRET_KEY === 'string',
 					}
