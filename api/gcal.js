@@ -7,12 +7,15 @@ const CALENDARS = {
 	pantry: 'c_16733423f0da780704fd694ee47fbfbd2e7d0aaac0f076464b49e02794c4f412@group.calendar.google.com',
 };
 
-const getCalURL = (cal, key) => cal in CALENDARS ? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal]}/events?key=${key}` : null;
+const getCalURL = ({ cal, key, timeMin, timeMax }) => cal in CALENDARS ? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal.trim().toLowerCase()]}/events?key=${key.trim()}&timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true` : null;
 
 async function getCal(cal = 'pantry', { signal } = {}) {
 	const key = await getSecretKey();
+	const timeMin = new Date();
+	timeMin.setHours(0, 0, 0, 0);
+	const timeMax = new Date(timeMin.getFullYear(), timeMin.getMonth() + 1, timeMin.getDate(), 23, 59, 59, 999);
 	const [secrets] = await openSecretStoreFile(key, '_data/secrets.json');
-	const url = getCalURL(cal?.toLowerCase(), await secrets.GOOGLE_CALENDAR_API_KEY);
+	const url = getCalURL({ cal, key: await secrets.GOOGLE_CALENDAR_API_KEY, timeMin, timeMax });
 
 	if (url instanceof URL) {
 		const resp = await fetch(url, { headers: { Accept: 'application/json', signal }});
@@ -31,6 +34,7 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 					url: htmlLink,
 				})) };
 		} else {
+			console.log(await resp.text());
 			throw new HTTPBadGatewayError(`${url.origin} [${resp.status}]`);
 		}
 	} else {
