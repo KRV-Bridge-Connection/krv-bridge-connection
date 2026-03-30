@@ -3,12 +3,13 @@ import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
-import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
+// import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
+import '../components/g-cal.js';
 import imgData from '/img/gallery.json' with { type: 'json' };
 
-const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
+// const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
 const [sheet, scoped] = useScopedStyle();
 const STORE_NAME = 'partners';
 const delay = 10_000;
@@ -166,12 +167,14 @@ const partnerFlex = scoped`
 const createPartners = results => results.map(({ name, description, image, id, telephone, email, url, keywords }) => `<div id="${id}" class="${orgCard}" ${data({ orgName: name })}>
 	<div class="${partnerFlex}">
 		<img ${attr({ src: image.src, height: image.height, width: image.width, alt: name })} loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />
-		<b class="partner-name">${name}</b>
+		<div>
+			<b class="partner-name">${name}</b>
+			<p>${description}</p>
+		</div>
 	</div>
 	<div class="flex row no-wrap tags">
 		${Array.isArray(keywords) ? keywords.map(tag => `<a href="/resources/?category=${tag}" class="btn btn-primary">#${tag}</a>`).join('') : ''}
 	</div>
-	<p>${description}</p>
 	<div>
 		${typeof telephone === 'string' ? `<a href="tel:${telephone}" class="block btn btn-link">
 			<svg class="icon" height="16" width="16" fill="currentColor" viewBox="0 0 16 16" role="presentation">
@@ -204,11 +207,12 @@ export default async ({ signal, stack }) => {
 	/**
 	 * @type {[IDBDatabase, HTMLElement, HTMLElement, HTMLElement]}
 	 */
-	const [db, HTMLScrollSnapElement, KRVEvents, WeatherForecast] = await Promise.all([
+	const [db, HTMLScrollSnapElement, KRVEvents, WeatherForecast, GCalEvents] = await Promise.all([
 		openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack }),
 		customElements.whenDefined('scroll-snap'),
 		customElements.whenDefined('krv-events'),
 		customElements.whenDefined('weather-forecast'),
+		customElements.whenDefined('g-cal-events'),
 	]);
 
 	const partners = await getAllItems(db, STORE_NAME, null, { signal });
@@ -236,12 +240,13 @@ export default async ({ signal, stack }) => {
 	scrollSnap.append(
 		cal,
 		forecast,
-		createGoogleCalendar(CAL, {
-			credentialless: true,
-			title: 'KRV Food Calendar',
-			showPrint: false,
-		}),
-		html`<div>
+		GCalEvents.create('pantry'),
+		// createGoogleCalendar(CAL, {
+		// 	credentialless: true,
+		// 	title: 'KRV Food Calendar',
+		// 	showPrint: false,
+		// }),
+		el`<div>
 			<h3>Bridge to Well-being</h3>
 			<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
 			<div class="flex row space-around">
