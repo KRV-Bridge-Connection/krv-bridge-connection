@@ -1,56 +1,8 @@
 import { IotaElement, $text, $attr, $state, $watch } from '@aegisjsproject/iota';
 import { url } from '@aegisjsproject/url';
-
-const fmt = new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium', timeStyle: 'short' });
-
-function createEventItem({ summary = 'Untitled', description, location, startDate, endDate, url }) {
-	const li = document.createElement('li');
-	const a = document.createElement('a');
-
-	li.part = 'event';
-	a.part = 'event-link';
-	a.href = url;
-	a.rel = 'noopener noreferrer';
-	a.target = '_blank';
-	a.textContent = summary;
-	li.append(a);
-
-	if (description) {
-		const p = document.createElement('p');
-		p.part = 'event-description';
-		p.textContent = description;
-		li.append(p);
-	}
-
-	const timeWrap = document.createElement('p');
-	timeWrap.part = 'event-times';
-
-	const start = document.createElement('time');
-	start.part = 'event-start';
-	start.dateTime = startDate ?? '';
-	start.textContent = startDate ? fmt.format(new Date(startDate)) : 'All day';
-	timeWrap.append(start);
-
-	if (endDate) {
-		timeWrap.append(' – ');
-		const end = document.createElement('time');
-		end.part = 'event-end';
-		end.dateTime = endDate;
-		end.textContent = new Date(endDate).toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
-		timeWrap.append(end);
-	}
-
-	li.append(timeWrap);
-
-	if (location) {
-		const addr = document.createElement('address');
-		addr.part = 'event-location';
-		addr.textContent = location;
-		li.append(addr);
-	}
-
-	return li;
-}
+import { escapeHTML } from '@aegisjsproject/escape';
+import { html } from '@aegisjsproject/core/parsers/html.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
 
 export class GCalEvents extends IotaElement {
 	static observedAttributes = ['cal'];
@@ -58,22 +10,23 @@ export class GCalEvents extends IotaElement {
 
 	#summary = this.use($text('Untitled Calendar'));
 	#desc = this.use($text(''));
+	#descHidden = this.use($attr('hidden', true));
 	#status = this.use($text('No Calendar Specified'));
 	#statusHidden = this.use($attr('hidden', false));
 	#events = this.use($state([]));
 	#activeCal = null;
 
 	get html() {
-		return `
+		return html`
 			<h2 part="title" id="cal-title">${this.#summary}</h2>
-			<p part="description" id="cal-desc" hidden>${this.#desc}</p>
+			<p part="description" id="cal-desc" ${this.#descHidden}>${this.#desc}</p>
 			<ul part="events" id="events" role="list"></ul>
 			<p part="status" id="status" role="status" ${this.#statusHidden}>${this.#status}</p>
 		`;
 	}
 
 	get styles() {
-		return `:host {
+		return css`:host {
 			display: block;
 			font-family: system-ui, sans-serif;
 			color-scheme: light dark;
@@ -165,14 +118,30 @@ export class GCalEvents extends IotaElement {
 						internals.states.add('empty');
 					} else {
 						const list = shadow.getElementById('events');
-						list.replaceChildren(...events.map(createEventItem));
+						internals.states.delete('empty');
+
+						list.replaceChildren(html`${events.map(({ summary = 'Untitled', description, location, startDate, endDate, url }) => {
+							const startTime = new Date(startDate);
+							const endTime = typeof endDate === 'string' ? new Date(endDate) : null;
+
+							return `<li part="event">
+								<a href="${url}" part="event-link" target="gCal" rel="noopener noreferrer external">${escapeHTML(summary)}</a>
+								${typeof description === 'string' ? `<p part="event-description">${escapeHTML(description)}</p>` : ''}
+								<p part="event-times">
+									<time datetime="${startTime.toISOString()}" part="event-start">${startTime.toLocaleString(navigator.language, { dateStyle: 'medium', timeStyle: 'short' })}</time>
+									${endTime instanceof Date ? `<span>&mdash;</span><time datetime="${endTime.toISOString()}" part="event-end">${endTime.toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' })}</time>` : ''}
+								</p>
+								${typeof location === 'string' ? `<address part="event-location">${escapeHTML(location)}</address>` : ''}
+							</li>`;
+						}).join('')}`);
+
 						this.#statusHidden.set(true);
 					}
 				});
 				break;
 
 			case 'attributeChanged':
-				this.#updateCalendar({ signal, internals });
+				await this.#updateCalendar({ signal, internals }).catch(reportError);
 				break;
 		}
 	}
@@ -189,10 +158,10 @@ export class GCalEvents extends IotaElement {
 			this.#statusHidden.set(false);
 
 			try {
-				internals.states.add('loading');
 				const { title, description, events } = await this.#getCalendar({ signal });
 				this.#summary.set(title);
-				this.#desc.set(description ?? '');
+				this.#desc.set(description);
+				this.#descHidden.set(typeof description !== 'string' || description.length === 0);
 				this.#events.set(events);
 			} catch(err) {
 				internals.states.add('error');
