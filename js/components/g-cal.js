@@ -1,19 +1,18 @@
-import { IotaElement } from '@aegisjsproject/iota/iota-element.js';
+import { IotaElement, $text, $attr, $state, $watch } from '@aegisjsproject/iota';
 import { url } from '@aegisjsproject/url';
-
 
 const fmt = new Intl.DateTimeFormat(navigator.language, { dateStyle: 'medium', timeStyle: 'short' });
 
-function createEventItem({ summary, description, location, startDate, endDate, url }) {
+function createEventItem({ summary = 'Untitled', description, location, startDate, endDate, url }) {
 	const li = document.createElement('li');
-	li.part = 'event';
-
 	const a = document.createElement('a');
+
+	li.part = 'event';
 	a.part = 'event-link';
 	a.href = url;
 	a.rel = 'noopener noreferrer';
 	a.target = '_blank';
-	a.textContent = summary ?? 'Untitled';
+	a.textContent = summary;
 	li.append(a);
 
 	if (description) {
@@ -57,14 +56,19 @@ export class GCalEvents extends IotaElement {
 	static observedAttributes = ['cal'];
 	static shadowRootSlotAssignment = 'manual';
 
+	#summary = this.use($text('Untitled Calendar'));
+	#desc = this.use($text(''));
+	#status = this.use($text('No Calendar Specified'));
+	#statusHidden = this.use($attr('hidden', false));
+	#events = this.use($state([]));
 	#activeCal = null;
 
 	get html() {
 		return `
-			<h2 part="title" id="cal-title"></h2>
-			<p part="description" id="cal-desc" hidden></p>
+			<h2 part="title" id="cal-title">${this.#summary}</h2>
+			<p part="description" id="cal-desc" hidden>${this.#desc}</p>
 			<ul part="events" id="events" role="list"></ul>
-			<p part="status" id="status" role="status" hidden></p>
+			<p part="status" id="status" role="status" ${this.#statusHidden}>${this.#status}</p>
 		`;
 	}
 
@@ -152,57 +156,65 @@ export class GCalEvents extends IotaElement {
 	}
 
 	async update(type, { signal, shadow, internals }) {
-		if (type !== 'attributeChanged') return;
+		switch(type) {
+			case 'connected':
+				$watch(this.#events, events => {
+					if (events.length === 0) {
+						this.#status.set('No upcoming events.');
+						this.#statusHidden.set(false);
+						internals.states.add('empty');
+					} else {
+						const list = shadow.getElementById('events');
+						list.replaceChildren(...events.map(createEventItem));
+						this.#statusHidden.set(true);
+					}
+				});
+				break;
 
-		const cal = this.getAttribute('cal')?.trim().toLowerCase();
+			case 'attributeChanged':
+				this.#updateCalendar({ signal, internals });
+				break;
+		}
+	}
 
-		if (! cal || cal === this.#activeCal) return;
+	async #updateCalendar({ signal, internals } = {}) {
+		const cal = this.cal;
 
-		this.#activeCal = cal;
-		internals.states.add('loading');
-		internals.states.delete('error');
-		internals.states.delete('empty');
+		if (typeof cal === 'string' && cal !== this.#activeCal) {
+			this.#activeCal = cal;
+			internals.states.add('loading');
+			internals.states.delete('error');
+			internals.states.delete('empty');
+			this.#status.set('Loading Events…');
+			this.#statusHidden.set(false);
 
-
-		try {
-			const resp = await fetch(url`${location.origin}/api/gcal?cal=${cal}`, { signal });
-
-			if (signal.aborted) return;
-
-			if (! resp.ok) throw new Error(`${resp.status}`);
-			const status = shadow.getElementById('status');
-			status.hidden = false;
-			status.textContent = 'Loading events…';
-
-			const { title, description, events } = await resp.json();
-
-			shadow.getElementById('cal-title').textContent = title ?? '';
-
-			const descEl = shadow.getElementById('cal-desc');
-			if (description) {
-				descEl.textContent = description;
-				descEl.hidden = false;
-			} else {
-				descEl.hidden = true;
+			try {
+				internals.states.add('loading');
+				const { title, description, events } = await this.#getCalendar({ signal });
+				this.#summary.set(title);
+				this.#desc.set(description ?? '');
+				this.#events.set(events);
+			} catch(err) {
+				internals.states.add('error');
+				this.#status.set('Failed to load events.');
+				this.#statusHidden.set(false);
+				this.dispatchEvent(new ErrorEvent('error', { message: err.message, error: err }));
+			} finally {
+				internals.states.delete('loading');
 			}
+		}
+	}
 
-			const list = shadow.getElementById('events');
-			list.replaceChildren(...events.map(createEventItem));
+	async #getCalendar({ signal } = {}) {
+		const resp = await fetch(url`${location.origin}/api/gcal?cal=${this.cal}`, {
+			headers: { Accept: 'application/json' },
+			signal,
+		});
 
-			status.hidden = true;
-			internals.states.delete('loading');
-
-			if (events.length === 0) {
-				status.textContent = 'No upcoming events.';
-				status.hidden = false;
-				internals.states.add('empty');
-			}
-		} catch(err) {
-			if (signal.aborted) return;
-			internals.states.delete('loading');
-			internals.states.add('error');
-			status.textContent = 'Failed to load events.';
-			this.dispatchEvent(new ErrorEvent('error', { message: err.message, error: err }));
+		if (! resp.ok) {
+			throw new DOMException(`${resp.url} [${resp.status}]`, 'NetworkError');
+		} else {
+			return await resp.json();
 		}
 	}
 
