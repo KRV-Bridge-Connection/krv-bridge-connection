@@ -241,11 +241,8 @@ export default async ({ signal, stack }) => {
 		cal,
 		forecast,
 		GCalEvents.create('pantry'),
-		// createGoogleCalendar(CAL, {
-		// 	credentialless: true,
-		// 	title: 'KRV Food Calendar',
-		// 	showPrint: false,
-		// }),
+		GCalEvents.create('partners'),
+		// GCalEvents.create('events'),
 		el`<div>
 			<h3>Bridge to Well-being</h3>
 			<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
