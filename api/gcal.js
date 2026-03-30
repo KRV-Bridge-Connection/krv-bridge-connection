@@ -5,9 +5,11 @@ import { getSecretKey } from '@shgysk8zer0/aes-gcm';
 
 const CALENDARS = {
 	pantry: 'c_16733423f0da780704fd694ee47fbfbd2e7d0aaac0f076464b49e02794c4f412@group.calendar.google.com',
+	partners: 'c_211fc8998c3d75914906fb365b905502aa1e534cf71764237fa7d00e2715c6f8@group.calendar.google.com',
+	events: 'c_e793802b16d64a17e4e09e9cf6c048f7851a9abd8415e0c95be0f48b8c673581@group.calendar.google.com',
 };
 
-const getCalURL = ({ cal, key, timeMin, timeMax }) => cal in CALENDARS ? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal.trim().toLowerCase()]}/events?key=${key.trim()}&timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true` : null;
+const getCalURL = ({ cal, key, timeMin, timeMax }) => cal in CALENDARS ? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal.trim().toLowerCase()]}/events?key=${key.trim()}&timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true&orderBy=startTime` : null;
 
 async function getCal(cal = 'pantry', { signal } = {}) {
 	const key = await getSecretKey();
