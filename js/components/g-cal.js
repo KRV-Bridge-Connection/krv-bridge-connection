@@ -1,4 +1,4 @@
-import { IotaElement, $text, $attr, $state, $watch } from '@aegisjsproject/iota';
+import { IotaElement, $text, $hidden, $state, $watch } from '@aegisjsproject/iota';
 import { url } from '@aegisjsproject/url';
 import { escapeHTML } from '@aegisjsproject/escape';
 import { html } from '@aegisjsproject/core/parsers/html.js';
@@ -10,9 +10,9 @@ export class GCalEvents extends IotaElement {
 
 	#summary = this.use($text('Untitled Calendar'));
 	#desc = this.use($text(''));
-	#descHidden = this.use($attr('hidden', true));
+	#descHidden = this.use($hidden(true));
 	#status = this.use($text('No Calendar Specified'));
-	#statusHidden = this.use($attr('hidden', false));
+	#statusHidden = this.use($hidden(false));
 	#events = this.use($state([]));
 	#activeCal = null;
 
@@ -141,7 +141,7 @@ export class GCalEvents extends IotaElement {
 				break;
 
 			case 'attributeChanged':
-				await this.#updateCalendar({ signal, internals }).catch(reportError);
+				await this.#updateCalendar({ signal, internals });
 				break;
 		}
 	}
