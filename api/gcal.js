@@ -1,4 +1,4 @@
-import { createHandler, HTTPBadGatewayError, HTTPBadRequestError, HTTPError, HTTPInternalServerError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPBadRequestError } from '@shgysk8zer0/lambda-http';
 import { url } from '@aegisjsproject/url';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { getSecretKey } from '@shgysk8zer0/aes-gcm';
@@ -9,7 +9,9 @@ const CALENDARS = {
 	events: 'c_e793802b16d64a17e4e09e9cf6c048f7851a9abd8415e0c95be0f48b8c673581@group.calendar.google.com',
 };
 
-const getCalURL = ({ cal, key, timeMin, timeMax }) => cal in CALENDARS ? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal.trim().toLowerCase()]}/events?key=${key.trim()}&timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true&orderBy=startTime` : null;
+const getCalURL = ({ cal, key, timeMin, timeMax }) => cal in CALENDARS
+	? url`https://www.googleapis.com/calendar/v3/calendars/${CALENDARS[cal.trim().toLowerCase()]}/events?key=${key.trim()}&timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}&singleEvents=true&orderBy=startTime`
+	: null;
 
 async function getCal(cal = 'pantry', { signal } = {}) {
 	const key = await getSecretKey();
@@ -36,7 +38,6 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 					url: htmlLink,
 				})) };
 		} else {
-			console.log(await resp.text());
 			throw new HTTPBadGatewayError(`${url.origin} [${resp.status}]`);
 		}
 	} else {
@@ -46,26 +47,12 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 
 export default createHandler({
 	async get(req) {
-		try {
-			if (req.searchParams.has('cal')) {
-				return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
-			} else {
-				return await getCal('pantry', { signal: req.signal });
-			}
-		} catch(err) {
-			if (err instanceof HTTPError) {
-				throw err;
-			} else {
-				throw new HTTPInternalServerError('An unknown error occured', {
-					cause: err,
-					details: {
-						hasSecretKey: typeof process.env.SECRET_KEY === 'string',
-					}
-				});
-			}
+		if (req.searchParams.has('cal')) {
+			return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
+		} else {
+			return await getCal('pantry', { signal: req.signal });
 		}
 	}
 }, {
 	allowOrigins: ['*'],
-	logger: console.error,
 });
