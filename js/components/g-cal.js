@@ -1,4 +1,4 @@
-import { IotaElement, $text, $hidden, $state, $watch } from '@aegisjsproject/iota';
+import { IotaElement, $text, $hidden, $state, $watch, $html } from '@aegisjsproject/iota';
 import { url } from '@aegisjsproject/url';
 import { escapeHTML } from '@aegisjsproject/escape';
 import { html } from '@aegisjsproject/core/parsers/html.js';
@@ -10,14 +10,14 @@ export class GCalEvents extends IotaElement {
 
 	#summary = this.use($text('Untitled Calendar'));
 	#desc = this.use($text(''));
-	#descHidden = this.use($hidden(true));
+	#descHidden = this.use($hidden(() => this.#desc.get()?.toString?.().length === 0));
 	#status = this.use($text('No Calendar Specified'));
-	#statusHidden = this.use($hidden(false));
+	#statusHidden = this.use($hidden(() => this.#status.get()?.toString?.().length === 0));
 	#events = this.use($state([]));
 	#activeCal = null;
 
 	get html() {
-		return html`
+		return $html`
 			<h2 part="title" id="cal-title">${this.#summary}</h2>
 			<p part="description" id="cal-desc" ${this.#descHidden}>${this.#desc}</p>
 			<ul part="events" id="events" role="list"></ul>
@@ -38,6 +38,7 @@ export class GCalEvents extends IotaElement {
 		}
 
 		:host(:state(error)) [part="status"] {
+			color: salmon;
 			color: light-dark(crimson, salmon);
 		}
 
@@ -64,7 +65,7 @@ export class GCalEvents extends IotaElement {
 		[part="event"] {
 			padding: 0.75em 1em;
 			border-inline-start: 3px solid light-dark(royalblue, cornflowerblue);
-			background: light-dark(#f5f7ff, #1a1d2e);
+			background-color: light-dark(#f5f7ff, #1a1d2e);
 			border-radius: 0 4px 4px 0;
 			display: grid;
 			gap: 0.25em;
@@ -72,7 +73,7 @@ export class GCalEvents extends IotaElement {
 
 		[part="event-link"] {
 			font-weight: 600;
-			color: light-dark(royalblue, cornflowerblue);
+			color: LinkText;
 			text-decoration: none;
 
 			&:hover {
@@ -114,11 +115,11 @@ export class GCalEvents extends IotaElement {
 				$watch(this.#events, events => {
 					if (events.length === 0) {
 						this.#status.set('No upcoming events.');
-						this.#statusHidden.set(false);
 						internals.states.add('empty');
 					} else {
 						const list = shadow.getElementById('events');
 						internals.states.delete('empty');
+						this.#status.set('');
 
 						list.replaceChildren(html`${events.map(({ summary = 'Untitled', description, location, startDate, endDate, url }) => {
 							const startTime = new Date(startDate);
@@ -134,8 +135,6 @@ export class GCalEvents extends IotaElement {
 								${typeof location === 'string' ? `<address part="event-location">${escapeHTML(location)}</address>` : ''}
 							</li>`;
 						}).join('')}`);
-
-						this.#statusHidden.set(true);
 					}
 				});
 				break;
@@ -155,18 +154,17 @@ export class GCalEvents extends IotaElement {
 			internals.states.delete('error');
 			internals.states.delete('empty');
 			this.#status.set('Loading Events…');
-			this.#statusHidden.set(false);
 
 			try {
-				const { title, description, events } = await this.#getCalendar({ signal });
+				const { title, description = '', events } = await this.#getCalendar({ signal });
 				this.#summary.set(title);
 				this.#desc.set(description);
-				this.#descHidden.set(typeof description !== 'string' || description.length === 0);
 				this.#events.set(events);
+				this.#status.set(events.length === 0 ? 'No events to display' : '');
 			} catch(err) {
 				internals.states.add('error');
 				this.#status.set('Failed to load events.');
-				this.#statusHidden.set(false);
+				this.#desc.set('');
 				this.dispatchEvent(new ErrorEvent('error', { message: err.message, error: err }));
 			} finally {
 				internals.states.delete('loading');
