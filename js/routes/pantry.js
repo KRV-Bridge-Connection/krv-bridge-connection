@@ -82,7 +82,7 @@ export default () => html`<section aria-labelledby="pantry-header">
 	</section>
 	<p>
 		<span>For other KRV Food Distributions, please see the Calendar</span>
-		<a href="/food/">
+		<a href="/calendar/pantry">
 			<svg class="icon" width="16" height="16" fill="currentColor" role="presentation" aria-hidden="true">
 				<use href="/img/icons.svg#link"></use>
 			</svg>

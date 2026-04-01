@@ -1,5 +1,6 @@
 import { HOURS as HOUR } from '@shgysk8zer0/consts/date.js';
 import { getIdToken } from '@aegisjsproject/firebase-account-routes/auth.js';
+import { navigate } from '@aegisjsproject/router';
 import { ORG_TOKEN_KEY } from '../consts.js';
 
 export async function createTokenCookie(name = 'token') {
@@ -22,7 +23,7 @@ export async function genOrgToken({ signal } = {}) {
 				headers: { Authorization: `Bearer ${token}` },
 				signal,
 				credentials: 'same-origin',
-			});
+			}).catch(() => Response.error());
 
 			if (resp.ok) {
 				const { expires } = await resp.json();
@@ -35,5 +36,12 @@ export async function genOrgToken({ signal } = {}) {
 			return -1;
 		}
 	}
+}
 
+export const isLoggedIn = async ({ signal } = {}) => await genOrgToken({ signal }) > Date.now();
+
+export async function redirectToLogin({ signal, redirect = location.href, state = history.state ?? {} } = {}) {
+	const url = new URL('/account/sign-in', location.origin);
+	url.searchParams.set('redirect', redirect);
+	await navigate(url, state, { signal });
 }

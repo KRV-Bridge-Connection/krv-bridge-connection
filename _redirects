@@ -21,6 +21,7 @@
 /partners  /partners/ 301
 /event/ /dynamic.html 200
 /event/* /dynamic.html 200
+/calendar/* /dynamic.html 200
 /account/* /dynamic.html 200
 /tv-display /dynamic.html 200
 /jwid /dynamic.html 200
