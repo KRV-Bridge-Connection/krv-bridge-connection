@@ -4,6 +4,9 @@ import { escapeHTML } from '@aegisjsproject/escape';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 
+const START_FORMAT = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+const END_FORMAT = { hour: '2-digit', minute: '2-digit' };
+
 export class GCalEvents extends IotaElement {
 	static observedAttributes = ['cal'];
 	static shadowRootSlotAssignment = 'manual';
@@ -129,8 +132,8 @@ export class GCalEvents extends IotaElement {
 								<a href="${url}" part="event-link" target="gCal" rel="noopener noreferrer external">${escapeHTML(summary)}</a>
 								${typeof description === 'string' ? `<p part="event-description">${escapeHTML(description)}</p>` : ''}
 								<p part="event-times">
-									<time datetime="${startTime.toISOString()}" part="event-start">${startTime.toLocaleString(navigator.language, { dateStyle: 'medium', timeStyle: 'short' })}</time>
-									${endTime instanceof Date ? `<span>&mdash;</span><time datetime="${endTime.toISOString()}" part="event-end">${endTime.toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' })}</time>` : ''}
+									<time datetime="${startTime.toISOString()}" part="event-start">${startTime.toLocaleString(navigator.language, START_FORMAT)}</time>
+									${endTime instanceof Date ? `<span>&mdash;</span><time datetime="${endTime.toISOString()}" part="event-end">${endTime.toLocaleTimeString(navigator.language, END_FORMAT)}</time>` : ''}
 								</p>
 								${typeof location === 'string' ? `<address part="event-location">${escapeHTML(location)}</address>` : ''}
 							</li>`;
