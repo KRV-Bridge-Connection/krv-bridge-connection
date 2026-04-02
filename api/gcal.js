@@ -27,16 +27,20 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 		if (resp.ok) {
 			const { items , summary, description } = await resp.json();
 
-			return { title: summary, description, events: items
-				.filter(({ status }) => status === 'confirmed')
-				.map(({ summary, description, start, end, location, htmlLink }) => ({
-					summary,
-					description,
-					location,
-					startDate: start.dateTime,
-					endDate: end.dateTime,
-					url: htmlLink,
-				})) };
+			return Response.json({
+				title: summary,
+				description,
+				events: items
+					.filter(({ status }) => status === 'confirmed')
+					.map(({ summary, description, start, end, location, htmlLink }) => ({
+						summary,
+						description,
+						location,
+						startDate: start.dateTime,
+						endDate: end.dateTime,
+						url: htmlLink,
+					}))
+			});
 		} else {
 			throw new HTTPBadGatewayError(`${url.origin} [${resp.status}]`);
 		}
@@ -47,7 +51,7 @@ async function getCal(cal = 'pantry', { signal } = {}) {
 
 export default createHandler({
 	async get(req) {
-		if (req.searchParams.has('cal')) {
+		 if (req.searchParams.has('cal')) {
 			return await getCal(req.searchParams.get('cal').trim().toLowerCase(), { signal: req.signal });
 		} else {
 			return await getCal('pantry', { signal: req.signal });
@@ -55,4 +59,5 @@ export default createHandler({
 	}
 }, {
 	allowOrigins: ['*'],
+	logger: console.error,
 });

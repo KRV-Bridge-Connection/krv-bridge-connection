@@ -21,16 +21,25 @@ export class GCalEvents extends IotaElement {
 
 	get html() {
 		return $html`
-			<h2 part="title" id="cal-title">${this.#summary}</h2>
+			<h2 part="title" id="cal-title">
+				<slot name="title">${this.#summary}</slot>
+			</h2>
 			<p part="description" id="cal-desc" ${this.#descHidden}>${this.#desc}</p>
 			<ul part="events" id="events" role="list"></ul>
 			<p part="status" id="status" role="status" ${this.#statusHidden}>${this.#status}</p>
+			<div part="footer">
+				<slot name="footer"></slot>
+			</div>
 		`;
 	}
 
 	get styles() {
 		return css`:host {
 			display: block;
+			contain: strict;
+			width: auto;
+			aspect-ratio: 16 / 9;
+			overflow-y: auto;
 			font-family: system-ui, sans-serif;
 			color-scheme: light dark;
 		}
@@ -196,8 +205,10 @@ export class GCalEvents extends IotaElement {
 		this.setAttribute('cal', val);
 	}
 
-	static create(cal) {
+	static create(cal, { theme = 'auto', loading = 'lazy' } = {}) {
 		const el = new this();
+		el.loading = loading;
+		el.theme = theme;
 		el.cal = cal;
 		return el;
 	}

@@ -205,16 +205,16 @@ const category = getSearch('category', '');
 
 const sortPartners = (a, b) => a.partner === b.partner ? 0 : a.partner ? -1 : 1;
 
-const linkIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Website">
-	<use xlink:href="/img/icons.svg#link-external"></use>
+const linkIcon = `<svg class="icon" width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-label="Website">
+	<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
 </svg>`;
 
-const phoneIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Call">
-	<use xlink:href="/img/icons.svg#call-start"></use>
+const phoneIcon = `<svg class="icon" width="16" height="16" version="1" viewBox="0 0 16 16" fill="currentColor" aria-label="Call">
+	 <path d="M13.032 1c.534 0 .969.427.969.969v.062c-.017 6.613-5.383 11.97-12 11.97H1.97c-.545 0-.97-.447-.97-1v-3c0-.555.447-1 1-1h2c.555 0 1 .445 1 1v.468A8.967 8.967 0 0 0 10.47 5H10c-.553 0-1-.446-1-1V2c0-.554.447-1 1-1h3.032z"/>
 </svg>`;
 
-const emailIcon = `<svg class="icon" width="18" height="18" fill="currentColor" aria-label="Email">
-	<use xlink:href="/img/icons.svg#mail"></use>
+const emailIcon = `<svg class="icon" width="14" height="16" viewBox="0 0 14 16" fill="currentColor" aria-label="Email">
+	<path fill-rule="evenodd" d="M0 4v8c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H1c-.55 0-1 .45-1 1zm13 0L7 9 1 4h12zM1 5.5l4 3-4 3v-6zM2 12l3.5-3L7 10.5 8.5 9l3.5 3H2zm11-.5l-4-3 4-3v6z"/>
 </svg>`;
 
 const getPhoneLink = ({ telephone }) => typeof telephone !== 'string' ? '' : `<a ${attr({ href: 'tel:' + telephone, content: telephone })} itemprop="telephone" class="btn btn-link btn-lg">
@@ -271,8 +271,8 @@ const getCategoryLink = (category) => {
 };
 
 const categoryLink = category => `<a href="${getCategoryLink(category)}" class="btn btn-link">
-	<svg class="icon" width="16" height="16" fill="currentColor" aria-hidden="true">
-		<use xlink:href="/img/icons.svg#tag"></use>
+	<svg class="icon" width="14" height="16" viewBox="0 0 14 16" fill="currentColor" aria-hidden="true">
+		<path fill-rule="evenodd" d="M7.685 1.72a2.49 2.49 0 0 0-1.76-.726H3.48A2.5 2.5 0 0 0 .994 3.48v2.456c0 .656.269 1.292.726 1.76l6.024 6.024a.99.99 0 0 0 1.402 0l4.563-4.563a.99.99 0 0 0 0-1.402L7.685 1.72zM2.366 7.048A1.54 1.54 0 0 1 1.9 5.925V3.48c0-.874.716-1.58 1.58-1.58h2.456c.418 0 .825.159 1.123.467l6.104 6.094-4.702 4.702-6.094-6.114zm.626-4.066h1.989v1.989H2.982V2.982h.01z"/>
 	</svg>
 	<span itemprop="keywords">${category}</span>
 </a>`;
@@ -290,14 +290,14 @@ const searchForm = ({ autoFocus = false } = {}) => `<search>
 			</datalist>
 			<br />
 			<button type="submit" class="btn btn-success">
-				<svg class="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
-					<use xlink:href="/img/icons.svg#search"></use>
+				<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/>
 				</svg>
 				<span>Search</span>
 			</button>
 			<button type="reset" class="btn btn-danger">
-				<svg class="icon" height="18" width="18" fill="currentColor" aria-hidden="true">
-					<use xlink:href="/img/icons.svg#x"></use>
+				<svg class="icon"  width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
 				</svg>
 				<span>Reset</span>
 			</button>
@@ -317,8 +317,8 @@ const search211 = () => `<search>
 			</div>
 		</fieldset>
 		<button type="submit" class="btn btn-success">
-			<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-				<use xlink:href="/img/icons.svg#search"></use>
+			<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
+				<path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0 0 13 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 0 0 0-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"/>
 			</svg>
 			<span>Search 211</span>
 		</button>
@@ -327,9 +327,7 @@ const search211 = () => `<search>
 			<span>Call 211</span>
 		</button>
 		<a href="https://www.211ca.org/about-2-1-1" class="btn btn-link" target="_blank" rel="noopener noreferrer external" target="_blank">
-			<svg height="16" width="16" fill="currentColor" class="icon" role="presentation" aria-hidden="true">
-				<use xlink:href="/img/icons.svg#link-external"></use>
-			</svg>
+			${phoneIcon}
 			<span>More information</span>
 		</a>
 	</form>
@@ -383,8 +381,8 @@ export const createPartners = results => results.sort(sortPartners).map(({ name,
 		: createSVGFallbackLogo(name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 	<p>${description}</p>
 	<a href="/${partner ? 'partners' : 'resources'}/${id}" class="btn btn-primary btn-lg">
-		<svg height="18" width="18" fill="currentColor" aria-hidden="true">
-			<use xlink:href="/img/icons.svg#organization"></use>
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class="icon" fill="currentColor" aria-hidden="true">
+			<path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/>
 		</svg>
 		<span>Learn More</span>
 	</a>
@@ -565,6 +563,7 @@ export default async function ({ matches, signal, stack, url, params: { partner,
 
 			const frag = html`
 				${searchForm({ autoFocus: false })}
+				<p>These are the nonprofit organizations providing services at or through the KRV Bridge Connection.</p>
 				<div>
 					${createPartners(results.filter(result => result.partner))}
 				</div>

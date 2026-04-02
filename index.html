@@ -5,15 +5,110 @@ pinned: true
 description: Our mission is to bridge individuals and families to services that address food insecurity, homelessness, and the needs of low-income households.
 ---
 <section id="intro">
-	<h2>Welcome to the KRV Bridge Connection!</h2>
+	<h2 class="visually-hidden">KRV Bridge Connection</h2>
+	<svg width="1232" height="385" class="block full-width" role="presentation">
+		<use href="/img/icons.svg#krv-bridge-full"></use>
+	</svg>
 	<p>The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley
 	community.
 	Our mission is to bridge individuals and families to services that address food insecurity, homelessness, and the needs of low-income households.</p>
 	<blockquote class="color-inherit ui-serif">KRVBC is a grassroots hub of united public, private, and non-profit sectors, bridging our underserved with locally accessible advocates and resources to uplift our community as a whole.</blockquote>
-	<p>See our <a href="/calendar/partners">Parnter Calendar</a> to check when various organizations will be available.</p>
+</section>
+<section id="actions">
+	<h2>I want to...</h2>
+	<div class="flex row wrap space-evenly home-ctas">
+		<a href="/calendar/pantry" class="cta block color-default center">
+			<span class="cta-label">Find Food</span>
+			{% include "11ty-common/icon.html" icon: "calendar" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
+		</a>
+		<a href="/partners/" class="cta block color-default center">
+			<span class="cta-label">Find Resources</span>
+			{% include "11ty-common/icon.html" icon: "list-unordered" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
+		</a>
+		<a href="/about/" class="cta block color-default center">
+			<span class="cta-label">Learn More</span>
+			{% include "11ty-common/icon.html" icon: "info" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
+		</a>
+		<a href="/donate/" class="cta block color-default center">
+			<span class="cta-label">Donate</span>
+			{% include "11ty-common/icon.html" icon: "donate" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
+		</a>
+		<a href="/volunteer/" class="cta block color-default center">
+			<span class="cta-label">Volunteer</span>
+			{% include "11ty-common/icon.html" icon: "hand" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
+		</a>
+	</div>
+</section>
+<section id="location">
+	<h2>Where are you located?</h2>
+	<p>We are located in Lake Isabella, right across from True Value.</p>
+	<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+		<div itemprop="streetAddress">6069 Lake Isabella Blvd.</div>
+		<div>
+			<span itemprop="addressLocality">Lake Isabella</span>,
+			<span itemprop="addressRegion">CA</span>
+			<span itemprop="postalCode" hidden="">93240</span>
+			<span itemprop="addressCountry" hidden="">US</span>
+		</div>
+	</address>
+	<div>
+		<br />
+		<a href="https://maps.app.goo.gl/br45XhRnT3Fcrjsa8" class="btn btn-primary" rel="noopener noreferrer external" target="_blank">
+			{% include "11ty-common/icon.html" icon: "link-external" %}
+			<span>Get Directions</span>
+		</a>
+		<br />
+		<br />
+	</div>
+	<iframe name="KRV Maps" src="https://maps.kernvalley.us/embed?popup=%3Cb%3EKRV%20Bridge%20Connection%3C%2Fb%3E%3Cbr%3E%3Cp%3E6069%20Lake%20Isabella%20Blvd%3C%2Fp%3E&amp;latitude=35.62402821269649&amp;longitude=-118.4750282764435&amp;zoomControl=1&amp;fullscreen=1" referrerpolicy="no-referrer" loading="lazy" width="100%" height="400px" sandbox="allow-scripts" frameborder="0" allow="fullscreen=(https://maps.kernvalley.us)" allowfullscreen="true" credentialless=""></iframe>
+</section>
+<section id="services-available">
+	<h2>What Services are Available?</h2>
+	<p>
+		Services vary by day based on which partners are on-site and the programs they are offering.
+		Check the schedule below to see what services are available and when.
+	</p>
+	<p>
+		For details about specific partners and resources, visit the
+		<a href="/partners/" class="btn btn-link">{% include "11ty-common/icon.html" icon: "link" %}  Directory</a>.
+	</p>
+	<p><strong>Daily partner schedule:</strong></p>
+	<g-cal-events cal="partners" loading="lazy"></g-cal-events>
+</section>
+<section id="getting-involved">
+	<h2>Getting Involved</h2>
+	<p>There are many ways to support the KRV Bridge Connection and help strengthen access to services in the Kern River Valley.</p>
+	<div class="involvement-links flex row space-evenly">
+		<a href="/donate/" class="btn btn-primary btn-lg">{% include "11ty-common/icon.html" icon: "link" %} Donate</a>
+		<a href="/volunteer/" class="btn btn-primary btn-lg">{% include "11ty-common/icon.html" icon: "link" %} Volunteer</a>
+		<a href="/contact/" class="btn btn-primary btn-lg">{% include "11ty-common/icon.html" icon: "link" %} Get in Touch</a>
+	</div>
+	<div class="involvement-details">
+		<div class="involvement-item">
+			<h3>Donate</h3>
+			<p>Support ongoing programs, events, and services that connect people to essential resources.</p>
+		</div>
+
+		<div class="involvement-item">
+			<h3>Volunteer</h3>
+			<p>Help with events, outreach, and community support efforts across the Kern River Valley.</p>
+		</div>
+
+		<div class="involvement-item">
+			<h3>Get in Touch</h3>
+			<p>Have ideas, questions, or want to learn more about how to support the work being done.</p>
+		</div>
+	</div>
+
+	<p>Community involvement helps ensure that individuals and families can access the services they need, when they need them.</p>
 </section>
 <section id="pop-ups">
-	<h2>Some of our Pop-Ups &amp; Events</h2>
+	<h2>Community Involvement</h2>
+	<p>
+		The KRV Bridge Connection is built on community participation. Our work is strengthened by individuals, families,
+		and local partners coming together to support one another and improve access to essential resources across the Kern River Valley.
+	</p>
+	<p>Community events create opportunities to connect, share resources, and support one another through meaningful, local engagement.</p>
 	<scroll-snap type="inline" align="center" class="gallery">
 		<figure id="img-36GpNkP">
 			<img src="https://i.imgur.com/36GpNkP.jpeg" alt="36GpNkP" width="1920" height="1080" srcset="
@@ -186,29 +281,4 @@ description: Our mission is to bridge individuals and families to services that 
 
 		</figure>
 	</scroll-snap>
-</section>
-<section id="actions">
-	<h2>I want to...</h2>
-	<div class="flex row wrap space-evenly home-ctas">
-		<a href="/calendar/pantry" class="cta block color-default center">
-			<span class="cta-label">Find Food</span>
-			{% include "11ty-common/icon.html" icon: "calendar" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
-		</a>
-		<a href="/partners/" class="cta block color-default center">
-			<span class="cta-label">Find Resources</span>
-			{% include "11ty-common/icon.html" icon: "list-unordered" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
-		</a>
-		<a href="/about/" class="cta block color-default center">
-			<span class="cta-label">Learn More</span>
-			{% include "11ty-common/icon.html" icon: "info" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
-		</a>
-		<a href="/donate/" class="cta block color-default center">
-			<span class="cta-label">Donate</span>
-			{% include "11ty-common/icon.html" icon: "donate" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
-		</a>
-		<a href="/volunteer/" class="cta block color-default center">
-			<span class="cta-label">Volunteer</span>
-			{% include "11ty-common/icon.html" icon: "hand" height: 96 width: 96 fill: "currentColor" class: "cta-icon" %}
-		</a>
-	</div>
 </section>

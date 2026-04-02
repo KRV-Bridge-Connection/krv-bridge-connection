@@ -12,3 +12,6 @@
 - src: ./js/index.min.js
   referrerPolicy: no-referrer
   type: module
+- src: ./js/components/g-cal.js
+  type: module
+  referrerPolicy: no-referrer
