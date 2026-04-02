@@ -72,12 +72,12 @@
   "dependencies": {
     "@aegisjsproject/attempt": "^1.0.7",
     "@aegisjsproject/qr-encoder": "^1.0.1",
-    "@aegisjsproject/secret-store": "^1.1.0",
+    "@aegisjsproject/secret-store": "^1.1.1",
     "@aegisjsproject/url": "^1.0.3",
     "@shgysk8zer0/11ty-netlify": "^1.1.34",
-    "@shgysk8zer0/aes-gcm": "^1.0.8",
+    "@shgysk8zer0/aes-gcm": "^1.0.9",
     "@shgysk8zer0/geoutils": "^1.0.6",
-    "@shgysk8zer0/importmap": "^1.8.9",
+    "@shgysk8zer0/importmap": "^1.8.11",
     "@shgysk8zer0/lambda-http": "^1.1.24",
     "@shgysk8zer0/netlify-func-utils": "^1.1.2",
     "@shgysk8zer0/slack": "^0.0.7",
@@ -87,6 +87,6 @@
   },
   "devDependencies": {
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^17.3.1"
+    "dotenv": "^17.4.0"
   }
 }
