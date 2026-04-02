@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Update home page content/sections
+
+### Fixed
+- Fixed icons on partners page
+
 ## [v2.0.16] - 2026-03-19
 
 ### Added
