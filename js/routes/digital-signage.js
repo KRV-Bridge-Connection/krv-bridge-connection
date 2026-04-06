@@ -3,13 +3,10 @@ import { html, el } from '@aegisjsproject/core/parsers/html.js';
 import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
-// import { createGoogleCalendar } from '@shgysk8zer0/kazoo/google/calendar.js';
 import { SCHEMA } from '../consts.js';
 import { syncDB } from './partners.js';
-import '../components/g-cal.js';
 import imgData from '/img/gallery.json' with { type: 'json' };
 
-// const CAL = 'Y18xNjczMzQyM2YwZGE3ODA3MDRmZDY5NGVlNDdmYmZiZDJlN2QwYWFhYzBmMDc2NDY0YjQ5ZTAyNzk0YzRmNDEyQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20';
 const [sheet, scoped] = useScopedStyle();
 const STORE_NAME = 'partners';
 const delay = 10_000;
@@ -240,12 +237,15 @@ export default async ({ signal, stack }) => {
 	scrollSnap.append(
 		cal,
 		forecast,
-		GCalEvents.create('pantry'),
-		GCalEvents.create('partners'),
+		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
+		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		// GCalEvents.create('events'),
 		el`<div>
 			<h3>Bridge to Well-being</h3>
 			<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
+			<div class="center">
+				<img src="https://i.imgur.com/w6FozIM.jpeg" loading="lazy" decoding="async" crossorigin="anonymous" width="960" height="524" alt="" />
+			</div>
 			<div class="flex row space-around">
 				<a href="/partners/krv-bridge-connection">
 					<img src="/img/branding/krv-bridge-logo-wide.svg" alt="KRV Bridge Connection" width="340" loading="lazy" decoding="lazy" />
