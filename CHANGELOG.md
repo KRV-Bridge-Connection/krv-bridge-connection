@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.17] - 2026-04-07
+
+### Added
+- Implement CSS `@layer`s
+
 ### Changed
 - Update home page content/sections
 

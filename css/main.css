@@ -1,129 +1,131 @@
-#main {
-	--link-color: #049ccf;
-	--link-decoration: underline;
+@layer layout {
+	#main {
+		--link-color: #049ccf;
+		--link-decoration: underline;
 
-	/* Copy .card rules */
-	border: var(--card-border, 1px solid #ccc);
-	border-radius: var(--card-radius, 2px);
-	background: var(--card-bg, var(--primary-color, white));
-	padding: var(--card-padding, 0.7em);
-}
+		/* Copy .card rules */
+		border: var(--card-border, 1px solid #ccc);
+		border-radius: var(--card-radius, 2px);
+		background: var(--card-bg, var(--primary-color, white));
+		padding: var(--card-padding, 0.7em);
+	}
 
-.ctas.flex {
-	gap: 0.7rem;
-}
+	.ctas.flex {
+		gap: 0.7rem;
+	}
 
-.home-ctas .cta, .home-ctas .cta:visited, .home-ctas .cta:visited:hover:not([rel="bookmark"]) {
-	color: var(--default-color);
-	text-decoration: none;
-}
-
-.cta-label {
-	display: block;
-	text-decoration: none;
-}
-
-.grid.card-list {
-	grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 200px);
-	gap: 8px;
-
-	& a {
-		color: inherit;
+	.home-ctas .cta, .home-ctas .cta:visited, .home-ctas .cta:visited:hover:not([rel="bookmark"]) {
+		color: var(--default-color);
 		text-decoration: none;
 	}
 
-	@media (max-width: 440px) {
-		& {
-			grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 100%);
-		}
+	.cta-label {
+		display: block;
+		text-decoration: none;
 	}
-}
 
-article p::first-letter {
-	margin-left: 2em;
-}
+	.grid.card-list {
+		grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 200px);
+		gap: 8px;
 
-.meta-author-links.flex {
-	gap: 12px;
-}
-
-.btn-toggle {
-	color: var(--aegis-color-dark, #f8f9fa);
-}
-
-button.btn[is="share-button"], body > share-button.btn:not([hidden]) {
-	line-height: 1;
-}
-
-.donorbox-container {
-	background-color: #ffffff;
-	color: #232323;
-	padding: 0.8rem;
-	border-radius: 4px;
-
-	& .donorbox-embed {
-		width: clamp(250px, 100%, 500px);
-		max-height: none;
-		background-color: inherit;
-		border: none;
-	}
-}
-
-@media (min-width: 1400px) {
-	.donorbox-container {
-		&::after {
-			clear: both;
-			display: block;
-			content: "";
-		}
-
-		.donorbox-embed {
-			float: left;
-		}
-
-		.donorbox-details {
-			float: right;
-			max-width: calc(100% - 500px);
-		}
-	}
-}
-
-.btn.btn-checkbox {
-	& input[type="checkbox"] {
-		display: inline-block;
-		width: 0;
-		height: 0;
-		margin: 0;
-		vertical-align: middle;
-		opacity: 0;
-
-		&:checked {
-			opacity: 1;
-			height: 1em;
-			width: 1em;
-			accent-color: var(--button-primary-background);
-		}
-
-		&:not(:checked) + label::before {
-			content: "X";
+		& a {
 			color: inherit;
-			display: inline-block;
-			width: 1em;
-			height: 1em;
-			vertical-align: middle;
-			margin-bottom: 0.5em;
+			text-decoration: none;
+		}
+
+		@media (max-width: 440px) {
+			& {
+				grid-template: repeat(auto-fit, 200px) / repeat(auto-fit, 100%);
+			}
 		}
 	}
 
-	&:focus-within {
-		outline: 2px solid var(--accent-color);
-		outline-offset: 2px;
+	article p::first-letter {
+		margin-left: 2em;
 	}
-}
 
-@media (any-pointer: coarse) {
-	scroll-snap::part(btn) {
-		background-color: transparent;
-		backdrop-filter: none;
+	.meta-author-links.flex {
+		gap: 12px;
+	}
+
+	.btn-toggle {
+		color: var(--aegis-color-dark, #f8f9fa);
+	}
+
+	button.btn[is="share-button"], body > share-button.btn:not([hidden]) {
+		line-height: 1;
+	}
+
+	.donorbox-container {
+		background-color: #ffffff;
+		color: #232323;
+		padding: 0.8rem;
+		border-radius: 4px;
+
+		& .donorbox-embed {
+			width: clamp(250px, 100%, 500px);
+			max-height: none;
+			background-color: inherit;
+			border: none;
+		}
+	}
+
+	@media (min-width: 1400px) {
+		.donorbox-container {
+			&::after {
+				clear: both;
+				display: block;
+				content: "";
+			}
+
+			.donorbox-embed {
+				float: left;
+			}
+
+			.donorbox-details {
+				float: right;
+				max-width: calc(100% - 500px);
+			}
+		}
+	}
+
+	.btn.btn-checkbox {
+		& input[type="checkbox"] {
+			display: inline-block;
+			width: 0;
+			height: 0;
+			margin: 0;
+			vertical-align: middle;
+			opacity: 0;
+
+			&:checked {
+				opacity: 1;
+				height: 1em;
+				width: 1em;
+				accent-color: var(--button-primary-background);
+			}
+
+			&:not(:checked) + label::before {
+				content: "X";
+				color: inherit;
+				display: inline-block;
+				width: 1em;
+				height: 1em;
+				vertical-align: middle;
+				margin-bottom: 0.5em;
+			}
+		}
+
+		&:focus-within {
+			outline: 2px solid var(--accent-color);
+			outline-offset: 2px;
+		}
+	}
+
+	@media (any-pointer: coarse) {
+		scroll-snap::part(btn) {
+			background-color: transparent;
+			backdrop-filter: none;
+		}
 	}
 }

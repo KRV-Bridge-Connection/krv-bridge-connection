@@ -1,13 +1,13 @@
 @charset "UTF-8";
-
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-@import url("https://unpkg.com/normalize.css@8.0.1/normalize.css");
+@layer reset, vendor, base, layout, components, utilities.core-css, utilities.aegisjsproject;
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap") layer(base);
+@import url("https://unpkg.com/normalize.css@8.0.1/normalize.css") layer(reset);
 @import url("./aegis-styles.css");
 @import url("./core-css.css");
-@import url("./layout.css");
-@import url("./vars.css");
-@import url("./form-extras.css");
-@import url("./admin.css");
+@import url("./layout.css") layer(layout);
+@import url("./vars.css") layer(base);
+@import url("./form-extras.css") layer(components);
+@import url("./admin.css") layer(components);
 @import url("./print.css") print;
 
 :root {
