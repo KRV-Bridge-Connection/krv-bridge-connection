@@ -1,2 +1,4 @@
-@import url("https://unpkg.com/@aegisjsproject/styles@0.2.5/css/properties.css");
-@import url("https://unpkg.com/@aegisjsproject/styles@0.2.5/css/button.css");
+@import url("https://unpkg.com/@aegisjsproject/styles/@0.3.0/css/reset.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.3.0/css/properties.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.3.0/css/button.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.3.0/css/presentation.css");

@@ -1,10 +1,12 @@
-.multi-step-form {
-	overflow: hidden;
-	display: flex;
-	flex-direction: row;
+@layer components {
+	.multi-step-form {
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
 
-	& .form-section {
-		flex-basis: 100%;
-		flex-shrink: 0;
+		& .form-section {
+			flex-basis: 100%;
+			flex-shrink: 0;
+		}
 	}
 }
