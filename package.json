@@ -74,7 +74,7 @@
     "@aegisjsproject/qr-encoder": "^1.0.1",
     "@aegisjsproject/secret-store": "^1.1.1",
     "@aegisjsproject/url": "^1.0.3",
-    "@shgysk8zer0/11ty-netlify": "^1.1.35",
+    "@shgysk8zer0/11ty-netlify": "^1.1.36",
     "@shgysk8zer0/aes-gcm": "^1.0.9",
     "@shgysk8zer0/geoutils": "^1.0.6",
     "@shgysk8zer0/importmap": "^1.8.13",
@@ -87,6 +87,6 @@
   },
   "devDependencies": {
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^17.4.0"
+    "dotenv": "^17.4.1"
   }
 }
