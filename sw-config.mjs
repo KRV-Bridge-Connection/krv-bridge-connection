@@ -42,6 +42,7 @@ const config = {
 		'/js/routes/volunteer.js',
 		'/js/routes/oasis.js',
 		'/js/routes/digital-signage.js',
+		'/js/components/g-cal.js',
 		/* Other */
 	].map(path => new URL(path, location.origin).href),
 	stale: [
@@ -108,6 +109,9 @@ const config = {
 	allowedFresh: [
 		new URL('/paths/', location.origin).href,
 		new URL('/js/routes/', location.origin).href,
+		new URL('/api/gcal?cal=partners', location.origin).href,
+		new URL('/api/gcal?cal=pantry', location.origin).href,
+		new URL('/api/gcal?cal=events', location.origin).href,
 		'https://api.openweathermap.org/data/',
 		'https://api.github.com/users/',
 		/\.(html|css|js|json)$/,
@@ -130,7 +134,6 @@ const config = {
 			'/volunteer/',
 			'/account/',
 		]),
-		'recent-posts': async () => await updateAssets(['{{ site.posts | map: "url" | join: "', '" }}']),
 	}
 };
 
