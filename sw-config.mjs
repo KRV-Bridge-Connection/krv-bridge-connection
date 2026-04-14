@@ -56,6 +56,8 @@ const config = {
 		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/html.js',
 		'{{ importmap.imports["@aegisjsproject/core/"] }}parsers/css.js',
 		'{{ importmap.imports["@aegisjsproject/idb"] }}',
+		'{{ importmap.imports["@aegisjsproject/disposable-registry"] }}',
+		'{{ importmap.imports["@aegisjsproject/iot"] }}',
 		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}callbacks.js',
 		'{{ importmap.imports["@aegisjsproject/callback-registry/"] }}events.js',
 		'{{ importmap.imports["@aegisjsproject/core/"] }}stringify.js',
