@@ -24,12 +24,4 @@ export default [{
 		sourcemap: true,
 		inlineDynamicImports: true,
 	}
-}, {
-	input: 'sw.config.js',
-	plugins: [rollupImport(importmap)],
-	output: {
-		file: 'sw.config.min.js',
-		format: 'esm',
-		// plugins: [terser()],
-	}
 }];

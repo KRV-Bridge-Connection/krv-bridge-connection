@@ -25,10 +25,7 @@ try {
 		}
 	});
 
-	registerServiceWorker(hermes.createScriptURL('/worker.js')).catch(err => {
-		console.info('Error registering service worker');
-		console.error(err);
-	}).then(console.log);
+	registerServiceWorker(hermes.createScriptURL('/worker.js'));
 } catch(err) {
 	console.error(err);
 }
