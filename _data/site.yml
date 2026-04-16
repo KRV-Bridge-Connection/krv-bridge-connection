@@ -11,5 +11,5 @@ color-scheme: 'light dark'
 og-type: 'website'
 base: '/'
 manifest: '/webapp.webmanifest'
-service_worker: '/service-worker.js'
+# service_worker: '/service-worker.js'
 keep-kern-clean: false

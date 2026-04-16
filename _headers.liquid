@@ -77,5 +77,10 @@ permalink: /_headers
   Link: <//cdn.kernvalley.us/service-worker.js>; rel=preload; as=script
   Link: </sw-config.js>; rel=preload; as=script
 
+/worker.js
+  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' {{ importmap.imports['@aegisjsproject/hermes'] }} {{ importmap.imports['@shgysk8zer0/importmap/'] }}; worker-src 'self' {{ importmap.imports['@aegisjsproject/hermes'] }} {{ importmap.imports['@shgysk8zer0/importmap/'] }};
+  Link: <{{ importmap.imports['@aegisjsproject/hermes'] }}>; rel=preload; as=script;
+  Link: <{{ importmap.imports["@shgysk8zer0/importmap/"] }}imap.js>; rel=preload; as=script;
+
 /*
   X-Content-Type-Options: nosniff

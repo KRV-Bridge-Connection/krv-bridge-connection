@@ -23,6 +23,8 @@ default:
   worker-src:
     - "'self'"
     - https://cdn.kernvalley.us/service-worker.js
+    - https://unpkg.com/@aegisjsproject/
+    - https://unpkg.com/@shgysk8zer0/
   style-src:
     - "'self'"
     - https://cdn.kernvalley.us/css/

@@ -2,7 +2,7 @@ import { rollupImport, rollupImportMeta } from '@shgysk8zer0/rollup-import';
 import { importmap } from '@shgysk8zer0/importmap';
 import terser from '@rollup/plugin-terser';
 
-export default {
+export default [{
 	input: 'js/index.js',
 	plugins: [rollupImport(importmap), rollupImportMeta({ baseURL: 'https://krvbridge.org' })],
 	external: [
@@ -24,4 +24,12 @@ export default {
 		sourcemap: true,
 		inlineDynamicImports: true,
 	}
-};
+}, {
+	input: 'sw.config.js',
+	plugins: [rollupImport(importmap)],
+	output: {
+		file: 'sw.config.min.js',
+		format: 'esm',
+		// plugins: [terser()],
+	}
+}];
