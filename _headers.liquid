@@ -78,9 +78,8 @@ permalink: /_headers
   Link: </sw-config.js>; rel=preload; as=script
 
 /worker.js
-  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' {{ importmap.imports['@aegisjsproject/hermes'] }} {{ importmap.imports['@shgysk8zer0/importmap/'] }}; worker-src 'self' {{ importmap.imports['@aegisjsproject/hermes'] }} {{ importmap.imports['@shgysk8zer0/importmap/'] }};
-  Link: <{{ importmap.imports['@aegisjsproject/hermes'] }}>; rel=preload; as=script;
-  Link: <{{ importmap.imports["@shgysk8zer0/importmap/"] }}imap.js>; rel=preload; as=script;
+  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' {{ importmap.imports['@aegisjsproject/hermes/'] }}worker.js;
+  Link: <{{ importmap.imports['@aegisjsproject/hermes/'] }}worker.js>; rel=modulepreload;
 
 /*
   X-Content-Type-Options: nosniff

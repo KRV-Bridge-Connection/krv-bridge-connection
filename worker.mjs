@@ -1,10 +1,10 @@
-import { HermesWorker } from '{{ importmap.imports["@aegisjsproject/hermes"] }}';
-import { Importmap } from '{{ importmap.imports["@shgysk8zer0/importmap/"] }}imap.js';
+import { HermesWorker } from '{{ importmap.imports["@aegisjsproject/hermes/"] }}worker.js';
 
 try {
-	const importmap = new Importmap(JSON.parse('{{ importmap | jsonify }}'));
+	self.addEventListener('error', e => console.error('SW error:', e.message, e.filename, e.lineno));
+	self.addEventListener('unhandledrejection', e => console.error('SW unhandled rejection:', e.reason));
 
-	const worker = new HermesWorker([
+	new HermesWorker([
 		{
 			name: 'krv-bridge-connection',
 			version: '{{ app.version | default: pkg.version }}',
@@ -30,24 +30,19 @@ try {
 		{
 			name: 'unpkg',
 			strategy: 'cache-first',
-			pattern: new URLPattern({ baseURL: 'https://unpkg.com', pathname: '/*' }),
-			preload: [
-				'@shgysk8zer0/polyfills', '@aegisjsproject/core/parsers/html.js', '@aegisjsproject/core/parsers/css.js',
-				'@aegisjsproject/core/stringify.js', '@aegisjsproject/core/dom.js', '@aegisjsproject/idb',
-				'@aegisjsproject/disposable-registry', '@aegisjsproject/iota', '@aegisjsproject/callback-registry/callbacks.js',
-				'@aegisjsproject/callback-registry/events.js', '@shgysk8zer0/consts/date.js', '@aegisjsproject/attempt',
-				'@shgysk8zer0/kazoo/geo.js', '@aegisjsproject/command', '@aegisjsproject/jwk-utils/jwk.js', '@aegisjsproject/jwk-utils/jwt.js',
-				'@aegisjsproject/markdown', '@aegisjsproject/url/search.js', '@aegisjsproject/url/url.min.js', '@shgysk8zer0/signals',
-			].map(specifier => importmap.resolve(specifier))
+			pattern: new URLPattern({ baseURL: 'https://unpkg.com/', pathname: '/*' }),
 		},
 		{
 			name: 'imgur',
 			strategy: 'cache-first',
-			pattern: new URLPattern({ baseURL: 'https://i.imgur.com', pathname: '/*' }),
+			pattern: new URLPattern({ baseURL: 'https://i.imgur.com/', pathname: '/*' }),
+		},
+		{
+			name: 'google-fonts',
+			strategy: 'cache-first',
+			pattern: new URLPattern({ baseURL: 'https://fonts.googleapis.com/' }),
 		}
 	]);
-
-	console.log(worker);
 } catch(err) {
 	console.error(err);
 }
