@@ -88,6 +88,6 @@
   "devDependencies": {
     "@aegisjsproject/hermes": "^1.0.3",
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^17.4.1"
+    "dotenv": "^17.4.2"
   }
 }
