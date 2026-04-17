@@ -11,24 +11,6 @@ import '@shgysk8zer0/components/install/prompt.js';
 import '@shgysk8zer0/components/app/stores.js';
 import '@shgysk8zer0/components/scroll-snap.js';
 import '@shgysk8zer0/components/youtube/player.js';
-import { registerServiceWorker } from '@aegisjsproject/hermes/registry.js';
-
-try {
-	const hermes = trustedTypes.createPolicy('hermes#script-url', {
-		createScriptURL(input) {
-			const url = URL.parse(input, document.baseURI);
-			if (url?.origin === location.origin) {
-				return url.href;
-			} else {
-				throw new TypeError(`Invalid script URL: "${input}".`);
-			}
-		}
-	});
-
-	registerServiceWorker(hermes.createScriptURL('/worker.js'));
-} catch(err) {
-	console.error(err);
-}
 
 initRouter(document.scripts.namedItem('aegis-routes'), {
 	rootEl: document.getElementById('main'),
