@@ -8,4 +8,5 @@ trusted:
   - pwa-install
   - aegis-router#html
   - aegis-escape#html
+  - hermes#script-url
   - lit-html

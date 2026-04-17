@@ -3,12 +3,14 @@
 import { load } from 'js-yaml';
 import * as filters from '@shgysk8zer0/11ty-filters';
 import { markdownIt } from '@shgysk8zer0/11ty-netlify/markdown';
-import { Importmap } from '@shgysk8zer0/importmap';
+import { imports, scopes } from '@shgysk8zer0/importmap';
 import firebase from 'firebase-admin';
 import { Liquid } from 'liquidjs';
 import { config } from 'dotenv';
 
-const importmap = JSON.parse(JSON.stringify(new Importmap()));
+const importmap = { imports, scopes };
+// const importmap = JSON.parse(JSON.stringify(new Importmap({ imports, scopes })));
+// console.log(importmap.imports);
 
 if (process.env.ELEVENTY_SOURCE === 'cli'  && ! ('FIREBASE_CERT' in process.env)) {
 	config();
