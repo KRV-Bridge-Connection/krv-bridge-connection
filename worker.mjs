@@ -18,7 +18,7 @@ try {
 				'/js/index.min.js', '/css/index.min.css', '/img/icons.svg', '/img/favicon.svg',
 				'/js/routes/pantry.js', '/js/routes/partners.js', '/js/routes/volunteer.js',
 				'/js/components/g-cal.js', '/img/apple-touch-icon.png', '/img/icon-192.png',
-				'/js/routes/404.js',
+				'/js/routes/404.js', '/js/routes/contact.js'
 			].map(path => URL.parse(path, location.origin)),
 		},
 		{
