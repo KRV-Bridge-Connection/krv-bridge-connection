@@ -8,19 +8,13 @@ try {
 			strategy: 'network-first',
 			pattern: new URLPattern({
 				baseURL: location.origin,
-				pathname: '/((?:about|contact|pantry|partners|resources|account|volunteer|donate)(?:/.*)?|)'
+				pathname: '/((?!api(?:\\/|$))[^\\/]*){/*}?', // Everything except `/api/*`
 			}),
 			prefetch: [
+				// Pages
 				'/', '/about/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
 				'/donate/', '/account/',
-			].map(path => URL.parse(path, location.origin)),
-		},
-		{
-			name: 'krc-bridge-connection-assets',
-			version: '{{ app.version | default: pkg.version }}',
-			strategy: 'stale-while-revalidate',
-			pattern: new URLPattern({ baseURL: location.origin, pathname: '/(img|css|js|fonts)/*'}),
-			prefetch: [
+				// Assets
 				'/js/index.min.js', '/css/index.min.css', '/img/icons.svg', '/img/favicon.svg',
 				'/js/routes/pantry.js', '/js/routes/partners.js', '/js/routes/volunteer.js',
 				'/js/components/g-cal.js', '/img/apple-touch-icon.png', '/img/icon-192.png',
