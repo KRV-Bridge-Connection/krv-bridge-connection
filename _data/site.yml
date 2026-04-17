@@ -1,6 +1,6 @@
 ---
 title: 'KRV Bridge Connection'
-description: 'A directory of helpful services for the KRV'
+description: 'Bringing multiple nonprofit services into the KRV'
 repository:
   username: 'KRV-Bridge-Connection'
   project: 'krv-bridge-connection'
@@ -11,5 +11,6 @@ color-scheme: 'light dark'
 og-type: 'website'
 base: '/'
 manifest: '/webapp.webmanifest'
-# service_worker: '/service-worker.js'
+service_worker: '/worker.js'
+service_worker_type: 'module'
 keep-kern-clean: false
