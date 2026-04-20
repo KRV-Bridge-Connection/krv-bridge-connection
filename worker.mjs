@@ -45,7 +45,7 @@ new HermesWorker([
 	}, {
 		name: 'unpkg',
 		strategy: 'cache-first',
-		pattern: new URLPattern({ hostname: 'https://unpkg.com/', pathname: '/*' }),
+		pattern: new URLPattern({ baseURL: 'https://unpkg.com/', pathname: '/*' }),
 		prefetch: [
 			'{{ importmap.imports["@aegisjsproject/router"] }}',
 			'{{ importmap.imports["@aegisjsproject/idb"] }}',
