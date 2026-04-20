@@ -237,6 +237,7 @@ export default async ({ signal, stack }) => {
 	scrollSnap.append(
 		cal,
 		forecast,
+		el`<img src="https://i.imgur.com/cb1ObqD.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		// GCalEvents.create('events'),
@@ -282,4 +283,4 @@ export const title = 'KRV Bridge Connection Digital Display';
 
 export const description = 'Informational material for KRV Bridge Connection for digital displays';
 
-export const styles = sheet;
+export const styles = [sheet];
