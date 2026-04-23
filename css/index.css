@@ -1,8 +1,7 @@
 @charset "UTF-8";
 @layer reset, vendor, base, layout, components, utilities.core-css, utilities.aegisjsproject;
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap") layer(base);
-@import url("https://unpkg.com/normalize.css@8.0.1/normalize.css") layer(reset);
 @import url("./aegis-styles.css");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap") layer(base);
 @import url("./core-css.css");
 @import url("./layout.css") layer(layout);
 @import url("./vars.css") layer(base);
