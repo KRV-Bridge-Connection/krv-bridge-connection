@@ -238,10 +238,9 @@ export default async ({ signal, stack }) => {
 		cal,
 		forecast,
 		el`<img src="https://i.imgur.com/ha1pLty.webp" width="2752" height="1536" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="CO.STARTERS" />`,
-		el`<img src="https://i.imgur.com/cb1ObqD.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
+		// el`<img src="https://i.imgur.com/cb1ObqD.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
-		// GCalEvents.create('events'),
 		el`<div>
 			<h3>Bridge to Well-being</h3>
 			<p>The Bridge to Well-Being program assists with non-medical transportation to Kern River Valley residents by providing access to scheduled routes and Dial-a-Ride services provided by Kern Transit. Its goal is to offer access to transportation to those in need to promote mental and emotional well-being by offering residents the ability to go shopping, visit friends and family, attend events, utilize services at the KRV Bridge Connection, and to otherwise help alleviate the stress created by lack of transportation. Where the need is of a medical nature, other programs for non-emergency medical transportation should be used instead. This program is offered thanks to a grant from <b>Kern Family Health Care.</b></p>
