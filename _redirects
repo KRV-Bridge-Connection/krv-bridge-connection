@@ -3,7 +3,7 @@
 /api/* /.netlify/functions/:splat 200!
 /api/firebase-config	/firebase.json 301
 /banner-qr/ https://www.facebook.com/krvbridgeconnection
-/events/ https://events.kernvalley.us/tags/krv-bridge?utm_source=krv-bridge&utm_medium=redirect
+/events/* /dynamic.html 200
 /volunteer/* /dynamic.html 200
 /admin/ /account/sign-in
 /admin/* /dynamic.html 200
