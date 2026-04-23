@@ -7,10 +7,11 @@ import '@shgysk8zer0/components/weather/current.js';
 import '@kernvalley/components/events.js';
 import '@shgysk8zer0/components/github/user.js';
 import '@shgysk8zer0/components/notification/html-notification.js';
-import '@shgysk8zer0/components/install/prompt.js';
+import '@aegisjsproject/pwa-prompt';
 import '@shgysk8zer0/components/app/stores.js';
 import '@shgysk8zer0/components/scroll-snap.js';
 import '@shgysk8zer0/components/youtube/player.js';
+
 
 initRouter(document.scripts.namedItem('aegis-routes'), {
 	rootEl: document.getElementById('main'),
@@ -52,16 +53,6 @@ document.addEventListener(NAV_EVENT, event => {
 			}
 		}
 	});
-});
-
-Promise.all([
-	customElements.whenDefined('install-prompt'),
-]).then(([HTMLInstallPromptElement]) => {
-	const btn = document.getElementById('install-btn');
-	registerRootCommand('--install', () => new HTMLInstallPromptElement().show());
-	btn.command = '--install';
-	btn.commandForElement = document.documentElement;
-	btn.hidden = false;
 });
 
 Promise.all([

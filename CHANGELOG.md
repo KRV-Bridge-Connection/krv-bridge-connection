@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.20] - 2026-04-22
+
+### Changed
+- Switch to using `@aegisjsproject/pwa-prompt` for PWA Install Prompt
+
 ## [v2.0.19] - 2026-04-17
 
 ### Changed
