@@ -12,10 +12,6 @@ export const styles = css`#pantry-message {
 	max-width: min(800px, 95%);
 }
 
-.pantry-schedule-${placehodler} {
-	min-height: 40vh;
-}
-
 #pantry-message .btns {
 	justify-content: center;
 	gap: 0.8rem;
@@ -28,7 +24,7 @@ export default ({ signal }) => {
 		whenLoaded({ signal }),
 	]).then(([GCal]) => {
 		const cal = GCal.create('pantry', { loading: 'lazy' });
-		cal.classList.add('pantry-schedule-' + placehodler);
+		cal.classList.add('calendar');
 		document.getElementById(placehodler)?.replaceWith?.(cal);
 	});
 
