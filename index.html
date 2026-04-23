@@ -6,7 +6,7 @@ description: Our mission is to bridge individuals and families to services that 
 ---
 <section id="intro">
 	<h2 class="visually-hidden">KRV Bridge Connection</h2>
-	<svg width="1232" height="385" class="block full-width" role="presentation">
+	<svg width="1232" height="385" class="block full-width height-fit-content" role="presentation" aria-hidden="true">
 		<use href="/img/icons.svg#krv-bridge-full"></use>
 	</svg>
 	<p>The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley
@@ -81,7 +81,7 @@ description: Our mission is to bridge individuals and families to services that 
 		<a href="/partners/" class="btn btn-link">{% include "11ty-common/icon.html" icon: "link" %}  Directory</a>.
 	</p>
 	<p><strong>Daily partner schedule:</strong></p>
-	<g-cal-events cal="partners" loading="lazy"></g-cal-events>
+	<g-cal-events class="calendar" cal="partners" loading="lazy"></g-cal-events>
 </section>
 <section id="getting-involved">
 	<h2>Getting Involved</h2>
