@@ -31,6 +31,14 @@ a.btn {
 	padding: 0.7rem;
 }
 
+button.btn[is="share-button"] {
+	bottom: 1rem;
+	right: 1rem;
+	border-radius: 50%;
+	padding: 0.8rem;
+	font-size: 1.5rem;
+}
+
 @supports (width: clamp(1px, 2em, 1rem)) {
 	:root {
 		font-size: clamp(18px, 1.5vmax, 24px);
