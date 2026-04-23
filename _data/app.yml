@@ -34,6 +34,27 @@ icons:
     type: image/png
     sizes: 16x16
 screenshots:
+  # Home
+  - src: https://i.imgur.com/akVxai3.png
+    sizes: 432x756
+    type: image/png
+  # Pantry
+  - src: https://i.imgur.com/QOQ6D5d.png
+    sizes: 432x756
+    type: image/png
+  # Resources
+  - src: https://i.imgur.com/3vtLQT9.png
+    sizes: 432x756
+    type: image/png
+  # Profile
+  - src: https://i.imgur.com/IeQ1d8q.png
+    sizes: 432x756
+    type: image/png
+  # Events
+  - src: https://i.imgur.com/5o8bZaY.png
+    sizes: 432x756
+    type: image/png
+  # Desktop
   - src: 'https://i.imgur.com/E9BEmLkh.webp'
     sizes: 1024x502
     type: image/webp
@@ -129,18 +150,13 @@ iarc_rating_id: dd768f7f-8541-4555-a447-f07338b2d4aa
 related_applications:
   - platform: webapp
     url: /webapp.webmanifest
-  - platform: play
-    id: "org.krvbridge.twa"
-    url: "https://play.google.com/store/apps/details?id=org.krvbridge.twa"
+  # - platform: play
+  #   id: "org.krvbridge.twa"
+  #   url: "https://play.google.com/store/apps/details?id=org.krvbridge.twa"
   # - platform: itunes
   #   url: "#"
   # - platform: windows
   #   url: "#"
-features:
-  - Easily find the services and resources you're looking for
-  - Schedule an appointment for our Choice Pantry
-  - Find out how to contact numerous nonprofit organizations
-  - Learn about upcoming events to benefit residents of the Kern River Valley
 # https://github.com/w3c/manifest/wiki/Categories
 categories:
   - business
@@ -149,4 +165,4 @@ categories:
   - health
   - medical
   - lifestyle
-
+features: []
