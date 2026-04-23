@@ -1,19 +1,19 @@
-import { site, PANTRY_OPENING_HOURS } from '../consts.js';
+import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { whenLoaded } from '@aegisjsproject/router';
 
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const MESSAGE = null;
-const timeFormatter = new Intl.DateTimeFormat(navigator.language, { timeStyle: 'short' });
+
+const placehodler = '_' + crypto.randomUUID();
 
 export const styles = css`#pantry-message {
 	max-width: min(800px, 95%);
 }
 
-#pantry-date:not(:invalid) + #pantry-date-invalid,
-#pantry-time:not(:invalid) + #pantry-time-invalid {
-	visibility: hidden;
+.pantry-schedule-${placehodler} {
+	min-height: 40vh;
 }
 
 #pantry-message .btns {
@@ -22,13 +22,14 @@ export const styles = css`#pantry-message {
 }`;
 
 export default ({ signal }) => {
-	const placehodler = '_' + crypto.randomUUID();
 
 	Promise.all([
 		customElements.whenDefined('g-cal-events'),
 		whenLoaded({ signal }),
 	]).then(([GCal]) => {
-		document.getElementById(placehodler)?.replaceWith?.(GCal.create('pantry', { loading: 'lazy' }));
+		const cal = GCal.create('pantry', { loading: 'lazy' });
+		cal.classList.add('pantry-schedule-' + placehodler);
+		document.getElementById(placehodler)?.replaceWith?.(cal);
 	});
 
 	return html`<section aria-labelledby="pantry-header">
@@ -78,22 +79,9 @@ export default ({ signal }) => {
 			<meta itemprop="addressCountry" content="US" />
 		</div>
 	</section>
-	<section>
-		<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
-			<h3 id="general-pantry-hours">General Pantry Hours</h3>
-			<p>Please be aware that this schedule does not reflect closures due to holidays or unexpected circumstances.</p>
-			<ul>
-				${PANTRY_OPENING_HOURS.map(({ dayOfWeek, opens, closes }) => `<li itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
-					<span itemprop="dayOfWeek">${dayOfWeek}</span>
-					${typeof opens === 'string' && typeof closes === 'string' /* eslint-disable indent */
-						? `<time itemprop="opens" datetime="${opens}">${timeFormatter.format(new Date(`2025-08-29T${opens}`))}</time> &mdash; <time itemprop="closes" datetime="${closes}">${timeFormatter.format(new Date(`2025-08-29T${closes}`))}</time>`
-						: '<meta itemprop="opens" content="00:00" /><meta itemprop="closes" content="00:00" /><strong>Closed</strong>' /* eslint-enable indent */}
-				</li>`).join('')}
-			</ul>
-		</section>
-		<p>
-			<span>For other KRV Food Distributions, please see the Calendar</span>
-		</p>
+	<section class="pantry-general-hours" aria-labelledby="general-pantry-hours">
+		<h3 id="general-pantry-hours">General Pantry Hours</h3>
+		<p>The following calendar shows the pantry and distribution hours provided by the organizations. Please check the dates, times, and locations carefully.</p>
 		<div id="${placehodler}"></div>
 	</section>`;
 };
