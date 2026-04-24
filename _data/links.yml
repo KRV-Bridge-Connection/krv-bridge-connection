@@ -22,9 +22,9 @@ nav:
   - label: Donate
     icon: donate
     href: /donate/
-  - label: Volunteer
-    icon: hand
-    href: '/volunteer/'
+  # - label: Volunteer
+  #   icon: hand
+  #   href: '/volunteer/'
   # - label: Search 211
   #   href: '/211/'
   #   icon: search
