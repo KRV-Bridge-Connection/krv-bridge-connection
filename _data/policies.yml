@@ -5,7 +5,8 @@ trusted:
   - goog-cal#script-url
   - youtube#script-url
   - aegis-sanitizer#html
-  - pwa-install
+  # - pwa-install
+  - sw#script-url
   - aegis-router#html
   - aegis-escape#html
   - hermes#script-url
