@@ -1,15 +1,13 @@
 import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
-import { registerRootCommand, initRootCommands } from '@aegisjsproject/commands';
+import { registerRootCommand, initRootCommands, ROOT_COMMANDS } from '@aegisjsproject/commands';
 import { createPolicy } from '@shgysk8zer0/kazoo/trust.js';
-import '@shgysk8zer0/components/share-button.js';
 import '@shgysk8zer0/components/weather/current.js';
 import '@kernvalley/components/events.js';
 import '@shgysk8zer0/components/github/user.js';
 import '@shgysk8zer0/components/notification/html-notification.js';
 import '@aegisjsproject/pwa-prompt';
-import '@shgysk8zer0/components/app/stores.js';
 import '@shgysk8zer0/components/scroll-snap.js';
 import '@shgysk8zer0/components/youtube/player.js';
 
@@ -127,5 +125,13 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 				}
 			});
 		});
+	});
+}
+
+if (typeof navigator.share === 'function') {
+	document.querySelectorAll('button[is="share-button"]').forEach(btn => {
+		btn.command = ROOT_COMMANDS.share;
+		btn.commandForElement = document.documentElement;
+		btn.hidden = false;
 	});
 }
