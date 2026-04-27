@@ -31,7 +31,7 @@ a.btn {
 	padding: 0.7rem;
 }
 
-.share-btn {
+.share-btn:not([hidden]) {
 	bottom: 1rem;
 	right: 1rem;
 	border-radius: 50%;
