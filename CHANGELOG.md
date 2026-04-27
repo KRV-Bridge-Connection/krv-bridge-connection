@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.21] - 2026-04-27
+
+### Changed
+- Use `<share-buton>` instead of `<button is="share-button">`
+
 ## [v2.0.20] - 2026-04-22
 
 ### Changed
