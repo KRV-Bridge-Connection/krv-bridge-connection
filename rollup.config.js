@@ -16,6 +16,7 @@ export default [{
 		'@aegisjsproject/firebase-account-routes',
 		'@aegisjsproject/firebase-account-routes/auth.js',
 		'@aegisjsproject/disposable-registry',
+		'@aegisjsproject/styles/',
 	],
 	output: {
 		file: 'js/index.min.js',
