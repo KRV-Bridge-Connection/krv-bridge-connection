@@ -1,6 +1,10 @@
 import { GCalEvents } from '../components/g-cal.js';
 
-export default ({ params } ={}) => GCalEvents.create(params?.cal);
+export default ({ params } ={}) => {
+	const cal = GCalEvents.create(params?.cal);
+	cal.classList.add('calendar');
+	return cal;
+};
 
 export const title = 'KRV Bridge Connection Calendar';
 

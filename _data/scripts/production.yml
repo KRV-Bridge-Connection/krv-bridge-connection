@@ -1,9 +1,3 @@
-- src: https://unpkg.com/@webcomponents/custom-elements@1.4.2/custom-elements.min.js
-  crossOrigin: anonymous
-  referrerPolicy: no-referrer
-  noModule: true
-  defer: true
-  integrity: sha384-xyhN4T4+9VPh8uXl6uWjGzsqwNXN9C2tla8b6zSrSqYlMFUoeCdoxiEJU0js+GNE
 - src: '@shgysk8zer0/polyfills'
   crossOrigin: anonymous
   referrerPolicy: no-referrer
