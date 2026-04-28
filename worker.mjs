@@ -25,8 +25,10 @@ new HermesWorker([
 		prefetch: [
 			'/', '/about/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
 			'/donate/', '/account/', '/webapp.webmanifest', '/.well-known/jwks.json',
-			'/.well-known/openid-configuration', '/firebase.json',
+			'/.well-known/openid-configuration', '/firebase.json', '/404.html',
+			'/calendar/pantry', '/calendar/partners',
 		].map(path => URL.parse(path, location.origin)),
+		fallback: new URL('/404.html', location.origin),
 	}, {
 		name: 'krv-bridge-connection-assets',
 		version: '{{ app.version | default: pkg.version }}',
