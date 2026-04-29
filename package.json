@@ -74,19 +74,19 @@
     "@aegisjsproject/qr-encoder": "^1.0.1",
     "@aegisjsproject/secret-store": "^1.1.1",
     "@aegisjsproject/url": "^1.0.3",
-    "@shgysk8zer0/11ty-netlify": "^1.1.36",
+    "@shgysk8zer0/11ty-netlify": "^1.1.37",
     "@shgysk8zer0/aes-gcm": "^1.0.9",
     "@shgysk8zer0/geoutils": "^1.0.6",
-    "@shgysk8zer0/importmap": "^1.9.10",
+    "@shgysk8zer0/importmap": "^1.9.11",
     "@shgysk8zer0/lambda-http": "^1.1.24",
     "@shgysk8zer0/netlify-func-utils": "^1.1.2",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
     "firebase-admin": "^13.8.0",
-    "qr": "^0.5.5"
+    "qr": "^0.6.0"
   },
   "devDependencies": {
-    "@aegisjsproject/hermes": "^1.0.5",
+    "@aegisjsproject/hermes": "^1.0.6",
     "@shgysk8zer0/squish": "^1.0.2",
     "dotenv": "^17.4.2"
   }
