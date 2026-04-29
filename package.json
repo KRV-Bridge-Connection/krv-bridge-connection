@@ -83,10 +83,10 @@
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
     "firebase-admin": "^13.8.0",
-    "qr": "^0.5.5"
+    "qr": "^0.6.0"
   },
   "devDependencies": {
-    "@aegisjsproject/hermes": "^1.0.5",
+    "@aegisjsproject/hermes": "^1.0.6",
     "@shgysk8zer0/squish": "^1.0.2",
     "dotenv": "^17.4.2"
   }
