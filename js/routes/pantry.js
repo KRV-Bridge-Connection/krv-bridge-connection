@@ -17,36 +17,30 @@ export const styles = css`#pantry-message {
 	gap: 0.8rem;
 }`;
 
-export default ({ signal }) => {
+export default async ({ signal }) => {
 
-	Promise.all([
-		customElements.whenDefined('g-cal-events'),
-		whenLoaded({ signal }),
-	]).then(([GCal]) => {
-		const cal = GCal.create('pantry', { loading: 'lazy' });
-		cal.classList.add('calendar');
-		document.getElementById(placehodler)?.replaceWith?.(cal);
-	});
-
-	return html`<section aria-labelledby="pantry-header">
+	/**
+	 * @type {DocumentFragment}
+	 */
+	const frag = html`<section aria-labelledby="pantry-header">
 		<h3>Emergency Choice Pantry</h3>
 		${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
 		<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
-			https://i.imgur.com/h68vmgFm.jpeg 160w,
-			https://i.imgur.com/h68vmgFl.jpeg 320w,
-			https://i.imgur.com/h68vmgFh.jpeg 640w,
-			https://i.imgur.com/h68vmgF.jpeg 2500w"
-		class="full-width"
-		sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
-		width="640"
-		height="482"
-		src="https://i.imgur.com/h68vmgFh.jpeg"
-		alt="KRV Bridge Food Pantry"
-		loading="lazy"
-		decoding="async"
-		crossorigin="anonymous"
-		itemprop="image"
-		referrerpolicy="no-referrer" />
+				https://i.imgur.com/h68vmgFm.jpeg 160w,
+				https://i.imgur.com/h68vmgFl.jpeg 320w,
+				https://i.imgur.com/h68vmgFh.jpeg 640w,
+				https://i.imgur.com/h68vmgF.jpeg 2500w"
+			class="full-width"
+			sizes="(max-width: 800px) 100vw, calc(100vw - 400px)"
+			width="640"
+			height="482"
+			src="https://i.imgur.com/h68vmgFh.jpeg"
+			alt="KRV Bridge Food Pantry"
+			loading="lazy"
+			decoding="async"
+			crossorigin="anonymous"
+			itemprop="image"
+			referrerpolicy="no-referrer" />
 		<p itemprop="description">The Choice Pantry is designed to provide emergency food assistance. It's for community members who are facing a
 			temporary food crisis and need help filling the gaps when other resources, like SNAP benefits and food distributions,
 			are not enough.</p>
@@ -80,6 +74,11 @@ export default ({ signal }) => {
 		<p>The following calendar shows the pantry and distribution hours provided by the organizations. Please check the dates, times, and locations carefully.</p>
 		<div id="${placehodler}"></div>
 	</section>`;
+
+	const GCal = await customElements.whenDefined('g-cal-events')
+	const cal = GCal.create('pantry', { loading: 'lazy' });
+	cal.classList.add('calendar');
+	frag.getElementById(placehodler).replaceWith(cal);
 };
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
