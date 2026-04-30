@@ -8,6 +8,7 @@
 @import url("./form-extras.css") layer(components);
 @import url("./admin.css") layer(components);
 @import url("./print.css") print;
+@import url("./view-tranistions.css");
 
 :root {
 	font-size: 18px;
