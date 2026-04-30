@@ -1,7 +1,6 @@
 import { site } from '../consts.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { whenLoaded } from '@aegisjsproject/router';
 
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const MESSAGE = null;
@@ -17,7 +16,7 @@ export const styles = css`#pantry-message {
 	gap: 0.8rem;
 }`;
 
-export default async ({ signal }) => {
+export default async () => {
 
 	/**
 	 * @type {DocumentFragment}
@@ -75,10 +74,11 @@ export default async ({ signal }) => {
 		<div id="${placehodler}"></div>
 	</section>`;
 
-	const GCal = await customElements.whenDefined('g-cal-events')
+	const GCal = await customElements.whenDefined('g-cal-events');
 	const cal = GCal.create('pantry', { loading: 'lazy' });
 	cal.classList.add('calendar');
 	frag.getElementById(placehodler).replaceWith(cal);
+	return frag;
 };
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
