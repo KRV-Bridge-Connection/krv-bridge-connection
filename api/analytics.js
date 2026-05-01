@@ -24,11 +24,13 @@ export default createHandler({
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('You are not authorized to view analytics.', { cause: result });
 			} else {
+				const url = new URL(req.url);
 				const startDate = new Date(params.get('from'));
 				const endDate = new Date(params.get('to'));
 				const db = await getFirestore();
 				const query = db.collection(STORE_NAME)
 					.where('type', '==', params.get('type') ?? 'load')
+					.where('origin', url.origin)
 					.where('timestamp', '>=', startDate)
 					.where('timestamp', '<=', endDate);
 
@@ -47,11 +49,12 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 
-		if (['id', 'type', 'timestamp', 'url'].every(field => data.has(field))) {
+		if (['id', 'type', 'timestamp', 'url', 'origin'].every(field => data.has(field))) {
 			await putCollectionItem(STORE_NAME, data.get('id'), {
 				id: data.get('id'),
 				type: data.get('type'),
 				timestamp: new Date(parseInt(data.get('timestamp'))),
+				origin: data.get('origin'),
 				url: data.get('url'),
 			});
 			// console.log(Object.fromEntries(req.headers));
