@@ -135,21 +135,27 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 	});
 }
 
-(function log() {
-	const data = new FormData();
+function log(type = 'load', {
+	path = location.pathname,
+	timestamp = Date.now(),
+	data = '',
+} = {}) {
+	const body = new FormData();
 	const url = new URL(location.href);
 
-	data.set('type', 'load');
-	data.set('id', crypto.randomUUID());
-	data.set('timestamp', Date.now());
-	data.set('path', url.pathname);
-	data.set('origin', url.origin);
-	data.set('utm_source', url.searchParams.get('utm_source') ?? '');
-	data.set('utm_medium', url.searchParams.get('utm_medium') ?? '');
-	data.set('utm_campaign', url.searchParams.get('utm_campaign') ?? '');
-	data.set('utm_term', url.searchParams.get('utm_term') ?? '');
-	data.set('utm_content', url.searchParams.get('utm_content') ?? '');
-	data.set('referrer', URL.parse(document.referrer)?.origin ?? '');
+	body.set('type', type);
+	body.set('id', crypto.randomUUID());
+	body.set('timestamp', timestamp);
+	body.set('path', path);
+	body.set('origin', url.origin);
+	body.set('utm_source', url.searchParams.get('utm_source') ?? '');
+	body.set('utm_medium', url.searchParams.get('utm_medium') ?? '');
+	body.set('utm_campaign', url.searchParams.get('utm_campaign') ?? '');
+	body.set('utm_term', url.searchParams.get('utm_term') ?? '');
+	body.set('utm_content', url.searchParams.get('utm_content') ?? '');
+	// Facebook is odd...
+	body.set('referrer', URL.parse(document.referrer)?.origin ?? url.searchParams.has('fbclid') ? 'www.facebook.com' : '');
+	body.set('data', data);
 
 	if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
 		url.searchParams.delete('utm_source');
@@ -159,7 +165,32 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 		url.searchParams.delete('utm_content');
 
 		history.replaceState(history.state, '', url.href);
+	} else if (url.searchParams.has('fbclid')) {
+		url.searchParams.delete('fbclid');
+		history.replaceState(history.state, '', url.href);
 	}
 
-	return navigator.sendBeacon('/api/analytics', data);
-})();
+	return navigator.sendBeacon('/api/analytics', body);
+};
+
+document.addEventListener('click', event => {
+	const link = event.target.closest('a[href]');
+
+	if (link instanceof HTMLAnchorElement && link.origin !== location.origin) {
+		switch(link.protocol) {
+			case 'https:':
+				log('external_link', { data: link.origin });
+				break;
+
+			case 'tel:':
+				log('call', { data: link.pathname });
+				break;
+
+			case 'mailto:':
+				log('email', { data: link.pathname });
+				break;
+		}
+	}
+}, { passive: true });
+
+log('load');
