@@ -30,7 +30,7 @@ export default createHandler({
 				const db = await getFirestore();
 				const query = db.collection(STORE_NAME)
 					.where('type', '==', params.get('type') ?? 'load')
-					.where('origin', url.origin)
+					.where('origin', '==', url.origin)
 					.where('timestamp', '>=', startDate)
 					.where('timestamp', '<=', endDate);
 
