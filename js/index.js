@@ -140,4 +140,5 @@ data.set('type', 'load');
 data.set('id', crypto.randomUUID());
 data.set('timestamp', Date.now());
 data.set('url', new URL(location.pathname, location.origin).href);
+data.set('origin', location.origin);
 navigator.sendBeacon('/api/analytics', data);
