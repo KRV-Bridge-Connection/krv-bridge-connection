@@ -135,10 +135,31 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 	});
 }
 
-const data = new FormData();
-data.set('type', 'load');
-data.set('id', crypto.randomUUID());
-data.set('timestamp', Date.now());
-data.set('url', new URL(location.pathname, location.origin).href);
-data.set('origin', location.origin);
-navigator.sendBeacon('/api/analytics', data);
+(function log() {
+	const data = new FormData();
+	const url = new URL(location.href);
+
+	data.set('type', 'load');
+	data.set('id', crypto.randomUUID());
+	data.set('timestamp', Date.now());
+	data.set('path', url.pathname);
+	data.set('origin', url.origin);
+	data.set('utm_source', url.searchParams.get('utm_source') ?? '');
+	data.set('utm_medium', url.searchParams.get('utm_medium') ?? '');
+	data.set('utm_campaign', url.searchParams.get('utm_campaign') ?? '');
+	data.set('utm_term', url.searchParams.get('utm_term') ?? '');
+	data.set('utm_content', url.searchParams.get('utm_content') ?? '');
+	data.set('referrer', URL.parse(document.referrer)?.origin ?? '');
+
+	if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
+		url.searchParams.delete('utm_source');
+		url.searchParams.delete('utm_medium');
+		url.searchParams.delete('utm_campaign');
+		url.searchParams.delete('utm_term');
+		url.searchParams.delete('utm_content');
+
+		history.replaceState(history.state, '', url.href);
+	}
+
+	return navigator.sendBeacon('/api/analytics', data);
+})();
