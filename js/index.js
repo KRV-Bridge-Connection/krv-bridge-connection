@@ -1,4 +1,3 @@
-import { debounce } from '@shgysk8zer0/kazoo/events.js';
 import { EVENT_TYPES, NAV_EVENT, init as initRouter } from '@aegisjsproject/router';
 import { observeEvents } from '@aegisjsproject/callback-registry/events.js';
 import { registerRootCommand, initRootCommands } from '@aegisjsproject/commands';
@@ -20,16 +19,6 @@ initRouter(document.scripts.namedItem('aegis-routes'), {
 
 observeEvents(document.getElementById('main'));
 initRootCommands();
-
-if (! CSS.supports('height', '1dvh')) {
-	document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
-
-	requestIdleCallback(() => {
-		window.addEventListener('resize', debounce(() => {
-			document.documentElement.style.setProperty('--viewport-height', `${globalThis.innerHeight}px`);
-		}), { passive: true });
-	});
-}
 
 document.documentElement.classList.add('js');
 document.documentElement.classList.remove('no-js');
@@ -96,7 +85,7 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 	Promise.all([
 		navigator.serviceWorker.ready,
 		customElements.whenDefined('html-notification')
-	]).then(([reg, HTMLNotificationElement]) => {
+	]).then(async ([reg, HTMLNotificationElement]) => {
 		reg.addEventListener('updatefound', async ({ target }) => {
 			target.update();
 
@@ -126,13 +115,29 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 				}
 			});
 		});
+
+		if ('periodicSync' in reg) {
+			const status = await navigator.permissions.query({
+				name: 'periodic-background-sync',
+			}).catch(() => ({ state: 'denied' }));
+
+			if (status.state === 'granted') {
+				try {
+					await reg.periodicSync.register('analytics-sync', {
+						// Minimum interval in milliseconds (e.g., 24 hours)
+						minInterval: 24 * 60 * 60 * 1000,
+					});
+				} catch (error) {
+					console.error('Periodic sync registration failed:', error);
+				}
+			};
+		}
 	});
 }
 
-// if (typeof navigator.share === 'function') {
-// 	document.querySelectorAll('button[is="share-button"]').forEach(btn => {
-// 		btn.command = ROOT_COMMANDS.share;
-// 		btn.commandForElement = document.documentElement;
-// 		btn.hidden = false;
-// 	});
-// }
+const data = new FormData();
+data.set('type', 'load');
+data.set('id', crypto.randomUUID());
+data.set('timestamp', Date.now());
+data.set('url', new URL(location.pathname, location.origin).href);
+navigator.sendBeacon('/api/analytics', data);

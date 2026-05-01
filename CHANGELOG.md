@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.23] - 2026-05-01
+
+### Added
+- Add peridic sync to sync partners IDB
+- Implement most basic analytics (view count with datetimes for querying)
+
 ## [v2.0.22] - 2026-04-30
 
 ### Added
