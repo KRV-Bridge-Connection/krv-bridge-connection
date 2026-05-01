@@ -49,15 +49,20 @@ export default createHandler({
 	async post(req) {
 		const data = await req.formData();
 
-		if (['id', 'type', 'timestamp', 'url', 'origin'].every(field => data.has(field))) {
+		if (['id', 'type', 'timestamp', 'path', 'origin'].every(field => data.has(field))) {
 			await putCollectionItem(STORE_NAME, data.get('id'), {
 				id: data.get('id'),
 				type: data.get('type'),
 				timestamp: new Date(parseInt(data.get('timestamp'))),
 				origin: data.get('origin'),
-				url: data.get('url'),
+				path: data.get('path'),
+				utm_source: data.get('utm_source'),
+				utm_medium: data.get('utm_medium'),
+				utm_campaign: data.get('utm_campaign'),
+				utm_term: data.get('utm_term'),
+				utm_content: data.get('utm_content'),
+				referrer: data.get('referrer'),
 			});
-			// console.log(Object.fromEntries(req.headers));
 			return new Response(null, { status: 202 });
 		} else {
 			throw new HTTPBadRequestError('Request has missing required fields.');
