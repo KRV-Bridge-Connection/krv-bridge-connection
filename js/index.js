@@ -144,12 +144,12 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 	data.set('timestamp', Date.now());
 	data.set('path', url.pathname);
 	data.set('origin', url.origin);
-	data.set('utm_source', url.searchParams.get('utm_source'));
-	data.set('utm_medium', url.searchParams.get('utm_medium'));
-	data.set('utm_campaign', url.searchParams.get('utm_campaign'));
-	data.set('utm_term', url.searchParams.get('utm_term'));
-	data.set('utm_content', url.searchParams.get('utm_content'));
-	data.set('referrer', URL.parse(document.referrer)?.origin);
+	data.set('utm_source', url.searchParams.get('utm_source') ?? '');
+	data.set('utm_medium', url.searchParams.get('utm_medium') ?? '');
+	data.set('utm_campaign', url.searchParams.get('utm_campaign') ?? '');
+	data.set('utm_term', url.searchParams.get('utm_term') ?? '');
+	data.set('utm_content', url.searchParams.get('utm_content') ?? '');
+	data.set('referrer', URL.parse(document.referrer)?.origin ?? '');
 
 	if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
 		url.searchParams.delete('utm_source');
