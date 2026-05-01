@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 import { HermesWorker } from '{{ importmap.imports["@aegisjsproject/hermes/"] }}worker.js';
 
 const staticDirs = ['js', 'css', 'img', '.well-known'];
@@ -26,7 +27,7 @@ new HermesWorker([
 			'/', '/about/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
 			'/donate/', '/account/', '/webapp.webmanifest', '/.well-known/jwks.json',
 			'/.well-known/openid-configuration', '/firebase.json', '/404.html',
-			'/calendar/pantry', '/calendar/partners',
+			'/calendar/pantry', '/calendar/partners', '/events/',
 		].map(path => URL.parse(path, location.origin)),
 		fallback: new URL('/404.html', location.origin),
 	}, {
@@ -86,3 +87,40 @@ new HermesWorker([
 		]
 	},
 ]);
+
+addEventListener('periodicsync', async event => {
+	if (event.tag === 'partners') {
+		const { resolve, reject, promise } = Promise.withResolvers();
+		event.waitUntil(promise);
+
+		try {
+			const STORAGE_KEY = '_lastSync_partners';
+			const STORE_NAME = 'partners';
+			const url = new URL('/api/partners', location.origin);
+			const cookie = await cookieStore.get({ name: STORAGE_KEY});
+			const lastSync = parseInt(cookie?.value ?? '0');
+			url.searchParams.set('lastUpdated', new Date(lastSync || 0).toISOString());
+
+			const [{ putAllItems, openDB }, { SCHEMA }, partners] = await Promise.all([
+				import('@aegisjsproject/idb'),
+				import('/js/consts.js'),
+				fetch(url, {
+					headers: { Accept: 'application/json' },
+					referrerPolicy: 'no-referrer',
+					credentials: 'include',
+				}).then(resp => resp.json()),
+			]);
+
+			const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+
+			putAllItems(db, STORE_NAME, partners, { durability: 'strict' })
+				.then(async () => {
+					await cookieStore.set({ name: STORAGE_KEY, value: Date.now().toString() });
+					resolve();
+				}).catch(reject)
+				.finally(() => db.close());
+		} catch(err) {
+			reject(err);
+		}
+	}
+});

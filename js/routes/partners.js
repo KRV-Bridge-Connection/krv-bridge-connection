@@ -404,7 +404,7 @@ export async function syncDB(db, { signal } = {}) {
 			const resp = await fetch(url, {
 				headers: { Accept: 'application/json' },
 				referrerPolicy: 'no-referrer',
-				credentials: 'omit',
+				credentials: 'include',
 				priority: 'high',
 				signal,
 			});

@@ -4,8 +4,6 @@ import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from '
 const STORE = 'partners';
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const headers = { 'Cache-Control': 'public, max-age=86400' };
-
 function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data }) {
 	return {
 		...data,
@@ -19,6 +17,8 @@ function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data 
 
 export default createHandler({
 	async get(req) {
+		const headers = new Headers({ 'Cache-Control': 'private, max-age=86400' });
+
 		const params = new URL(req.url).searchParams;
 
 		if (params.has('id')) {
@@ -35,12 +35,10 @@ export default createHandler({
 		} else if (params.has('lastUpdated')) {
 			const lastUpdated = new Date(params.get('lastUpdated'));
 			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
-			return Response.json(results.map(transformPartner));
+			return Response.json(results.map(transformPartner), { headers });
 		} else {
 			const partners = await getCollectionItems(STORE, { limit: NaN });
 			return Response.json(partners.map(transformPartner), { headers });
 		}
 	},
-}, {
-	logger: err => console.error(err),
 });
