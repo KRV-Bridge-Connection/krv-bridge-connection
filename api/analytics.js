@@ -53,6 +53,7 @@ export default createHandler({
 			await putCollectionItem(STORE_NAME, data.get('id'), {
 				id: data.get('id'),
 				type: data.get('type'),
+				data: data.get('data'),
 				timestamp: new Date(parseInt(data.get('timestamp'))),
 				origin: data.get('origin'),
 				path: data.get('path'),
