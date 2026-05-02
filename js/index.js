@@ -135,7 +135,7 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 	});
 }
 
-function log(type = 'load', {
+function logEvent(type = 'load', {
 	timestamp = Date.now(),
 	data,
 } = {}) {
@@ -184,18 +184,18 @@ document.addEventListener('click', event => {
 	if (link instanceof HTMLAnchorElement && link.origin !== location.origin) {
 		switch(link.protocol) {
 			case 'https:':
-				log('external_link', { data: link.origin });
+				logEvent('external_link', { data: link.origin });
 				break;
 
 			case 'tel:':
-				log('call', { data: link.pathname });
+				logEvent('call', { data: link.pathname });
 				break;
 
 			case 'mailto:':
-				log('email', { data: link.pathname });
+				logEvent('email', { data: link.pathname });
 				break;
 		}
 	}
 }, { passive: true });
 
-log('load');
+logEvent('load');
