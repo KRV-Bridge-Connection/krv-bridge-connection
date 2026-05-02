@@ -47,26 +47,32 @@ export default createHandler({
 		}
 	},
 	async post(req) {
-		const data = await req.formData();
-
-		if (['id', 'type', 'timestamp', 'path', 'origin'].every(field => data.has(field))) {
-			await putCollectionItem(STORE_NAME, data.get('id'), {
-				id: data.get('id'),
-				type: data.get('type'),
-				data: data.get('data'),
-				timestamp: new Date(parseInt(data.get('timestamp'))),
-				origin: data.get('origin'),
-				path: data.get('path'),
-				utm_source: data.get('utm_source'),
-				utm_medium: data.get('utm_medium'),
-				utm_campaign: data.get('utm_campaign'),
-				utm_term: data.get('utm_term'),
-				utm_content: data.get('utm_content'),
-				referrer: data.get('referrer'),
-			});
-			return new Response(null, { status: 202 });
+		if (! req.headers.has('Referer')) {
+			throw new HTTPBadRequestError('Missing Referrer header.');
 		} else {
-			throw new HTTPBadRequestError('Request has missing required fields.');
+			const data = await req.formData();
+			const url = URL.parse(req.headers.get('Referer'));
+
+			if (url instanceof URL && ['type',].every(field => data.has(field))) {
+				await putCollectionItem(STORE_NAME, data.get('id'), {
+					id: data.get('id') ?? crypto.randomUUID(),
+					type: data.get('type'),
+					data: data.get('data'),
+					timestamp: data.has('timestamp') ?  new Date(parseInt(data.get('timestamp'))) : new Date(),
+					origin: url.origin,
+					path: url.pathname,
+					utm_source: url.searchParams.get('utm_source'),
+					utm_medium: url.searchParams.get('utm_medium'),
+					utm_campaign: url.searchParams.get('utm_campaign'),
+					utm_term: url.searchParams.get('utm_term'),
+					utm_content: url.searchParams.get('utm_content'),
+					referrer: data.get('referrer') || null,
+				});
+
+				return new Response(null, { status: 202 });
+			} else {
+				throw new HTTPBadRequestError('Invalid referrer or missing required fields.');
+			}
 		}
 	}
 }, {
