@@ -136,9 +136,8 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 }
 
 function log(type = 'load', {
-	path = location.pathname,
 	timestamp = Date.now(),
-	data = '',
+	data,
 } = {}) {
 	const body = new FormData();
 	const url = new URL(location.href);
@@ -146,31 +145,37 @@ function log(type = 'load', {
 	body.set('type', type);
 	body.set('id', crypto.randomUUID());
 	body.set('timestamp', timestamp);
-	body.set('path', path);
-	body.set('origin', url.origin);
-	body.set('utm_source', url.searchParams.get('utm_source') ?? '');
-	body.set('utm_medium', url.searchParams.get('utm_medium') ?? '');
-	body.set('utm_campaign', url.searchParams.get('utm_campaign') ?? '');
-	body.set('utm_term', url.searchParams.get('utm_term') ?? '');
-	body.set('utm_content', url.searchParams.get('utm_content') ?? '');
+
 	// Facebook is odd...
-	body.set('referrer', URL.parse(document.referrer)?.origin ?? url.searchParams.has('fbclid') ? 'www.facebook.com' : '');
-	body.set('data', data);
-
-	if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
-		url.searchParams.delete('utm_source');
-		url.searchParams.delete('utm_medium');
-		url.searchParams.delete('utm_campaign');
-		url.searchParams.delete('utm_term');
-		url.searchParams.delete('utm_content');
-
-		history.replaceState(history.state, '', url.href);
+	if (URL.canParse(document.referrer)) {
+		body.set('referrer', document.referrer);
 	} else if (url.searchParams.has('fbclid')) {
-		url.searchParams.delete('fbclid');
-		history.replaceState(history.state, '', url.href);
+		body.set('referrer', 'www.facebook.com');
 	}
 
-	return navigator.sendBeacon('/api/analytics', body);
+	if (typeof data === 'string' && data.length !== 0) {
+		body.set('data', data);
+	}
+
+	const result = navigator.sendBeacon('/api/analytics', body);
+
+	// Wait for send to preserve UTM params
+	setTimeout(() => {
+		if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
+			url.searchParams.delete('utm_source');
+			url.searchParams.delete('utm_medium');
+			url.searchParams.delete('utm_campaign');
+			url.searchParams.delete('utm_term');
+			url.searchParams.delete('utm_content');
+			url.searchParams.delete('fbclid');
+			history.replaceState(history.state, '', url.href);
+		} else if (url.searchParams.has('fbclid')) {
+			url.searchParams.delete('fbclid');
+			history.replaceState(history.state, '', url.href);
+		}
+	}, 100);
+
+	return result;
 };
 
 document.addEventListener('click', event => {
