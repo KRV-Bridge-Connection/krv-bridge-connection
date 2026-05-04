@@ -13,7 +13,30 @@ Thank you for considering a donation to KRV Bridge Connection. Your generous con
 
 <img src="https://i.imgur.com/qOHRte9h.jpg" width="1024" height="536" class="block full-width" alt="Building the Bridge to Hope" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="eager" srcset="https://i.imgur.com/qOHRte9h.jpg 1024w, https://i.imgur.com/qOHRte9l.jpg 640w, https://i.imgur.com/qOHRte9m.jpg 320w" sizes="(min-width: 700px) 75vw, 100vw" />
 
-## How Your Donation Helps
+**KRV Bridge Connection (KRVBC)** is working to benefit the rural Kern River Valley in Eastern Kern County, which is comprised of 10 small communities with a high percentage of elderly and low-income residents who live far from Bakersfield's resources.  We seek to uplift the community as a whole and are dedicated to strengthening the Kern River Valley (KRV) community of 22,000 residents. Our mission is to bridge individuals and families to services that address lasting solutions to food insecurity, homelessness, and the needs of low-income households.
+
+In 2025, KRVBC opened the doors to a building at 6069 Lake Isabella Blvd., Lake Isabella, CA to serve as a permanent hub for our resource providing partners; a multipurpose collaborative space to bridge the underserved of the KRV to locally accessible nonprofit advocates, resource providers and educational opportunities. 
+
+Our one-stop shop provides office and community space, allowing multiple agencies in the shared space including 
+
+- Cerro Coso College
+- Congressman Fong's Representative
+- Community Action Partnership of Kern (CAPK)
+- Flood Ministries
+- Garden Pathways
+- Greater Bakersfield Legal Assistance (GBLA)
+- Kern Initiative for Talent and Entrepreneurship (KITE)
+- Salvation Army 
+- Stewards, Inc.
+
+
+### Please see more at <a href="https://www.givebigkern.org/organization/Krv-Bridge-Connection?utm_source=krv-bridge&mp;utm_medium=referrer" rel="noopener noreferrer external" target="_blank"><q>A Garden is a Grand Teacher</q> Campaign</a> on GiveBigKern.
+
+We are excited to fundraise in 2026 for our community garden, including fruit trees, that will provide fresh vegetables and fruit.  Community members of all ages have helped build raised garden beds and our large teaching kitchen is a perfect gathering space for teaching healthy cooking skills. 
+
+## Other Donations
+
+### How Your Donation Helps
 
 Every dollar you donate goes a long way in making a difference. Your contribution will assist with:
 
