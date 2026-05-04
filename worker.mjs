@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
 import { HermesWorker } from '{{ importmap.imports["@aegisjsproject/hermes/"] }}worker.js';
+import { putAllItems, openDB } from '@aegisjsproject/idb';
+import { SCHEMA } from '/js/consts.js';
 
 const staticDirs = ['js', 'css', 'img', '.well-known'];
 const partnerLogos = [
@@ -89,7 +91,7 @@ new HermesWorker([
 ]);
 
 addEventListener('periodicsync', async event => {
-	if (event.tag === 'partners') {
+	if (event.tag === 'partners-sync') {
 		const { resolve, reject, promise } = Promise.withResolvers();
 		event.waitUntil(promise);
 
@@ -101,15 +103,11 @@ addEventListener('periodicsync', async event => {
 			const lastSync = parseInt(cookie?.value ?? '0');
 			url.searchParams.set('lastUpdated', new Date(lastSync || 0).toISOString());
 
-			const [{ putAllItems, openDB }, { SCHEMA }, partners] = await Promise.all([
-				import('@aegisjsproject/idb'),
-				import('/js/consts.js'),
-				fetch(url, {
-					headers: { Accept: 'application/json' },
-					referrerPolicy: 'no-referrer',
-					credentials: 'include',
-				}).then(resp => resp.json()),
-			]);
+			const partners = fetch(url, {
+				headers: { Accept: 'application/json' },
+				referrerPolicy: 'no-referrer',
+				credentials: 'include',
+			}).then(resp => resp.json());
 
 			const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 

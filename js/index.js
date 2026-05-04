@@ -123,7 +123,7 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 
 			if (status.state === 'granted') {
 				try {
-					await reg.periodicSync.register('analytics-sync', {
+					await reg.periodicSync.register('partners-sync', {
 						// Minimum interval in milliseconds (e.g., 24 hours)
 						minInterval: 24 * 60 * 60 * 1000,
 					});
