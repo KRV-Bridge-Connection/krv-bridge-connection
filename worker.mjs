@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { HermesWorker } from '{{ importmap.imports["@aegisjsproject/hermes/"] }}worker.js';
-import { putAllItems, openDB } from '@aegisjsproject/idb';
+import { putAllItems, openDB } from '{{ importmap.imports["@aegisjsproject/idb"] }}';
 import { SCHEMA } from '/js/consts.js';
 
 const staticDirs = ['js', 'css', 'img', '.well-known'];
