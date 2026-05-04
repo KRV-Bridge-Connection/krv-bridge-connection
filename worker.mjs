@@ -96,27 +96,25 @@ addEventListener('periodicsync', async event => {
 		event.waitUntil(promise);
 
 		try {
-			const STORAGE_KEY = '_lastSync_partners';
 			const STORE_NAME = 'partners';
-			const url = new URL('/api/partners', location.origin);
-			const cookie = await cookieStore.get({ name: STORAGE_KEY});
-			const lastSync = parseInt(cookie?.value ?? '0');
-			url.searchParams.set('lastUpdated', new Date(lastSync || 0).toISOString());
 
-			const partners = fetch(url, {
+			const partners = await fetch('/api/partners', {
 				headers: { Accept: 'application/json' },
 				referrerPolicy: 'no-referrer',
 				credentials: 'include',
 			}).then(resp => resp.json());
 
-			const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+			if (! Array.isArray(partners)) {
+				reject(new TypeError('Partners response was not an array'));
+			} else if (partners.length !== 0) {
+				const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 
-			putAllItems(db, STORE_NAME, partners, { durability: 'strict' })
-				.then(async () => {
-					await cookieStore.set({ name: STORAGE_KEY, value: Date.now().toString() });
-					resolve();
-				}).catch(reject)
-				.finally(() => db.close());
+				putAllItems(db, STORE_NAME, partners, { durability: 'strict' })
+					.then(resolve).catch(reject)
+					.finally(() => db.close());
+			} else {
+				resolve();
+			}
 		} catch(err) {
 			reject(err);
 		}

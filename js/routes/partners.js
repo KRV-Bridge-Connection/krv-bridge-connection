@@ -196,7 +196,7 @@ const STORE_NAME = 'partners';
 // const ONE_WEEK = 604800000;
 const ONE_DAY = 86400000;
 const DB_TTL = ONE_DAY;
-const storageKey = '_lastSync:partners';
+// const storageKey = '_lastSync:partners';
 const category = getSearch('category', '');
 
 // const ALIASES = {
@@ -388,19 +388,14 @@ export const createPartners = results => results.sort(sortPartners).map(({ name,
 	</a>
 </div>`).join('\n');
 
-const needsSync = (ttl = DB_TTL) => localStorage.hasOwnProperty(storageKey)
-	? navigator.onLine ? Date.now() - (parseInt(localStorage.getItem(storageKey)) || 0) > ttl : false
-	: true;
+const needsSync = async (ttl = DB_TTL) => await cookieStore.get({ name: '_lastSync_partners' }).then(cookie => {
+	return navigator.onLine && (typeof cookie?.value !== 'string' || Date.now() - (parseInt(cookie.value) || 0) > ttl);
+});
 
 export async function syncDB(db, { signal } = {}) {
-	if (needsSync(DB_TTL)) {
+	if (await needsSync(DB_TTL)) {
 		try {
 			const url = new URL('/api/partners', location.origin);
-
-			if (localStorage.hasOwnProperty(storageKey)) {
-				url.searchParams.set('lastUpdated', new Date(parseInt(localStorage.getItem(storageKey)) || 0).toISOString());
-			}
-
 			const resp = await fetch(url, {
 				headers: { Accept: 'application/json' },
 				referrerPolicy: 'no-referrer',
@@ -412,11 +407,9 @@ export async function syncDB(db, { signal } = {}) {
 			if (resp.ok) {
 				const partners = await resp.json();
 
-				if (partners.length !== 0) {
+				if (Array.isArray(partners) && partners.length !== 0) {
 					await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
 				}
-
-				localStorage.setItem(storageKey, Date.now());
 			} else {
 				throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
 			}
