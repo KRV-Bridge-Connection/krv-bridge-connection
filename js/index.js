@@ -123,10 +123,13 @@ if (typeof navigator.serviceWorker?.register === 'function') {
 
 			if (status.state === 'granted') {
 				try {
-					await reg.periodicSync.register('partners-sync', {
-						// Minimum interval in milliseconds (e.g., 24 hours)
-						minInterval: 24 * 60 * 60 * 1000,
-					});
+					const tags = await reg.periodicSync.getTags();
+
+					if (! tags.includes('partners-sync')) {
+						await reg.periodicSync.register('partners-sync', {
+							minInterval: 24 * 60 * 60 * 1000, // 24 hours
+						});
+					}
 				} catch (error) {
 					console.error('Periodic sync registration failed:', error);
 				}
