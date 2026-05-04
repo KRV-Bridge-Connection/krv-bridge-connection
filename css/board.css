@@ -1,0 +1,7 @@
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+  --card-radius: 8px;
+}

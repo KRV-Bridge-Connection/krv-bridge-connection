@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Karen Zuber",
+    "role": "President/CEO",
+    "other_affiliations": [
+      "President, Bank of America | Bakersfield",
+      "Board Member, Greater Bakersfield Chamber of Commerce",
+      "Board Member, Kern Economic Development Foundation"
+    ],
+    "email": "kzuber@krvbridge.org"
+  },
+  {
+    "name": "Julie Simpson",
+    "role": "Vice President",
+    "other_affiliations": [
+      "Co-Founder and Advisory Board Member, Hopester Inc.",
+      "Elementary School Teacher",
+      "Interpreter for the Deaf"
+    ]
+  },
+  {
+    "name": "Bryan Apaez",
+    "role": "Vice President of Marketing",
+    "other_affiliations": [
+      "Owner/Operator, Kern River Ceviche Company",
+      "Board Member, Sierra Shared Spaces"
+    ]
+  },
+  {
+    "name": "Laurie Birdwell",
+    "role": "Vice President of Volunteer Coordination",
+    "other_affiliations": [
+      "Owner/Operator, Evermore Homestead and Ranch",
+      "UC Master Gardener",
+      "College of the Canyons Instructor"
+    ],
+    "phone": "+1-661-432-2043",
+    "email": "lbirdwell@krvbridge.org"
+  },
+  {
+    "name": "Karole Nelson",
+    "role": "Secretary",
+    "other_affiliations": [
+      "Manager/Co-Owner, Orion Rose Properties, LLC",
+      "Secretary, Lake Isabella & Bodfish Property Owner's Association"
+    ],
+    "email": "knelson@krvbridge.org"
+  },
+  {
+    "name": "Denise Boshers",
+    "role": "Chief Financial Officer",
+    "other_affiliations": [
+      "Certified Public Accountant",
+      "Treasurer, Bakersfield National Cemetary Support Committee",
+      "Board Member, Community Action Partnership of Kern (CAPK)",
+      "Accountant, Kern County 999 Officer Down Foundation"
+    ]
+  },
+  {
+    "name": "John Blythe",
+    "role": "Auditor",
+    "other_affiliations": [
+      "Co-Chairman, Board of Directors, Film Regions International, Inc.",
+      "Chairman, Board of Directors, Kern Valley Healthcare District",
+      "Region 1 Vice President, Board of Directors, National Exchange Club"
+    ]
+  }
+]

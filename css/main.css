@@ -1,3 +1,5 @@
+@import url("./board.css");
+
 @layer layout {
 	#main {
 		--link-color: #049ccf;
