@@ -10,7 +10,7 @@ export default createHandler({
 
 		if (! req.cookies.has('org-jwt')) {
 			throw new HTTPUnauthorizedError('Missing required JWT');
-		} else if (! (params.has('from') && params.has('to'))) {
+		} else if (! (params.has('from'))) {
 			throw new HTTPBadRequestError('Missing required start and end dates.');
 		} else {
 			const key = await getPublicKey();
@@ -25,11 +25,11 @@ export default createHandler({
 				throw new HTTPForbiddenError('You are not authorized to view analytics.', { cause: result });
 			} else {
 				const url = new URL(req.url);
-				const startDate = new Date(params.get('from'));
-				const endDate = new Date(params.get('to'));
+				const startDate = new Date(params.get('from').trim());
+				const endDate = params.has('to') ? new Date(params.get('to').trim()) : new Date();
 				const db = await getFirestore();
 				const query = db.collection(STORE_NAME)
-					.where('type', '==', params.get('type') ?? 'load')
+					.where('type', '==', params.get('type')?.trim?.() ?? 'load')
 					.where('origin', '==', url.origin)
 					.where('timestamp', '>=', startDate)
 					.where('timestamp', '<=', endDate);
@@ -40,6 +40,7 @@ export default createHandler({
 				return Response.json({
 					count: snapshot.data().count,
 					at: Date.now(),
+					type: params.has('type') ? params.get('type').trim() : 'load',
 					from: startDate.toISOString(),
 					to: startDate.toISOString(),
 				});
@@ -56,16 +57,16 @@ export default createHandler({
 			if (url instanceof URL && ['type',].every(field => data.has(field))) {
 				await putCollectionItem(STORE_NAME, data.get('id'), {
 					id: data.get('id') ?? crypto.randomUUID(),
-					type: data.get('type'),
-					data: data.get('data'),
-					timestamp: data.has('timestamp') ?  new Date(parseInt(data.get('timestamp'))) : new Date(),
+					type: data.get('type').trim(),
+					data:data.has('data') ?  data.get('data')?.trim() : null,
+					timestamp: data.has('timestamp') ?  new Date(parseInt(data.get('timestamp').trim())) : new Date(),
 					origin: url.origin,
 					path: url.pathname,
-					utm_source: url.searchParams.get('utm_source'),
-					utm_medium: url.searchParams.get('utm_medium'),
-					utm_campaign: url.searchParams.get('utm_campaign'),
-					utm_term: url.searchParams.get('utm_term'),
-					utm_content: url.searchParams.get('utm_content'),
+					utm_source: url.searchParams.get('utm_source')?.trim?.(),
+					utm_medium: url.searchParams.get('utm_medium')?.trim?.(),
+					utm_campaign: url.searchParams.get('utm_campaign')?.trim?.(),
+					utm_term: url.searchParams.get('utm_term')?.trim?.(),
+					utm_content: url.searchParams.get('utm_content')?.trim?.(),
 					referrer: data.get('referrer') || null,
 				});
 
