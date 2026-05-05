@@ -62,11 +62,11 @@ export default createHandler({
 					timestamp: data.has('timestamp') ?  new Date(parseInt(data.get('timestamp').trim())) : new Date(),
 					origin: url.origin,
 					path: url.pathname,
-					utm_source: url.searchParams.get('utm_source')?.trim?.(),
-					utm_medium: url.searchParams.get('utm_medium')?.trim?.(),
-					utm_campaign: url.searchParams.get('utm_campaign')?.trim?.(),
-					utm_term: url.searchParams.get('utm_term')?.trim?.(),
-					utm_content: url.searchParams.get('utm_content')?.trim?.(),
+					utm_source: url.searchParams.get('utm_source')?.trim?.() ?? null,
+					utm_medium: url.searchParams.get('utm_medium')?.trim?.() ?? null,
+					utm_campaign: url.searchParams.get('utm_campaign')?.trim?.() ?? null,
+					utm_term: url.searchParams.get('utm_term')?.trim?.() ?? null,
+					utm_content: url.searchParams.get('utm_content')?.trim?.() ?? null,
 					referrer: data.get('referrer') || null,
 				});
 
