@@ -238,7 +238,7 @@ export default async ({ signal, stack }) => {
 		cal,
 		forecast,
 		el`<img src="https://i.imgur.com/ha1pLty.webp" width="2752" height="1536" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="CO.STARTERS" />`,
-		el`<img src="https://i.imgur.com/zo5vMu5.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
+		// el`<img src="https://i.imgur.com/zo5vMu5.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		el`<div>
