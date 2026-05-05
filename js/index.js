@@ -201,4 +201,8 @@ document.addEventListener('click', event => {
 	}
 }, { passive: true });
 
+document.addEventListener('submit', ({ target }) => {
+	logEvent('form_submit', { data: target.id ?? target.name });
+}, { passive: true });
+
 logEvent('load');
