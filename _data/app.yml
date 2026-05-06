@@ -10,6 +10,10 @@ icons-file: /img/icons.svg
 theme:
   color: '#1a5fb4'
   background: '#242424'
+serviceworker:
+  src: /worker.js
+  scope: /
+  use_cache: true
 icons:
   - src: /img/favicon.svg
     type: image/svg+xml
@@ -165,4 +169,4 @@ categories:
   - health
   - medical
   - lifestyle
-features: []
+# features: []
