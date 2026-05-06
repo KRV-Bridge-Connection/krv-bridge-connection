@@ -10,6 +10,10 @@ icons-file: /img/icons.svg
 theme:
   color: '#1a5fb4'
   background: '#242424'
+serviceworker:
+  src: /worker.js
+  scope: /
+  use_cache: true
 icons:
   - src: /img/favicon.svg
     type: image/svg+xml
@@ -36,23 +40,23 @@ icons:
 screenshots:
   # Home
   - src: https://i.imgur.com/akVxai3.png
-    sizes: 432x756
+    sizes: 864x1512
     type: image/png
   # Pantry
   - src: https://i.imgur.com/QOQ6D5d.png
-    sizes: 432x756
+    sizes: 864x1512
     type: image/png
   # Resources
   - src: https://i.imgur.com/3vtLQT9.png
-    sizes: 432x756
+    sizes: 864x1512
     type: image/png
   # Profile
   - src: https://i.imgur.com/IeQ1d8q.png
-    sizes: 432x756
+    sizes: 864x1512
     type: image/png
   # Events
   - src: https://i.imgur.com/5o8bZaY.png
-    sizes: 432x756
+    sizes: 864x1512
     type: image/png
   # Desktop
   - src: 'https://i.imgur.com/E9BEmLkh.webp'
@@ -165,4 +169,4 @@ categories:
   - health
   - medical
   - lifestyle
-features: []
+# features: []

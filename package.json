@@ -1,7 +1,7 @@
 {
   "name": "krv-bridge-connection",
   "version": "2.0.23",
-  "description": "Bringing multiple nonprofit services into the KRV",
+  "description": "The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community. Our mission is to bridge individuals and families to services that address food insecurity, homelessness, and the needs of low-income households.",
   "private": true,
   "type": "module",
   "config": {

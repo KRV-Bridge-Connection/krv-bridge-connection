@@ -1,4 +1,11 @@
-import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPBadRequestError, HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
+import {
+	createHandler,
+	HTTPNotFoundError,
+	HTTPForbiddenError,
+	HTTPUnauthorizedError,
+	HTTPBadRequestError,
+	HTTPNotImplementedError,
+} from '@shgysk8zer0/lambda-http';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import firebase from 'firebase-admin';
