@@ -4,6 +4,7 @@
     "namespace": "android_app",
     "package_name": "org.krvbridge.twa",
     "sha256_cert_fingerprints": [
+      "9F:47:FC:9F:92:47:FF:EF:2E:D6:59:47:94:CC:65:D8:B2:DC:C5:F8:CD:50:4F:B4:5A:78:F8:75:C1:C9:3B:3D",
       "62:10:FF:7F:0B:5A:AC:0B:1B:94:68:E5:F8:3E:7D:A8:9B:01:71:D0:FD:06:CD:CF:F5:91:9C:44:6A:42:87:1A",
       "E3:A4:CB:C2:32:A5:22:D8:38:94:98:4D:EA:25:44:B3:FE:8A:4F:82:49:9B:F0:D9:78:88:7C:4A:5B:B3:AB:39",
       "87:64:BE:F6:4B:1D:C0:53:6F:DA:E7:BA:95:22:61:37:64:04:DF:56:CB:8B:14:20:A0:78:4B:39:FE:05:30:F6"
