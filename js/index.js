@@ -23,26 +23,6 @@ initRootCommands();
 document.documentElement.classList.add('js');
 document.documentElement.classList.remove('no-js');
 
-document.addEventListener(NAV_EVENT, event => {
-	event.waitUntil(async () => {
-		if (event.reason === EVENT_TYPES.load) {
-			const oldLink = document.querySelector('#nav a.active');
-			const newLink = [...document.querySelectorAll('#nav a:not(.active)')].find(a => a.href === location.href);
-
-			if (oldLink instanceof HTMLElement) {
-				oldLink.inert = false;
-				oldLink.tabIndex = 0;
-				oldLink.classList.remove('active', 'no-pointer-events');
-			}
-
-			if (newLink instanceof HTMLElement) {
-				newLink.inert = true;
-				newLink.classList.add('active', 'no-pointer-events');
-			}
-		}
-	});
-});
-
 Promise.all([
 	fetch('/firebase.json', { referrerPolicy: 'origin', headers: { Accept: 'application/json' } })
 		.then(resp => resp.json()),
@@ -161,7 +141,6 @@ function logEvent(type = 'load', {
 	}
 
 	const result = navigator.sendBeacon('/api/analytics', body);
-
 	// Wait for send to preserve UTM params
 	setTimeout(() => {
 		if (url.searchParams.has('utm_source') || url.searchParams.has('utm_medium')) {
@@ -176,7 +155,7 @@ function logEvent(type = 'load', {
 			url.searchParams.delete('fbclid');
 			history.replaceState(history.state, '', url.href);
 		}
-	}, 100);
+	}, 300);
 
 	return result;
 };
@@ -206,3 +185,24 @@ document.addEventListener('submit', ({ target }) => {
 }, { passive: true });
 
 logEvent('load');
+
+document.addEventListener(NAV_EVENT, event => {
+	event.waitUntil(async () => {
+		if (event.reason === EVENT_TYPES.load) {
+			const oldLink = document.querySelector('#nav a.active');
+			const newLink = [...document.querySelectorAll('#nav a:not(.active)')].find(a => a.href === location.href);
+			logEvent('navigate', { data: location.pathname });
+
+			if (oldLink instanceof HTMLElement) {
+				oldLink.inert = false;
+				oldLink.tabIndex = 0;
+				oldLink.classList.remove('active', 'no-pointer-events');
+			}
+
+			if (newLink instanceof HTMLElement) {
+				newLink.inert = true;
+				newLink.classList.add('active', 'no-pointer-events');
+			}
+		}
+	});
+});
