@@ -16,5 +16,6 @@
   "/event/sign-in/": "/js/routes/sign-in.js",
   "/account/:page": "@aegisjsproject/firebase-account-routes",
   "/account/": "@aegisjsproject/firebase-account-routes",
-  "/tv-display": "/js/routes/digital-signage.js"
+  "/tv-display": "/js/routes/digital-signage.js",
+  "/assistance": "/js/routes/assistance.js"
 }
