@@ -150,7 +150,7 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data }) {
 	return {
 		...data,
-		lastUpdated: new Date(lastUpdated._seconds * 1000).toISOString(),
+		lastUpdated: new Date(lastUpdated._seconds * 1000),
 		keywords: Array.isArray(keywords) ? keywords.map(keyword => keyword.toLowerCase()) : [],
 		hoursAvailable: Array.isArray(hoursAvailable)
 			? hoursAvailable.sort((day1, day2) => DAYS.indexOf(day1.dayOfWeek) - DAYS.indexOf(day2.dayOfWeek))
@@ -423,7 +423,8 @@ async function _sync(url, db, { signal } = {}) {
 				await putAllItems(db, STORE_NAME, data, { signal, durability: 'strict' });
 				return Date.now();
 			} else if (Array.isArray(data?.partners) && data.partners.length !== 0) {
-				await putAllItems(db, STORE_NAME, data.partners.map(transformPartner), { signal, durability: 'strict' });
+				const partners = data.partners.map(transformPartner);
+				await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
 				return Number.isSafeInteger(data.updated) ? data.updated : Date.now();
 			} else {
 				throw new TypeError('Expected an array of partners or an object with a partners array.');
