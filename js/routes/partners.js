@@ -147,11 +147,12 @@ const REDIRECTS = new Map([
 // Taken from `/api/partners`
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data }) {
+function transformPartner({ lastUpdated, keywords = [], hoursAvailable = {}, partner = false, ...data }) {
 	return {
 		...data,
 		lastUpdated: new Date(lastUpdated._seconds * 1000),
 		keywords: Array.isArray(keywords) ? keywords.map(keyword => keyword.toLowerCase()) : [],
+		partner,
 		hoursAvailable: Array.isArray(hoursAvailable)
 			? hoursAvailable.sort((day1, day2) => DAYS.indexOf(day1.dayOfWeek) - DAYS.indexOf(day2.dayOfWeek))
 			: []
