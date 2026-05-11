@@ -144,6 +144,21 @@ const REDIRECTS = new Map([
 	['mold', 'Home Improvement & Safety'],
 ]);
 
+// Taken from `/api/partners`
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function transformPartner({ lastUpdated, keywords = [], hoursAvailable = {}, partner = false, ...data }) {
+	return {
+		...data,
+		lastUpdated: new Date(lastUpdated._seconds * 1000),
+		keywords: Array.isArray(keywords) ? keywords.map(keyword => keyword.toLowerCase()) : [],
+		partner,
+		hoursAvailable: Array.isArray(hoursAvailable)
+			? hoursAvailable.sort((day1, day2) => DAYS.indexOf(day1.dayOfWeek) - DAYS.indexOf(day2.dayOfWeek))
+			: []
+	};
+}
+
 function _addUTM(url) {
 	if (typeof url === 'string') {
 		return _addUTM(URL.parse(url));
@@ -388,34 +403,61 @@ export const createPartners = results => results.sort(sortPartners).map(({ name,
 	</a>
 </div>`).join('\n');
 
-const needsSync = async (ttl = DB_TTL) => await cookieStore.get({ name: '_lastSync_partners' }).then(cookie => {
+const needsSync = (cookie, ttl = DB_TTL) => {
 	return navigator.onLine && (typeof cookie?.value !== 'string' || Date.now() - (parseInt(cookie.value) || 0) > ttl);
-});
+};
+
+async function _sync(url, db, { signal } = {}) {
+	try {
+		const resp = await fetch(url, {
+			headers: { Accept: 'application/json' },
+			referrerPolicy: 'no-referrer',
+			credentials: 'include',
+			priority: 'high',
+			signal,
+		});
+
+		if (resp.ok) {
+			const data = await resp.json();
+
+			if (Array.isArray(data) && data.length !== 0) {
+				await putAllItems(db, STORE_NAME, data, { signal, durability: 'strict' });
+				return Date.now();
+			} else if (Array.isArray(data?.partners) && data.partners.length !== 0) {
+				const partners = data.partners
+					.filter(e => typeof e.name === 'string' && typeof e.id === 'string')
+					.map(transformPartner);
+				await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
+				return Number.isSafeInteger(data.updated) ? data.updated : Date.now();
+			} else {
+				throw new TypeError('Expected an array of partners or an object with a partners array.');
+			}
+		} else {
+			throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
+		}
+	} catch(err) {
+		reportError(err);
+		return NaN;
+	}
+}
 
 export async function syncDB(db, { signal } = {}) {
-	if (await needsSync(DB_TTL)) {
-		try {
-			const url = new URL('/api/partners', location.origin);
-			const resp = await fetch(url, {
-				headers: { Accept: 'application/json' },
-				referrerPolicy: 'no-referrer',
-				credentials: 'include',
-				priority: 'high',
-				signal,
-			});
+	const cookie = await cookieStore.get({ name: '_lastSync_partners' });
 
-			if (resp.ok) {
-				const partners = await resp.json();
-
-				if (Array.isArray(partners) && partners.length !== 0) {
-					await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
-				}
-			} else {
-				throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
-			}
-		} catch(err) {
-			reportError(err);
-		}
+	if (typeof cookie?.value !== 'string') {
+		// Static JSON does not set cookie, so set it via JS
+		const value = await _sync(new URL('/partners.json', location.origin), db, { signal });
+		await cookieStore.set({
+			name: '_lastSync_partners',
+			value: Number.isNaN(value) ? Date.now() : value,
+			path: '/',
+			sameSite: 'strict',
+			secure: true,
+			expires: new Date(Date.now() + 15724800000), // + 182 days
+		});
+	} else if (needsSync(cookie, DB_TTL)) {
+		// API sets cookie
+		await _sync(new URL('/api/partners', location.origin), db, { signal });
 	}
 }
 

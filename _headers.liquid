@@ -78,7 +78,7 @@ permalink: /_headers
   Link: </sw-config.js>; rel=preload; as=script
 
 /worker.js
-  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' {{ importmap.imports['@aegisjsproject/hermes/'] }}worker.js;
+  Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' {{ importmap.imports['@aegisjsproject/idb/'] }} {{ importmap.imports['@aegisjsproject/hermes/'] }};
   Link: <{{ importmap.imports['@aegisjsproject/hermes/'] }}worker.js>; rel=modulepreload;
 
 /*

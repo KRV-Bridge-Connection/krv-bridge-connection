@@ -2,4 +2,7 @@
 layout: null
 permalink: /partners.json
 ---
-{{ partners | jsonify }}
+{
+	"partners": {{ partners | jsonify }},
+	"updated": {{ "now" | date: "%s" | times: 1000 }}
+}
