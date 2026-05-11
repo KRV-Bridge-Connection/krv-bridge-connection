@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.24] - 2026-05-11
+
+### Changed
+- Initial partners store synced from static JSON
+- Clean-up IDB store schemas
+
 ## [v2.0.23] - 2026-05-01
 
 ### Added

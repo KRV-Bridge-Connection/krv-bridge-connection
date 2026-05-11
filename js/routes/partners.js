@@ -424,7 +424,9 @@ async function _sync(url, db, { signal } = {}) {
 				await putAllItems(db, STORE_NAME, data, { signal, durability: 'strict' });
 				return Date.now();
 			} else if (Array.isArray(data?.partners) && data.partners.length !== 0) {
-				const partners = data.partners.map(transformPartner);
+				const partners = data.partners
+					.filter(e => typeof e.name === 'string' && typeof e.id === 'string')
+					.map(transformPartner);
 				await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
 				return Number.isSafeInteger(data.updated) ? data.updated : Date.now();
 			} else {
