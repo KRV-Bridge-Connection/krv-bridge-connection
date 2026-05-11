@@ -58,7 +58,7 @@ const policy = createPolicy('sw#script-url', {
 });
 
 if (typeof navigator.serviceWorker?.register === 'function') {
-	navigator.serviceWorker.register(policy.createScriptURL(document.documentElement.dataset.serviceWorker), {
+	await navigator.serviceWorker.register(policy.createScriptURL(document.documentElement.dataset.serviceWorker), {
 		type: 'module',
 	});
 

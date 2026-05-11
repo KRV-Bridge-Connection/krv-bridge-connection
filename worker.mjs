@@ -90,33 +90,35 @@ new HermesWorker([
 	},
 ]);
 
-addEventListener('periodicsync', async event => {
-	if (event.tag === 'partners-sync') {
-		const { resolve, reject, promise } = Promise.withResolvers();
-		event.waitUntil(promise);
+if (typeof self.registration === 'object' && 'periodicSync' in self.registration) {
+	this.addEventListener('periodicsync', async event => {
+		if (event.tag === 'partners-sync') {
+			const { resolve, reject, promise } = Promise.withResolvers();
+			event.waitUntil(promise);
 
-		try {
-			const STORE_NAME = 'partners';
+			try {
+				const STORE_NAME = 'partners';
 
-			const partners = await fetch('/api/partners', {
-				headers: { Accept: 'application/json' },
-				referrerPolicy: 'no-referrer',
-				credentials: 'include',
-			}).then(resp => resp.json());
+				const partners = await fetch('/api/partners', {
+					headers: { Accept: 'application/json' },
+					referrerPolicy: 'no-referrer',
+					credentials: 'include',
+				}).then(resp => resp.json());
 
-			if (! Array.isArray(partners)) {
-				reject(new TypeError('Partners response was not an array'));
-			} else if (partners.length !== 0) {
-				const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+				if (! Array.isArray(partners)) {
+					reject(new TypeError('Partners response was not an array'));
+				} else if (partners.length !== 0) {
+					const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
 
-				putAllItems(db, STORE_NAME, partners, { durability: 'strict' })
-					.then(resolve).catch(reject)
-					.finally(() => db.close());
-			} else {
-				resolve();
+					putAllItems(db, STORE_NAME, partners, { durability: 'strict' })
+						.then(resolve).catch(reject)
+						.finally(() => db.close());
+				} else {
+					resolve();
+				}
+			} catch(err) {
+				reject(err);
 			}
-		} catch(err) {
-			reject(err);
 		}
-	}
-});
+	});
+}
