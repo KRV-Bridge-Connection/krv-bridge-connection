@@ -51,7 +51,12 @@ export default createHandler({
 		} else {
 			const partners = await getCollectionItems(STORE, { limit: NaN });
 			headers.set('Set-Cookie', getCookie());
-			return Response.json(partners.map(transformPartner), { headers });
+			return Response.json(
+				partners
+					.filter(p => typeof p.name === 'string' && typeof p.id === 'string')
+					.map(transformPartner),
+				{ headers }
+			);
 		}
 	},
 });
