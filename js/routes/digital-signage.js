@@ -9,7 +9,7 @@ import imgData from '/img/gallery.json' with { type: 'json' };
 
 const [sheet, scoped] = useScopedStyle();
 const STORE_NAME = 'partners';
-const delay = 10_000;
+const delay = 15_000;
 
 const imgs = imgData.map(({ link, width, height, id, description }) => {
 	const ext = link.split('.').pop();
@@ -189,7 +189,7 @@ const createPartners = results => results.map(({ name, description, image, id, t
 		</a>` : ''}
 		${typeof url === 'string' && URL.canParse(url) ? `<a href="${url}" class="block btn btn-link" role="noopener noreferrer external">
 			<svg class="icon" height="16" width="12" fill="currentColor" viewBox="0 0 12 16" role="presentation">
-					<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
 			</svg>
 			<span>${new URL(url).hostname}</span>
 		</a>` : ''}
@@ -237,7 +237,6 @@ export default async ({ signal, stack }) => {
 	scrollSnap.append(
 		cal,
 		forecast,
-		el`<img src="https://i.imgur.com/ha1pLty.webp" width="2752" height="1536" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="CO.STARTERS" />`,
 		// el`<img src="https://i.imgur.com/zo5vMu5.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
