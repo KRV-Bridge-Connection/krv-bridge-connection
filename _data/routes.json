@@ -1,7 +1,5 @@
 {
   "/volunteer/": "/js/routes/volunteer.js",
-  "/volunteer/list": "/js/routes/volunteer-list.js",
-  "/volunteer/reg": "/js/routes/volunteer-reg.js",
   "/(partners|resources)/?category=:category": "/js/routes/partners.js",
   "/(partners|resources)/:partner([\\w\\-]*)": "/js/routes/partners.js",
   "/calendar/:cal(pantry|events|partners)": "/js/routes/cal.js",

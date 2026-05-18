@@ -72,6 +72,9 @@ permalink: /_headers
   Access-Control-Allow-Origin: *
   Content-Security-Policy: default-src 'none'
 
+/docs/*
+  X-Frame-Options: SAMEORIGIN
+
 /service-worker.js
   Content-Security-Policy: default-src 'self'; connect-src *; script-src 'self' cdn.kernvalley.us/service-worker.js;
   Link: <//cdn.kernvalley.us/service-worker.js>; rel=preload; as=script
