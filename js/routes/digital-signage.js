@@ -4,7 +4,7 @@ import { useScopedStyle } from '@aegisjsproject/core/parsers/css.js';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { SCHEMA } from '../consts.js';
-import { syncDB } from './partners.js';
+import { syncPartners } from './partners.js';
 import imgData from '/img/gallery.json' with { type: 'json' };
 
 const [sheet, scoped] = useScopedStyle();
@@ -33,15 +33,7 @@ const imgs = imgData.map(({ link, width, height, id, description }) => {
 	</figure>`;
 });
 
-await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(async db => {
-	try {
-		await syncDB(db);
-	} catch(err) {
-		reportError(err);
-	} finally {
-		db.close();
-	}
-});
+await syncPartners();
 
 const orgCard = scoped`
 	padding: 0.8em;
