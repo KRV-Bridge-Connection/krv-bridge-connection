@@ -407,7 +407,9 @@ const needsSync = (cookie, ttl = DB_TTL) => {
 	return navigator.onLine && (typeof cookie?.value !== 'string' || Date.now() - (parseInt(cookie.value) || 0) > ttl);
 };
 
-async function _sync(url, db, { signal } = {}) {
+async function _sync(url, { signal } = {}) {
+	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA });
+
 	try {
 		const resp = await fetch(url, {
 			headers: { Accept: 'application/json' },
@@ -438,28 +440,37 @@ async function _sync(url, db, { signal } = {}) {
 	} catch(err) {
 		reportError(err);
 		return NaN;
+	} finally {
+		db.close();
 	}
 }
 
-export async function syncDB(db, { signal } = {}) {
-	const cookie = await cookieStore.get({ name: '_lastSync_partners' });
+const cookieParams = {
+	name: '_lastSync_partners',
+	path: '/',
+	sameSite: 'strict',
+	secure: true,
+	partitioned: true,
+};
+
+export async function syncPartners({ signal } = {}) {
+	const cookie = await cookieStore.get(cookieParams);
 
 	if (typeof cookie?.value !== 'string') {
 		// Static JSON does not set cookie, so set it via JS
-		const value = await _sync(new URL('/partners.json', location.origin), db, { signal });
+		const value = await _sync(new URL('/partners.json', location.origin), { signal });
 		await cookieStore.set({
-			name: '_lastSync_partners',
+			...cookieParams,
 			value: Number.isNaN(value) ? Date.now() : value,
-			path: '/',
-			sameSite: 'strict',
-			secure: true,
 			expires: new Date(Date.now() + 15724800000), // + 182 days
 		});
 	} else if (needsSync(cookie, DB_TTL)) {
 		// API sets cookie
-		await _sync(new URL('/api/partners', location.origin), db, { signal });
+		await _sync(new URL('/api/partners', location.origin), { signal });
 	}
 }
+
+await syncPartners();
 
 export async function getMetadata({ matches, signal } = {}) {
 	if (typeof matches.search.groups.category === 'string' && matches.search.groups.category.length !== 0) {
@@ -514,16 +525,6 @@ async function getPartnerInfo({
 
 	return promise;
 }
-
-await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA }).then(async db => {
-	try {
-		await syncDB(db);
-	} catch(err) {
-		reportError(err);
-	} finally {
-		db.close();
-	}
-});
 
 export default async function ({ matches, signal, stack, url, params: { partner, category } = {} } = {}) {
 	const db = await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack });
