@@ -233,7 +233,7 @@ export default async ({ signal, stack }) => {
 		el`<img src="https://i.imgur.com/hvKw1WV.webp" width="1305" height="729" alt="Diabetic Cooking Class" crossorigin="anonymous" referrerpolicy="anonymous" decoding="lazy" loading="lazy" />`,
 		// el`<img src="https://i.imgur.com/zo5vMu5.webp" width="1024" height="541" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" alt="KRHC Mobile Medical Unit" />`,
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
-		el`<img src="https://i.imgur.com/f4sIcQo.webp" width="1305" height="690" alt="Mobile Medical Unit" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="lazy" />`,
+		el`<img src="https://i.imgur.com/1m655aA.webp" width="1305" height="690" alt="Mobile Medical Unit" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="lazy" />`,
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		el`<img src="https://i.imgur.com/iJTxGeL.webp" width="1376" height="768" alt="Volunteer with KRV Bridge Connection!" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />` ,
 		el`<div>
