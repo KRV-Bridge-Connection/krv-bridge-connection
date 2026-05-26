@@ -4,6 +4,7 @@ import { escape } from '@aegisjsproject/core/dom.js';
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { md } from '@aegisjsproject/markdown';
+import { url } from '@aegisjsproject/url';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { createSVGFallbackLogo } from '../functions.js';
@@ -251,7 +252,10 @@ const getTime = time => new Date('2000-01-01T' + time).toLocaleTimeString(naviga
 
 const getHours = ({ hoursAvailable }) => Array.isArray(hoursAvailable) && hoursAvailable.length !== 0
 	? '<ul class="hours-list block">' +  hoursAvailable.map(({ dayOfWeek, opens, closes }) => `<li class="hours block" itemprop="hoursAvailable" itemtype="https://schema.org/OpeningHoursSpecification" itemscope="">
-		<b itemprop="dayOfWeek" content="${dayOfWeek}">${dayOfWeek}</b>
+		<b>
+			<link itemprop="dayOfWeek" href="${url`https://schema.org/${dayOfWeek}`}" />
+			<span>${dayOfWeek}</span>
+		</b>
 		<time datetime="${opens}" itemprop="opens">${getTime(opens)}</time>
 		<span class="spacer">&mdash;</span>
 		<time datetime="${closes}" itemprop="closes">${getTime(closes)}</time>
@@ -354,9 +358,11 @@ export const createPartner = result => {
 	const page = html`<div class="org-info" itemtype="https://schema.org/${result['@type'] ?? 'Organization'}" ${data({ orgName: result.name })} itemscope="">
 		<h2>
 			<span itemprop="name">${result.name}</span>
+			${typeof result.taxID === 'string' ? `<meta itemprop="taxID" ${attr({ content: result.taxID })}>` : ''}
+			${typeof result.duns === 'string' ? `<meta itemprop="duns" ${attr({ content: result.duns })}>` : ''}
 		</h2>
 		${typeof result?.image?.src === 'string'
-		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
+		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
 		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 		<div class="flex row wrap">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
 		<p itemprop="description">${result.description}</p>
