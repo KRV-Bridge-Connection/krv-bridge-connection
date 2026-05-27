@@ -7,6 +7,7 @@ import { attr } from '@aegisjsproject/core/stringify.js';
 import { escapeHTML } from '@aegisjsproject/escape/html.js';
 import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from '/js/consts.js';
+import { site } from '../consts.js';
 
 const changeHandler = registerCallback('contact:change', change);
 
@@ -224,3 +225,6 @@ export default ({
 		</div>
 	</form>`;
 };
+
+export const title = `Contact | ${site.title}`;
+export const description = 'Contact page for KRV Bridge Connection';
