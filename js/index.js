@@ -129,6 +129,18 @@ function logEvent(type = 'load', {
 	body.set('id', crypto.randomUUID());
 	body.set('timestamp', timestamp);
 
+	// Detects WebView on iOS
+	if (typeof globalThis.webkit?.messageHandlers === 'object') {
+		body.set('displayMode', 'webview');
+	} else {
+		body.set(
+			'displayMode',
+			['browser', 'standalone', 'minimal-ui', 'fullscreen', 'window-controls-overlay']
+				.find(mode => matchMedia(`(display-mode: ${mode})`).matches) ?? 'browser'
+		);
+	}
+
+
 	// Facebook is odd...
 	if (URL.canParse(document.referrer)) {
 		body.set('referrer', document.referrer);
