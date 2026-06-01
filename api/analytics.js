@@ -42,7 +42,7 @@ export default createHandler({
 					at: Date.now(),
 					type: params.has('type') ? params.get('type').trim() : 'load',
 					from: startDate.toISOString(),
-					to: startDate.toISOString(),
+					to: endDate.toISOString(),
 				});
 			}
 		}
@@ -58,7 +58,7 @@ export default createHandler({
 				await putCollectionItem(STORE_NAME, data.get('id'), {
 					id: data.get('id') ?? crypto.randomUUID(),
 					type: data.get('type').trim(),
-					data:data.has('data') ?  data.get('data')?.trim() : null,
+					data: data.has('data') ?  data.get('data')?.trim() : null,
 					timestamp: data.has('timestamp') ?  new Date(parseInt(data.get('timestamp').trim())) : new Date(),
 					origin: url.origin,
 					path: url.pathname,
@@ -68,6 +68,7 @@ export default createHandler({
 					utm_term: url.searchParams.get('utm_term')?.trim?.() ?? null,
 					utm_content: url.searchParams.get('utm_content')?.trim?.() ?? null,
 					referrer: data.get('referrer') || null,
+					displayMode: data.get('displayMode') ?? 'browser',
 				});
 
 				return new Response(null, { status: 202 });
