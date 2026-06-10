@@ -8,6 +8,7 @@ import { url } from '@aegisjsproject/url';
 import { attr, data } from '@aegisjsproject/core/stringify.js';
 import { getSearch } from '@aegisjsproject/url/search.js';
 import { createSVGFallbackLogo } from '../functions.js';
+import { ROOT_COMMANDS } from '@aegisjsproject/commands/consts.js';
 
 const SOURCE = 'krv-bridge';
 const MEDIUM = 'referrer';
@@ -364,7 +365,14 @@ export const createPartner = result => {
 		${typeof result?.image?.src === 'string'
 		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
 		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
-		<div class="flex row wrap">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
+		<div class="flex row wrap no-print">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
+		<button type="button" class="btn btn-primary btn-lg no-print" command="${ROOT_COMMANDS.print}" commandfor="${document.documentElement.id}">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="icon" version="1" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
+				<path d="M2 4c-.5 0-1 .5-1 1v4c0 .5.5 1 1 1h1V8h10v2h1c.5 0 1-.5 1-1V5c0-.5-.5-1-1-1H2zm2-3v2h8V1H4z"/>
+				<path d="M4 9v5h8V9H4zm1 1h6v1H5v-1zm0 2h5v1H5v-1z"/>
+			</svg>
+			<span>Print Page</span>
+		</button>
 		<p itemprop="description">${result.description}</p>
 		${['email', 'telephone', 'url', 'address'].some(prop => result.hasOwnProperty(prop)) ? `<section class="card resource-contact main-contact">
 			<h3>Main Contact</h3>
@@ -437,8 +445,6 @@ async function _sync(url, { signal } = {}) {
 					.map(transformPartner);
 				await putAllItems(db, STORE_NAME, partners, { signal, durability: 'strict' });
 				return Number.isSafeInteger(data.updated) ? data.updated : Date.now();
-			} else {
-				throw new TypeError('Expected an array of partners or an object with a partners array.');
 			}
 		} else {
 			throw new DOMException(`${resp.url} [${resp.status}]`, 'NotFound');
