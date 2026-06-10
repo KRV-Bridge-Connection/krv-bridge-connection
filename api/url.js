@@ -4,36 +4,16 @@ import {
 	HTTPForbiddenError,
 	HTTPUnauthorizedError,
 	HTTPBadRequestError,
-	HTTPNotImplementedError,
 } from '@shgysk8zer0/lambda-http';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
-import firebase from 'firebase-admin';
 import { readFile } from 'node:fs/promises';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
+import { getFirestore } from './utils.js';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
 	return await importJWK(keyData);
-}
-
-async function getFirebase() {
-	if (! process.env.hasOwnProperty('FIREBASE_CERT')) {
-		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
-	} else if (firebase.apps.length !== 0) {
-		return firebase.apps[0];
-	} else {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-
-		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
-
-		return firebase;
-	}
-}
-
-async function getFirestore() {
-	const firebase = await getFirebase();
-	return firebase.firestore();
 }
 
 async function getCollectionItem(collection, id) {

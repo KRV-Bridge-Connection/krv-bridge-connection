@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0.0] - 2026-06-10
+
+### Changed
+- Update to node 22.12.0
+- Update to Firebase 14
+
 ## [v2.0.24] - 2026-05-11
 
 ### Changed

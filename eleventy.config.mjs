@@ -4,7 +4,8 @@ import { load } from 'js-yaml';
 import * as filters from '@shgysk8zer0/11ty-filters';
 import { markdownIt } from '@shgysk8zer0/11ty-netlify/markdown';
 import { imports, scopes } from '@shgysk8zer0/importmap';
-import firebase from 'firebase-admin';
+import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
+import { initializeFirestore } from 'firebase-admin/firestore';
 import { Liquid } from 'liquidjs';
 import { config } from 'dotenv';
 
@@ -34,12 +35,12 @@ export default function(eleventyConfig) {
 
 	if (typeof process.env.FIREBASE_CERT !== 'string') {
 		throw new Error('Missing FIREBASE_CERT in `process.env');
-	} else if (firebase.apps.length === 0) {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
+	} else if (getApps().length === 0) {
+		const certObj = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
+		initializeApp({ credential: cert(certObj) });
 	}
 
-	const db = firebase.firestore();
+	const db = initializeFirestore(getApp());
 	const liquid = new Liquid();
 
 	eleventyConfig.addTemplateFormats('mjs');

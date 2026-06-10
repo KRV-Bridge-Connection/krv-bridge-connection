@@ -1,21 +1,7 @@
-import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, HTTPNotImplementedError, Cookie } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, Cookie } from '@shgysk8zer0/lambda-http';
 import { getPrivateKey, createJWT, getRequestToken } from '@shgysk8zer0/jwk-utils';
 import { encodeGeohash } from '@shgysk8zer0/geoutils';
-import firebase from 'firebase-admin';
-
-async function getFirebase() {
-	if (! process.env.hasOwnProperty('FIREBASE_CERT')) {
-		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
-	} else if (firebase.apps.length !== 0) {
-		return firebase.apps[0];
-	} else {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-
-		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
-
-		return firebase;
-	}
-}
+import { getAuth, getFirestore } from './utils.js';
 
 const cookieName = 'org-jwt';
 const path = '/api/';
@@ -30,8 +16,9 @@ export default createHandler({
 		geo: { latitude = NaN, longitude = NaN, timezone = null } = {},
 	} = {}) {
 		const reqToken = getRequestToken(req);
-		const firebase = await getFirebase();
-		const auth = firebase.auth();
+
+		const auth = await getAuth();
+
 		const user = await auth.verifyIdToken(reqToken, true).catch(err => {
 			return new HTTPForbiddenError('Invalid id token', { cause: err });
 		});
@@ -46,7 +33,7 @@ export default createHandler({
 		} else {
 			const { uid, name, email, picture, email_verified } = user;
 
-			const db = firebase.firestore();
+			const db = await getFirestore();
 			const doc = await db.collection('users').doc(uid).get();
 
 			if (doc.exists) {
@@ -117,4 +104,5 @@ export default createHandler({
 	}
 }, {
 	allowCredentials: true,
+	logger: console.error,
 });
