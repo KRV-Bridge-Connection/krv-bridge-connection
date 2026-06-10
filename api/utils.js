@@ -1,5 +1,7 @@
 import { HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
-import firebase from 'firebase-admin';
+import { verifyFirebaseIdToken } from '@shgysk8zer0/jwk-utils';
+import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
+import { initializeFirestore } from 'firebase-admin/firestore';
 import { importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 
@@ -19,25 +21,23 @@ export async function getPublicKey(file = '_data/jwk.json') {
 export async function getFirebase(envName = ENV_CERT_NAME) {
 	if (! process.env.hasOwnProperty(envName)) {
 		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
-	} else if (firebase.apps.length !== 0) {
-		return firebase.apps[0];
+	} else if (getApps().length === 0) {
+		const certObj = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
+
+		return initializeApp({ credential: cert(certObj) });
 	} else {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-
-		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
-
-		return firebase;
+		return getApp();
 	}
 }
 
-export async function getAuth(envName = ENV_CERT_NAME) {
-	const firebase = await getFirebase(envName);
-	return firebase.auth();
-}
+// export async function getAuth(envName = ENV_CERT_NAME) {
+// 	const firebase = await getFirebase(envName);
+// 	return getFBAuth(firebase);
+// }
 
 export async function getFirestore(envName = ENV_CERT_NAME) {
 	const firebase = await getFirebase(envName);
-	return firebase.firestore();
+	return initializeFirestore(firebase);
 }
 
 export async function getCollection(collection, { envName = ENV_CERT_NAME } = {}) {
@@ -179,8 +179,7 @@ export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME }
 export async function getFirebaseRequestUser(req) {
 	if (req.headers.has('Authorization')) {
 		const token = req.headers.get('Authorization').substring(7);
-		const auth = await getAuth();
-		return await auth.verifyIdToken(token, true);
+		return await verifyFirebaseIdToken(token);
 	} else {
 		return null;
 	}

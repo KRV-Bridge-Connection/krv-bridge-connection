@@ -1,6 +1,6 @@
 {
   "name": "krv-bridge-connection",
-  "version": "2.0.24",
+  "version": "3.0.0",
   "description": "The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community. Our mission is to bridge individuals and families to services that address food insecurity, homelessness, and the needs of low-income households.",
   "private": true,
   "type": "module",
@@ -77,16 +77,16 @@
     "@shgysk8zer0/11ty-netlify": "^1.1.37",
     "@shgysk8zer0/aes-gcm": "^1.0.9",
     "@shgysk8zer0/geoutils": "^1.0.6",
-    "@shgysk8zer0/importmap": "^1.9.20",
+    "@shgysk8zer0/importmap": "^1.9.21",
     "@shgysk8zer0/lambda-http": "^1.1.24",
     "@shgysk8zer0/netlify-func-utils": "^1.1.2",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
-    "firebase-admin": "^13.8.0",
+    "firebase-admin": "^14.0.0",
     "qr": "^0.6.0"
   },
   "devDependencies": {
-    "@aegisjsproject/hermes": "^1.0.6",
+    "@aegisjsproject/hermes": "^1.1.0",
     "@shgysk8zer0/squish": "^1.0.2",
     "dotenv": "^17.4.2"
   }

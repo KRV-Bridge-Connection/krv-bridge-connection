@@ -2,11 +2,11 @@ import { NOT_FOUND, NO_CONTENT, OK } from '@shgysk8zer0/consts/status.js';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { checkGeohash } from '@shgysk8zer0/geoutils/hash.js';
-import firebase from 'firebase-admin';
 import {
-	createHandler, HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError,
+	createHandler, HTTPBadRequestError, HTTPForbiddenError,
 	HTTPUnauthorizedError, HTTPInternalServerError,
 } from '@shgysk8zer0/lambda-http';
+import { getFirestore } from './utils.js';
 
 const collection = 'organizations';
 
@@ -38,27 +38,6 @@ async function getItemsBy(collection, field, value, { limit = 10 } = {}) {
 	const snapshot = await db.collection(collection).where(field, '==', value).limit(limit).get();
 
 	return snapshot.docs.map(doc => doc.data());
-}
-
-async function getFirebase() {
-	if (! process.env.hasOwnProperty('FIREBASE_CERT')) {
-		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
-	} else if (firebase.apps.length !== 0) {
-		return firebase.apps[0];
-	} else {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-
-		firebase.initializeApp({
-			credential: firebase.credential.cert(cert),
-		});
-
-		return firebase;
-	}
-}
-
-async function getFirestore() {
-	const firebase = await getFirebase();
-	return firebase.firestore();
 }
 
 export default createHandler({
@@ -111,8 +90,8 @@ export default createHandler({
 			} else if (params.get('id') !== result.sub_id) {
 				throw new HTTPForbiddenError('You do not have access to that organization.');
 			} else {
-				const firebase = await getFirebase();
-				await firebase.firestore().collection(collection).doc(params.get('id')).delete();
+				const firestore = await getFirestore();
+				await firestore().collection(collection).doc(params.get('id')).delete();
 				return new Response(null, { status: NO_CONTENT });
 			}
 		}

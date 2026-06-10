@@ -1,30 +1,12 @@
-import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPNotImplementedError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
+import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError, HTTPNotFoundError } from '@shgysk8zer0/lambda-http';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { SEE_OTHER, CREATED, NOT_FOUND, OK, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { getSecretKey, encrypt, decrypt, BASE64, TEXT } from '@shgysk8zer0/aes-gcm';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import firebase from 'firebase-admin';
+import { getFirestore } from './utils.js';
 
 const COLLECTION = 'volunteers_list';
-
-async function getFirebase() {
-	if (! process.env.hasOwnProperty('FIREBASE_CERT')) {
-		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
-	} else if (firebase.apps.length !== 0) {
-		return firebase.apps[0];
-	} else {
-		const cert = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
-		firebase.initializeApp({ credential: firebase.credential.cert(cert) });
-
-		return firebase;
-	}
-}
-
-async function getFirestore() {
-	const firebase = await getFirebase();
-	return firebase.firestore();
-}
 
 async function getCollection(collection) {
 	const firestore = await getFirestore();
