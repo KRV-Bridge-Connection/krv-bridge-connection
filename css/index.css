@@ -7,7 +7,7 @@
 @import url("./vars.css") layer(base);
 @import url("./form-extras.css") layer(components);
 @import url("./admin.css") layer(components);
-@import url("./print.css") print;
+@import url("./print.css") layer(utilites) print;
 @import url("./view-tranistions.css");
 
 :root {
