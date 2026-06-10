@@ -1,7 +1,7 @@
 @layer utilities {
 	@page {
-		margin: 0;
-		size: letter;
+		margin: 1.2em;
+		size: portrait;
 	}
 
 	body > :not(#main) {
