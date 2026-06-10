@@ -82,11 +82,11 @@
     "@shgysk8zer0/netlify-func-utils": "^1.1.2",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
-    "firebase-admin": "^13.8.0",
+    "firebase-admin": "^14.0.0",
     "qr": "^0.6.0"
   },
   "devDependencies": {
-    "@aegisjsproject/hermes": "^1.0.6",
+    "@aegisjsproject/hermes": "^1.1.0",
     "@shgysk8zer0/squish": "^1.0.2",
     "dotenv": "^17.4.2"
   }
