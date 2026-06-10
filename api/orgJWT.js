@@ -1,7 +1,8 @@
 import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundError, Cookie } from '@shgysk8zer0/lambda-http';
-import { getPrivateKey, createJWT, getRequestToken } from '@shgysk8zer0/jwk-utils';
+import { verifyFirebaseAuthRequestToken } from '@shgysk8zer0/jwk-utils';
+import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { encodeGeohash } from '@shgysk8zer0/geoutils';
-import { getAuth, getFirestore } from './utils.js';
+import { getFirestore } from './utils.js';
 
 const cookieName = 'org-jwt';
 const path = '/api/';
@@ -15,23 +16,19 @@ export default createHandler({
 		ip = null,
 		geo: { latitude = NaN, longitude = NaN, timezone = null } = {},
 	} = {}) {
-		const reqToken = getRequestToken(req);
-
-		const auth = await getAuth();
-
-		const user = await auth.verifyIdToken(reqToken, true).catch(err => {
+		const user = await verifyFirebaseAuthRequestToken(req).catch(err => {
 			return new HTTPForbiddenError('Invalid id token', { cause: err });
 		});
 
 		if (user instanceof Error) {
 			throw user;
-		} else if (! (typeof user.email === 'string' && typeof user.uid === 'string')) {
+		} else if (! (typeof user.email === 'string' && typeof user.sub === 'string')) {
 			throw new HTTPBadGatewayError('Invalid token data');
 		} else if (! user.email_verified) {
-			auth.generateEmailVerificationLink(user.email);
+			// @todo resend verification email since `firebase-admin/auth` is broken thanks to jose/require()
 			throw new HTTPForbiddenError('You will need to verify your email address and try again. An verification email has been sent.');
 		} else {
-			const { uid, name, email, picture, email_verified } = user;
+			const { sub: uid, name, email, picture, email_verified } = user;
 
 			const db = await getFirestore();
 			const doc = await db.collection('users').doc(uid).get();

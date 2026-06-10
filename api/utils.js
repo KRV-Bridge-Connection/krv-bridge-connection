@@ -1,7 +1,7 @@
 import { HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
+import { verifyFirebaseIdToken } from '@shgysk8zer0/jwk-utils';
 import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
 import { initializeFirestore } from 'firebase-admin/firestore';
-import { getAuth as getFBAuth } from 'firebase-admin/auth';
 import { importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 
@@ -30,10 +30,10 @@ export async function getFirebase(envName = ENV_CERT_NAME) {
 	}
 }
 
-export async function getAuth(envName = ENV_CERT_NAME) {
-	const firebase = await getFirebase(envName);
-	return getFBAuth(firebase);
-}
+// export async function getAuth(envName = ENV_CERT_NAME) {
+// 	const firebase = await getFirebase(envName);
+// 	return getFBAuth(firebase);
+// }
 
 export async function getFirestore(envName = ENV_CERT_NAME) {
 	const firebase = await getFirebase(envName);
@@ -179,8 +179,7 @@ export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME }
 export async function getFirebaseRequestUser(req) {
 	if (req.headers.has('Authorization')) {
 		const token = req.headers.get('Authorization').substring(7);
-		const auth = await getAuth();
-		return await auth.verifyIdToken(token, true);
+		return await verifyFirebaseIdToken(token);
 	} else {
 		return null;
 	}
