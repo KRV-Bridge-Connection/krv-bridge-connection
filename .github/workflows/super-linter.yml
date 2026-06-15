@@ -37,10 +37,6 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      # matrix:
-      #   language:
     # Name the Job
     name: Lint Code Base
     # Set the agent to run on
