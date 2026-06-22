@@ -31,7 +31,6 @@
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint .",
     "lint:css": "stylelint ${npm_package_config_dir_css}**.css",
-    "lint:html": "htmlhint ${npm_package_config_dir_html}",
     "fix:css": "stylelint ${npm_package_config_dir_css}**.css --fix",
     "fix:js": "eslint --fix .",
     "build": "npm run build:icons && npm run build:css && npm run build:js",
