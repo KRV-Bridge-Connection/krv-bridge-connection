@@ -26,6 +26,10 @@ jobs:
           api.github.com:443
           github.com:443
           uploads.github.com:443
+          unpkg.com:443
+          fonts.googleapis.com:443
+          registry.npmjs.org:443
+          release-assets.githubusercontent.com:443
           168.63.129.16:80
 
     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
