@@ -37,10 +37,14 @@ jobs:
         # https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
 
     steps:
-    - name: Harden the runner (Audit all outbound calls)
+    - name: Harden the runner (Block disallowed outbound calls)
       uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
       with:
-        egress-policy: audit
+        egress-policy: block
+        allowed-endpoints: >
+          api.github.com:443
+          uploads.github.com:443
+          168.63.129.16:80
 
     - name: Checkout repository
       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
