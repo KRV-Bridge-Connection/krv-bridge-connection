@@ -75,7 +75,9 @@ export default createHandler({
 					partitioned,
 				});
 
-				return Response.json({ expires, jti }, { headers: new Headers({ 'Set-Cookie': cookie }) });
+				return Response.json({ expires, jti }, {
+					headers: new Headers({ 'Set-Cookie': cookie }),
+				});
 			} else {
 				throw new HTTPNotFoundError(`No user record exists for user ${uid}.`);
 			}

@@ -19,13 +19,13 @@ function transformPartner({ lastUpdated, keywords, hoursAvailable = {}, ...data 
 const getCookie = () => new Cookie({
 	name: COOKIE_NAME,
 	value: Date.now(),
-	// path: '/', // Seems to be a bug setting a path of "/", so adding it manually
-	httpOnly: false,
+	path: '/', // Needs to be accessible from any page
+	httpOnly: false, // So that client can check if sync is due
 	sameSite: 'strict',
 	secure: true,
 	expires: new Date(Date.now() + 15724800000), // + 182 days
 	partitioned: true,
-}) + '; Path=/;';
+});
 
 export default createHandler({
 	async get(req) {
@@ -44,7 +44,7 @@ export default createHandler({
 			const results = await getCollectionItemsWhere(STORE, 'keywords', 'array-contains', params.get('category').toLowerCase());
 			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200 }, { headers });
 		} else if (req.cookies.has(COOKIE_NAME)) {
-			const lastUpdated = new Date((parseInt(req.cookies.get(COOKIE_NAME)) || 0));
+			const lastUpdated = new Date(parseInt(req.cookies.get(COOKIE_NAME)) || 0);
 			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
 			headers.set('Set-Cookie', getCookie());
 			return Response.json(results.map(transformPartner), { headers });
