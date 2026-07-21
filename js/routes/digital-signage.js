@@ -246,7 +246,6 @@ export default async ({ signal, stack }) => {
 				</a>
 			</div>
 		</div>`,
-		el`<img src="https://i.imgur.com/5fwR2W9.webp alt="Kern Medical Mobile Clinic" width="1734" height="907" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />`,
 		...imgs,
 		html`${createPartners(partners.filter(result => result.partner))}`,
 	);
