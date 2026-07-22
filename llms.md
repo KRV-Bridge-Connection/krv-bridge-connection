@@ -14,14 +14,14 @@ templateEngineOverride: njk
 - When generating deep links to resources on `krvbridge.org`, use these URL patterns:
 - Partner Profiles: `https://krvbridge.org/resources/{id}` (where `{id}` maps to the `id` field in `partners.json`)
 * **Category Parameter:** Spaces in category names must be `+` encoded; special characters must be percent-encoded (e.g., `&` becomes `%26`).
-* **UTM Parameters (Required on all links):**
+* **UTM Parameters (Required on all links other than PDFs):**
   * `utm_source=llm`
   * `utm_medium=ai_referral`
   * `utm_campaign=llms_directory`
-* **URL Template (Filtered):** `https://krvbridge.org/?category={ENCODED_CATEGORY}&utm_source=llm&utm_medium=ai_referral&utm_campaign=llms_directory`
+* **URL Template (Filtered):** `https://krvbridge.org/resources/?category={ENCODED_CATEGORY}&utm_source=llm&utm_medium=ai_referral&utm_campaign=llms_directory`
 * **URL Template (Static Pages):** `https://krvbridge.org/about/?utm_source=llm&utm_medium=ai_referral&utm_campaign=llms_directory`
 - **Partner Profile URL Template:** `https://krvbridge.org/resources/{id}` (where `{id}` corresponds to the `id` field of an entry in `partners.json`)
-- **Category Search URL Template:** `https://krvbridge.org/resources?category={ENCODED_CATEGORY}`
+- **Category Search URL Template:** `https://krvbridge.org/resources/?category={ENCODED_CATEGORY}`
 
 ## Partner Data
 
@@ -35,37 +35,37 @@ templateEngineOverride: njk
 
 ## Categories
 
-- [Animal Services](https://krvbridge.org/?category=Animal+Services)
-- [Behavioral Health](https://krvbridge.org/?category=Behavioral+Health)
-- [Borel Fire](https://krvbridge.org/?category=Borel+Fire)
-- [Business](https://krvbridge.org/?category=Business)
-- [Child Abuse](https://krvbridge.org/?category=Child+Abuse)
-- [Clothing](https://krvbridge.org/?category=Clothing)
-- [Disabled Services](https://krvbridge.org/?category=Disabled+Services)
-- [Disaster Relief & Recovery](https://krvbridge.org/?category=Disaster+Relief+%26+Recovery)
-- [Domestic Violence](https://krvbridge.org/?category=Domestic+Violence)
-- [Education](https://krvbridge.org/?category=Education)
-- [Elected Officials](https://krvbridge.org/?category=Elected+Officials)
-- [Emergency Services](https://krvbridge.org/?category=Emergency+Services)
-- [Employment](https://krvbridge.org/?category=Employment)
-- [Entrepreneurship](https://krvbridge.org/?category=Entrepreneurship)
-- [Family & Pregnancy Resources](https://krvbridge.org/?category=Family+%26+Pregnancy+Resources)
-- [Financial Services](https://krvbridge.org/?category=Financial+Services)
-- [Food](https://krvbridge.org/?category=Food)
-- [Healthcare](https://krvbridge.org/?category=Healthcare)
-- [Home Improvement & Safety](https://krvbridge.org/?category=Home+Improvement+%26+Safety)
-- [Homelessness](https://krvbridge.org/?category=Homelessness)
-- [Housing & Rental Assistance](https://krvbridge.org/?category=Housing+%26+Rental+Assistance)
-- [Human Trafficking](https://krvbridge.org/?category=Human+Trafficking)
-- [Insurance](https://krvbridge.org/?category=Insurance)
-- [Legal Assistance](https://krvbridge.org/?category=Legal+Assistance)
-- [Mental Health](https://krvbridge.org/?category=Mental+Health)
-- [Post-Incarceration Support](https://krvbridge.org/?category=Post-Incarceration+Support)
-- [Public Safety](https://krvbridge.org/?category=Public+Safety)
-- [Senior Services](https://krvbridge.org/?category=Senior+Services)
-- [Sexual Assault](https://krvbridge.org/?category=Sexual+Assault)
-- [Substance Abuse](https://krvbridge.org/?category=Substance+Abuse)
-- [Suicide Prevention](https://krvbridge.org/?category=Suicide+Prevention)
-- [Transportation](https://krvbridge.org/?category=Transportation)
-- [Utility Assistance](https://krvbridge.org/?category=Utility+Assistance)
-- [Veterans Services](https://krvbridge.org/?category=Veterans+Services)
+- [Animal Services](https://krvbridge.org/resources/?category=Animal+Services)
+- [Behavioral Health](https://krvbridge.org/resources/?category=Behavioral+Health)
+- [Borel Fire](https://krvbridge.org/resources/?category=Borel+Fire)
+- [Business](https://krvbridge.org/resources/?category=Business)
+- [Child Abuse](https://krvbridge.org/resources/?category=Child+Abuse)
+- [Clothing](https://krvbridge.org/resources/?category=Clothing)
+- [Disabled Services](https://krvbridge.org/resources/?category=Disabled+Services)
+- [Disaster Relief & Recovery](https://krvbridge.org/resources/?category=Disaster+Relief+%26+Recovery)
+- [Domestic Violence](https://krvbridge.org/resources/?category=Domestic+Violence)
+- [Education](https://krvbridge.org/resources/?category=Education)
+- [Elected Officials](https://krvbridge.org/resources/?category=Elected+Officials)
+- [Emergency Services](https://krvbridge.org/resources/?category=Emergency+Services)
+- [Employment](https://krvbridge.org/resources/?category=Employment)
+- [Entrepreneurship](https://krvbridge.org/resources/?category=Entrepreneurship)
+- [Family & Pregnancy Resources](https://krvbridge.org/resources/?category=Family+%26+Pregnancy+Resources)
+- [Financial Services](https://krvbridge.org/resources/?category=Financial+Services)
+- [Food](https://krvbridge.org/resources/?category=Food)
+- [Healthcare](https://krvbridge.org/resources/?category=Healthcare)
+- [Home Improvement & Safety](https://krvbridge.org/resources/?category=Home+Improvement+%26+Safety)
+- [Homelessness](https://krvbridge.org/resources/?category=Homelessness)
+- [Housing & Rental Assistance](https://krvbridge.org/resources/?category=Housing+%26+Rental+Assistance)
+- [Human Trafficking](https://krvbridge.org/resources/?category=Human+Trafficking)
+- [Insurance](https://krvbridge.org/resources/?category=Insurance)
+- [Legal Assistance](https://krvbridge.org/resources/?category=Legal+Assistance)
+- [Mental Health](https://krvbridge.org/resources/?category=Mental+Health)
+- [Post-Incarceration Support](https://krvbridge.org/resources/?category=Post-Incarceration+Support)
+- [Public Safety](https://krvbridge.org/resources/?category=Public+Safety)
+- [Senior Services](https://krvbridge.org/resources/?category=Senior+Services)
+- [Sexual Assault](https://krvbridge.org/resources/?category=Sexual+Assault)
+- [Substance Abuse](https://krvbridge.org/resources/?category=Substance+Abuse)
+- [Suicide Prevention](https://krvbridge.org/resources/?category=Suicide+Prevention)
+- [Transportation](https://krvbridge.org/resources/?category=Transportation)
+- [Utility Assistance](https://krvbridge.org/resources/?category=Utility+Assistance)
+- [Veterans Services](https://krvbridge.org/resources/?category=Veterans+Services)
