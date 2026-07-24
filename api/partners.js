@@ -29,7 +29,7 @@ const getCookie = () => new Cookie({
 
 export default createHandler({
 	async get(req) {
-		const headers = new Headers({ 'Cache-Control': 'private, max-age=86400' });
+		const headers = new Headers({ 'Cache-Control': 'private, max-age=86400', Vary: 'Cookie' });
 		const params = new URL(req.url).searchParams;
 
 		if (params.has('id')) {
@@ -42,12 +42,23 @@ export default createHandler({
 			}
 		} else if (params.has('category')) {
 			const results = await getCollectionItemsWhere(STORE, 'keywords', 'array-contains', params.get('category').toLowerCase());
-			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200 }, { headers });
+			return Response.json(results.map(transformPartner), { status: results.length === 0 ? 404 : 200, headers });
 		} else if (req.cookies.has(COOKIE_NAME)) {
 			const lastUpdated = new Date(parseInt(req.cookies.get(COOKIE_NAME)) || 0);
-			const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
-			headers.set('Set-Cookie', getCookie());
-			return Response.json(results.map(transformPartner), { headers });
+
+			// Check if synced in last 24 hours
+			if (lastUpdated.getTime() < Date.now() - 86400000) {
+				const results = await getCollectionItemsWhere(STORE, 'lastUpdated', '>', lastUpdated);
+				headers.set('Set-Cookie', getCookie());
+				return Response.json(results.map(transformPartner), { headers });
+			} else {
+				// Retry 24 hours after last sync
+				headers.set('Retry-After', new Date(lastUpdated.getTime() + 86400000).toUTCString());
+				return Response.json([], {
+					status: 429, //Too Many Requests
+					headers,
+				});
+			}
 		} else {
 			const partners = await getCollectionItems(STORE, { limit: NaN });
 			headers.set('Set-Cookie', getCookie());
