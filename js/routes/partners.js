@@ -362,8 +362,8 @@ export const createPartner = result => {
 			${typeof result.taxID === 'string' ? `<meta itemprop="taxID" ${attr({ content: result.taxID })}>` : ''}
 			${typeof result.duns === 'string' ? `<meta itemprop="duns" ${attr({ content: result.duns })}>` : ''}
 		</h2>
-		${typeof result?.image?.src === 'string'
-		? `<img ${attr({ src: result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
+		${(typeof result.image.url === 'string' || typeof result?.image?.src === 'string')
+		? `<img ${attr({ src: result.image.url ?? result.image.src, height: result.image.height, width: result.image.width, alt: name })} class="block full-width partner-image" itemprop="image" loading="lazy" crossorigin="anonymous" referrerpolicy="no-referrer" />`
 		: createSVGFallbackLogo(result.name, { width: 640, height: 240, fontSize: 52, fontWeight: 800, fill: getSVGFill(), textColor: getSVGTextColor(), classList: ['full-width', 'resource-logo'] }).outerHTML}
 		<div class="flex row wrap no-print">${(result.keywords ?? result.categories).map(category => categoryLink(category)).join(' ')}</div>
 		<button type="button" class="btn btn-primary btn-lg no-print" command="${ROOT_COMMANDS.print}" commandfor="${document.documentElement.id}">
