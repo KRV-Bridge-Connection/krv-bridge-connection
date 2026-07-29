@@ -246,7 +246,7 @@ export default async ({ signal, stack }) => {
 				</a>
 			</div>
 		</div>`,
-		el`<img src="https://i.imgur.com/ngJxxRT.webp" width="1835" height="1024" alt="Sowing Seeds of Change" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />`
+		el`<img src="https://i.imgur.com/ngJxxRT.webp" width="1835" height="1024" alt="Sowing Seeds of Change" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />`,
 		...imgs,
 		html`${createPartners(partners.filter(result => result.partner))}`,
 	);
