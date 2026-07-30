@@ -25,4 +25,5 @@
 /account/* /dynamic.html 200
 /tv-display /dynamic.html 200
 /jwid /dynamic.html 200
+/kiosk /dynamic.html 200
 /* /404.html
