@@ -1,6 +1,6 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { onSubmit, onReset, signal as signalAttr, onClick } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onCommand, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 
@@ -19,8 +19,6 @@ const submitHandler = registerCallback('kiosk:submit', async event => {
 			method: 'POST',
 			body: data,
 		});
-
-		// const resp = Math.random() > 0.5 ? { ok: true } : { ok: false, status: 500, url: new URL('/api/kiosk', location.origin) };
 
 		if (resp.ok) {
 			const { resolve, promise } = Promise.withResolvers();
@@ -62,10 +60,18 @@ const submitHandler = registerCallback('kiosk:submit', async event => {
 	}
 });
 
+const commandHandler = registerCallback('kiosk-container:command', event => {
+	switch(event.command) {
+		case COMMANDS.requestFullscreen:
+			event.target.requestFullscreen();
+			break;
+	}
+});
+
 const resetHandler = registerCallback('kiosk:reset', () => document.getElementById('kiosk-id').value = `submit-${crypto.randomUUID()}`);
 
 export const styles = css`@layer utility {
-	#kiosk {
+	#kiosk-container {
 		& .partner-item {
 			list-style: none;
 		}
@@ -93,7 +99,7 @@ export const styles = css`@layer utility {
 	}
 }`;
 
-export default ({ signal }) => html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark">
+export default ({ signal }) => html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
 	<form id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
 		<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}"
 		<fieldset id="agencies">
@@ -162,8 +168,7 @@ export default ({ signal }) => html`<div id="kiosk-container" class="background-
 		<div id="kiosk-error-message" class="status-box error"></div>
 		<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-error">Dismiss</button>
 	</div>
-	<!--<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">Fullscreen</button>-->
-	<button type="button" class="btn btn-secondary" ${onClick}="${() => document.getElementById('kiosk-container').requestFullscreen()}">Fullscreen</button>
+	<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">Fullscreen</button>
 </div>`;
 
 export const title = 'KRV Bridge Connection kiosk';
