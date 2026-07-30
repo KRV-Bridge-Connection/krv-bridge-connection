@@ -9,7 +9,7 @@ export default createHandler({
 		await putCollectionItem('kiosk', data.get('uuid'), {
 			partners: data.getAll('partner'),
 			uuid: data.get('uuid'),
-			name: data.get('content[name]'),
+			name: data.get('contact[name]'),
 			phone: data.get('contact[phone]'),
 			email: data.get('contact[email]'),
 			timestamp: new Date(),
