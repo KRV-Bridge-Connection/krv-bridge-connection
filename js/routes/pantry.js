@@ -15,7 +15,12 @@ export const styles = css`#pantry-message {
 }`;
 
 export default async () => {
-	return html`<section aria-labelledby="pantry-header">
+	const id = 'pantry-hours';
+	const GCalEvents = await customElements.whenDefined('g-cal-events');
+	/**
+	 * @type {DocumentFragment}
+	 */
+	const frag = html`<section id="${id}" aria-labelledby="pantry-header">
 		<h3>Emergency Choice Pantry</h3>
 		${typeof MESSAGE === 'string' ? `<div class="status-box info"><p>${MESSAGE}</p></div><br />` : '' }
 		<img srcset="https://i.imgur.com/h68vmgFt.jpeg 90w,
@@ -83,6 +88,9 @@ export default async () => {
 			<meta itemprop="addressCountry" content="US" />
 		</div>
 	</section>`;
+
+	frag.getElementById(id).append(GCalEvents.create('pantry', { loading: 'lazy' }));
+	return frag;
 };
 
 export const title = `Emergency Choice Food Pantry - ${site.title}`;
