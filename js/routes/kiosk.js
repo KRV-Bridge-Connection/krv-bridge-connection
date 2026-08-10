@@ -1,6 +1,6 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { onSubmit, onReset, onCommand, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { getAllItems, openDB } from '@aegisjsproject/idb';
@@ -8,7 +8,6 @@ import { syncPartners } from './partners.js';
 import { SCHEMA } from '../consts.js';
 
 export const STORE_NAME = 'partners';
-
 
 const submitHandler = registerCallback('kiosk:submit', async event => {
 	event.preventDefault();
@@ -74,10 +73,28 @@ const commandHandler = registerCallback('kiosk-container:command', event => {
 	}
 });
 
-const resetHandler = registerCallback('kiosk:reset', () => document.getElementById('kiosk-id').value = `submit-${crypto.randomUUID()}`);
+const resetHandler = registerCallback('kiosk:reset', () => {
+	document.getElementById('kiosk-id').value = `submit-${crypto.randomUUID()}`;
+	document.querySelectorAll(':popover-open').forEach(popover => popover.hidePopover());
+});
+
+const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newState }) => {
+	if (newState === 'open') {
+		document.querySelectorAll(':popover-open').forEach(popover => {
+			if (! popover.isSameNode(target)) {
+				popover.hidePopover();
+			}
+		});
+	}
+});
 
 export const styles = css`@layer utility {
 	#kiosk-container {
+		& :popover-open {
+			max-height: 95vh;
+			overflow: auto;
+		}
+
 		& .partner-item {
 			list-style: none;
 		}
@@ -112,41 +129,47 @@ export default async ({ signal }) => {
 	const results = await getAllItems(db, STORE_NAME, null, { signal });
 
 	return html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
-		<form id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
-			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}"
-			<fieldset id="agencies">
-				<legend>Partners</legend>
-				<p>What partners may we help connect you with?</p>
-				<ul class="partners-select flex row wrap" data-gap="0.8">
-					${results.filter(({ partner }) => partner === true).map(result => `<li class="partner-item">
-						<label class="partner-entry btn btn-secondary">
-						<input type="checkbox" name="partner" value="${result.id}" class="partner-check visually-hidden" />
-						<span class="partner-label">${result.name}</span>
-						<br />
-						<img src="${result.image.url ?? result.image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${result.name}" class="partner-logo" />
-						</label>
-					</li>`).join('\n')}
-				</ul>
-			</fieldset>
-			<fieldset id="contact">
+		<div class="center">
+			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">Get Started</button>
+		</div>
+		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
+			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
+			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+				<div class="flex row wrap">
+					${results.filter(({ partner }) => partner === true).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card">
+						<legend class="partner-heading">${name}</legend>
+						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
+						<h4>Services</h4>
+						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+					</fieldset>`).join('\n')}
+				</div>
+				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">Next</button>
+				<button type="reset" class="btn btn-danger">Cancel</button>
+			</section>
+			<fieldset id="kiosk-contact" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<legend>Contact Info</legend>
 				<div class="form-group">
-				<label for="contact-name" class="input-label required">Name</label>
-				<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
+					<label for="contact-name" class="input-label required">Name</label>
+					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
 				</div>
 				<div class="form-group">
-				<label for="contact-phone" class="input-label required">Phone</label>
-				<input type="tel" name="contact[phone]" id="contact-phone" class="input" placeholder="+1-555-555-5555" autocomplete="off" required="" />
+					<label for="contact-phone" class="input-label">Phone</label>
+					<input type="tel" name="contact[phone]" id="contact-phone" class="input" placeholder="+1-555-555-5555" autocomplete="off" />
 				</div>
 				<div class="form-group">
-				<label for="contact-email" class="input-label">Email</label>
-				<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
+					<label for="contact-age" class="input-label required">Age</label>
+					<input type="number" id="contact-age" class="input" name="contact[age]" placeholder="##" autocomplete="off" requried="" />
+				</div>
+				<div class="form-group">
+					<label for="contact-email" class="input-label">Email</label>
+					<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
+				</div>
+				<div class="flex row" data-gap="0.8">
+					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">Back</button>
+					<button type="submit" class="btn btn-success">Submit</button>
+					<button type="reset" class="btn btn-danger">Cancel</button>
 				</div>
 			</fieldset>
-			<div class="flex row" data-gap="0.8">
-				<button type="submit" class="btn btn-success">Submit</button>
-				<button type="reset" class="btn btn-danger">Cancel</button>
-			</div>
 		</form>
 		<div id="kiosk-success" popover="auto">
 			<p>Your information will be shared with the selected partners.</p>
