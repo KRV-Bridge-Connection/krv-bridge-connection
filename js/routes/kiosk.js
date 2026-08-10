@@ -160,6 +160,77 @@ export const styles = css`@layer utility {
 			overflow: auto;
 		}
 
+		#kiosk-services {
+			padding: 2rem;
+			max-width: 1200px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		#kiosk-services .flex.row.wrap {
+			gap: 2rem;
+			justify-content: center;
+			margin-bottom: 2.5rem;
+		}
+
+		.card {
+			border-radius: 16px;
+			padding: 1.5rem 1.5rem 2rem;
+			border: 2px solid;
+			flex: 1 1 320px;
+			max-width: 450px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+		}
+
+		.partner-heading {
+			font-size: 1.5rem;
+			font-weight: 700;
+			padding: 0 0.75rem;
+		}
+
+		.partner-logo {
+			border-radius: 4px;
+			margin-bottom: 1rem;
+			object-fit: contain;
+			width: 300px;
+			height: auto;
+		}
+
+		.card h4 {
+			margin: 1rem 0;
+			font-size: 1.25rem;
+			width: 100%;
+			text-align: left;
+		}
+
+		.card label {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+			padding: 1.25rem;
+			margin-bottom: 0.75rem;
+			border: 1px solid;
+			border-radius: 8px;
+			font-size: 1.2rem;
+			cursor: pointer;
+			box-sizing: border-box;
+		}
+
+		.card label:active {
+			transform: scale(0.98);
+		}
+
+		.card input[type="checkbox"] {
+			width: 1.75rem;
+			height: 1.75rem;
+			margin-left: 1rem;
+			cursor: pointer;
+		}
+
 		& .partner-item {
 			list-style: none;
 		}
