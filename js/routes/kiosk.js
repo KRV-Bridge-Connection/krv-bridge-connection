@@ -88,6 +88,71 @@ const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newSta
 	}
 });
 
+export default async ({ signal }) => {
+	await syncPartners({ signal });
+	using stack = new DisposableStack();
+	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
+	const results = await getAllItems(db, STORE_NAME, null, { signal });
+
+	return html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
+		<div class="center">
+			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">Get Started</button>
+		</div>
+		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
+			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
+			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+				<div class="flex row wrap">
+					${results.filter(({ partner, keywords }) => partner === true && Array.isArray(keywords)).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card">
+						<legend class="partner-heading">${name}</legend>
+						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
+						<h4>Services</h4>
+						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+					</fieldset>`).join('\n')}
+				</div>
+				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">Next</button>
+				<button type="reset" class="btn btn-danger">Cancel</button>
+			</section>
+			<fieldset id="kiosk-contact" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+				<legend>Contact Info</legend>
+				<div class="form-group">
+					<label for="contact-name" class="input-label required">Name</label>
+					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
+				</div>
+				<div class="form-group">
+					<label for="contact-phone" class="input-label">Phone</label>
+					<input type="tel" name="contact[phone]" id="contact-phone" class="input" placeholder="+1-555-555-5555" autocomplete="off" />
+				</div>
+				<div class="form-group">
+					<label for="contact-age" class="input-label required">Age</label>
+					<input type="number" id="contact-age" class="input" name="contact[age]" placeholder="##" autocomplete="off" required="" />
+				</div>
+				<div class="form-group">
+					<label for="contact-email" class="input-label">Email</label>
+					<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
+				</div>
+				<div class="flex row" data-gap="0.8">
+					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">Back</button>
+					<button type="submit" class="btn btn-success">Submit</button>
+					<button type="reset" class="btn btn-danger">Cancel</button>
+				</div>
+			</fieldset>
+		</form>
+		<div id="kiosk-success" popover="auto">
+			<p>Your information will be shared with the selected partners.</p>
+			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-success">Dismiss</button>
+		</div>
+		<div id="kiosk-error" popover="auto">
+			<div id="kiosk-error-message" class="status-box error"></div>
+			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-error">Dismiss</button>
+		</div>
+		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">Fullscreen</button>
+	</div>`;
+};
+
+export const title = 'KRV Bridge Connection kiosk';
+
+export const description = 'A self-help kiosk for the KRV Bridge Connection';
+
 export const styles = css`@layer utility {
 	#kiosk-container {
 		& :popover-open {
@@ -121,68 +186,3 @@ export const styles = css`@layer utility {
 		}
 	}
 }`;
-
-export default async ({ signal }) => {
-	await syncPartners({ signal });
-	using stack = new DisposableStack();
-	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
-	const results = await getAllItems(db, STORE_NAME, null, { signal });
-
-	return html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
-		<div class="center">
-			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">Get Started</button>
-		</div>
-		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
-			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
-			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
-				<div class="flex row wrap">
-					${results.filter(({ partner }) => partner === true).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card">
-						<legend class="partner-heading">${name}</legend>
-						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
-						<h4>Services</h4>
-						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
-					</fieldset>`).join('\n')}
-				</div>
-				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">Next</button>
-				<button type="reset" class="btn btn-danger">Cancel</button>
-			</section>
-			<fieldset id="kiosk-contact" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
-				<legend>Contact Info</legend>
-				<div class="form-group">
-					<label for="contact-name" class="input-label required">Name</label>
-					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
-				</div>
-				<div class="form-group">
-					<label for="contact-phone" class="input-label">Phone</label>
-					<input type="tel" name="contact[phone]" id="contact-phone" class="input" placeholder="+1-555-555-5555" autocomplete="off" />
-				</div>
-				<div class="form-group">
-					<label for="contact-age" class="input-label required">Age</label>
-					<input type="number" id="contact-age" class="input" name="contact[age]" placeholder="##" autocomplete="off" requried="" />
-				</div>
-				<div class="form-group">
-					<label for="contact-email" class="input-label">Email</label>
-					<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
-				</div>
-				<div class="flex row" data-gap="0.8">
-					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">Back</button>
-					<button type="submit" class="btn btn-success">Submit</button>
-					<button type="reset" class="btn btn-danger">Cancel</button>
-				</div>
-			</fieldset>
-		</form>
-		<div id="kiosk-success" popover="auto">
-			<p>Your information will be shared with the selected partners.</p>
-			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-success">Dismiss</button>
-		</div>
-		<div id="kiosk-error" popover="auto">
-			<div id="kiosk-error-message" class="status-box error"></div>
-			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-error">Dismiss</button>
-		</div>
-		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">Fullscreen</button>
-	</div>`;
-};
-
-export const title = 'KRV Bridge Connection kiosk';
-
-export const description = 'A self-help kiosk for the KRV Bridge Connection';
