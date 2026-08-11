@@ -34,8 +34,19 @@ export class GCalEvents extends IotaElement {
 	}
 
 	get styles() {
-		return css`:host {
+		return css`:host(:not([popover])) {
 			display: block;
+		}
+
+		:host(:popover-open) {
+			border-style: none;
+			border-radius: 6px;
+			max-width: 90vw;
+			max-height: 90vh;
+			padding: 0.8em;
+		}
+
+		:host {
 			contain: strict;
 			width: auto;
 			aspect-ratio: 16 / 9;
