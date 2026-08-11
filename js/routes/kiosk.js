@@ -137,9 +137,8 @@ const toggleWakeLock = registerCallback('kiosk:toggle-wakelock', async ({ curren
 	}
 });
 
-export default async ({ signal }) => {
+export default async ({ signal, stack }) => {
 	await syncPartners({ signal });
-	using stack = new DisposableStack();
 	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
 	const results = await getAllItems(db, STORE_NAME, null, { signal });
 	const $label = $text(() => $wakelock.get() instanceof WakeLockSentinel ? 'Revoke Lock' : 'Start Wakelock');
