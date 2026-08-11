@@ -1,13 +1,15 @@
-import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { onSubmit, onChange, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onChange, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { getAllItems, openDB } from '@aegisjsproject/idb';
+import { $state, $html, $text } from '@aegisjsproject/iota';
 import { syncPartners } from './partners.js';
 import { SCHEMA } from '../consts.js';
 
 export const STORE_NAME = 'partners';
+
+const $wakelock = $state(null);
 
 const NEXT = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
     <path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
@@ -113,13 +115,36 @@ const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newSta
 	}
 });
 
+const toggleWakeLock = registerCallback('kiosk:toggle-wakelock', async ({ currentTarget }) => {
+	if ('wakeLock' in navigator) {
+		const current = $wakelock.get();
+
+		if (current instanceof WakeLockSentinel) {
+			current.release();
+			$wakelock.set(null);
+		} else {
+			try {
+				const lock = await navigator.wakeLock.request('screen');
+				lock.addEventListener('release', () => $wakelock.set(null), { once: true });
+				$wakelock.set(lock);
+			} catch(err) {
+				reportError(err);
+				$wakelock.set(null);
+			}
+		}
+	} else {
+		currentTarget.disabled = true;
+	}
+});
+
 export default async ({ signal }) => {
 	await syncPartners({ signal });
 	using stack = new DisposableStack();
 	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
 	const results = await getAllItems(db, STORE_NAME, null, { signal });
+	const $label = $text(() => $wakelock.get() instanceof WakeLockSentinel ? 'Revoke Lock' : 'Start Wakelock');
 
-	return html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
+	return $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
 		<div class="center">
 			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">Get Started</button>
 		</div>
@@ -214,11 +239,15 @@ export default async ({ signal }) => {
 				${X}
 			</button>
 		</div>
+	</div>
+	<details>
+		<summary>Kiosk Controls</summary>
 		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">
 			<span>Fullscreen</span>
 			${FULLSCREEN}
 		</button>
-	</div>`;
+		<button type="button" ${onClick}="${toggleWakeLock}" class="btn btn-secondary" ${signalAttr}="${signal}">${$label}</button>
+	</details>`;
 };
 
 export const title = 'KRV Bridge Connection kiosk';
