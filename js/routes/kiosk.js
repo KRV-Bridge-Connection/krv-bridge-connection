@@ -8,6 +8,7 @@ import { syncPartners } from './partners.js';
 import { SCHEMA } from '../consts.js';
 
 export const STORE_NAME = 'partners';
+const GCalElement = customElements.get('g-cal-events');
 
 const $wakelock = $state(null);
 
@@ -37,6 +38,35 @@ const START = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="curren
 
 const HELP = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
 	<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.617.592-2.776 2.222a.25.25 0 0 0 .256.261zm1.385 4.908a.903.903 0 1 0 0-1.806.903.903 0 0 0 0 1.806z"/>
+</svg>`;
+
+const FOOD = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 483.297 483.298" role="presentation" aria-hidden="true">
+	<g>
+		<g>
+			<path d="M77.273,150.705c-21.494,20.822-33.567,46.752-38.825,75.96c-1.313,7.296-1.778,14.745-2.646,22.124
+				c-0.094,0.803-0.268,1.597-0.407,2.395c0,7.197,0,14.393,0,21.588c0.46,4.944,0.891,9.89,1.385,14.83
+				c2.331,23.281,8.067,45.762,15.78,67.807c10.486,29.969,25.457,57.268,44.502,82.08c0.591,0.789,1.186,1.578,1.782,2.363
+				c8.184,10.756,16.684,21.211,27.421,29.582c2.444,1.906,4.938,3.619,7.483,5.139c13.797,9.543,29.115,10.855,45.055,5.893
+				c0.436-0.137,0.87-0.281,1.306-0.422c7.148-1.852,14.081-4.385,20.932-7.209c4.79-1.973,9.635-3.719,14.548-5.143
+				c8.058-2.256,25.646-3.881,26.059-3.883c0.413,0,0.825-0.006,1.239,0.002c8.525,0.164,16.762,1.625,24.818,3.881
+				c4.914,1.424,9.758,3.17,14.549,5.143c6.852,2.824,13.783,5.357,20.932,7.211c0.437,0.135,0.87,0.283,1.307,0.42
+				c15.939,4.963,31.258,3.65,45.056-5.893c2.545-1.518,5.041-3.232,7.483-5.139c10.739-8.371,19.238-18.826,27.423-29.582
+				c0.6-0.785,1.192-1.574,1.78-2.363c19.049-24.812,34.019-52.111,44.504-82.08c7.714-22.045,13.449-44.521,15.779-67.807
+				c0.494-4.938,0.925-9.886,1.385-14.83c0-7.195,0-14.391,0-21.588c-0.137-0.797-0.312-1.592-0.407-2.395
+				c-0.865-7.379-1.331-14.828-2.646-22.124c-5.258-29.208-17.33-55.139-38.825-75.96c-2.897-2.806-5.875-5.436-8.931-7.897
+				c-16.712-14.104-36.623-21.511-58.44-25.131c-22.176-3.681-42.987,1.164-63.571,8.573c-10.595,3.813-32.914,11.537-33.435,11.687
+				c-0.521-0.149-22.84-7.874-33.434-11.687c-20.586-7.409-41.395-12.254-63.572-8.573c-21.821,3.624-41.73,11.03-58.441,25.131
+				C83.148,145.269,80.169,147.899,77.273,150.705z"/>
+			<path d="M174.413,83.121c11.172,12.094,24.207,21.392,40.299,25.866c7.938,2.208,16.017,3.021,24.248,2.585
+				c1.957-0.102,2.346-0.883,2.467-2.659c1.674-24.658-6.109-46.287-20.802-65.766c-17.44-23.129-40.703-36.752-68.887-42.401
+				c-1.349-0.271-2.704-0.497-4.057-0.746c-1.146,0-2.289,0-3.434,0c-0.672,9.246-0.437,18.452,1.276,27.585
+				C149.545,49.012,159.754,67.252,174.413,83.121z"/>
+		</g>
+	</g>
+</svg>`;
+
+const CAL = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="14" height="16" viewBox="0 0 14 16" role="presentation" aria-hidden="true">
+	<path fill-rule="evenodd" d="M13 2h-1v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H6v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H2c-.55 0-1 .45-1 1v11c0 .55.45 1 1 1h11c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm0 12H2V5h11v9zM5 3H4V1h1v2zm6 0h-1V1h1v2zM6 7H5V6h1v1zm2 0H7V6h1v1zm2 0H9V6h1v1zm2 0h-1V6h1v1zM4 9H3V8h1v1zm2 0H5V8h1v1zm2 0H7V8h1v1zm2 0H9V8h1v1zm2 0h-1V8h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1zm2 0h-1v-1h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1z"/>
 </svg>`;
 
 const submitHandler = registerCallback('kiosk:submit', async event => {
@@ -119,9 +149,9 @@ const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newSta
 			if (! popover.isSameNode(target)) {
 				popover.hidePopover();
 			}
-
-			target.firstElementChild.scrollIntoView({ behavior: 'instant', block: 'start' });
 		});
+
+		target.firstElementChild.scrollIntoView({ behavior: 'instant', block: 'start' });
 	}
 });
 
@@ -148,12 +178,12 @@ const toggleWakeLock = registerCallback('kiosk:toggle-wakelock', async ({ curren
 });
 
 export default async ({ signal, stack }) => {
-	await syncPartners({ signal });
+	await syncPartners({ signal }).catch(console.error);
 	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
 	const results = await getAllItems(db, STORE_NAME, null, { signal });
 	const $label = $text(() => $wakelock.get() instanceof WakeLockSentinel ? 'Revoke Lock' : 'Start Wakelock');
 
-	return $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
+	const frag = $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
 		<header class="kiosk-welcome-instructions">
 			<h1 class="center">
 				<div class="center">Welcome to the KRV Bridge Connection</div>
@@ -182,6 +212,14 @@ export default async ({ signal, stack }) => {
 			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-help">
 				<span>Need Help?</span>
 				${HELP}
+			</button>
+			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-pantry-cal">
+				<span>Pantry Schedule</span>
+				${FOOD}
+			</button>
+			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-events-cal">
+				<span>View Events</span>
+				${CAL}
 			</button>
 		</div>
 		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
@@ -288,6 +326,16 @@ export default async ({ signal, stack }) => {
 		</button>
 		<button type="button" ${onClick}="${toggleWakeLock}" class="btn btn-secondary" ${signalAttr}="${signal}">${$label}</button>
 	</details>`;
+
+	const pantry = GCalElement.create('pantry', { loading: 'lazy', theme: 'dark' });
+	const events = GCalElement.create('events', { loading: 'lazy', theme: 'dark' });
+	pantry.id = 'kiosk-pantry-cal';
+	pantry.popover = 'auto';
+	events.id = 'kiosk-events-cal';
+	events.popover = 'auto';
+	frag.append(pantry, events);
+
+	return frag;
 };
 
 export const title = 'KRV Bridge Connection kiosk';
