@@ -226,12 +226,13 @@ export default async ({ signal, stack }) => {
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
 			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<div class="flex row wrap">
-					${results.filter(({ partner, programs }) => partner === true && Array.isArray(programs) && programs.length !== 0).map(({ id, name, programs = [], image = {}}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
+					${results.filter(({ partner, programs }) => partner === true && Array.isArray(programs) && programs.length !== 0).map(({ id, name, programs = [], image = {}, description}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
 						<legend class="partner-heading">${name}</legend>
 						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
+						<p>${description}</p>
 						<h4>Services &amp; Programs</h4>
 						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
-						${programs.map(keyword => `<label><span>${keyword}</span><input type="checkbox" class="partner-service" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+						${programs.map(program => `<label><span>${program}</span><input type="checkbox" class="partner-service" name="services[]" value="${program}" /></label>`).join('')}
 					</fieldset>`).join('\n')}
 				</div>
 				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
