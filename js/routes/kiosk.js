@@ -119,6 +119,8 @@ const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newSta
 			if (! popover.isSameNode(target)) {
 				popover.hidePopover();
 			}
+
+			target.firstElementChild.scrollIntoView({ behavior: 'instant', block: 'start' });
 		});
 	}
 });
@@ -186,12 +188,12 @@ export default async ({ signal, stack }) => {
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
 			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<div class="flex row wrap">
-					${results.filter(({ partner, keywords }) => partner === true && Array.isArray(keywords) && keywords.length !== 0).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
+					${results.filter(({ partner, programs }) => partner === true && Array.isArray(programs) && programs.length !== 0).map(({ id, name, programs = [], image = {}}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
 						<legend class="partner-heading">${name}</legend>
 						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
 						<h4>Services &amp; Programs</h4>
 						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
-						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" class="partner-service" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+						${programs.map(keyword => `<label><span>${keyword}</span><input type="checkbox" class="partner-service" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
 					</fieldset>`).join('\n')}
 				</div>
 				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
@@ -291,6 +293,8 @@ export const description = 'A self-help kiosk for the KRV Bridge Connection';
 export const styles = css`@layer utility {
 	#kiosk-container {
 		& :popover-open {
+			margin-block-start: 2.5vh;
+			width: min(95vw, 1200px);
 			border-radius: 6px;
 			padding: 2em;
 			border-style: none;
@@ -300,8 +304,6 @@ export const styles = css`@layer utility {
 
 		#kiosk-services {
 			padding: 2rem;
-			max-width: 1200px;
-			margin: 0 auto;
 			text-align: center;
 		}
 
