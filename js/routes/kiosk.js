@@ -31,6 +31,14 @@ const FULLSCREEN = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="c
 	<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
 </svg>`;
 
+const START = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
+	<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
+</svg>`;
+
+const HELP = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
+	<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.617.592-2.776 2.222a.25.25 0 0 0 .256.261zm1.385 4.908a.903.903 0 1 0 0-1.806.903.903 0 0 0 0 1.806z"/>
+</svg>`;
+
 const submitHandler = registerCallback('kiosk:submit', async event => {
 	event.preventDefault();
 	const { target, submitter } = event;
@@ -144,8 +152,35 @@ export default async ({ signal, stack }) => {
 	const $label = $text(() => $wakelock.get() instanceof WakeLockSentinel ? 'Revoke Lock' : 'Start Wakelock');
 
 	return $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
-		<div class="center">
-			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">Get Started</button>
+		<header class="kiosk-welcome-instructions">
+			<h1 class="center">
+				<div class="center">Welcome to the KRV Bridge Connection</div>
+				<img src="/img/branding/krv-bridge-logo-wide.svg" class="block" referrerpolicy="no-referrer" decoding="async" />
+			</h1>
+			<p>Use this self-service kiosk to connect with local community resources and partners.</p>
+		</header>
+		<section id="kiosk-help" class="instruction-steps" popover="auto">
+			<h2>How it works:</h2>
+			<ol>
+				<li><strong>Select Services:</strong> Choose the specific programs or partners you need assistance from.</li>
+				<li><strong>Provide Contact Info:</strong> Enter your basic details so the partners can reach you.</li>
+				<li><strong>Submit:</strong> Securely send your information to your chosen providers.</li>
+			</ol>
+			<p class="call-to-action"><strong>Tap <q>Get Started</q> below to begin.</strong></p>
+			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-help">
+				<span>Dismiss</span>
+				${X}
+			</button>
+		</section>
+		<div class="flex row space-around">
+			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">
+				<span>Get Started</span>
+				${START}
+			</button>
+			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-help">
+				<span>Need Help?</span>
+				${HELP}
+			</button>
 		</div>
 		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
@@ -256,6 +291,9 @@ export const description = 'A self-help kiosk for the KRV Bridge Connection';
 export const styles = css`@layer utility {
 	#kiosk-container {
 		& :popover-open {
+			border-radius: 6px;
+			padding: 2em;
+			border-style: none;
 			max-height: 95vh;
 			overflow: auto;
 		}
@@ -354,6 +392,32 @@ export const styles = css`@layer utility {
 			&:has(input:focus-visible) {
 				outline: 2px solid currentColor;
 			}
+		}
+
+		.kiosk-welcome-instructions {
+			padding: 1rem;
+		}
+
+		.kiosk-welcome-instructions h1 {
+			font-size: 2rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.instruction-steps {
+			text-align: left;
+			padding: 1.5rem 2rem;
+			border-radius: 12px;
+		}
+
+		.instruction-steps ol {
+			line-height: 1.8;
+			font-size: 1.2rem;
+			margin: 0;
+		}
+
+		.call-to-action {
+			font-size: 1.25rem;
+			margin-bottom: 1.5rem;
 		}
 	}
 }`;
