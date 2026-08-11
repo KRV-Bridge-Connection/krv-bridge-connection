@@ -212,16 +212,20 @@ export default async ({ signal, stack }) => {
 					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
 				</div>
 				<div class="form-group">
+					<label for="contact-size" class="input-label required">How Many Individuals will be Receiving Services?</label>
+					<input type="number" name="size" id="contact-size" class="input" value="1" min="1" max="14" placeholder="##" autocomplete="off" required="" />
+				</div>
+				<div class="form-group">
 					<label for="contact-phone" class="input-label">Phone</label>
 					<input type="tel" name="contact[phone]" id="contact-phone" class="input" placeholder="+1-555-555-5555" autocomplete="off" />
 				</div>
 				<div class="form-group">
-					<label for="contact-age" class="input-label required">Age</label>
-					<input type="number" id="contact-age" class="input" name="contact[age]" placeholder="##" autocomplete="off" required="" />
-				</div>
-				<div class="form-group">
 					<label for="contact-email" class="input-label">Email</label>
 					<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
+				</div>
+				<div class="form-group">
+					<label for="contact-age" class="input-label">Age</label>
+					<input type="number" id="contact-age" class="input" name="contact[age]" placeholder="##" autocomplete="off" />
 				</div>
 				<div class="flex row" data-gap="0.8">
 					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">

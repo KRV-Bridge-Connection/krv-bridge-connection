@@ -8,6 +8,7 @@ export default createHandler({
 		await putCollectionItem('kiosk', data.get('uuid'), {
 			uuid: data.get('uuid'),
 			name: data.get('contact[name]'),
+			size: parseInt(data.get('size'), 10),
 			phone: data.get('contact[phone]'),
 			email: data.get('contact[email]'),
 			message: data.get('message'),
