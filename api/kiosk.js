@@ -12,7 +12,7 @@ export default createHandler({
 		});
 
 		return Response.json(items.map(item => ({
-			name: item.name,
+			// name: item.name,
 			timestamp: new Date(item.timestamp._seconds * 1000).toLocaleString(),
 			size: item.size,
 			partners: item.partners,
