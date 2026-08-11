@@ -9,8 +9,10 @@ export default createHandler({
 			uuid: data.get('uuid'),
 			name: data.get('contact[name]'),
 			phone: data.get('contact[phone]'),
-			services: data.getAll('services[]'),
 			email: data.get('contact[email]'),
+			message: data.get('message'),
+			partners: data.getAll('partners[]'),
+			services: data.getAll('services[]'),
 			age: parseInt(data.get('contact[age]'), 10),
 			timestamp: new Date(),
 		});

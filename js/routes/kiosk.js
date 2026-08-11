@@ -1,6 +1,6 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { onSubmit, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onChange, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { getAllItems, openDB } from '@aegisjsproject/idb';
@@ -8,6 +8,26 @@ import { syncPartners } from './partners.js';
 import { SCHEMA } from '../consts.js';
 
 export const STORE_NAME = 'partners';
+
+const NEXT = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
+    <path d="M11.44 8l-5.719 5.719a1.01 1.01 0 0 1-.719.281h-1v-1c0-.256.086-.523.282-.719l4.28-4.28-4.28-4.282A1.01 1.01 0 0 1 4.002 3V2h1c.256 0 .523.086.72.281z"/>
+</svg>`;
+
+const PREV = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
+    <path d="M4.56 8l5.719 5.719c.196.196.463.281.719.281h1v-1a1.01 1.01 0 0 0-.282-.719l-4.28-4.28 4.28-4.282A1.01 1.01 0 0 0 11.998 3V2h-1a1.01 1.01 0 0 0-.72.281z"/>
+</svg>`;
+
+const CHECK = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" role="presentation" aria-hidden="true">
+	<path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/>
+</svg>`;
+
+const X = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" role="presentation" aria-hidden="true">
+	<path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/>
+</svg>`;
+
+const FULLSCREEN = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="14" height="16" viewBox="0 0 14 16" role="presentation" aria-hidden="true">
+	<path fill-rule="evenodd" d="M13 10h1v3c0 .547-.453 1-1 1h-3v-1h3v-3zM1 10H0v3c0 .547.453 1 1 1h3v-1H1v-3zm0-7h3V2H1c-.547 0-1 .453-1 1v3h1V3zm1 1h10v8H2V4zm2 6h6V6H4v4zm6-8v1h3v3h1V3c0-.547-.453-1-1-1h-3z"/>
+</svg>`;
 
 const submitHandler = registerCallback('kiosk:submit', async event => {
 	event.preventDefault();
@@ -78,6 +98,11 @@ const resetHandler = registerCallback('kiosk:reset', () => {
 	document.querySelectorAll(':popover-open').forEach(popover => popover.hidePopover());
 });
 
+const changeHandler = registerCallback('kiosk:change', ({ currentTarget }) => {
+	const selected = currentTarget.querySelector('[name="services[]"]:checked') instanceof HTMLElement;
+	currentTarget.elements.namedItem('partners[]').checked = selected;
+});
+
 const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newState }) => {
 	if (newState === 'open') {
 		document.querySelectorAll(':popover-open').forEach(popover => {
@@ -102,15 +127,22 @@ export default async ({ signal }) => {
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
 			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<div class="flex row wrap">
-					${results.filter(({ partner, keywords }) => partner === true && Array.isArray(keywords)).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card">
+					${results.filter(({ partner, keywords }) => partner === true && Array.isArray(keywords) && keywords.length !== 0).map(({ id, name, keywords = [], image = {}}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
 						<legend class="partner-heading">${name}</legend>
 						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
-						<h4>Services</h4>
-						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+						<h4>Services &amp; Programs</h4>
+						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
+						${keywords.map(keyword => `<label><span>${keyword}</span><input type="checkbox" class="partner-service" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
 					</fieldset>`).join('\n')}
 				</div>
-				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">Next</button>
-				<button type="reset" class="btn btn-danger">Cancel</button>
+				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
+					<span>Next</span>
+					${NEXT}
+				</button>
+				<button type="reset" class="btn btn-danger">
+					<span>Cancel</span>
+					${X}
+				</button>
 			</section>
 			<fieldset id="kiosk-contact" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<legend>Contact Info</legend>
@@ -131,21 +163,61 @@ export default async ({ signal }) => {
 					<input type="email" name="contact[email]" id="contact-email" class="input" placeholder="user@example.com" autocomplete="off" />
 				</div>
 				<div class="flex row" data-gap="0.8">
-					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">Back</button>
-					<button type="submit" class="btn btn-success">Submit</button>
-					<button type="reset" class="btn btn-danger">Cancel</button>
+					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-services">
+						<span>Back</span>
+						${PREV}
+					</button>
+					<button type="button" class="btn btn-secondary"command="show-popover" commandfor="kiosk-message">
+						<span>Next</span>
+						${NEXT}
+					</button>
+					<button type="reset" class="btn btn-danger">
+						<span>Cancel</span>
+						${X}
+					</button>
+				</div>
+			</fieldset>
+			<fieldset id="kiosk-message" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+				<legend>Additional Comments?</legend>
+				<p>Please do not share any sensitive information.</p>
+				<div class="form-group">
+					<label for="kiosk-message-text" class="input-label">Message/Comment</label>
+					<textarea name="message" id="kiosk-message-text" class="input" placeholder="Add an additional comment or message"></textarea>
+				</div>
+				<div class="flex row" data-gap="0.8">
+					<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
+						<span>Back</span>
+						${PREV}
+					</button>
+					<button type="submit" class="btn btn-success">
+						<span>Submit</span>
+						${CHECK}
+					</button>
+					<button type="reset" class="btn btn-danger">
+						<span>Cancel</span>
+						${X}
+					</button>
 				</div>
 			</fieldset>
 		</form>
 		<div id="kiosk-success" popover="auto">
 			<p>Your information will be shared with the selected partners.</p>
-			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-success">Dismiss</button>
+			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-success">
+				<span>Dismiss</span>
+				${X}
+			</button>
 		</div>
 		<div id="kiosk-error" popover="auto">
 			<div id="kiosk-error-message" class="status-box error"></div>
-			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-error">Dismiss</button>
+			<button type="button" class="btn btn-danger" command="hide-popover" commandfor="kiosk-error">
+				<span>Dismiss</span>
+				${X}
+			</button>
 		</div>
-		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">Fullscreen</button>
+		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">
+			<span>Fullscreen</span>
+			${FULLSCREEN}
+		</button>
 	</div>`;
 };
 
