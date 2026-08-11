@@ -231,7 +231,7 @@ export default async ({ signal, stack }) => {
 						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
 						<h4>Services &amp; Programs</h4>
 						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
-						${programs.map(keyword => `<label><span>${keyword}</span><input type="checkbox" class="partner-service" name="services[]" value="${id}[${keyword}]" /></label>`).join('')}
+						${programs.map(program => `<label><span>${program}</span><input type="checkbox" class="partner-service" name="services[]" value="${program}" /></label>`).join('')}
 					</fieldset>`).join('\n')}
 				</div>
 				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
