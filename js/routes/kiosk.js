@@ -308,7 +308,7 @@ export default async ({ signal, stack }) => {
 				<legend>Contact Info</legend>
 				<div class="form-group">
 					<label for="contact-name" class="input-label required">Name</label>
-					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
+					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocapitalize="words" autocomplete="off" autofocus="" required="" />
 				</div>
 				<div class="form-group">
 					<label for="contact-size" class="input-label required">How Many Individuals will be Receiving Services?</label>
