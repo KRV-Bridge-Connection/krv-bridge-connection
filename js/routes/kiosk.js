@@ -1,5 +1,5 @@
 import { css } from '@aegisjsproject/core/parsers/css.js';
-import { onClick, onSubmit, onChange, onReset, onCommand, onToggle, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
+import { onClick, onSubmit, onChange, onReset, onCommand, onToggle, onInvalid, signal as signalAttr } from '@aegisjsproject/callback-registry/events.js';
 import { COMMANDS } from '@aegisjsproject/commands/consts.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
 import { getAllItems, openDB } from '@aegisjsproject/idb';
@@ -93,6 +93,14 @@ const submitHandler = registerCallback('kiosk:submit', async event => {
 	try {
 		const data = new FormData(target);
 
+		if (! data.has('services[]')) {
+			const fieldset = document.getElementById('kiosk-services');
+			fieldset.showPopover();
+			alert('Please select one or more services.');
+			fieldset.firstElementChild.scrollIntoView({ behavior: 'instant', block: 'start' });
+			return;
+		}
+
 		if (submitter instanceof HTMLButtonElement) {
 			submitter.disabled = true;
 		}
@@ -157,7 +165,7 @@ const resetHandler = registerCallback('kiosk:reset', () => {
 
 const changeHandler = registerCallback('kiosk:change', ({ currentTarget }) => {
 	const selected = currentTarget.querySelector('[name="services[]"]:checked') instanceof HTMLElement;
-	currentTarget.elements.namedItem('partners[]').checked = selected;
+	currentTarget.querySelector('[name="partners[]"]').checked = selected;
 });
 
 const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newState }) => {
@@ -170,6 +178,13 @@ const toggleHandler = registerCallback('kiosk:popover-toggle', ({ target, newSta
 
 		target.firstElementChild.scrollIntoView({ behavior: 'instant', block: 'start' });
 	}
+});
+
+const invalidHandler = registerCallback('kiosk:invalid', ({ currentTarget }) => {
+	const invalid = currentTarget.querySelector(':invalid');
+	const fieldset = invalid.closest('fieldset');
+	fieldset.showPopover();
+	invalid.focus();
 });
 
 const toggleWakeLock = registerCallback('kiosk:toggle-wakelock', async ({ currentTarget }) => {
@@ -282,18 +297,20 @@ export default async ({ signal, stack }) => {
 				${CAL}
 			</button>
 		</menu>
-		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
+		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}" ${onInvalid}="${invalidHandler}">
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
-			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+			<fieldset id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
+				<legend>Partners &amp; Services</legend>
+				<p>Please select all of the services that you are seeking today.</p>
 				<div class="flex row wrap">
-					${results.filter(({ partner, programs }) => partner === true && Array.isArray(programs) && programs.length !== 0).map(({ id, name, programs = [], image = {}, description}) => `<fieldset class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
-						<legend class="partner-heading">${name}</legend>
+					${results.filter(({ partner, programs }) => partner === true && Array.isArray(programs) && programs.length !== 0).map(({ id, name, programs = [], image = {}, description}) => `<div class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
+						<h3 class="partner-heading visually-hidden">${name}</h3>
 						<img src="${image.url ?? image.src}" crossorigin="anonymous" referrerpolicy="no-referrer" width="64" alt="${name}" class="partner-logo" />
 						<p>${description}</p>
 						<h4>Services &amp; Programs</h4>
 						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
 						${programs.map(program => `<label><span>${program}</span><input type="checkbox" class="partner-service" name="services[]" value="${program}" /></label>`).join('')}
-					</fieldset>`).join('\n')}
+					</div>`).join('\n')}
 				</div>
 				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
 					<span>Next</span>
@@ -303,9 +320,10 @@ export default async ({ signal, stack }) => {
 					<span>Cancel</span>
 					${X}
 				</button>
-			</section>
+			</fieldset>
 			<fieldset id="kiosk-contact" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
 				<legend>Contact Info</legend>
+				<p>Only inputs with a <q>*</q> are required. Please provide contact info if you wish for our partners to contact you regarding your request.</p>
 				<div class="form-group">
 					<label for="contact-name" class="input-label required">Name</label>
 					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocapitalize="words" autocomplete="off" autofocus="" required="" />
@@ -404,7 +422,6 @@ export default async ({ signal, stack }) => {
 
 	const pantry = GCalElement.create('pantry', { loading: 'lazy' });
 	const parterCal = GCalElement.create('partners', { loading: 'lazy' });
-	// const events = GCalElement.create('events', { loading: 'lazy', theme: 'dark' });
 	const events = new KRVEvents();
 	events.tag = ['krv-bridge'];
 	pantry.id = 'kiosk-pantry-cal';
@@ -414,6 +431,18 @@ export default async ({ signal, stack }) => {
 	parterCal.id = 'kiosk-partner-cal';
 	parterCal.popover = 'auto';
 	frag.getElementById('kiosk-container').append(pantry, events, parterCal);
+
+	// Needs to be `capture: true`
+	frag.getElementById('kiosk').addEventListener('invalid', ({ target }) => {
+		if (target instanceof HTMLInputElement) {
+			const fieldset = target.closest('fieldset');
+
+			if (fieldset instanceof HTMLFieldSetElement && ! fieldset.matches(':popover-open')) {
+				fieldset.showPopover();
+				target.focus();
+			}
+		}
+	}, { capture: true, signal });
 
 	return frag;
 };
@@ -485,6 +514,8 @@ export const styles = css`@layer utility {
 			object-fit: contain;
 			width: 300px;
 			height: auto;
+			padding: 0.2em;
+			background-color: #dadada;
 		}
 
 		.card h4 {
