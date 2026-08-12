@@ -9,6 +9,7 @@ import { SCHEMA } from '../consts.js';
 
 export const STORE_NAME = 'partners';
 const GCalElement = customElements.get('g-cal-events');
+const KRVEvents = customElements.get('krv-events');
 
 const $wakelock = $state(null);
 
@@ -67,6 +68,22 @@ const FOOD = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="icon"
 
 const CAL = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="14" height="16" viewBox="0 0 14 16" role="presentation" aria-hidden="true">
 	<path fill-rule="evenodd" d="M13 2h-1v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H6v1.5c0 .28-.22.5-.5.5h-2c-.28 0-.5-.22-.5-.5V2H2c-.55 0-1 .45-1 1v11c0 .55.45 1 1 1h11c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm0 12H2V5h11v9zM5 3H4V1h1v2zm6 0h-1V1h1v2zM6 7H5V6h1v1zm2 0H7V6h1v1zm2 0H9V6h1v1zm2 0h-1V6h1v1zM4 9H3V8h1v1zm2 0H5V8h1v1zm2 0H7V8h1v1zm2 0H9V8h1v1zm2 0h-1V8h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1zm2 0h-1v-1h1v1zm-8 2H3v-1h1v1zm2 0H5v-1h1v1zm2 0H7v-1h1v1zm2 0H9v-1h1v1z"/>
+</svg>`;
+
+const LOCK = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="12" height="16" viewBox="0 0 12 16" role="presentation" aria-hidden="true">
+	<path fill-rule="evenodd" d="M4 13H3v-1h1v1zm8-6v7c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h1V4c0-2.2 1.8-4 4-4s4 1.8 4 4v2h1c.55 0 1 .45 1 1zM3.8 6h4.41V4c0-1.22-.98-2.2-2.2-2.2-1.22 0-2.2.98-2.2 2.2v2H3.8zM11 7H2v7h9V7zM4 8H3v1h1V8zm0 2H3v1h1v-1z"/>
+</svg>`;
+
+const THEME = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="presentation" aria-hidden="true">
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2v20a10 10 0 0 0 0-20z" fill="currentColor" />
+</svg>`;
+
+const REFRESH = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="presentation" aria-hidden="true">
+  <polyline points="17 1 21 5 17 9" />
+  <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+  <polyline points="7 23 3 19 7 15" />
+  <path d="M21 13v2a4 4 0 0 1-4 4H3" />
 </svg>`;
 
 const submitHandler = registerCallback('kiosk:submit', async event => {
@@ -177,13 +194,51 @@ const toggleWakeLock = registerCallback('kiosk:toggle-wakelock', async ({ curren
 	}
 });
 
+const refresh = registerCallback('kiosk:refresh', async ({ currentTarget }) => {
+	currentTarget.disabled = true;
+
+	try {
+		await cookieStore.set({
+			name: '_lastSync_partners',
+			value: new Date(Date.now() - 86400001).getTime(), // Now minus 24 hours and one second
+			path: '/',
+			sameSite: 'strict',
+			secure: true,
+			partitioned: true,
+			expires: new Date(Date.now() + 15724800000),
+		});
+
+		await syncPartners();
+		location.reload();
+	} catch(err) {
+		reportError(err);
+	} finally {
+		currentTarget.disabled = false;
+	}
+});
+
+const toggleTheme = registerCallback('kiosk:toggle-theme', () => {
+	switch(document.documentElement.dataset.theme) {
+		case 'dark':
+			document.documentElement.dataset.theme = 'light';
+			break;
+
+		case 'light':
+			document.documentElement.dataset.theme = 'auto';
+			break;
+
+		default:
+			document.documentElement.dataset.theme = 'dark';
+	}
+});
+
 export default async ({ signal, stack }) => {
 	await syncPartners({ signal }).catch(console.error);
 	const db = await await openDB(SCHEMA.name, { version: SCHEMA.version, schema: SCHEMA, stack, signal });
 	const results = await getAllItems(db, STORE_NAME, null, { signal });
 	const $label = $text(() => $wakelock.get() instanceof WakeLockSentinel ? 'Revoke Lock' : 'Start Wakelock');
 
-	const frag = $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" data-theme="dark" ${onCommand}="${commandHandler}">
+	const frag = $html`<div id="kiosk-container" class="background-primary color-default overflow-auto" ${onCommand}="${commandHandler}">
 		<header class="kiosk-welcome-instructions">
 			<h1 class="center">
 				<div class="center">Welcome to the KRV Bridge Connection</div>
@@ -204,7 +259,7 @@ export default async ({ signal, stack }) => {
 				${X}
 			</button>
 		</section>
-		<div class="flex row space-around">
+		<menu class="flex row wrap space-around kiosk-menu">
 			<button type="button" class="btn btn-primary btn-lg" command="show-popover" commandfor="kiosk-services">
 				<span>Get Started</span>
 				${START}
@@ -213,6 +268,7 @@ export default async ({ signal, stack }) => {
 				<span>Need Help?</span>
 				${HELP}
 			</button>
+			<br class="full-width" />
 			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-pantry-cal">
 				<span>Pantry Schedule</span>
 				${FOOD}
@@ -221,7 +277,11 @@ export default async ({ signal, stack }) => {
 				<span>View Events</span>
 				${CAL}
 			</button>
-		</div>
+			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-partner-cal">
+				<span>View Partner Schedule</span>
+				${CAL}
+			</button>
+		</menu>
 		<form action="/api/kiosk" method="post" id="kiosk" data-font-family="system-ui" ${signalAttr}="${signal}" ${onSubmit}="${submitHandler}"${onReset}="${resetHandler}">
 			<input type="hidden" name="uuid" id="kiosk-id" value="submit-${crypto.randomUUID()}" />
 			<section id="kiosk-services" popover="manual" ${onToggle}="${toggleHandler}" ${signalAttr}="${signal}">
@@ -248,7 +308,7 @@ export default async ({ signal, stack }) => {
 				<legend>Contact Info</legend>
 				<div class="form-group">
 					<label for="contact-name" class="input-label required">Name</label>
-					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocomplete="off" required="" />
+					<input type="text" name="contact[name]" id="contact-name" class="input" placeholder="First Last" autocapitalize="words" autocomplete="off" autofocus="" required="" />
 				</div>
 				<div class="form-group">
 					<label for="contact-size" class="input-label required">How Many Individuals will be Receiving Services?</label>
@@ -319,22 +379,41 @@ export default async ({ signal, stack }) => {
 			</button>
 		</div>
 	</div>
-	<details>
+	<br />
+	<details class="accordion" open="">
 		<summary>Kiosk Controls</summary>
-		<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">
-			<span>Fullscreen</span>
-			${FULLSCREEN}
-		</button>
-		<button type="button" ${onClick}="${toggleWakeLock}" class="btn btn-secondary" ${signalAttr}="${signal}">${$label}</button>
+		<menu class="block">
+			<button type="button" class="btn btn-secondary" command="${COMMANDS.requestFullscreen}" commandfor="kiosk-container">
+				<span>Fullscreen</span>
+				${FULLSCREEN}
+			</button>
+			<button type="button" ${onClick}="${toggleWakeLock}" class="btn btn-secondary" ${signalAttr}="${signal}">
+				<span>${$label}</span>
+				${LOCK}
+			</button>
+			<button type="button" class="btn btn-warning" ${onClick}="${refresh}" ${signalAttr}="${signal}">
+				<span>Refresh</span>
+				${REFRESH}
+			</button>
+			<button type="button" class="btn btn-secondary" ${onClick}="${toggleTheme}" ${signalAttr}="${signal}">
+				<span>Toggle Theme</span>
+				${THEME}
+			</button>
+		</menu>
 	</details>`;
 
-	const pantry = GCalElement.create('pantry', { loading: 'lazy', theme: 'dark' });
-	const events = GCalElement.create('events', { loading: 'lazy', theme: 'dark' });
+	const pantry = GCalElement.create('pantry', { loading: 'lazy' });
+	const parterCal = GCalElement.create('partners', { loading: 'lazy' });
+	// const events = GCalElement.create('events', { loading: 'lazy', theme: 'dark' });
+	const events = new KRVEvents();
+	events.tag = ['krv-bridge'];
 	pantry.id = 'kiosk-pantry-cal';
 	pantry.popover = 'auto';
 	events.id = 'kiosk-events-cal';
 	events.popover = 'auto';
-	frag.append(pantry, events);
+	parterCal.id = 'kiosk-partner-cal';
+	parterCal.popover = 'auto';
+	frag.getElementById('kiosk-container').append(pantry, events, parterCal);
 
 	return frag;
 };
@@ -345,6 +424,10 @@ export const description = 'A self-help kiosk for the KRV Bridge Connection';
 
 export const styles = css`@layer utility {
 	#kiosk-container {
+		[popover]:not(:popover-open) {
+			display: none;
+		}
+
 		& :popover-open {
 			margin-block-start: 2.5vh;
 			width: min(95vw, 1200px);
@@ -364,6 +447,18 @@ export const styles = css`@layer utility {
 			gap: 2rem;
 			justify-content: center;
 			margin-bottom: 2.5rem;
+		}
+
+		.flex > br {
+			flex: 1 0 100%;
+			display: block;
+			width: 100%;
+			content: "";
+			margin: 0;
+		}
+
+		.kiosk-menu {
+			gap: 0.8em;
 		}
 
 		.card {
