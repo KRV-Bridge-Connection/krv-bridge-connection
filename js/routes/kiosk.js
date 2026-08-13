@@ -11,6 +11,10 @@ export const STORE_NAME = 'partners';
 const GCalElement = customElements.get('g-cal-events');
 const KRVEvents = customElements.get('krv-events');
 
+const OTHER_SERVICES = [
+	'Behavioral Health', 'Medical Insurance', 'Employment', 'Career Training', 'Veteran Services', 'Senior Services',
+];
+
 const $wakelock = $state(null);
 
 const NEXT = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" role="presentation" aria-hidden="true">
@@ -312,6 +316,11 @@ export default async ({ signal, stack }) => {
 						<input type="checkbox" class="parnter-selected" name="partners[]" value="${id}" hidden="" readonly="" />
 						${programs.map(program => `<label><span>${program}</span><input type="checkbox" class="partner-service" name="services[]" value="${program}" /></label>`).join('')}
 					</div>`).join('\n')}
+					<div class="card" ${onChange}="${changeHandler}" ${signalAttr}="${signal}">
+						<h3>Other Services</h3>
+						<input type="checkbox" class="parnter-selected" name="partners[]" value="other" hidden="" readonly="" />
+						${OTHER_SERVICES.map(program => `<label><span>${program}</span><input type="checkbox" class="partner-service" name="services[]" value="${program}" /></label>`).join('')}
+					</div>
 				</div>
 				<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-contact">
 					<span>Next</span>
