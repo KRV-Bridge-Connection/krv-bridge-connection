@@ -279,20 +279,20 @@ export default async ({ signal, stack }) => {
 				<span>Get Started</span>
 				${START}
 			</button>
-			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-help">
+			<button type="button" class="btn btn-info btn-lg" command="show-popover" commandfor="kiosk-help">
 				<span>Need Help?</span>
 				${HELP}
 			</button>
-			<br class="full-width" />
-			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-pantry-cal">
+			<div class="flex-break"></div>
+			<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-pantry-cal">
 				<span>Pantry Schedule</span>
 				${FOOD}
 			</button>
-			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-events-cal">
+			<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-events-cal">
 				<span>View Events</span>
 				${CAL}
 			</button>
-			<button type="button" class="btn btn-secondary btn-lg" command="show-popover" commandfor="kiosk-partner-cal">
+			<button type="button" class="btn btn-secondary" command="show-popover" commandfor="kiosk-partner-cal">
 				<span>View Partner Schedule</span>
 				${CAL}
 			</button>
@@ -478,12 +478,9 @@ export const styles = css`@layer utility {
 			margin-bottom: 2.5rem;
 		}
 
-		.flex > br {
+		.flex-break {
 			flex: 1 0 100%;
 			display: block;
-			width: 100%;
-			content: "";
-			margin: 0;
 		}
 
 		.kiosk-menu {
@@ -500,6 +497,10 @@ export const styles = css`@layer utility {
 			flex-direction: column;
 			align-items: center;
 			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+		}
+
+		.btn.btn-lg {
+			padding: 0.5em 1.1em;
 		}
 
 		.partner-heading {
