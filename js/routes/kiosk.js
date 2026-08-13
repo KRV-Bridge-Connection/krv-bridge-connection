@@ -121,6 +121,7 @@ const submitHandler = registerCallback('kiosk:submit', async event => {
 				}
 			}, { signal: controller.signal });
 			popover.showPopover();
+			setTimeout(() => popover.hidePopover(), 10_000);
 
 			await promise;
 			target.reset();
