@@ -31,7 +31,11 @@ export default createHandler({
 			message: data.get('message'),
 			partners: data.getAll('partners[]'),
 			services: data.getAll('services[]'),
-			age: parseInt(data.get('contact[age]'), 10),
+			// age: parseInt(data.get('contact[age]'), 10),
+			details: {
+				isHomeless: data.has('contact[homeless]'),
+				hasSCEDisconnect: data.has('contact[sce-disconnect]'),
+			},
 			timestamp: new Date(),
 		});
 
