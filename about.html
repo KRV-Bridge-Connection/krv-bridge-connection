@@ -209,10 +209,56 @@ description: About the KRV Bridge Connection
 	</section>
 	<section id="krv-bridge-board">
 		<h2>Our Board</h2>
-		<div class="board-grid">
-			{% for member in board %}
+		<div id="bridge-{{ member.name | slugify }}" class="board-grid">
+			{% for member in team.board %}
 				<div class="card">
 					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
+					{% if member.image %}
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+					{% else %}
+						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
+					{% endif %}
+
+					{% if member.other_affiliations %}
+						<div><strong>Other Affiliations</strong></div>
+						<ul class="affiliations">
+							{% for affiliation in member.other_affiliations %}
+								<li>{{ affiliation }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+
+					<div class="contact-info">
+						{% if member.phone %}
+							<p>Phone: <a href="tel:{{ member.phone }}">{{ member.phone | remove: "+1-" }}</a></p>
+						{% endif %}
+						{% if member.email %}
+							<p>Email:
+								{% if member.email[0] %}
+									{% for email in member.email %}
+										<a href="mailto:{{ email }}">{{ email }}</a>{% unless forloop.last %}, {% endunless %}
+									{% endfor %}
+								{% else %}
+								<a href="mailto:{{ member.email }}">{{ member.email }}</a>
+								{% endif %}
+							</p>
+						{% endif %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</section>
+	<section id="krv-bridge-staff">
+		<h2>Our Staff</h2>
+		<div class="board-grid">
+			{% for member in team.staff %}
+				<div id="bridge-{{ member.name | slugify }}" class="card">
+					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
+					{% if member.image %}
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+					{% else %}
+						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
+					{% endif %}
 
 					{% if member.other_affiliations %}
 						<div><strong>Other Affiliations</strong></div>

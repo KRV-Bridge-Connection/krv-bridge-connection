@@ -4,4 +4,11 @@
   gap: 2rem;
   margin: 2rem 0;
   --card-radius: 8px;
+
+  .bridge-member {
+	aspect-ratio: 1 / 1;
+	width: 100%;
+	border-radius: 6px;
+	object-fit: cover;
+  }
 }

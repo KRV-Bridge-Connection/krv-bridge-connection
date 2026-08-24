@@ -19,15 +19,13 @@ In 2025, KRVBC opened the doors to a building at 6069 Lake Isabella Blvd., Lake 
 
 Our one-stop shop provides office and community space, allowing multiple agencies in the shared space including 
 
-- Cerro Coso College
 - Congressman Fong's Representative
-- Community Action Partnership of Kern (CAPK)
-- Flood Ministries
-- Garden Pathways
-- Greater Bakersfield Legal Assistance (GBLA)
-- Kern Initiative for Talent and Entrepreneurship (KITE)
-- Salvation Army 
-- Stewards, Inc.
+- [Community Action Partnership of Kern (CAPK)](/partners/capk)
+- [Flood Ministries](/partners/flood-ministries)
+- [Garden Pathways](/partners/garden-pathways)
+- [Greater Bakersfield Legal Assistance (GBLA)](/partners/gbla)
+- [Kern Initiative for Talent and Entrepreneurship (KITE)](/partners/kite)
+- [Salvation Army](/partners/salvation-army)
 
 
 ### Please see more at <a href="https://www.givebigkern.org/organization/Krv-Bridge-Connection?utm_source=krv-bridge&mp;utm_medium=referrer" rel="noopener noreferrer external" target="_blank"><q>A Garden is a Grand Teacher</q> Campaign</a> on GiveBigKern.
