@@ -209,12 +209,17 @@ description: About the KRV Bridge Connection
 	</section>
 	<section id="krv-bridge-board">
 		<h2>Our Board</h2>
-		<div id="bridge-{{ member.name | slugify }}" class="board-grid">
+		<div class="board-grid">
 			{% for member in team.board %}
-				<div class="card">
-					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
+				<div id="bridge-{{ member.name | slugify }}" class="card" itemtype="https://schema.org/Person" itemscope="">
+					<h3 itemprop="name">
+						<span itemprop="name">{{ member.name }}</span>
+						<span class="spacer">&mdash;</span>
+						<span itemprop="jobTitle">{{ member.role }}</span>
+						<meta itemprop="memberOf" content="KRV Bridge Connection" />
+					</h3>
 					{% if member.image %}
-						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" itemprop="image" alt="" aria-hidden="true" />
 					{% else %}
 						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
 					{% endif %}
@@ -230,16 +235,16 @@ description: About the KRV Bridge Connection
 
 					<div class="contact-info">
 						{% if member.phone %}
-							<p>Phone: <a href="tel:{{ member.phone }}">{{ member.phone | remove: "+1-" }}</a></p>
+							<p>Phone: <a href="tel:{{ member.phone }}" itemprop="telephone">{{ member.phone | remove: "+1-" }}</a></p>
 						{% endif %}
 						{% if member.email %}
 							<p>Email:
 								{% if member.email[0] %}
 									{% for email in member.email %}
-										<a href="mailto:{{ email }}">{{ email }}</a>{% unless forloop.last %}, {% endunless %}
+										<a href="mailto:{{ email }}" itemprop="email">{{ email }}</a>{% unless forloop.last %}, {% endunless %}
 									{% endfor %}
 								{% else %}
-								<a href="mailto:{{ member.email }}">{{ member.email }}</a>
+								<a href="mailto:{{ member.email }}" itemprop="email">{{ member.email }}</a>
 								{% endif %}
 							</p>
 						{% endif %}
@@ -252,10 +257,15 @@ description: About the KRV Bridge Connection
 		<h2>Our Staff</h2>
 		<div class="board-grid">
 			{% for member in team.staff %}
-				<div id="bridge-{{ member.name | slugify }}" class="card">
-					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
+				<div id="bridge-{{ member.name | slugify }}" class="card" itemtype="https://schema.org/Person" itemscope="">
+					<h3 itemprop="name">
+						<span itemprop="name">{{ member.name }}</span>
+						<span class="spacer">&mdash;</span>
+						<span itemprop="jobTitle">{{ member.role }}</span>
+						<meta itemprop="worksFor" content="KRV Bridge Connection" />
+					</h3>
 					{% if member.image %}
-						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" itemprop="image" alt="" aria-hidden="true" />
 					{% else %}
 						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
 					{% endif %}
@@ -271,16 +281,16 @@ description: About the KRV Bridge Connection
 
 					<div class="contact-info">
 						{% if member.phone %}
-							<p>Phone: <a href="tel:{{ member.phone }}">{{ member.phone | remove: "+1-" }}</a></p>
+							<p>Phone: <a href="tel:{{ member.phone }}" itemprop="telephone">{{ member.phone | remove: "+1-" }}</a></p>
 						{% endif %}
 						{% if member.email %}
 							<p>Email:
 								{% if member.email[0] %}
 									{% for email in member.email %}
-										<a href="mailto:{{ email }}">{{ email }}</a>{% unless forloop.last %}, {% endunless %}
+										<a href="mailto:{{ email }}" itemprop="email">{{ email }}</a>{% unless forloop.last %}, {% endunless %}
 									{% endfor %}
 								{% else %}
-								<a href="mailto:{{ member.email }}">{{ member.email }}</a>
+								<a href="mailto:{{ member.email }}" itemprop="email">{{ member.email }}</a>
 								{% endif %}
 							</p>
 						{% endif %}
