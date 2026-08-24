@@ -209,12 +209,14 @@ description: About the KRV Bridge Connection
 	</section>
 	<section id="krv-bridge-board">
 		<h2>Our Board</h2>
-		<div class="board-grid">
+		<div id="bridge-{{ member.name | slugify }}" class="board-grid">
 			{% for member in team.board %}
 				<div class="card">
 					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
 					{% if member.image %}
-						<img src="{{ member.image }}" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+					{% else %}
+						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
 					{% endif %}
 
 					{% if member.other_affiliations %}
@@ -250,10 +252,12 @@ description: About the KRV Bridge Connection
 		<h2>Our Staff</h2>
 		<div class="board-grid">
 			{% for member in team.staff %}
-				<div class="card">
+				<div id="bridge-{{ member.name | slugify }}" class="card">
 					<h3>{{ member.name }} &mdash; {{ member.role }}</h3>
 					{% if member.image %}
-						<img src="{{ member.image }}" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+						<img src="{{ member.image }}" width="320" height="320" class="block full-width bridge-member" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" alt="" aria-hidden="true" />
+					{% else %}
+						<img src="https://cdn.kernvalley.us/img/raster/missing-image.svg" width="320" height="320" class="block full-width" loading="lazy" decoding="async" crossorigin="anonymous" referrerpolicy="no-referrer" aria-hidden="true" />
 					{% endif %}
 
 					{% if member.other_affiliations %}
