@@ -192,6 +192,7 @@ const style = css`.partner-image {
 	border-color: #dadada;
 	border-color: light-dark(#dadada, rgb(73, 80, 87));
 	margin-bottom: 0.5em;
+	scroll-margin-top: var(--nav-height, 3rem);
 }
 
 .org-card .partner-name {
