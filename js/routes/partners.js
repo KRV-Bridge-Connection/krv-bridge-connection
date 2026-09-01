@@ -161,6 +161,10 @@ function transformPartner({ lastUpdated, keywords = [], hoursAvailable = {}, par
 	};
 }
 
+const slugify = (...parts) => parts.filter(part => typeof part === 'string' && part.length !== 0)
+	.map(part => part.trim().replaceAll(/[^0-9a-z]+/ig, '-'))
+	.join('-').toLowerCase();
+
 function _addUTM(url) {
 	if (typeof url === 'string') {
 		return _addUTM(URL.parse(url));
@@ -382,7 +386,7 @@ export const createPartner = result => {
 			${getAddress(result)}
 		</section>` : ''}
 
-		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
+		${Array.isArray(result.contactPoint) && result.contactPoint.length !== 0 ? result.contactPoint.map(contact => `<div id="${slugify(contact.name, contact.contactType)}" class="card resource-contact contact-point" itemprop="contactPoint" itemtype="https://schema.org/ContactPoint" itemscope="">
 			<h3>${typeof contact.name === 'string'
 			? `<span itemprop="name">${contact.name}</span> &mdash; <span itemprop="contactType">${contact.contactType}</span>`
 			: `<span itemprop="contactType">${contact.contactType}</span>`}</h3>
