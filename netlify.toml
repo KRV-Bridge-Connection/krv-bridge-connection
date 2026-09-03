@@ -32,5 +32,5 @@
   node_bundler = "esbuild"
   included_files = ["_data/jwk.json", "_data/secrets.json"]
 [build.environment]
-  AWS_LAMBDA_JS_RUNTIME = "nodejs22.x"
+  AWS_LAMBDA_JS_RUNTIME = "nodejs24.x"
   NODE_OPTIONS = "--experimental-require-module"
