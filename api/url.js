@@ -117,4 +117,5 @@ export default createHandler({
 }, {
 	exposeHeaders: ['Location'],
 	allowCredentials: true,
+	logger: err => console.error(err),
 });

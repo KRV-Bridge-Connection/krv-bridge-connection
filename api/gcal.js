@@ -59,5 +59,5 @@ export default createHandler({
 	}
 }, {
 	allowOrigins: ['*'],
-	logger: console.error,
+	logger: err => console.error(err),
 });

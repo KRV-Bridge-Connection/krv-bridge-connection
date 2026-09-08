@@ -110,5 +110,5 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: console.error,
+	logger: err => console.error(err),
 });
