@@ -25,6 +25,8 @@
     "node:child_process",
     "node:events",
     "node:crypto",
+    "@shgysk8zer0/polyfills",
+    "@shgysk8zer0/consts",
     "firebase-admin",
     "jwks-rsa",
     "jose"
