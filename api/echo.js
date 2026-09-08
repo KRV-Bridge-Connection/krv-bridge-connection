@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import '@shgysk8zer0/polyfills';
+import * as EXT from '@shgysk8zer0/consts/exts.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,6 +16,7 @@ export const handler = async () => {
 			statusCode: 200,
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
+				EXT,
 				directory: __dirname,
 				files: files,
 				currentFileContent: content
