@@ -1,6 +1,6 @@
-import { readdir, stat, readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { join, dirname } from 'node:path';
+import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -8,22 +8,22 @@ const __dirname = dirname(__filename);
 export const handler = async () => {
 	try {
 		const files = await readdir(__dirname);
-		const fileContents = {};
+		const content = await readFile(__filename, 'utf8');
 
-		for (const file of files) {
-			const filePath = join(__dirname, file);
-			const fileStat = await stat(filePath);
-
-			if (fileStat.isFile()) {
-				fileContents[file] = await readFile(filePath, 'utf8');
-			}
-		}
-
-		return Response.json({
-			directory: __dirname,
-			files: fileContents,
-		});
+		return {
+			statusCode: 200,
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				directory: __dirname,
+				files: files,
+				currentFileContent: content
+			}, null, '\t')
+		};
 	} catch (error) {
-		return Response.json({ error: { message: error.message }});
+		return {
+			statusCode: 500,
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ error: error.message })
+		};
 	}
 };
