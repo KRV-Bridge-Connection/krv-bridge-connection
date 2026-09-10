@@ -87,4 +87,6 @@ export default createHandler({
 			}
 		}
 	}
+}, {
+	logger: err => console.error(err),
 });

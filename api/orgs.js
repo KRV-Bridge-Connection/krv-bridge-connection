@@ -98,4 +98,5 @@ export default createHandler({
 	}
 }, {
 	allowCredentials: true,
+	logger: err => console.error(err),
 });
