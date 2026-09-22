@@ -233,7 +233,6 @@ export default async ({ signal, stack }) => {
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('events', { loading: 'lazy', theme: 'dark' }),
-		el`<img src="https://i.imgur.com/ngJxxRT.webp" width="1835" height="1024" alt="Sowing Seeds of Change" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />`,
 		el`<img src="https://i.imgur.com/efmlmDq.webp" width="1376" height="768" alt="National Night Out - Oct 6 starting at 5:30 PM" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="lazy" />`,
 		el`<img src="https://i.imgur.com/xh1cftk.webp" width="1376" height="768" alt="Volunteer Bell Ringer Training - Oct 1 starting at 2:00 PM" title="" crossorigin="anonymous" referrerpolicy="no-referrer" decoding="auto" loading="lazy" />`,
 		el`<div>
