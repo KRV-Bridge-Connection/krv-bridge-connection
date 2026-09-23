@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<title>KRV Bridge Connection Kiosk</title>
+		<meta charset="utf-8" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="viewport" content="width=device-width" />
+		<script type="importmap" integrity="sha384-KRKEczCN31pLgM0TAuY6OnBTOqLgeZE3uNelyS4XnF8eiedEgmvYa7XMbmKAjrRI">{
+			"imports": {
+				"@node/": "/node_modules/",
+				"@shgysk8zer0/kazoo/": "https://unpkg.com/@shgysk8zer0/kazoo@1.0.12/",
+				"@shgysk8zer0/konami": "https://unpkg.com/@shgysk8zer0/konami@1.1.2/konami.js",
+				"@shgysk8zer0/polyfills": "https://unpkg.com/@shgysk8zer0/polyfills@0.8.6/browser.min.js",
+				"@shgysk8zer0/polyfills/": "https://unpkg.com/@shgysk8zer0/polyfills@0.8.6/",
+				"@shgysk8zer0/jwk-utils": "https://unpkg.com/@shgysk8zer0/jwk-utils@1.2.1/jwk-utils.min.js",
+				"@shgysk8zer0/jwk-utils/": "https://unpkg.com/@shgysk8zer0/jwk-utils@1.2.1/",
+				"@shgysk8zer0/jswaggersheets": "https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/swagger.js",
+				"@shgysk8zer0/jswaggersheets/": "https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/",
+				"@shgysk8zer0/jss/": "https://unpkg.com/@shgysk8zer0/jss@1.0.1/",
+				"@shgysk8zer0/consts/": "https://unpkg.com/@shgysk8zer0/consts@1.0.8/",
+				"@shgysk8zer0/http/": "https://unpkg.com/@shgysk8zer0/http@1.0.5/",
+				"@shgysk8zer0/http-status": "https://unpkg.com/@shgysk8zer0/http-status@1.1.4/http-status.js",
+				"@shgysk8zer0/aes-gcm": "https://unpkg.com/@shgysk8zer0/aes-gcm@1.1.0/aes-gcm.min.js",
+				"@shgysk8zer0/aes-gcm/": "https://unpkg.com/@shgysk8zer0/aes-gcm@1.1.0/",
+				"@shgysk8zer0/squish": "https://unpkg.com/@shgysk8zer0/squish@1.0.2/squish.min.js",
+				"@shgysk8zer0/squish/": "https://unpkg.com/@shgysk8zer0/squish@1.0.2/",
+				"@shgysk8zer0/suid": "https://unpkg.com/@shgysk8zer0/suid@1.0.0/suid.min.js",
+				"@shgysk8zer0/suid/": "https://unpkg.com/@shgysk8zer0/suid@1.0.0/",
+				"@shgysk8zer0/geoutils": "https://unpkg.com/@shgysk8zer0/geoutils@1.0.6/geoutils.min.js",
+				"@shgysk8zer0/geoutils/": "https://unpkg.com/@shgysk8zer0/geoutils@1.0.6/",
+				"@shgysk8zer0/core-css/": "https://unpkg.com/@shgysk8zer0/core-css@3.0.0/",
+				"@shgysk8zer0/signals": "https://unpkg.com/@shgysk8zer0/signals@0.1.0/signals.min.js",
+				"@shgysk8zer0/signals/": "https://unpkg.com/@shgysk8zer0/signals@0.1.0/",
+				"@shgysk8zer0/importmap": "https://unpkg.com/@shgysk8zer0/importmap@1.10.4/importmap.js",
+				"@shgysk8zer0/importmap/": "https://unpkg.com/@shgysk8zer0/importmap@1.10.4/",
+				"@shgysk8zer0/components/": "https://unpkg.com/@shgysk8zer0/components@0.3.23/",
+				"@aegisjsproject/trusted-types": "https://unpkg.com/@aegisjsproject/trusted-types@1.1.0/bundle.min.js",
+				"@aegisjsproject/trusted-types/": "https://unpkg.com/@aegisjsproject/trusted-types@1.1.0/",
+				"@aegisjsproject/parsers": "https://unpkg.com/@aegisjsproject/parsers@0.2.0/bundle.min.js",
+				"@aegisjsproject/parsers/": "https://unpkg.com/@aegisjsproject/parsers@0.2.0/",
+				"@aegisjsproject/sanitizer": "https://unpkg.com/@aegisjsproject/sanitizer@0.3.0/sanitizer.js",
+				"@aegisjsproject/sanitizer/": "https://unpkg.com/@aegisjsproject/sanitizer@0.3.0/",
+				"@aegisjsproject/core": "https://unpkg.com/@aegisjsproject/core@0.3.0/core.js",
+				"@aegisjsproject/core/": "https://unpkg.com/@aegisjsproject/core@0.3.0/",
+				"@aegisjsproject/styles": "https://unpkg.com/@aegisjsproject/styles@0.4.1/styles.js",
+				"@aegisjsproject/styles/": "https://unpkg.com/@aegisjsproject/styles@0.4.1/",
+				"@aegisjsproject/component": "https://unpkg.com/@aegisjsproject/component@0.2.0/component.js",
+				"@aegisjsproject/component/": "https://unpkg.com/@aegisjsproject/component@0.2.0/",
+				"@aegisjsproject/markdown": "https://unpkg.com/@aegisjsproject/markdown@0.1.7/markdown.min.js",
+				"@aegisjsproject/markdown/": "https://unpkg.com/@aegisjsproject/markdown@0.1.7/",
+				"@aegisjsproject/aegis-md": "https://unpkg.com/@aegisjsproject/aegis-md@0.0.4/aegis-md.js",
+				"@aegisjsproject/aegis-md/": "https://unpkg.com/@aegisjsproject/aegis-md@0.0.4/",
+				"@aegisjsproject/url": "https://unpkg.com/@aegisjsproject/url@1.1.0/url.min.js",
+				"@aegisjsproject/url/": "https://unpkg.com/@aegisjsproject/url@1.1.0/",
+				"@aegisjsproject/idb/": "https://unpkg.com/@aegisjsproject/idb@1.1.0/",
+				"@aegisjsproject/idb": "https://unpkg.com/@aegisjsproject/idb@1.1.0/idb.min.js",
+				"@aegisjsproject/otp/": "https://unpkg.com/@aegisjsproject/otp@1.0.2/",
+				"@aegisjsproject/otp": "https://unpkg.com/@aegisjsproject/otp@1.0.2/otp.min.js",
+				"@aegisjsproject/md-editor": "https://unpkg.com/@aegisjsproject/md-editor@1.0.0/md-editor.js",
+				"@aegisjsproject/md-editor/": "https://unpkg.com/@aegisjsproject/md-editor@1.0.0/",
+				"@aegisjsproject/barcodescanner": "https://unpkg.com/@aegisjsproject/barcodescanner@1.2.3/scanner.min.js",
+				"@aegisjsproject/barcodescanner/": "https://unpkg.com/@aegisjsproject/barcodescanner@1.2.3/",
+				"@aegisjsproject/state": "https://unpkg.com/@aegisjsproject/state@1.1.0/state.mjs",
+				"@aegisjsproject/state/": "https://unpkg.com/@aegisjsproject/state@1.1.0/",
+				"@aegisjsproject/router": "https://unpkg.com/@aegisjsproject/router@1.3.1/router.mjs",
+				"@aegisjsproject/router/": "https://unpkg.com/@aegisjsproject/router@1.3.1/",
+				"@aegisjsproject/callback-registry": "https://unpkg.com/@aegisjsproject/callback-registry@2.1.0/callbackRegistry.js",
+				"@aegisjsproject/callback-registry/": "https://unpkg.com/@aegisjsproject/callback-registry@2.1.0/",
+				"@aegisjsproject/attempt": "https://unpkg.com/@aegisjsproject/attempt@1.0.7/attempt.js",
+				"@aegisjsproject/attempt/": "https://unpkg.com/@aegisjsproject/attempt@1.0.7/",
+				"@aegisjsproject/secret-store": "https://unpkg.com/@aegisjsproject/secret-store@1.1.1/commands.min.js",
+				"@aegisjsproject/commands/": "https://unpkg.com/@aegisjsproject/commands@1.0.2/",
+				"@aegisjsproject/commands": "https://unpkg.com/@aegisjsproject/commands@1.0.2/commands.min.js",
+				"@aegisjsproject/firebase-account-routes": "https://unpkg.com/@aegisjsproject/firebase-account-routes@0.0.6/main.js",
+				"@aegisjsproject/firebase-account-routes/": "https://unpkg.com/@aegisjsproject/firebase-account-routes@0.0.6/",
+				"@aegisjsproject/secret-store/": "https://unpkg.com/@aegisjsproject/secret-store@1.1.1/",
+				"@aegisjsproject/qr-encoder": "https://unpkg.com/@aegisjsproject/qr-encoder@1.0.1/index.min.js",
+				"@aegisjsproject/qr-encoder/": "https://unpkg.com/@aegisjsproject/qr-encoder@1.0.1/",
+				"@aegisjsproject/escape": "https://unpkg.com/@aegisjsproject/escape@1.1.0/index.min.js",
+				"@aegisjsproject/escape/": "https://unpkg.com/@aegisjsproject/escape@1.1.0/",
+				"@aegisjsproject/disposable": "https://unpkg.com/@aegisjsproject/disposable@1.0.3/disposable.min.js",
+				"@aegisjsproject/disposable/": "https://unpkg.com/@aegisjsproject/disposable@1.0.3/",
+				"@aegisjsproject/iota": "https://unpkg.com/@aegisjsproject/iota@1.0.12/iota.min.js",
+				"@aegisjsproject/iota/": "https://unpkg.com/@aegisjsproject/iota@1.0.12/",
+				"@aegisjsproject/disposable-registry": "https://unpkg.com/@aegisjsproject/disposable-registry@1.1.0/registry.js",
+				"@aegisjsproject/disposable-registry/": "https://unpkg.com/@aegisjsproject/disposable-registry@1.1.0/",
+				"@aegisjsproject/hermes": "https://unpkg.com/@aegisjsproject/hermes@1.1.0/hermes.js",
+				"@aegisjsproject/hermes/": "https://unpkg.com/@aegisjsproject/hermes@1.1.0/",
+				"@aegisjsproject/pwa-prompt": "https://unpkg.com/@aegisjsproject/pwa-prompt@1.0.1/prompt.js",
+				"@aegisjsproject/pwa-prompt/": "https://unpkg.com/@aegisjsproject/pwa-prompt@1.0.1/",
+				"@aegisjsproject/button": "https://unpkg.com/@aegisjsproject/button@1.0.1/button.min.js",
+				"@aegisjsproject/button/": "https://unpkg.com/@aegisjsproject/button@1.0.1/",
+				"@aegisjsproject/atlas": "https://unpkg.com/@aegisjsproject/atlas@1.1.0/atlas.min.js",
+				"@aegisjsproject/atlas/": "https://unpkg.com/@aegisjsproject/atlas@1.1.0/",
+				"@aegisjsproject/toast-message": "https://unpkg.com/@aegisjsproject/toast-message@1.0.3/toast-message.min.js",
+				"@aegisjsproject/toast-message/": "https://unpkg.com/@aegisjsproject/toast-message@1.0.3/",
+				"@kernvalley/components/": "https://unpkg.com/@kernvalley/components@2.0.10/",
+				"@webcomponents/custom-elements": "https://unpkg.com/@webcomponents/custom-elements@1.6.0/custom-elements.min.js",
+				"leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+				"leaflet/": "https://unpkg.com/leaflet@1.9.4/dist/",
+				"urlpattern-polyfill": "https://unpkg.com/urlpattern-polyfill@10.1.0/index.js",
+				"highlight.js": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/core.min.js",
+				"highlight.js/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/",
+				"highlight.js/styles/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/styles/",
+				"@highlightjs/cdn-assets": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/core.min.js",
+				"@highlightjs/cdn-assets/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/",
+				"@highlightjs/cdn-assets/styles/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/styles/",
+				"marked": "https://unpkg.com/marked@18.0.11/lib/marked.esm.js",
+				"marked-highlight": "https://unpkg.com/marked-highlight@2.2.4/src/index.js",
+				"yaml": "https://unpkg.com/yaml@2.9.0/browser/dist/index.js",
+				"yaml/": "https://unpkg.com/yaml@2.9.0/browser/dist/",
+				"firebase/": "https://www.gstatic.com/firebasejs/12.12.1/",
+				"firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+				"firebase/app-check": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app-check.js",
+				"firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+				"firebase/database": "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js",
+				"firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+				"firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+				"firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js",
+				"firebase/performance": "https://www.gstatic.com/firebasejs/12.12.1/firebase-performance.js",
+				"firebase/remote-config": "https://www.gstatic.com/firebasejs/12.12.1/firebase-remote-config.js",
+				"firebase/storage": "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js",
+				"firebase/analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+				"qr": "https://unpkg.com/qr@0.7.0/index.js",
+				"qr/": "https://unpkg.com/qr@0.7.0/",
+				"lit": "https://unpkg.com/lit@3.3.3/index.js",
+				"lit/": "https://unpkg.com/lit@3.3.3/",
+				"lit-html": "https://unpkg.com/lit-html@3.3.3/lit-html.js",
+				"lit-html/": "https://unpkg.com/lit-html@3.3.3/",
+				"lit-element": "https://unpkg.com/lit-element@4.2.2/lit-element.js",
+				"lit-element/": "https://unpkg.com/lit-element@4.2.2/",
+				"@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.1.2/reactive-element.js",
+				"@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.1.2/",
+				"@awesome.me/webawesome/": "https://unpkg.com/@awesome.me/webawesome@3.12.0/",
+				"normalize.css": "https://unpkg.com/normalize.css@8.0.1/normalize.css"
+			},
+			"scopes": {}
+		}</script>
+		<script type="module" src="/js/kiosk.js" referrerpolicy="no-referrer"></script>
+		<link rel="icon" type="image/svg+xml" sizes="any" href="/img/favicon.svg" />
+		<link rel="stylesheet" href="/css/kiosk.css" referrerpolicy="no-referrer" />
+	</head>
+	<body>
+
+		<div id="app" class="system-ui">
+			<header class="header">
+				<img src="https://krvbridge.org/img/branding/krv-bridge-logo-wide-blue.svg" alt="KRV Bridge Connection" width="1232" height="385" class="block logo" loading="eager" referrerpolicy="no-referrer" crossorigin="anonymous" />
+				<div class="subtitle">How can we help you today?</div>
+			</header>
+			<div id="results" class="modal" popover="manual">
+				<pre><code id="result-data"></code></pre>
+				<button type="button" command="hide-popover" commandfor="results" class="btn btn-danger">Dismiss</button>
+			</div>
+
+			<nav class="button-container">
+				<button type="button" class="kiosk-button services btn btn-primary" data-background="#d9ead3" commandfor="clientCheckIn" command="show-popover">
+					I AM HERE FOR SERVICES
+				</button>
+				<button type="button" class="kiosk-button volunteer btn btn-secondary" data-background="#fff2cc" commandfor="volunteerInterestScreen" command="show-popover">
+					I WANT TO HELP — BECOME A VOLUNTEER
+				</button>
+				<button type="button" class="kiosk-button referral btn btn-outline-primary" data-background="#eadcf8" commandfor="referralScreen" command="show-popover">
+					REFER A CLIENT
+				</button>
+				<button type="button" class="kiosk-button partner btn btn-secondary" data-background="#fce5cd" commandfor="partnerScreen" command="show-popover">
+					COMMUNITY PARTNER
+				</button>
+				<button type="button" class="kiosk-button info btn btn-info" data-background="#eeeeee" commandfor="infoScreen" command="show-popover">
+					EVENTS / INFORMATION
+				</button>
+				<button type="button" class="kiosk-button btn btn-light" data-background="#e9e9ed" commandfor="feedbackScreen" command="show-popover">
+					⭐ GIVE US YOUR FEEDBACK
+				</button>
+				<button type="button" class="kiosk-button employee btn btn-dark" data-background="#cfe2f3" commandfor="employeeClock" command="show-popover">
+					EMPLOYEE TIME CLOCK
+				</button>
+				<button type="button" class="kiosk-button volunteer btn btn-dark" data-background="#fff2cc" commandfor="volunteerClock" command="show-popover">
+					VOLUNTEER TIME CLOCK
+				</button>
+			</nav>
+
+			<div id="infoScreen" popover="manual" class="popover-card">
+				<h1>KRV BRIDGE CONNECTION</h1>
+				<p class="subtitle">Community Events & Activities</p>
+		<!-- 		<iframe src="https://events.kernvalley.us/embed/?tags=krv-bridge&amp;source=krv-bridge-kiosk" frameborder="0" width="800" height="600" class="block cal-embed" referrerpolicy="no-referrer" sandbox="allow-scripts allow-popups"></iframe> -->
+				<krv-events source="krv-bridge-kiosk" tag="krv-bridge">
+					<span slot="title">KRV Bridge Events</span>
+				</krv-events>
+
+				<div id="photoGallery" class="gallery">
+				</div>
+
+				<div class="actions">
+					<button type="button" class="kiosk-button btn btn-warning" command="hide-popover" commandfor="infoScreen">BACK TO HOME</button>
+				</div>
+			</div>
+
+			<form id="feedbackScreen" popover="manual" class="popover-card">
+				<input type="hidden" name="scriptAction" value="submitFeedback" />
+				<h2>KRV BRIDGE CONNECTION</h2>
+				<h3>How was your experience today?</h3>
+
+				<fieldset class="star-rating">
+					<legend>Rating</legend>
+					<div class="rating-group">
+						<input type="radio" class="star-rating" name="rating" value="1" aria-label="1 star" required="">
+						<input type="radio" class="star-rating" name="rating" value="2" aria-label="2 stars">
+						<input type="radio" class="star-rating" name="rating" value="3" aria-label="3 stars">
+						<input type="radio" class="star-rating" name="rating" value="4" aria-label="4 stars">
+						<input type="radio" class="star-rating" name="rating" value="5" aria-label="5 stars">
+					</div>
+				</fieldset>
+
+				<div class="form-group">
+					<label for="feedbackComment" class="input-label">Tell us about your experience:</label>
+					<textarea id="feedbackComment" class="input" name="comment" rows="6" placeholder="Your comments are appreciated..."></textarea>
+				</div>
+				<div data-height="2em"></div>
+				<div class="actions">
+					<button type="submit" class="kiosk-button btn btn-success">SUBMIT FEEDBACK</button>
+					<button type="reset" class="kiosk-button btn btn-danger">BACK TO KIOSK</button>
+				</div>
+			</form>
+
+			<form id="employeeClock" popover="manual" class="popover-card">
+				<h2>EMPLOYEE TIME CLOCK</h2>
+
+				<div class="form-group">
+					<label for="employeeName" class="input-label required">Employee Name</label>
+					<input type="text" id="employeeName" class="input" name="employeeName" placeholder="Enter your name" autofocus autocapitalize required="" />
+				</div>
+
+				<div class="form-group">
+					<label for="employeePin" class="input-label required">PIN</label>
+					<input type="text" id="employeePin" class="input mask" name="employeePin" placeholder="Enter PIN" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" required="">
+				</div>
+
+				<div class="actions flex row wrap">
+					<button type="submit" name="scriptAction" value="employeeClockIn" class="kiosk-button btn btn-success">CLOCK IN</button>
+					<button type="submit" name="scriptAction" value="employeeClockOut" class="kiosk-button btn btn-secondary">CLOCK OUT</button>
+					<span class="spacer"></span>
+					<button type="reset" class="kiosk-button btn btn-danger">RETURN TO HOME</button>
+				</div>
+			</form>
+
+			<form id="volunteerClock" popover="manual" class="popover-card">
+				<input type="hidden" name="scriptAction" value="submitVolunteerInterest" />
+				<h2>VOLUNTEER TIME CLOCK</h2>
+
+				<div class="form-group">
+					<label for="volunteerName" class="input-label required">Volunteer Name</label>
+					<input type="text" id="volunteerName" class="input" name="volunteerName" placeholder="Enter your name" autofocus autocapitalize required="">
+				</div>
+
+				<div class="form-group">
+					<label for="volunteerPin" class="input-label required">PIN</label>
+					<input type="text" id="volunteerPin" class="input mask" name="volunteerPin" placeholder="Enter PIN" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" required="">
+				</div>
+
+				<div class="actions flex row wrap">
+					<button type="submit" name="scriptAction" value="volunteerClockIn" class="kiosk-button btn btn-success">SIGN IN</button>
+					<button type="submit" name="scriptAction" value="volunteerClockOut" class="kiosk-button btn btn-secondary">SIGN OUT</button>
+					<span class="spacer"></span>
+					<button type="reset" class="kiosk-button btn btn-danger">RETURN TO HOME</button>
+				</div>
+			</form>
+
+			<form id="clientCheckIn" popover="manual" class="popover-card">
+				<input type="hidden" name="scriptAction" value="submitClientCheckIn" />
+				<header class="header">
+					<h1>CLIENT CHECK-IN</h1>
+					<p class="subtitle">We're glad you're here. Please complete the information below.</p>
+				</header>
+
+				<div class="form-body">
+					<div class="form-group">
+						<label for="clientName" class="input-label required">Full Name</label>
+						<input type="text" id="clientName" class="input" name="fullName" minlength="3" autofocus required="">
+					</div>
+
+					<div class="form-group">
+						<label for="clientPhone" class="input-label">Phone Number</label>
+						<input type="tel" id="clientPhone" class="input" name="phone">
+					</div>
+
+					<div class="form-group">
+						<label for="clientEmail" class="input-label">Email Address</label>
+						<input type="email" id="clientEmail" class="input" name="email">
+					</div>
+
+					<div class="form-group">
+						<label for="returningClient" class="input-label">Are you a returning client?</label>
+						<select id="returningClient" name="returningClient" class="input">
+							<option value="">Please select</option>
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="assistance" class="input-label">What brings you to KRV Bridge today?</label>
+						<select id="assistance" class="input" name="assistance">
+							<option value="">Please select</option>
+							<option value="Food Assistance">Food Assistance</option>
+							<option value="Housing/Homelessness">Housing/Homelessness</option>
+							<option value="Utility Assistance">Utility Assistance</option>
+							<option value="Legal Assistance">Legal Assistance</option>
+							<option value="Transportation">Transportation</option>
+							<option value="Other">Other</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="partnerAgency" class="input-label">Are you currently working with one of our partner agencies?</label>
+						<select id="partnerAgency" class="input" name="partnerAgency">
+							<option value="">Please select</option>
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>
+							<option value="Unsure">Unsure</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label for="needsReferral" class="input-label">Do you need a referral to another organization?</label>
+						<select id="needsReferral" class="input" name="needsReferral">
+							<option value="">Please select</option>
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>
+							<option value="Unsure">Unsure</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<p class="disclaimer">I understand that the information I provide may be used by KRV Bridge Connection to assist me with services and referrals.</p>
+
+						<label for="consent" class="input-label required">Consent</label>
+						<select id="consent" class="input" name="consent" required>
+							<option value="">Please select</option>
+							<option value="I Agree">I Agree</option>
+							<option value="">I Do Not Agree</option>
+						</select>
+					</div>
+
+					<div class="actions">
+						<button type="submit" class="kiosk-button btn btn-success">SUBMIT CHECK-IN</button>
+						<button type="reset" class="kiosk-button btn btn-danger">BACK TO KIOSK</button>
+					</div>
+				</div>
+			</form>
+
+			<form id="referralScreen" popover="manual" class="popover-card">
+				<input type="hidden" name="scriptAction" value="submitKioskReferral" />
+				<h1>REFER A CLIENT</h1>
+				<p class="subtitle">Please complete the referral information below.</p>
+
+				<div class="form-group">
+					<label for="referralFullName" class="input-label required">Client Full Name</label>
+					<input type="text" id="referralFullName" class="input" name="fullName" placeholder="Enter client's full name" autofocus autocapitalize required="">
+				</div>
+
+				<div class="form-group">
+					<label for="referralPhone" class="input-label required">Phone Number</label>
+					<input type="tel" id="referralPhone" class="input" name="phone" placeholder="Enter client's phone number" required="">
+				</div>
+
+					<div class="form-group">
+						<label for="referralAssistance" class="input-label required">Service Needed</label>
+						<select id="referralAssistance" class="input" name="assistanceNeeded" required="">
+							<option value="">Select a service</option>
+							<option value="Utilities">Utilities</option>
+							<option value="Food">Food</option>
+							<option value="Housing">Housing</option>
+							<option value="Legal">Legal</option>
+							<option value="Other">Other</option>
+						</select>
+					</div>
+
+				<div class="form-group">
+					<label for="referralPartner" class="input-label required">Preferred Partner</label>
+					<select id="referralPartner" class="input" name="preferredPartner" required>
+						<option value="">Select a partner</option>
+						<option value="Salvation Army">Salvation Army</option>
+						<option value="Flood Ministries">Flood Ministries</option>
+						<option value="GBLA">GBLA</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="referralDescription" class="input-label">Briefly Describe What the Client Needs</label>
+					<textarea id="referralDescription" class="input" name="description" placeholder="Describe the client's need" rows="5"></textarea>
+				</div>
+
+				<div class="form-group">
+					<label for="referralContactPreference" class="input-label required">Preferred Contact Method</label>
+					<select id="referralContactPreference" class="input" name="contactPreference" required="">
+						<option value="">Select one</option>
+						<option value="Phone">Phone</option>
+						<option value="Email">Email</option>
+						<option value="Either">Either</option>
+					</select>
+				</div>
+
+				<div class="authorization-box">
+					<label class="custom-checkbox">
+						<input type="checkbox" id="referralAuthorization" name="authorization" required>
+						<span>I confirm that the client has authorized KRV Bridge Connection to send this referral information to the selected partner.</span>
+					</label>
+				</div>
+				<div data-height="2em"></div>
+				<div class="actions">
+					<button type="submit" class="kiosk-button btn btn-success">SUBMIT REFERRAL</button>
+					<button type="reset" class="kiosk-button btn btn-danger">BACK TO KIOSK</button>
+				</div>
+			</form>
+
+			<form id="volunteerInterestScreen" popover="manual" class="popover-card">
+				<input type="hidden" name="scriptAction" value="submitVolunteerInterest" />
+				<h1>I WANT TO HELP</h1>
+				<p class="subtitle">Thank you for your interest in volunteering with KRV Bridge Connection. Please complete the information below.</p>
+
+				<div class="form-group">
+					<label for="volunteerInterestName" class="input-label required">Full Name</label>
+					<input type="text" id="volunteerInterestName" class="input" name="fullName" placeholder="Enter your full name" autofocus autocapitalize required="">
+				</div>
+
+				<div class="form-group">
+					<label for="volunteerInterestPhone" class="input-label required">Phone Number</label>
+					<input type="tel" id="volunteerInterestPhone" class="input" name="phone" placeholder="Enter your phone number" required="">
+				</div>
+
+				<div class="form-group">
+					<label for="volunteerInterestEmail" class="input-label">Email Address</label>
+					<input type="email" id="volunteerInterestEmail" class="input" name="email" placeholder="Enter your email address">
+				</div>
+
+				<fieldset class="volunteer-contact-options">
+					<legend>Preferred Contact Method</legend>
+					<label><input type="radio" name="volunteerContact" value="Phone"> Phone</label>
+					<label><input type="radio" name="volunteerContact" value="Email"> Email</label>
+					<label><input type="radio" name="volunteerContact" value="Text"> Text</label>
+				</fieldset>
+
+				<fieldset class="volunteer-help-options">
+					<legend>How would you like to help? *</legend>
+					<div class="volunteer-options flex row wrap space-around">
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Fresh Choice Food Pantry">
+							<span>Fresh Choice Food Pantry<span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Garden">
+							<span>Garden</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Office">
+							<span>Office</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Events">
+							<span>Events</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Maintenance">
+							<span>Maintenance</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Set up/Break down of event">
+							<span>Set up/Break down of event</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="General">
+							<span>General (anywhere you need me)</span>
+						</label>
+						<label class="custom-checkbox btn">
+							<input type="checkbox" name="volunteerHelp" value="Other">
+							<span>Other</span>
+						</label>
+					</div>
+				</fieldset>
+
+				<div class="form-group">
+					<label for="volunteerInterestOther" class="input-label">If Other, please specify</label>
+					<input type="text" id="volunteerInterestOther" class="input" name="volunteerHelpOther" placeholder="If Other, please specify">
+				</div>
+
+				<div class="form-group">
+					<label for="volunteerInterestAvailability" class="input-label">What days are you generally available?</label>
+					<input type="text" id="volunteerInterestAvailability" class="input" name="availability" placeholder="Example: Saturdays, weekdays, evenings">
+				</div>
+
+				<div class="form-group">
+					<label for="volunteerInterestSkills" class="input-label">Skills, Comments</label>
+					<textarea id="volunteerInterestSkills" class="input" name="skills" placeholder="Tell us about any skills, experience, or interests you would like to share." rows="5"></textarea>
+				</div>
+
+				<div class="actions">
+					<button type="submit" class="kiosk-button volunteer btn btn-success">SUBMIT VOLUNTEER INTEREST</button>
+					<button type="reset" class="kiosk-button btn btn-danger">BACK TO KIOSK</button>
+				</div>
+			</form>
+
+			<div id="partnerScreen" popover="manual" class="popover-card">
+				<h2>COMMUNITY PARTNER</h2>
+				<div id="partners-container" class="partner-list"></div>
+				<p>Community Partner functions coming soon.</p>
+				<div class="actions">
+					<button type="button" class="kiosk-button btn btn-danger" command="hide-popover" commandfor="partnerScreen">BACK TO KIOSK</button>
+				</div>
+			</div>
+			<dialog id="message-box">
+				<p id="msg"></p>
+				<button type="button" class="btn btn-warning" command="close" commandfor="message-box">Dismiss</button>
+			</dialog>
+		</div>
+
+		<button type="button" class="kiosk-button btn btn-primary" command="--fullscreen" commandfor="app">Fullscreen</button>
+		<button type="button" id="wake-lock-btn" class="kiosk-button btn btn-secondary" command="--wake-lock" commandfor="doc">Wake Lock</button>
+		<button type="button" class="btn btn-info kiosk-button" command="--toggle-theme" commandfor="doc">Toggle Theme</button>
+		<svg aria-hidden="true" hidden="">
+		  <symbol id="icon-star" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+			<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+		  </symbol>
+			<symbol id="link-external" viewBox="0 0 12 16">
+				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
+			</symbol>
+		</svg>
+		<template id="partner-template">
+			<div class="partner-card block">
+				<p class="partner-name" data-field="name"></p>
+				<img class="partner-logo" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" data-field="image" />
+				<p class="partner-description" data-field="description"></p>
+				<a class="btn btn-link partner-link" data-field="link" target="_blank" rel="noopner noreferrer external">
+					<svg class="icon" fill="currentColor" width="20" height="20" aria-hidden="true">
+						<use href="#link-external"></use>
+					</svg>
+					<span>Learn More</span>
+				</a>
+			</div>
+		</template>
+	</body>
+</html>

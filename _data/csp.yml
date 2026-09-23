@@ -15,6 +15,7 @@ default:
     - https://donorbox.org/widget.js
     - https://cdn.kernvalley.us/js/pwa-reset.js
     - https://unpkg.com/rxing-wasm@0.5.4/rxing_wasm_bg.js
+    - "'sha384-EmDzQDhlWdiZSKtj/cBAtudbXhfiXNwMh57oFsCZswOQry9578o9XsunELBhYZd2'"
     - "'wasm-unsafe-eval'"
     # - https://www.google-analytics.com
     # - https://www.googletagmanager.com
