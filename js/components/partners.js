@@ -5,7 +5,7 @@ import reset from '@aegisjsproject/styles/css/reset.css' with { type: 'css' };
 import palette from '@aegisjsproject/styles/css/palette.css' with { type: 'css' };
 import layers from '@aegisjsproject/styles/css/layers.css' with { type: 'css' };
 import button from '@aegisjsproject/styles/css/button.css' with { type: 'css' };
-import data from 'https://krvbridge.org/partners.json' with { type: 'json' };
+import data from '/partners.json' with { type: 'json' };
 
 const resources = data.partners;
 

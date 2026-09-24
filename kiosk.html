@@ -141,7 +141,6 @@
 		<link rel="stylesheet" href="/css/kiosk.css" referrerpolicy="no-referrer" />
 	</head>
 	<body>
-
 		<div id="app" class="system-ui">
 			<header class="header">
 				<img src="https://krvbridge.org/img/branding/krv-bridge-logo-wide-blue.svg" alt="KRV Bridge Connection" width="1232" height="385" class="block logo" loading="eager" referrerpolicy="no-referrer" crossorigin="anonymous" />
@@ -179,7 +178,7 @@
 				</button>
 			</nav>
 
-			<div id="infoScreen" popover="manual" class="popover-card">
+			<div id="infoScreen" popover="auto" class="popover-card">
 				<h1>KRV BRIDGE CONNECTION</h1>
 				<p class="subtitle">Community Events & Activities</p>
 		<!-- 		<iframe src="https://events.kernvalley.us/embed/?tags=krv-bridge&amp;source=krv-bridge-kiosk" frameborder="0" width="800" height="600" class="block cal-embed" referrerpolicy="no-referrer" sandbox="allow-scripts allow-popups"></iframe> -->
@@ -499,10 +498,10 @@
 				</div>
 			</form>
 
-			<div id="partnerScreen" popover="manual" class="popover-card">
+			<div id="partnerScreen" popover="auto" class="popover-card">
 				<h2>COMMUNITY PARTNER</h2>
-				<div id="partners-container" class="partner-list"></div>
-				<p>Community Partner functions coming soon.</p>
+				<krv-bridge-partners partners=""></krv-bridge-partners>
+				<!-- <p>Community Partner functions coming soon.</p> -->
 				<div class="actions">
 					<button type="button" class="kiosk-button btn btn-danger" command="hide-popover" commandfor="partnerScreen">BACK TO KIOSK</button>
 				</div>
@@ -524,7 +523,7 @@
 				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
 			</symbol>
 		</svg>
-		<template id="partner-template">
+		<!-- <template id="partner-template">
 			<div class="partner-card block">
 				<p class="partner-name" data-field="name"></p>
 				<img class="partner-logo" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" data-field="image" />
@@ -536,6 +535,6 @@
 					<span>Learn More</span>
 				</a>
 			</div>
-		</template>
+		</template> -->
 	</body>
 </html>

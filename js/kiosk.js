@@ -1,5 +1,6 @@
 import '@shgysk8zer0/polyfills';
 import '@kernvalley/components/events.js';
+import '/js/components/partners.js';
 import { $state, $watch } from '@aegisjsproject/iota';
 import layers from '@aegisjsproject/styles/css/layers.css' with { type: 'css' };
 import theme from '@aegisjsproject/styles/css/theme.css' with { type: 'css' };
@@ -376,25 +377,3 @@ const toggleLock = lock => {
 };
 
 $watch($wakelock, toggleLock);
-
-async function init({ signal } = {}) {
-	const resp = await fetch('/partners.json', {
-		mode: 'cors',
-		referrerPolicy: 'no-referrer',
-		headers: { Accept: 'application/json' },
-		signal,
-	});
-	const { partners } = await resp.json();
-	const template = document.getElementById('partner-template');
-
-	document.getElementById('partners-container').append(...partners.filter(({ partner }) => partner).map(({ name, id, image, description }) => {
-		const tmp = template.content.cloneNode(true);
-		tmp.querySelector('[data-field="name"]').textContent = name;
-		tmp.querySelector('[data-field="description"]').textContent = description;
-		tmp.querySelector('[data-field="image"]').src = `https://krvbridge.org${image.url ?? image.src}`;
-		tmp.querySelector('[data-field="link"]').href = `https://krvbridge.org/partners/${id}`;
-		return tmp;
-	}));
-}
-
-init().catch(console.error);
