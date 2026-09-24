@@ -82,13 +82,13 @@
     "@shgysk8zer0/netlify-func-utils": "^1.1.2",
     "@shgysk8zer0/slack": "^0.0.7",
     "@shgysk8zer0/suid": "^1.0.0",
-    "firebase-admin": "^14.3.0",
+    "firebase-admin": "^14.4.0",
     "qr": "^0.7.0"
   },
   "devDependencies": {
     "@aegisjsproject/hermes": "^1.1.0",
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^17.4.2"
+    "dotenv": "^18.0.2"
   },
   "overrides": {
     "uuid": "^14.0.0"
@@ -101,7 +101,7 @@
     "sharp@0.34.5": true,
     "unix-dgram@2.0.7": true,
     "netlify-cli@26.2.0": true,
-    "protobufjs@7.6.5": true,
+    "protobufjs@7.6.6": true,
     "esbuild@0.28.1": true
   }
 }
