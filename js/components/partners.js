@@ -1,25 +1,18 @@
+import { html } from '@aegisjsproject/core/parsers/html.js';
+import { css } from '@aegisjsproject/core/parsers/css.js';
+import { componentBase } from '@aegisjsproject/styles/theme.js';
+import reset from '@aegisjsproject/styles/css/reset.css' with { type: 'css' };
+import palette from '@aegisjsproject/styles/css/palette.css' with { type: 'css' };
+import layers from '@aegisjsproject/styles/css/layers.css' with { type: 'css' };
+import button from '@aegisjsproject/styles/css/button.css' with { type: 'css' };
 import data from 'https://krvbridge.org/partners.json' with { type: 'json' };
 
 const resources = data.partners;
-const sheet = new CSSStyleSheet();
 
-sheet.replaceSync(`
-	:host {
-		display: block;
-		font-family: system-ui, sans-serif;
-
-		&([theme='dark']) {
-			color-scheme: dark;
-		}
-
-		&([theme='light']) {
-			color-scheme: light;
-		}
-	}
-
+const sheet = css`@layer component {
 	.wrapper {
-		background-color: light-dark(#ffffff, #121212);
-		color: light-dark(#111111, #eeeeee);
+		background-color: light-dark(var(--gray-100), var(--gray-900));
+		color: light-dark(var(--gray-900), var(--gray-200));
 		padding: 1rem;
 		border-radius: 8px;
 
@@ -31,25 +24,11 @@ sheet.replaceSync(`
 			& input[type='search'] {
 				flex: 1;
 				padding: 0.5rem 1rem;
-				border: 1px solid light-dark(#cccccc, #444444);
-				background-color: light-dark(#ffffff, #2a2a2a);
-				color: light-dark(#111111, #eeeeee);
+				border: 1px solid light-dark(var(--gray-400), var(--gray-700));
+				background-color: light-dark(var(--gray-100), var(--gray-800));
+				color: light-dark(var(--gray-900), var(--gray-100));
 				border-radius: 4px;
 				font-size: 1rem;
-			}
-
-			& button {
-				padding: 0.5rem 1rem;
-				border: 1px solid light-dark(#cccccc, #444444);
-				background-color: light-dark(#f0f0f0, #333333);
-				color: light-dark(#111111, #eeeeee);
-				border-radius: 4px;
-				cursor: pointer;
-				font-size: 1rem;
-
-				&:hover {
-					background-color: light-dark(#e0e0e0, #444444);
-				}
 			}
 		}
 
@@ -61,15 +40,19 @@ sheet.replaceSync(`
 
 		& .card {
 			padding: 1.2rem;
-			border: 1px solid light-dark(#e0e0e0, #333333);
+			border: 1px solid light-dark(var(--gray-300), var(--gray-800));
 			border-radius: 6px;
-			background-color: light-dark(#fafafa, #1e1e1e);
-			display: flex;
+			background-color: light-dark(var(--gray-100), var(--gray-900));
 			flex-direction: column;
 			gap: 0.5rem;
+			transition: transform 250ms ease-out;
 
-			&[hidden] {
-				display: none !important;
+			&:not([hidden]) {
+				display: flex;
+			}
+
+			&:hover {
+				transform: scale(1.1) rotate(-2deg);
 			}
 
 			& .card-logo {
@@ -84,19 +67,19 @@ sheet.replaceSync(`
 			& h3 {
 				margin: 0;
 				font-size: 1.2rem;
-				color: light-dark(#0056b3, #66b3ff);
+				color: light-dark(var(--blue-700), var(--blue-300));
 			}
 
 			& p {
 				margin: 0;
 				font-size: 0.9rem;
 				line-height: 1.4;
-				color: light-dark(#444444, #cccccc);
+				color: light-dark(var(--gray-700), var(--gray-400));
 			}
 
 			& .meta {
 				font-size: 0.85rem;
-				color: light-dark(#666666, #aaaaaa);
+				color: light-dark(var(--gray-600), var(--gray-500));
 			}
 
 			& .tags {
@@ -109,14 +92,14 @@ sheet.replaceSync(`
 				& .tag {
 					padding: 0.2rem 0.6rem;
 					font-size: 0.75rem;
-					background-color: light-dark(#e9ecef, #333333);
+					background-color: light-dark(var(--gray-200), var(--gray-800));
 					border-radius: 12px;
-					color: light-dark(#333333, #dddddd);
+					color: light-dark(var(--gray-800), var(--gray-300));
 					cursor: pointer;
 					transition: background-color 0.2s ease;
 
 					&:hover {
-						background-color: light-dark(#d0d4d8, #555555);
+						background-color: light-dark(var(--gray-300), var(--gray-700));
 					}
 				}
 			}
@@ -131,19 +114,21 @@ sheet.replaceSync(`
 			text-decoration: underline;
 		}
 	}
-`);
+}`;
 
 export class KRVBridgePartners extends HTMLElement {
 	#shadow = this.attachShadow({ mode: 'closed' });
-	// #internals = this.attachInternals();
 	#isInitialized = false;
 	#listContainer;
 	#searchInput;
 	#cards = [];
+	#stack = new DisposableStack();
+	#controller;
+	#resolvers = Promise.withResolvers();
 
 	constructor() {
 		super();
-		this.#shadow.adoptedStyleSheets = [sheet];
+		this.#shadow.adoptedStyleSheets = [layers, reset, palette, componentBase, button, sheet];
 
 		this.#renderLayout();
 		this.#buildCards();
@@ -161,11 +146,7 @@ export class KRVBridgePartners extends HTMLElement {
 	}
 
 	set partners(val) {
-		if (val) {
-			this.setAttribute('partners', '');
-		} else {
-			this.removeAttribute('partners');
-		}
+		this.toggleAttribute('partners', val);
 	}
 
 	get keyword() {
@@ -173,7 +154,7 @@ export class KRVBridgePartners extends HTMLElement {
 	}
 
 	set keyword(val) {
-		if (val) {
+		if (typeof val === 'string' && val.length !== 0) {
 			this.setAttribute('keyword', val);
 		} else {
 			this.removeAttribute('keyword');
@@ -181,193 +162,126 @@ export class KRVBridgePartners extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		if (oldValue !== newValue) {
-			if (name === 'keyword' && this.#searchInput) {
-				this.#searchInput.value = newValue || '';
-			}
-			if (this.#isInitialized) {
-				this.#filterCards(true);
+		if (! this.#stack?.disposed) {
+			if (oldValue !== newValue) {
+				if (name === 'keyword' && this.#searchInput) {
+					this.#searchInput.value = newValue || '';
+				}
+				if (this.#isInitialized) {
+					this.#filterCards(true);
+				}
 			}
 		}
 	}
 
-	#renderLayout() {
-		const wrapper = document.createElement('div');
-		wrapper.className = 'wrapper';
-		wrapper.part.add('wrapper');
+	connectedCallback() {
+		if (! this.#stack.disposed) {
+			this.#controller = this.#stack.adopt(new AbortController(), controller => controller.abort());
+			this.#resolvers.resolve();
+		}
+	}
 
-		const searchBar = document.createElement('form');
-		searchBar.className = 'search-bar';
-		searchBar.part.add('search-bar');
+	disconnectedCallback() {
+		this.#controller.abort();
+	}
+
+	[Symbol.dispose]() {
+		this.#stack.dispose();
+		this.#shadow.querySelectorAll('button, fieldset, input').forEach(el => el.disabled = true);
+	}
+
+	async #renderLayout() {
+		await this.#resolvers.promise;
+		const uniqueKeywords = Array.from(
+			new Set((data.partners || []).flatMap(item => item.keywords || []))
+		).sort();
+
+		const frag = html`
+			<search class="wrapper" part="wrapper">
+				<form class="search-bar" part="search-bar">
+					<input type="search" placeholder="Search by keyword or name..." list="keyword-suggestions" part="search-input">
+					<datalist id="keyword-suggestions">
+						${uniqueKeywords.map(kw => `<option value="${kw}"></option>`).join('')}
+					</datalist>
+					<button type="submit" class="btn btn-success" part="submit-button">Search</button>
+					<button type="button" class="btn btn-danger clear-btn" part="clear-button">Clear</button>
+				</form>
+				<div class="list" part="list"></div>
+			</search>
+		`;
+
+		const wrapper = frag.firstElementChild;
+		const searchBar = wrapper.querySelector('form');
+		this.#searchInput = searchBar.querySelector('input');
+		const clearBtn = searchBar.querySelector('.clear-btn');
+		this.#listContainer = wrapper.querySelector('.list');
+
+		this.#searchInput.value = this.keyword;
+
 		searchBar.addEventListener('submit', (e) => {
 			e.preventDefault();
 			this.keyword = this.#searchInput.value;
-		});
+		}, { signal: this.#controller.signal });
 
-		this.#searchInput = document.createElement('input');
-		this.#searchInput.type = 'search';
-		this.#searchInput.placeholder = 'Search by keyword or name...';
-		this.#searchInput.value = this.keyword;
-		this.#searchInput.setAttribute('list', 'keyword-suggestions');
-		this.#searchInput.part.add('search-input');
-
-		const datalist = document.createElement('datalist');
-		datalist.id = 'keyword-suggestions';
-
-		const uniqueKeywords = new Set();
-		if (data.partners) {
-			data.partners.forEach(item => {
-				if (item.keywords) {
-					item.keywords.forEach(kw => uniqueKeywords.add(kw));
-				}
-			});
-		}
-
-		Array.from(uniqueKeywords).sort().forEach(kw => {
-			const option = document.createElement('option');
-			option.value = kw;
-			datalist.append(option);
-		});
-
-		const submitBtn = document.createElement('button');
-		submitBtn.type = 'submit';
-		submitBtn.textContent = 'Search';
-		submitBtn.part.add('submit-button');
-
-		const clearBtn = document.createElement('button');
-		clearBtn.type = 'button';
-		clearBtn.textContent = 'Clear';
-		clearBtn.part.add('clear-button');
 		clearBtn.addEventListener('click', () => {
 			this.#searchInput.value = '';
 			this.keyword = '';
-		});
+		}, { passive: true, signal: this.#controller.signal });
 
-		searchBar.append(this.#searchInput, datalist, submitBtn, clearBtn);
-
-		this.#listContainer = document.createElement('div');
-		this.#listContainer.className = 'list';
-		this.#listContainer.part.add('list');
-
-		wrapper.append(searchBar, this.#listContainer);
-		this.#shadow.append(wrapper);
+		this.#shadow.append(frag);
 	}
 
-	#buildCards() {
+	async #buildCards() {
+		await this.#resolvers.promise;
 		const partnersData = data.partners || [];
 
 		partnersData.forEach(item => {
-			const card = document.createElement('div');
-			card.className = 'card';
-			card.part.add('card');
+			const rawSrc = item.image?.src || item.image?.url;
+			const imgSrc = rawSrc ? new URL(rawSrc, 'https://krvbridge.org').href : '';
+			const imgWidth = item.image?.width ? `width="${item.image.width}"` : '';
+			const imgHeight = item.image?.height ? `height="${item.image.height}"` : '';
 
-			if (item.image && (item.image.src || item.image.url)) {
-				const img = document.createElement('img');
-				const rawSrc = item.image.src || item.image.url;
+			const frag = html`
+				<div class="card" part="card">
+					${imgSrc ? `<img src="${imgSrc}" alt="${item.name} logo" class="card-logo" loading="lazy" part="card-logo" ${imgWidth}${imgHeight}>` : ''}
+					<h3 part="card-title">
+						${item.url ? `<a href="${item.url}" target="_blank" part="card-link">${item.name}</a>` : item.name}
+					</h3>
+					<p part="card-description">${item.description || ''}</p>
+					${(item.telephone || item.email) ? `
+						<div class="meta" part="card-meta">
+							${item.telephone ? `<span part="phone-label">Phone: <a href="tel:${item.telephone.replace(/\s+/g, '')}" part="phone-link">${item.telephone}</a></span>` : ''}
+							${(item.telephone && item.email) ? '<span part="meta-separator"> | </span>' : ''}
+							${item.email ? `<span part="email-label">Email: <a href="mailto:${item.email.trim()}" part="email-link">${item.email}</a></span>` : ''}
+						</div>
+					` : ''}
+					${(item.keywords && item.keywords.length > 0) ? `
+						<div class="tags" part="tags">
+							${item.keywords.map(kw => `<span class="tag" part="tag" data-kw="${kw}">${kw}</span>`).join('')}
+						</div>
+					` : ''}
+				</div>
+			`;
 
-				img.src = new URL(rawSrc, 'https://krvbridge.org').href;
-				img.alt = `${item.name} logo`;
-				img.className = 'card-logo';
-				img.loading = 'lazy';
-				img.part.add('card-logo');
+			const card = frag.firstElementChild;
 
-				if (item.image.width) img.setAttribute('width', item.image.width);
-				if (item.image.height) img.setAttribute('height', item.image.height);
-
-				card.append(img);
-			}
-
-			const title = document.createElement('h3');
-			title.part.add('card-title');
-			if (item.url) {
-				const link = document.createElement('a');
-				link.href = item.url;
-				link.target = '_blank';
-				link.textContent = item.name;
-				link.part.add('card-link');
-				title.append(link);
-			} else {
-				title.textContent = item.name;
-			}
-
-			const desc = document.createElement('p');
-			desc.textContent = item.description || '';
-			desc.part.add('card-description');
-
-			card.append(title, desc);
-
-			if (item.telephone || item.email) {
-				const meta = document.createElement('div');
-				meta.className = 'meta';
-				meta.part.add('card-meta');
-
-				if (item.telephone) {
-					const phoneSpan = document.createElement('span');
-					phoneSpan.textContent = 'Phone: ';
-					phoneSpan.part.add('phone-label');
-
-					const phoneLink = document.createElement('a');
-					phoneLink.href = `tel:${item.telephone.replace(/\s+/g, '')}`;
-					phoneLink.textContent = item.telephone;
-					phoneLink.part.add('phone-link');
-
-					phoneSpan.append(phoneLink);
-					meta.append(phoneSpan);
-				}
-
-				if (item.telephone && item.email) {
-					const separator = document.createElement('span');
-					separator.textContent = ' | ';
-					separator.part.add('meta-separator');
-					meta.append(separator);
-				}
-
-				if (item.email) {
-					const emailSpan = document.createElement('span');
-					emailSpan.textContent = 'Email: ';
-					emailSpan.part.add('email-label');
-
-					const emailLink = document.createElement('a');
-					emailLink.href = `mailto:${item.email.trim()}`;
-					emailLink.textContent = item.email;
-					emailLink.part.add('email-link');
-
-					emailSpan.append(emailLink);
-					meta.append(emailSpan);
-				}
-
-				card.append(meta);
-			}
-
-			if (item.keywords && item.keywords.length > 0) {
-				const tags = document.createElement('div');
-				tags.className = 'tags';
-				tags.part.add('tags');
-				item.keywords.forEach(kw => {
-					const tag = document.createElement('span');
-					tag.className = 'tag';
-					tag.textContent = kw;
-					tag.part.add('tag');
-					tag.addEventListener('click', () => {
-						this.keyword = kw;
-					});
-					tags.append(tag);
-				});
-				card.append(tags);
-			}
-
-			this.#listContainer.append(card);
+			card.querySelectorAll('.tag').forEach(tagEl => {
+				tagEl.addEventListener('click', () => {
+					this.keyword = tagEl.dataset.kw;
+				}, { passive: true, signal: this.#controller.signal });
+			});
 
 			const nameMatch = item.name?.toLowerCase() || '';
 			const descMatch = item.description?.toLowerCase() || '';
 			const keywordMatch = item.keywords?.map(k => k.toLowerCase()).join(' ') || '';
-			const searchableText = `${nameMatch} ${descMatch} ${keywordMatch}`;
 
 			this.#cards.push({
 				element: card,
 				isPartner: item.partner === true,
-				searchableText: searchableText
+				searchableText: `${nameMatch} ${descMatch} ${keywordMatch}`
 			});
+
+			this.#listContainer.append(frag);
 		});
 	}
 
