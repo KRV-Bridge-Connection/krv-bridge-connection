@@ -1,10 +1,7 @@
-@import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/viewport.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/element.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/class-rules.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/animations.css");
-@import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/scrollbar.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/accordion.css");
-@import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/forms.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/palette/gnome.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/theme/bootstrap/index.css");
 @import url("https://unpkg.com/@shgysk8zer0/core-css@3.0.0/theme/properties.css");
