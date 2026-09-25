@@ -6,7 +6,7 @@ import {
 	HTTPBadRequestError,
 } from '@shgysk8zer0/lambda-http';
 import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
-import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
+// import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { readFile } from 'node:fs/promises';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
 import { getFirestore } from './utils.js';
@@ -82,7 +82,7 @@ export default createHandler({
 
 					return new Response(null, {
 						headers: { Location: url.href },
-						status: CREATED,
+						status: 201, // Created
 					});
 				}
 			}
@@ -112,7 +112,7 @@ export default createHandler({
 				const db = await getFirestore();
 				await db.collection(collection).doc(req.searchParams.get('id')).delete();
 
-				return new Response(null, { status: NO_CONTENT });
+				return new Response(null, { status: 204 /* No Content */ });
 			}
 		}
 	}
