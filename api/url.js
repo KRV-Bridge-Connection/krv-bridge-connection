@@ -35,9 +35,10 @@ export default createHandler({
 			throw new HTTPBadRequestError('Missing required id.');
 		} else {
 			const result = await getCollectionItem('links', req.searchParams.get('id'));
+			const url = new URL(result?.url);
 
-			if (URL.canParse(result?.url)) {
-				return Response.redirect(result.url);
+			if (url instanceof URL) {
+				return Response.redirect(url, 307);
 			} else {
 				throw new HTTPNotFoundError(`No link for ${req.searchParams.get('id')} found.`);
 			}
@@ -62,8 +63,9 @@ export default createHandler({
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
 			} else {
 				const data = await req.formData();
+				const url = URL.parse(data.url);
 
-				if (! URL.canParse(data.get('url'))) {
+				if (! (url instanceof URL)) {
 					throw new HTTPBadRequestError('Invalid or missing URL.');
 				} else {
 					const db = await getFirestore();

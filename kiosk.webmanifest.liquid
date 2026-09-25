@@ -1,0 +1,26 @@
+---
+layout: null
+permalink: /kiosk.webmanifest
+---
+{
+	"version": {{ app.version | default: pkg.version | jsonify }},
+	"id": "/webapp.webmanifest",
+	"name": "KRV Bridge Kiosk",
+	"short_name": "Bridge Kiosk",
+	"description": "The KRV Bridge Connection is a 501(c)(3) nonprofit organization dedicated to strengthening the Kern River Valley community. Our mission is to bridge individuals and families to services that address food insecurity, homelessness, and the needs of low-income households.",
+	"start_url": "/kiosk/",
+	"scope": "/kiosk/",
+	"lang": "en",
+	"dir": "ltr",
+	"orientation": "any",
+	"display": "standalone",
+	"theme_color": "#1a5fb4",
+	"background_color": "#242424",
+	"icons": [{"src":"/img/favicon.svg","type":"image/svg+xml","sizes":"150x150","purpose":"maskable any"},{"src":"/img/icon-512.png","type":"image/png","sizes":"512x512","purpose":"maskable any"},{"src":"/img/icon-192.png","type":"image/png","sizes":"192x192","purpose":"maskable any"}],
+	"screenshots": [{"src":"https://i.imgur.com/akVxai3.png","sizes":"864x1512","type":"image/png"},{"src":"https://i.imgur.com/QOQ6D5d.png","sizes":"864x1512","type":"image/png"},{"src":"https://i.imgur.com/3vtLQT9.png","sizes":"864x1512","type":"image/png"},{"src":"https://i.imgur.com/IeQ1d8q.png","sizes":"864x1512","type":"image/png"},{"src":"https://i.imgur.com/5o8bZaY.png","sizes":"864x1512","type":"image/png"},{"src":"https://i.imgur.com/E9BEmLkh.webp","sizes":"1024x502","type":"image/webp"}],
+	"iarc_rating_id": "dd768f7f-8541-4555-a447-f07338b2d4aa",
+	"serviceworker": {"src":"/worker.js","scope":"/","use_cache":true},
+	"prefer_related_applications": false,
+	"related_applications": [{"platform":"webapp","url":"/kiosk.webmanifest"}],
+	"categories": ["utilities"]
+}

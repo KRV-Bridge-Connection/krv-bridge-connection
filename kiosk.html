@@ -1,144 +1,19 @@
+---
+layout: null
+permalink: /kiosk/
+---
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" id="doc" class="scroll-smooth background-primary color-default font-main border-box js" data-service-worker="/worker.js" data-service-worker-type="module" data-service-worker-update-via-cache="imports" data-reload-on-update="" data-scope="/" data-layout="default" data-theme="" data-trusted-policies="goog-cal#script-url youtube#script-url aegis-sanitizer#html sw#script-url aegis-router#html aegis-escape#html hermes#script-url lit-html" itemtype="http://schema.org/WebPage" itemscope="">
 	<head>
 		<title>KRV Bridge Connection Kiosk</title>
 		<meta charset="utf-8" />
 		<meta name="color-scheme" content="light dark" />
 		<meta name="viewport" content="width=device-width" />
-		<script type="importmap" integrity="sha384-KRKEczCN31pLgM0TAuY6OnBTOqLgeZE3uNelyS4XnF8eiedEgmvYa7XMbmKAjrRI">{
-			"imports": {
-				"@node/": "/node_modules/",
-				"@shgysk8zer0/kazoo/": "https://unpkg.com/@shgysk8zer0/kazoo@1.0.12/",
-				"@shgysk8zer0/konami": "https://unpkg.com/@shgysk8zer0/konami@1.1.2/konami.js",
-				"@shgysk8zer0/polyfills": "https://unpkg.com/@shgysk8zer0/polyfills@0.8.6/browser.min.js",
-				"@shgysk8zer0/polyfills/": "https://unpkg.com/@shgysk8zer0/polyfills@0.8.6/",
-				"@shgysk8zer0/jwk-utils": "https://unpkg.com/@shgysk8zer0/jwk-utils@1.2.1/jwk-utils.min.js",
-				"@shgysk8zer0/jwk-utils/": "https://unpkg.com/@shgysk8zer0/jwk-utils@1.2.1/",
-				"@shgysk8zer0/jswaggersheets": "https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/swagger.js",
-				"@shgysk8zer0/jswaggersheets/": "https://unpkg.com/@shgysk8zer0/jswaggersheets@1.1.0/",
-				"@shgysk8zer0/jss/": "https://unpkg.com/@shgysk8zer0/jss@1.0.1/",
-				"@shgysk8zer0/consts/": "https://unpkg.com/@shgysk8zer0/consts@1.0.8/",
-				"@shgysk8zer0/http/": "https://unpkg.com/@shgysk8zer0/http@1.0.5/",
-				"@shgysk8zer0/http-status": "https://unpkg.com/@shgysk8zer0/http-status@1.1.4/http-status.js",
-				"@shgysk8zer0/aes-gcm": "https://unpkg.com/@shgysk8zer0/aes-gcm@1.1.0/aes-gcm.min.js",
-				"@shgysk8zer0/aes-gcm/": "https://unpkg.com/@shgysk8zer0/aes-gcm@1.1.0/",
-				"@shgysk8zer0/squish": "https://unpkg.com/@shgysk8zer0/squish@1.0.2/squish.min.js",
-				"@shgysk8zer0/squish/": "https://unpkg.com/@shgysk8zer0/squish@1.0.2/",
-				"@shgysk8zer0/suid": "https://unpkg.com/@shgysk8zer0/suid@1.0.0/suid.min.js",
-				"@shgysk8zer0/suid/": "https://unpkg.com/@shgysk8zer0/suid@1.0.0/",
-				"@shgysk8zer0/geoutils": "https://unpkg.com/@shgysk8zer0/geoutils@1.0.6/geoutils.min.js",
-				"@shgysk8zer0/geoutils/": "https://unpkg.com/@shgysk8zer0/geoutils@1.0.6/",
-				"@shgysk8zer0/core-css/": "https://unpkg.com/@shgysk8zer0/core-css@3.0.0/",
-				"@shgysk8zer0/signals": "https://unpkg.com/@shgysk8zer0/signals@0.1.0/signals.min.js",
-				"@shgysk8zer0/signals/": "https://unpkg.com/@shgysk8zer0/signals@0.1.0/",
-				"@shgysk8zer0/importmap": "https://unpkg.com/@shgysk8zer0/importmap@1.10.4/importmap.js",
-				"@shgysk8zer0/importmap/": "https://unpkg.com/@shgysk8zer0/importmap@1.10.4/",
-				"@shgysk8zer0/components/": "https://unpkg.com/@shgysk8zer0/components@0.3.23/",
-				"@aegisjsproject/trusted-types": "https://unpkg.com/@aegisjsproject/trusted-types@1.1.0/bundle.min.js",
-				"@aegisjsproject/trusted-types/": "https://unpkg.com/@aegisjsproject/trusted-types@1.1.0/",
-				"@aegisjsproject/parsers": "https://unpkg.com/@aegisjsproject/parsers@0.2.0/bundle.min.js",
-				"@aegisjsproject/parsers/": "https://unpkg.com/@aegisjsproject/parsers@0.2.0/",
-				"@aegisjsproject/sanitizer": "https://unpkg.com/@aegisjsproject/sanitizer@0.3.0/sanitizer.js",
-				"@aegisjsproject/sanitizer/": "https://unpkg.com/@aegisjsproject/sanitizer@0.3.0/",
-				"@aegisjsproject/core": "https://unpkg.com/@aegisjsproject/core@0.3.0/core.js",
-				"@aegisjsproject/core/": "https://unpkg.com/@aegisjsproject/core@0.3.0/",
-				"@aegisjsproject/styles": "https://unpkg.com/@aegisjsproject/styles@0.4.1/styles.js",
-				"@aegisjsproject/styles/": "https://unpkg.com/@aegisjsproject/styles@0.4.1/",
-				"@aegisjsproject/component": "https://unpkg.com/@aegisjsproject/component@0.2.0/component.js",
-				"@aegisjsproject/component/": "https://unpkg.com/@aegisjsproject/component@0.2.0/",
-				"@aegisjsproject/markdown": "https://unpkg.com/@aegisjsproject/markdown@0.1.7/markdown.min.js",
-				"@aegisjsproject/markdown/": "https://unpkg.com/@aegisjsproject/markdown@0.1.7/",
-				"@aegisjsproject/aegis-md": "https://unpkg.com/@aegisjsproject/aegis-md@0.0.4/aegis-md.js",
-				"@aegisjsproject/aegis-md/": "https://unpkg.com/@aegisjsproject/aegis-md@0.0.4/",
-				"@aegisjsproject/url": "https://unpkg.com/@aegisjsproject/url@1.1.0/url.min.js",
-				"@aegisjsproject/url/": "https://unpkg.com/@aegisjsproject/url@1.1.0/",
-				"@aegisjsproject/idb/": "https://unpkg.com/@aegisjsproject/idb@1.1.0/",
-				"@aegisjsproject/idb": "https://unpkg.com/@aegisjsproject/idb@1.1.0/idb.min.js",
-				"@aegisjsproject/otp/": "https://unpkg.com/@aegisjsproject/otp@1.0.2/",
-				"@aegisjsproject/otp": "https://unpkg.com/@aegisjsproject/otp@1.0.2/otp.min.js",
-				"@aegisjsproject/md-editor": "https://unpkg.com/@aegisjsproject/md-editor@1.0.0/md-editor.js",
-				"@aegisjsproject/md-editor/": "https://unpkg.com/@aegisjsproject/md-editor@1.0.0/",
-				"@aegisjsproject/barcodescanner": "https://unpkg.com/@aegisjsproject/barcodescanner@1.2.3/scanner.min.js",
-				"@aegisjsproject/barcodescanner/": "https://unpkg.com/@aegisjsproject/barcodescanner@1.2.3/",
-				"@aegisjsproject/state": "https://unpkg.com/@aegisjsproject/state@1.1.0/state.mjs",
-				"@aegisjsproject/state/": "https://unpkg.com/@aegisjsproject/state@1.1.0/",
-				"@aegisjsproject/router": "https://unpkg.com/@aegisjsproject/router@1.3.1/router.mjs",
-				"@aegisjsproject/router/": "https://unpkg.com/@aegisjsproject/router@1.3.1/",
-				"@aegisjsproject/callback-registry": "https://unpkg.com/@aegisjsproject/callback-registry@2.1.0/callbackRegistry.js",
-				"@aegisjsproject/callback-registry/": "https://unpkg.com/@aegisjsproject/callback-registry@2.1.0/",
-				"@aegisjsproject/attempt": "https://unpkg.com/@aegisjsproject/attempt@1.0.7/attempt.js",
-				"@aegisjsproject/attempt/": "https://unpkg.com/@aegisjsproject/attempt@1.0.7/",
-				"@aegisjsproject/secret-store": "https://unpkg.com/@aegisjsproject/secret-store@1.1.1/commands.min.js",
-				"@aegisjsproject/commands/": "https://unpkg.com/@aegisjsproject/commands@1.0.2/",
-				"@aegisjsproject/commands": "https://unpkg.com/@aegisjsproject/commands@1.0.2/commands.min.js",
-				"@aegisjsproject/firebase-account-routes": "https://unpkg.com/@aegisjsproject/firebase-account-routes@0.0.6/main.js",
-				"@aegisjsproject/firebase-account-routes/": "https://unpkg.com/@aegisjsproject/firebase-account-routes@0.0.6/",
-				"@aegisjsproject/secret-store/": "https://unpkg.com/@aegisjsproject/secret-store@1.1.1/",
-				"@aegisjsproject/qr-encoder": "https://unpkg.com/@aegisjsproject/qr-encoder@1.0.1/index.min.js",
-				"@aegisjsproject/qr-encoder/": "https://unpkg.com/@aegisjsproject/qr-encoder@1.0.1/",
-				"@aegisjsproject/escape": "https://unpkg.com/@aegisjsproject/escape@1.1.0/index.min.js",
-				"@aegisjsproject/escape/": "https://unpkg.com/@aegisjsproject/escape@1.1.0/",
-				"@aegisjsproject/disposable": "https://unpkg.com/@aegisjsproject/disposable@1.0.3/disposable.min.js",
-				"@aegisjsproject/disposable/": "https://unpkg.com/@aegisjsproject/disposable@1.0.3/",
-				"@aegisjsproject/iota": "https://unpkg.com/@aegisjsproject/iota@1.0.12/iota.min.js",
-				"@aegisjsproject/iota/": "https://unpkg.com/@aegisjsproject/iota@1.0.12/",
-				"@aegisjsproject/disposable-registry": "https://unpkg.com/@aegisjsproject/disposable-registry@1.1.0/registry.js",
-				"@aegisjsproject/disposable-registry/": "https://unpkg.com/@aegisjsproject/disposable-registry@1.1.0/",
-				"@aegisjsproject/hermes": "https://unpkg.com/@aegisjsproject/hermes@1.1.0/hermes.js",
-				"@aegisjsproject/hermes/": "https://unpkg.com/@aegisjsproject/hermes@1.1.0/",
-				"@aegisjsproject/pwa-prompt": "https://unpkg.com/@aegisjsproject/pwa-prompt@1.0.1/prompt.js",
-				"@aegisjsproject/pwa-prompt/": "https://unpkg.com/@aegisjsproject/pwa-prompt@1.0.1/",
-				"@aegisjsproject/button": "https://unpkg.com/@aegisjsproject/button@1.0.1/button.min.js",
-				"@aegisjsproject/button/": "https://unpkg.com/@aegisjsproject/button@1.0.1/",
-				"@aegisjsproject/atlas": "https://unpkg.com/@aegisjsproject/atlas@1.1.0/atlas.min.js",
-				"@aegisjsproject/atlas/": "https://unpkg.com/@aegisjsproject/atlas@1.1.0/",
-				"@aegisjsproject/toast-message": "https://unpkg.com/@aegisjsproject/toast-message@1.0.3/toast-message.min.js",
-				"@aegisjsproject/toast-message/": "https://unpkg.com/@aegisjsproject/toast-message@1.0.3/",
-				"@kernvalley/components/": "https://unpkg.com/@kernvalley/components@2.0.10/",
-				"@webcomponents/custom-elements": "https://unpkg.com/@webcomponents/custom-elements@1.6.0/custom-elements.min.js",
-				"leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
-				"leaflet/": "https://unpkg.com/leaflet@1.9.4/dist/",
-				"urlpattern-polyfill": "https://unpkg.com/urlpattern-polyfill@10.1.0/index.js",
-				"highlight.js": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/core.min.js",
-				"highlight.js/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/",
-				"highlight.js/styles/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/styles/",
-				"@highlightjs/cdn-assets": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/core.min.js",
-				"@highlightjs/cdn-assets/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/es/",
-				"@highlightjs/cdn-assets/styles/": "https://unpkg.com/@highlightjs/cdn-assets@11.12.0/styles/",
-				"marked": "https://unpkg.com/marked@18.0.11/lib/marked.esm.js",
-				"marked-highlight": "https://unpkg.com/marked-highlight@2.2.4/src/index.js",
-				"yaml": "https://unpkg.com/yaml@2.9.0/browser/dist/index.js",
-				"yaml/": "https://unpkg.com/yaml@2.9.0/browser/dist/",
-				"firebase/": "https://www.gstatic.com/firebasejs/12.12.1/",
-				"firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-				"firebase/app-check": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app-check.js",
-				"firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-				"firebase/database": "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js",
-				"firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
-				"firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
-				"firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js",
-				"firebase/performance": "https://www.gstatic.com/firebasejs/12.12.1/firebase-performance.js",
-				"firebase/remote-config": "https://www.gstatic.com/firebasejs/12.12.1/firebase-remote-config.js",
-				"firebase/storage": "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js",
-				"firebase/analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
-				"qr": "https://unpkg.com/qr@0.7.0/index.js",
-				"qr/": "https://unpkg.com/qr@0.7.0/",
-				"lit": "https://unpkg.com/lit@3.3.3/index.js",
-				"lit/": "https://unpkg.com/lit@3.3.3/",
-				"lit-html": "https://unpkg.com/lit-html@3.3.3/lit-html.js",
-				"lit-html/": "https://unpkg.com/lit-html@3.3.3/",
-				"lit-element": "https://unpkg.com/lit-element@4.2.2/lit-element.js",
-				"lit-element/": "https://unpkg.com/lit-element@4.2.2/",
-				"@lit/reactive-element": "https://unpkg.com/@lit/reactive-element@2.1.2/reactive-element.js",
-				"@lit/reactive-element/": "https://unpkg.com/@lit/reactive-element@2.1.2/",
-				"@awesome.me/webawesome/": "https://unpkg.com/@awesome.me/webawesome@3.12.0/",
-				"normalize.css": "https://unpkg.com/normalize.css@8.0.1/normalize.css"
-			},
-			"scopes": {}
-		}</script>
+		{% if importmap %}<script type="importmap" integrity="{{ importmap | jsonify | sri }}">{{ importmap | jsonify }}</script>{% endif %}
 		<script type="module" src="/js/kiosk.js" referrerpolicy="no-referrer"></script>
 		<link rel="icon" type="image/svg+xml" sizes="any" href="/img/favicon.svg" />
 		<link rel="stylesheet" href="/css/kiosk.css" referrerpolicy="no-referrer" />
+		<link rel="manifest" href="/kiosk.webmanifest" />
 	</head>
 	<body>
 		<div id="app" class="system-ui">
@@ -523,4 +398,5 @@
 				<path fill-rule="evenodd" d="M11 10h1v3c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3v1H1v10h10v-3zM6 2l2.25 2.25L5 7.5 6.5 9l3.25-3.25L12 8V2H6z"/>
 			</symbol>
 		</svg>
+	</body>
 </html>
