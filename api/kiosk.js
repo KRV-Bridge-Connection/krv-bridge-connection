@@ -1,46 +1,20 @@
-import { createHandler } from '@shgysk8zer0/lambda-http';
-import { putCollectionItem, getCollectionItems } from './utils.js';
+import { createHandler, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
+// import { putCollectionItem, getCollectionItems } from './utils.js';
 
 export default createHandler({
-	async get() {
-		const items = await getCollectionItems('kiosk', {
-			lomit: 1000,
-			filters: [
-				['timestamp', '>', new Date('2026-08-01T00:00')],
-				['timestamp', '<', new Date('2026-09-01T00:00')]
-			]
-		});
-
-		return Response.json(items.map(item => ({
-			// name: item.name,
-			timestamp: new Date(item.timestamp._seconds * 1000).toLocaleString(),
-			size: item.size,
-			partners: item.partners,
-			services: item.services,
-		})));
-	},
 	async post(req) {
 		const data = await req.formData();
 
-		await putCollectionItem('kiosk', data.get('uuid'), {
-			uuid: data.get('uuid'),
-			name: data.get('contact[name]'),
-			size: parseInt(data.get('size'), 10),
-			phone: data.get('contact[phone]'),
-			email: data.get('contact[email]'),
-			message: data.get('message'),
-			partners: data.getAll('partners[]'),
-			services: data.getAll('services[]'),
-			// age: parseInt(data.get('contact[age]'), 10),
-			details: {
-				isHomeless: data.has('contact[homeless]'),
-				hasSCEDisconnect: data.has('contact[sce-disconnect]'),
-			},
-			timestamp: new Date(),
-		});
+		if (! data.has('scriptAction')) {
+			throw new HTTPBadGatewayError('Invalid request.');
+		} else {
+			console.log(data);
 
-		return new Response(null, { status: 204 });
+			switch(data.get('scriptAction')) {
+				default:
+					return Response.json({ message: `Submitted ${data.get('scriptAction')}.`});
+			}
+
+		}
 	}
-}, {
-	logger: err => console.error(err),
 });
