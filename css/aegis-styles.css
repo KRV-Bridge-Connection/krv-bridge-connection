@@ -1,5 +1,7 @@
-@import url("https://unpkg.com/@aegisjsproject/styles@0.3.4/css/reset.css");
-@import url("https://unpkg.com/@aegisjsproject/styles@0.3.4/css/properties.css");
-@import url("https://unpkg.com/@aegisjsproject/styles@0.3.4/css/palette.css");
-@import url("https://unpkg.com/@aegisjsproject/styles@0.3.4/css/button.css");
-@import url("https://unpkg.com/@aegisjsproject/styles@0.3.4/css/presentation.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/reset.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/properties.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/palette.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/button.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/presentation.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/forms.css");
+@import url("https://unpkg.com/@aegisjsproject/styles@0.4.1/css/scrollbar.css");
