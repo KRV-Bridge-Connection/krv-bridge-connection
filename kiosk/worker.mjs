@@ -13,7 +13,7 @@ new HermesWorker([
 			pathname: `/((?!(?:${staticDirs.join('|')}|api)/).*)`
 		}),
 		prefetch: [
-			'/kiosk/', '/kiosk/kiosk.js', '/kiosk/kiosk.css', '/kiosk/', '/404.html',
+			'/kiosk/', '/kiosk/kiosk.js', '/kiosk/kiosk.css', '/kiosk/', '/404.html', '/partners.json',
 		].map(path => URL.parse(path, location.origin)),
 		fallback: new URL('/404.html', location.origin),
 	},{
