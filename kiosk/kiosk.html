@@ -3,17 +3,17 @@ layout: null
 permalink: /kiosk/
 ---
 <!DOCTYPE html>
-<html lang="en" dir="ltr" id="doc" class="scroll-smooth background-primary color-default font-main border-box js" data-service-worker="/worker.js" data-service-worker-type="module" data-service-worker-update-via-cache="imports" data-reload-on-update="" data-scope="/" data-layout="default" data-theme="" data-trusted-policies="goog-cal#script-url youtube#script-url aegis-sanitizer#html sw#script-url aegis-router#html aegis-escape#html hermes#script-url lit-html" itemtype="http://schema.org/WebPage" itemscope="">
+<html lang="en" dir="ltr" id="doc" class="scroll-smooth background-primary color-default font-main border-box js" data-service-worker="/kiosk/worker.js" data-service-worker-type="module" data-service-worker-update-via-cache="imports" data-reload-on-update="" data-scope="/" data-layout="default" data-theme="" data-trusted-policies="goog-cal#script-url youtube#script-url aegis-sanitizer#html sw#script-url aegis-router#html aegis-escape#html hermes#script-url lit-html" itemtype="http://schema.org/WebPage" itemscope="">
 	<head>
 		<title>KRV Bridge Connection Kiosk</title>
 		<meta charset="utf-8" />
 		<meta name="color-scheme" content="light dark" />
 		<meta name="viewport" content="width=device-width" />
 		{% if importmap %}<script type="importmap" integrity="{{ importmap | jsonify | sri }}">{{ importmap | jsonify }}</script>{% endif %}
-		<script type="module" src="/js/kiosk.js" referrerpolicy="no-referrer"></script>
+		<script type="module" src="/kiosk/kiosk.js" referrerpolicy="no-referrer"></script>
 		<link rel="icon" type="image/svg+xml" sizes="any" href="/img/favicon.svg" />
-		<link rel="stylesheet" href="/css/kiosk.css" referrerpolicy="no-referrer" />
-		<link rel="manifest" href="/kiosk.webmanifest" />
+		<link rel="stylesheet" href="/kiosk/kiosk.css" referrerpolicy="no-referrer" />
+		<link rel="manifest" href="/kisok/kiosk.webmanifest" />
 	</head>
 	<body>
 		<div id="app" class="system-ui">

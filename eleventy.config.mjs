@@ -79,6 +79,8 @@ export default function(eleventyConfig) {
 	eleventyConfig.addPassthroughCopy('.well-known');
 	eleventyConfig.addPassthroughCopy('_redirects');
 	eleventyConfig.addPassthroughCopy('robots.txt');
+	eleventyConfig.addPassthroughCopy('kiosk/*.css');
+	eleventyConfig.addPassthroughCopy('kiosk/*.js');
 
 	// Not including file extensions is slower, so alias them
 	eleventyConfig.addLayoutAlias('post', '11ty-layouts/post.html');
