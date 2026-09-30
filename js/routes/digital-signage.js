@@ -229,7 +229,7 @@ export default async ({ signal, stack }) => {
 	scrollSnap.append(
 		cal,
 		forecast,
-		el`<img src="https://i.imgur.com/S6DwXaH.webp" width="1376" height="768" alt="Volunteer with KRV Bridge Connection!" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />` ,
+		el`<img src="https://i.imgur.com/fzu77EW.webp" width="1376" height="768" alt="Volunteer with KRV Bridge Connection!" crossorigin="anonymous" referrerpolicy="no-referrer" loading="lazy" />` ,
 		GCalEvents.create('partners', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('pantry', { loading: 'lazy', theme: 'dark' }),
 		GCalEvents.create('events', { loading: 'lazy', theme: 'dark' }),
