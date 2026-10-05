@@ -2,6 +2,7 @@
 layout: null
 permalink: /llms.txt
 templateEngineOverride: njk
+eleventyExcludeFromCollections: true
 ---
 # KRV Bridge Connection
 

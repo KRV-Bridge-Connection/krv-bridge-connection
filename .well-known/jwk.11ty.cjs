@@ -3,7 +3,7 @@ const firebase = require('firebase-admin');
 const { initializeApp, cert, getApps, getApp } = require('firebase-admin/app');
 const { initializeFirestore } = require('firebase-admin/firestore');
 
-module.exports.data = () => ({ permalink: '/.well-known/jwks.json' });
+module.exports.data = () => ({ permalink: '/.well-known/jwks.json', eleventyExcludeFromCollections: true });
 
 module.exports.render = async () => {
 	if (getApps().length === 0) {

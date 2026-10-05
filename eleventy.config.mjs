@@ -27,7 +27,7 @@ async function getCollection(name, db) {
  * @param {UserConfig} eleventyConfig
  * @returns {object}
  */
-export default function(eleventyConfig) {
+export default async function(eleventyConfig) {
 	const {
 		ELEVENTY_ROOT, ELEVENTY_SOURCE, ELEVENTY_SERVERLESS, ELEVENTY_RUN_MODE,
 		DEPLOY_URL,
@@ -88,8 +88,8 @@ export default function(eleventyConfig) {
 
 	// Set global data/variables
 	// {{ environment }} -> 'production' | 'development'
-	eleventyConfig.addGlobalData('firebase-orgs', getCollection('organizations', db));
-	eleventyConfig.addGlobalData('partners', getCollection('partners', db));
+	eleventyConfig.addGlobalData('firebase-orgs', await getCollection('organizations', db));
+	eleventyConfig.addGlobalData('partners', await getCollection('partners', db));
 	eleventyConfig.addGlobalData('referrer', 'origin-when-cross-origin');
 	eleventyConfig.addGlobalData('importmap', importmap);
 	eleventyConfig.addGlobalData('environment',
@@ -127,4 +127,3 @@ export default function(eleventyConfig) {
 		}
 	};
 };
-

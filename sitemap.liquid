@@ -1,0 +1,37 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for page in collections.all -%}
+  {%- assign ext = page.url | split: "." | last -%}
+  {%- if ext == "js" -%}
+    {%- continue -%}
+  {%- endif -%}
+  <url>
+    <loc>{{ pkg.homepage }}{{ page.url }}</loc>
+    <lastmod>{{ page.date | date: "%Y-%m-%dT%H:%M:%S%:z" }}</lastmod>
+  </url>
+{%- endfor -%}
+{%- assign client_pages = "/pantry/, /partners/, /contact/, /events/, /calendar/, /calendar/partners, /calendar/pantry, /calendar/events" | split: ", " -%}
+{%- for client_url in client_pages -%}
+  <url>
+    <loc>{{ pkg.homepage }}{{ client_url }}</loc>
+    <lastmod>{{ "now" | date: "%Y-%m-%dT%H:%M:%S%:z" }}</lastmod>
+  </url>
+{%- endfor -%}
+{%- for item in partners -%}
+  {%- if item.partner -%}
+    {%- assign route = "partners" -%}
+  {%- else -%}
+    {%- assign route = "resources" -%}
+  {%- endif -%}
+  <url>
+    <loc>{{ pkg.homepage }}/{{ route }}/{{ item.id }}</loc>
+    {%- if item.lastUpdated and item.lastUpdated._seconds -%}
+    <lastmod>{{ item.lastUpdated._seconds | date: "%Y-%m-%dT%H:%M:%S%:z" }}</lastmod>
+    {%- endif -%}
+  </url>
+{%- endfor -%}
+</urlset>

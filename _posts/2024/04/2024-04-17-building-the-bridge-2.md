@@ -1,5 +1,6 @@
 ---
 title: Building the Bridge 2
+eleventyExcludeFromCollections: true
 date: 2024-04-17
 thumbnail:
   url: https://i.imgur.com/ERfBaVjm.jpeg
