@@ -35,7 +35,7 @@ export default createHandler({
 					.where('timestamp', '<=', endDate);
 
 				const aggregateQuery = query.count();
-				const snapshot = await aggregateQuery.get();
+				const snapshot = params.has('full') ? await aggregateQuery.get() : null;
 
 				return Response.json({
 					count: snapshot.data().count,
@@ -67,7 +67,7 @@ export default createHandler({
 					utm_campaign: url.searchParams.get('utm_campaign')?.trim?.() ?? null,
 					utm_term: url.searchParams.get('utm_term')?.trim?.() ?? null,
 					utm_content: url.searchParams.get('utm_content')?.trim?.() ?? null,
-					referrer: data.get('referrer') || null,
+					referrer: data.has('referrer') ? URL.parse(data.get('referrer'))?.origin ?? null : null,
 					displayMode: data.get('displayMode') ?? 'browser',
 				});
 
