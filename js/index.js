@@ -145,7 +145,7 @@ function logEvent(type = 'load', {
 	if (URL.canParse(document.referrer)) {
 		body.set('referrer', document.referrer);
 	} else if (url.searchParams.has('fbclid')) {
-		body.set('referrer', 'www.facebook.com');
+		body.set('referrer', 'https://facebook.com/');
 	}
 
 	if (typeof data === 'string' && data.length !== 0) {
