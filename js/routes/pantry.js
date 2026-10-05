@@ -16,7 +16,13 @@ export const styles = css`#pantry-message {
 
 export default async () => {
 	const id = 'pantry-hours';
-	const GCalEvents = await customElements.whenDefined('g-cal-events');
+	const [
+		GCalEvents,
+		YoutTubePlayer,
+	] = await Promise.all([
+		customElements.whenDefined('g-cal-events'),
+		customElements.whenDefined('youtube-player'),
+	]);
 	/**
 	 * @type {DocumentFragment}
 	 */
@@ -76,6 +82,7 @@ export default async () => {
 					<span>(760) 417-3056</span>
 				</a>.
 			</p>
+			https://youtu.be/e3n6aINp5qc
 	</section>
 	<section itemprop="address" itemtype="https://schema.org/PostalAddress" aria-labelledby="pantry-address" itemscope="">
 		<meta itemprop="name" content="KRV Bridge Connection" />
@@ -89,7 +96,14 @@ export default async () => {
 		</div>
 	</section>`;
 
-	frag.getElementById(id).append(GCalEvents.create('pantry', { loading: 'lazy' }));
+	const vid = new YoutTubePlayer('e3n6aINp5qc', { height: 638, width: 1134, credentialless: true, loading: 'lazt', controls: true });
+	vid.classList.add('block');
+
+	frag.getElementById(id).append(
+		GCalEvents.create('pantry', { loading: 'lazy' }),
+		vid,
+		// <iframe width="1134" height="638" src="https://www.youtube.com/embed/e3n6aINp5qc" title="Salvation Army Choice Pantry | Hunger Action Month" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+	);
 	return frag;
 };
 
