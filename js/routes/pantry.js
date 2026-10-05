@@ -12,8 +12,17 @@ export const styles = css`#pantry-message {
 #pantry-message .btns {
 	justify-content: center;
 	gap: 0.8rem;
-}`;
+}
 
+#pantry-vid {
+	margin: 0.4rem;
+
+	&::part(embed) {
+		max-width: 100%;
+		height: auto;
+		aspect-ratio: 1134 / 638;
+	}
+}`;
 export default async () => {
 	const id = 'pantry-hours';
 	const [
@@ -97,6 +106,7 @@ export default async () => {
 	</section>`;
 
 	const vid = new YoutTubePlayer('e3n6aINp5qc', { height: 638, width: 1134, credentialless: true, loading: 'lazt', controls: true });
+	vid.id = 'pantry-vid';
 	vid.classList.add('block');
 
 	frag.getElementById(id).append(
