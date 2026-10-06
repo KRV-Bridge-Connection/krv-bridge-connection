@@ -2,7 +2,7 @@ import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onReset, onCommand, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { openDB, getAllItems, clearStore, putItem } from '@aegisjsproject/idb';
 import { saveFile } from '@shgysk8zer0/kazoo/filesystem.js';
 import { confirm } from '@shgysk8zer0/kazoo/asyncDialog.js';
@@ -20,11 +20,10 @@ const EMAIL = 'event-guest-email';
  */
 const _openDB = async ({ signal } = {}) => await openDB(SCHEMA.name, { version: SCHEMA.version,  schema: SCHEMA, signal });
 
-const clearGuests = registerCallback('event:guests:clear', async ({ currentTarget }) => {
+const clearGuests = async () => {
 	const db = await _openDB();
 
 	try {
-		currentTarget.disabled = true;
 
 		if (await confirm('Are you sure you want to clear sign-ins?')) {
 			await clearStore(db, STORE);
@@ -33,16 +32,14 @@ const clearGuests = registerCallback('event:guests:clear', async ({ currentTarge
 	} catch(err) {
 		reportError(err);
 	} finally {
-		currentTarget.disabled = false;
 		db.close();
 	}
-});
+};
 
-const downloadGuests = registerCallback('event:guests:download', async ({ currentTarget }) => {
+const downloadGuests = async () => {
 	const db = await _openDB();
 
 	try {
-		currentTarget.disabled = true;
 		const guests = await getAllItems(db, STORE);
 		const fields = { givenName: 'First Name', familyName: 'Last Name', email: 'Email Address' };
 		const csv = [Array.from([fields, ...guests], ({ givenName, familyName, email }) => `"${givenName}","${familyName}","${email}"`).join('\n')];
@@ -57,10 +54,9 @@ const downloadGuests = registerCallback('event:guests:download', async ({ curren
 	} catch(err) {
 		reportError(err);
 	} finally {
-		currentTarget.disabled = false;
 		db.close();
 	}
-});
+};
 
 const addGuest = registerCallback('event:guests:add', async event => {
 	event.preventDefault();
@@ -124,7 +120,27 @@ document.adoptedStyleSheets = [
 	`,
 ];
 
-const randomEmail = registerCallback('event:guests:email-gen', () => document.getElementById(EMAIL).value = `${crypto.randomUUID().replaceAll('-', '')}@na.tld`);
+const resetHandler = registerCallback('event:guest:reset', ({ target }) => target.hidePopover());
+
+const commandHandler = registerCallback('event:guest:command', async ({ source, command }) => {
+	try {
+		source.disabled = true;
+
+		switch(command) {
+			case '--download-guests':
+				await downloadGuests();
+				break;
+
+			case '--clear-guests':
+				await clearGuests();
+				break;
+		}
+	} catch(err) {
+		reportError(err);
+	} finally {
+		source.disabled = false;
+	}
+});
 
 export default async ({ signal }) => {
 	const sig = registerSignal(signal);
@@ -132,24 +148,31 @@ export default async ({ signal }) => {
 
 	try {
 		/* eslint-disable indent */
-		const guests = html`<table id="${TABLE}">
-			<thead>
-				<tr>
-					<th>First Name</th>
-					<th>Last Name</th>
-					<th>Email</th>
-				</tr>
-			</thead>
-			<tbody>${Array.from(
-				await getAllItems(db, STORE),
-				({ id, givenName, familyName, email }) => `<tr ${attr({ id })}>
-					<td>${givenName}</td>
-					<td>${familyName}</td>
-					<td>${email}</td>
-				</tr>`
-			).join('')}</tbody>
-		</table>
-		<form popover="manual" id="${POPOVER}" autocomplete="off" ${onSubmit}="${addGuest}" ${signalAttr}="${sig}">
+		const guests = html`<div id="event-guest-list" popover="auto" ${onCommand}="${commandHandler}" ${signalAttr}="${sig}">
+			<table id="${TABLE}">
+				<thead>
+					<tr>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>${Array.from(
+					await getAllItems(db, STORE),
+					({ id, givenName, familyName, email }) => `<tr ${attr({ id })}>
+						<td>${givenName}</td>
+						<td>${familyName}</td>
+						<td>${email}</td>
+					</tr>`
+				).join('')}</tbody>
+			</table>
+			<div class="flex row wrap space-evenly">
+				<button type="button" class="btn btn-warning" command="hide-popover" commandfor="event-guest-list">Dismiss</button>
+				<button type="button" class="btn btn-danger" command="--clear-guests" commandfor="event-guest-list">Clear Guest List</button>
+				<button type="button" class="btn btn-secondary" command="--download-guests" commandfor="event-guest-list">Download</button>
+			</div>
+		</div>
+		<form popover="manual" id="${POPOVER}" autocomplete="off" ${onSubmit}="${addGuest}" ${onReset}="${resetHandler}" ${signalAttr}="${sig}">
 			<fieldset autocomplete="off">
 				<legend>Add Guest</legend>
 				<div class="form-group">
@@ -160,19 +183,17 @@ export default async ({ signal }) => {
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="${EMAIL}" class="input-label required">Email</label>
-					<input type="email" name="email" id="${EMAIL}" class="input" placeholder="user@example.com" autocomplete="off" required="" />
+					<label for="${EMAIL}" class="input-label">Email</label>
+					<input type="email" name="email" id="${EMAIL}" class="input" placeholder="user@example.com" autocomplete="off" />
 				</div>
 			</fieldset>
 			<div>
 				<button type="submit" class="btn btn-success">Add</button>
-				<button type="button" class="btn btn-primary" ${onClick}="${randomEmail}">No Email</button>
-				<button type="reset" class="btn btn-warning" popovertarget="${POPOVER}" popovertargetaction="hide">Cancel</button>
+				<button type="reset" class="btn btn-danger">Cancel</button>
 			</div>
 		</form>
-		<button type="button" class="btn btn-primary" popovertarget="${POPOVER}" popovertargetaction="show">Add Guest</button>
-		<button type="button" class="btn btn-danger" ${onClick}="${clearGuests}" ${signalAttr}="${sig}">Clear Guest List</button>
-		<button type="button" class="btn btn-secondary" ${onClick}="${downloadGuests}" ${signalAttr}="${sig}">Download</button>`;
+		<button type="button" class="btn btn-primary" commandfor="${POPOVER}" command="show-popover" accesskey="a">Add Guest</button>
+		<button type="button" class="btn btn-secondary" commandfor="event-guest-list" command="show-popover" accesskey="s">Show Guests</button>`;
 		/* eslint-enable indent */
 
 		db.close();
