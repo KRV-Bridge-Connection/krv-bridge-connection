@@ -36,13 +36,17 @@ const clearGuests = async () => {
 	}
 };
 
+export function escapeCSV(strings, ...values) {
+	return String.raw(strings, ...values.map(v => `"${String(v ?? '').replaceAll('"', '""')}"`));
+}
+
 const downloadGuests = async () => {
 	const db = await _openDB();
 
 	try {
 		const guests = await getAllItems(db, STORE);
 		const fields = { givenName: 'First Name', familyName: 'Last Name', email: 'Email Address' };
-		const csv = [Array.from([fields, ...guests], ({ givenName, familyName, email }) => `"${givenName}","${familyName}","${email}"`).join('\n')];
+		const csv = [Array.from([fields, ...guests], ({ givenName, familyName, email }) => escapeCSV`${givenName},${familyName},${email}`).join('\n')];
 		const file = new File(
 			csv,
 			`${new Date().toISOString().split('T')[0]}-event.csv`,
