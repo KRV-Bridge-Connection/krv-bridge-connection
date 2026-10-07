@@ -144,7 +144,10 @@ export default ({
 	const sig = registerSignal(signal);
 	const params = url.searchParams;
 
-	return html`<form id="contact-form" class="no-router" ${onSubmit}="${submit}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
+	return html`<section>
+		<p>For quick answers to common questions, checkout out our <a href="/faq/">FAQ Page.</a>
+	</section>
+	<form id="contact-form" class="no-router" ${onSubmit}="${submit}" ${onChange}="${changeHandler}" ${signalAttr}="${sig}">
 		<fieldset class="no-border">
 			<div class="form-group">
 				<label for="contact-name" class="input-label required">

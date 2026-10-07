@@ -1,0 +1,21 @@
+---
+title: Frequently Asked Questions
+layout: default
+permalink: /faq/
+itemtype: FAQPage
+description: Frequently Asked Questions for the KRV Bridge Connection
+---
+<section aria-labelledby="faq-heading">
+  <h2 id="faq-heading">Frequently Asked Questions</h2>
+
+  {% for qa in faq %}
+	<details name="faq" class="faq-item" itemprop="mainEntity" itemtype="https://schema.org/Question" itemscope="">
+		<summary itemprop="name">
+			<span class="question-text">{{ qa.question }}</span>
+		</summary>
+		<div class="faq-content" itemprop="acceptedAnswer" itemtype="https://schema.org/Answer" itemscope="">
+			<p itemprop="text">{{ qa.answer }}</p>
+		</div>
+	</details>
+  {% endfor %}
+</section>

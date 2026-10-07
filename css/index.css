@@ -9,6 +9,7 @@
 @import url("./admin.css") layer(components);
 @import url("./print.css") layer(utilites) print;
 @import url("./view-tranistions.css");
+@import url("./faq.css");
 
 :root {
 	font-size: 18px;

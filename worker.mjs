@@ -6,14 +6,12 @@ import { SCHEMA } from '/js/consts.js';
 const staticDirs = ['js', 'css', 'img', '.well-known'];
 const partnerLogos = [
 	'/img/partners/capk.svg',
-	'/img/partners/cerro-coso.png',
 	'/img/partners/flood.svg',
 	'/img/partners/garden-pathways.svg',
 	'/img/partners/gbla.svg',
 	'/img/partners/kite.svg',
 	'/img/branding/krv-bridge-logo-wide-blue.svg',
 	'/img/partners/salvation-army.svg',
-	'/img/partners/stewards.svg',
 ];
 
 new HermesWorker([
@@ -26,7 +24,7 @@ new HermesWorker([
 			pathname: `/((?!(?:${staticDirs.join('|')}|api)/).*)`
 		}),
 		prefetch: [
-			'/', '/about/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
+			'/', '/about/', '/faq/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
 			'/donate/', '/account/', '/webapp.webmanifest', '/.well-known/jwks.json',
 			'/.well-known/openid-configuration', '/firebase.json', '/404.html',
 			'/calendar/pantry', '/calendar/partners', '/events/',
