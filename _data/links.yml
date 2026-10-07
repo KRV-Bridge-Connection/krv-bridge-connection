@@ -13,6 +13,9 @@ nav:
   - label: About
     icon: info
     href: /about/
+  - label: FAQ
+    icon: question
+    href: /faq/
   - label: Contact
     icon: inbox
     href: /contact/
