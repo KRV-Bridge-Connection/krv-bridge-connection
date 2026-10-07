@@ -1,9 +1,7 @@
 - question: I'm looking for assistance but don't know where to start?
   answer: <span>There are many ways to connect you with resources.</span><ul><li><a href="/resources/" class="btn btn-link">View our partners and their services.</a></li><li><a href="/211/" class="btn btn-link">Search 211</a></li><li><a href="/docs/krv-bridge-assistance-form.pdf" download="krv-bridge-assistance-form.pdf" class="btn btn-link">Fill out and submit our assistance form.</a></li></ul>
 - question: What are your pantry hours?
-  answer: Please check the <a href="/food/">KRV Food Distribution Calendar</a> for the most up-to-date hours of the Emergency Choice Pantry by the Salvation Army, as well as other food distributions throughout the Kern River Valley.
-- question: Where do I setup an appointment for the pantry?
-  answer: With the change to the new platform, appointments are no longer supported. You now only have to enter your information once for all CAPK associated food programs throughout Kern County, but the system does not support appointments.
+  answer: Please check the <a href="/calendar/pantry">KRV Food Distribution Calendar</a> for the most up-to-date hours of the Emergency Choice Pantry by the Salvation Army, as well as other food distributions throughout the Kern River Valley.
 - question: What services do you provide to the community?
   answer: The KRV Bridge Connection helps nonprofit organizations benefit the community by providing a means for them to offer their services to the KRV, which also means that residents do not have to travel long distances to meet with them.
 - question: Is this a nonprofit?

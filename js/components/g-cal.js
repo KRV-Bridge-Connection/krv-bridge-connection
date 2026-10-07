@@ -156,12 +156,12 @@ export class GCalEvents extends IotaElement {
 
 									return `<li part="event">
 										<a href="${url}" part="event-link" target="gCal" rel="noopener noreferrer external">${escapeHTML(summary)}</a>
-										${typeof description === 'string' ? `<p part="event-description">${escapeHTML(description.replaceAll('<br>', '\n'))}</p>` : ''}
 										<p part="event-times">
-											<time datetime="${startTime.toISOString()}" part="event-start">${startTime.toLocaleString(navigator.language, START_FORMAT)}</time>
-											${endTime instanceof Date ? `<span>&mdash;</span><time datetime="${endTime.toISOString()}" part="event-end">${endTime.toLocaleTimeString(navigator.language, END_FORMAT)}</time>` : ''}
+										<time datetime="${startTime.toISOString()}" part="event-start">${startTime.toLocaleString(navigator.language, START_FORMAT)}</time>
+										${endTime instanceof Date ? `<span>&mdash;</span><time datetime="${endTime.toISOString()}" part="event-end">${endTime.toLocaleTimeString(navigator.language, END_FORMAT)}</time>` : ''}
 										</p>
 										${typeof location === 'string' ? `<address part="event-location">${escapeHTML(location)}</address>` : ''}
+										${typeof description === 'string' ? `<p part="event-description">${escapeHTML(description.replaceAll('<br>', '\n'))}</p>` : ''}
 									</li>`;
 								}
 							}).join('')}`);
