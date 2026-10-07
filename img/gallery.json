@@ -1,6 +1,6 @@
 [
   {
-    "id": "mnG5I9O",
+    "id": "YBJc0zh",
     "account_id": null,
     "account_url": null,
     "ad_type": null,
@@ -9,8 +9,8 @@
     "description": null,
     "name": "",
     "type": "image/webp",
-    "width": 1920,
-    "height": 1080,
+    "width": 1280,
+    "height": 720,
     "size": 198065,
     "views": 0,
     "section": null,
@@ -23,7 +23,7 @@
     "has_sound": false,
     "is_ad": false,
     "nsfw": null,
-    "link": "https://i.imgur.com/mnG5I9O.webp",
+    "link": "https://i.imgur.com/YBJc0zh.webp",
     "tags": [],
     "datetime": 1790809964,
     "mp4": "",
