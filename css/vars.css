@@ -9,6 +9,8 @@
 	--button-primary-background-light: var(--blue-400);
 	--button-primary-color-light: var(--gray-100);
 	--button-background: var(--button-primary-background);
+
+	--link-color: LinkText;
 }
 
 @supports (height: 1dvh) {

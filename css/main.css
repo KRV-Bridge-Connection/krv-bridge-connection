@@ -2,7 +2,7 @@
 
 @layer layout {
 	#main {
-		--link-color: #049ccf;
+		/* --link-color: #049ccf; */
 		--link-decoration: underline;
 
 		/* Copy .card rules */
