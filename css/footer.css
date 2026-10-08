@@ -1,8 +1,10 @@
 @layer layout {
 	#footer {
+		color-scheme: dark;
 		padding: 1.4em;
 		background-color: #232323;
 		color: #fafafa;
+		--link-color: currentColor;
 		grid-area: footer;
 	}
 

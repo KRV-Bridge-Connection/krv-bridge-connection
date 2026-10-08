@@ -3,7 +3,7 @@
 @import url("./aegis-styles.css");
 @import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap") layer(base);
 @import url("./core-css.css");
-@import url("./layout.css") layer(layout);
+@import url("./layout.css");
 @import url("./vars.css") layer(base);
 @import url("./form-extras.css") layer(components);
 @import url("./admin.css") layer(components);

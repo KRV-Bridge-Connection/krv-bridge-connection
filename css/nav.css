@@ -1,25 +1,23 @@
-@layer layout {
-	#nav {
-		font-size: 1.2em;
-		gap: 18px;
-		padding: 0 0.8rem;
-		background-color: var(--gnome-dark-4);
-		color: var(--gnome-light-2);
+#nav {
+	font-size: 1.2em;
+	gap: 18px;
+	padding: 0 0.8rem;
+	--link-color: currentColor;
 
-		@media (max-width: 600px) {
-			& .nav-link-label {
-				display: none;
-			}
+	@media (max-width: 600px) {
+		& .nav-link-label {
+			display: none;
 		}
 	}
+}
 
-	#nav > .nav-btn {
-		background-color: transparent;
-		color: inherit;
-		border: none;
-	}
+#nav > .nav-btn {
+	background-color: transparent;
+	color: inherit;
+	border: none;
+	font-size: inherit;
+}
 
-	#install-btn > svg {
-		margin-bottom: 10px;
-	}
+#install-btn > svg {
+	margin-bottom: 10px;
 }
