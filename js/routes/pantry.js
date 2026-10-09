@@ -5,6 +5,13 @@ import { css } from '@aegisjsproject/core/parsers/css.js';
 const CAL_BENEFITS = 'https://benefitscal.com/';
 const MESSAGE = null;
 
+function meta(itemprop, content) {
+	const el = document.createElement('meta');
+	el.setAttribute('itemprop', itemprop);
+	el.setAttribute('content', content);
+	return el;
+}
+
 export const styles = css`#pantry-message {
 	max-width: min(800px, 95%);
 }
@@ -116,12 +123,13 @@ export default async () => {
 	vid.setAttribute('itemprop', 'video');
 	vid.setAttribute('itemscope', '');
 
-	vid.append(html`
-		<meta itemprop="name" content="Salvation Army Choice Pantry | Hunger Action Month" />
-		<meta itemprop="thumbnailUrl" content="https://i.ytimg.com/vi/e3n6aINp5qc/hqdefault.jpg" />
-		<meta itemprop="uploadDate" content="2023-09-01" />
-		<meta itemprop="embedUrl" content="https://www.youtube.com/embed/e3n6aINp5qc" />
-	`);
+	vid.append(
+		meta('name', 'Salvation Army Choice Pantry | Hunger Action Month'),
+		meta('thumbnailUrl', 'https://i.ytimg.com/vi/e3n6aINp5qc/hqdefault.jpg'),
+		meta('uploadDate', '2026-09-24'),
+		meta('embedUrl', 'https://www.youtube.com/embed/e3n6aINp5qc'),
+		meta('description', 'CAPK interviews Salvation Army Lake Isabella Unit about the Choice Pantry'),
+	);
 
 	frag.getElementById(id).append(
 		GCalEvents.create('pantry', { loading: 'lazy' }),
