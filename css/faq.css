@@ -1,85 +1,73 @@
-.faq-item {
-	interpolate-size: allow-keywords;
-	border-radius: 8px;
-	--duration: 300ms;
-
+.faw-item {
+	--_duration: 300ms;
 	background-color: light-dark(#ffffff, #1e1e1e);
-	color: light-dark(#111111, #fdfdfd);
-	border: 1px solid light-dark(#e0e0e0, #444444);
+	color: light-dark(#1a1a1a, #f3f4f6);
+	border: 1px solid light-dark(#e5e7eb, #374151);
+	border-radius: 0.75rem;
+	overflow: hidden;
+	box-shadow: 0 4px 6px -1px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+	color-scheme: light dark;
 
 	& summary {
+		padding: 1.25rem;
 		cursor: pointer;
-		padding: 1rem;
-		font-weight: 600;
 		list-style: none;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		gap: 1rem;
+		font-weight: 600;
 
 		&::-webkit-details-marker {
 			display: none;
 		}
 
-		&::after {
-			content: '+';
-			font-size: 1.25rem;
+		&::before {
+			content: "+";
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			font-weight: 400;
 			line-height: 1;
-			transition: transform var(--duration) ease;
+			width: 1.5rem;
+			height: 1.5rem;
+			transform-origin: center;
+		}
+	}
+
+	&[open] {
+		& summary {
+			&::before {
+				transform: rotate(45deg);
+			}
 		}
 	}
 
 	&::details-content {
-		height: 0;
+		box-sizing: border-box;
+		block-size: 0;
 		overflow: clip;
-
-		transition:
-			height var(--duration) ease,
-			content-visibility var(--duration) ease,
-			display var(--duration) ease;
-
-		transition-behavior: allow-discrete;
 	}
 
 	&[open]::details-content {
-		height: auto;
-
-		@starting-style {
-			height: 0;
-		}
+		padding: 0.3rem;
+		block-size: auto;
 	}
 
-	& .faq-content {
-		margin: 0 1rem 1rem 1rem;
-		padding: 0.5rem 0 0.5rem 1rem;
-		border-left: 2px solid light-dark(#e0e0e0, #444444);
-		color: light-dark(#444444, #cccccc);
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (transition-behavior: allow-discrete) and (interpolate-size: allow-keywords) {
+			interpolate-size: allow-keywords;
 
-		opacity: 0;
-		transform: translateY(-10px);
-		transition:
-			opacity var(--duration) ease,
-			transform var(--duration) ease;
-	}
+			& summary::before {
+				transition: transform var(--_duration) ease;
+			}
 
-	&[open] .faq-content {
-		opacity: 1;
-		transform: translateY(0);
-
-		@starting-style {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-	}
-
-	&[open] summary::after {
-		transform: rotate(45deg);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		& summary::after,
-		&::details-content,
-		& .faq-content {
-			transition: none;
+			&::details-content {
+				transition-property: block-size, content-visibility;
+				transition-duration: var(--_duration);
+				transition-timing-function: ease;
+				transition-behavior: allow-discrete;
+			}
 		}
 	}
 }
