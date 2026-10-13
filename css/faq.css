@@ -6,7 +6,6 @@
 	border-radius: 0.75rem;
 	overflow: hidden;
 	box-shadow: 0 4px 6px -1px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
-	color-scheme: light dark;
 
 	& summary {
 		padding: 1.25rem;

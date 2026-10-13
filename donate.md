@@ -24,7 +24,6 @@ Our one-stop shop provides office and community space, allowing multiple agencie
 - [Flood Ministries](/partners/flood-ministries)
 - [Garden Pathways](/partners/garden-pathways)
 - [Greater Bakersfield Legal Assistance (GBLA)](/partners/gbla)
-- [Kern Initiative for Talent and Entrepreneurship (KITE)](/partners/kite)
 - [Salvation Army](/partners/salvation-army)
 
 

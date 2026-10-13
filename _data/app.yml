@@ -1,5 +1,6 @@
 name: KRV Bridge Connection
 shortName: KRV Bridge
+startUrl: /?utm_source=pwa&utm_medium=app&utm_campaign=homescreen_launch
 # version: 2.0.0
 lang: en
 dir: ltr
@@ -66,7 +67,7 @@ screenshots:
 shortcuts:
   - name: About
     description: About KRV Bridge Connection
-    url: /about/
+    url: /about/?utm_source=pwa&utm_medium=app&utm_campaign=pwa_shortcut
     icons:
     - src: /img/shortcuts/about.svg
       sizes: 192x192
@@ -91,7 +92,7 @@ shortcuts:
       type: image/png
   - name: Pantry
     description: Schedule an appointment in our Choice Pantry
-    url: /pantry/
+    url: /pantry/?utm_source=pwa&utm_medium=app&utm_campaign=pwa_shortcut
     icons:
     - src: /img/shortcuts/pantry.svg
       sizes: 192x192
@@ -119,7 +120,7 @@ shortcuts:
   #   url: /resources/
   - name: Resources
     description: Search Resoucres
-    url: /resources/
+    url: /resources/?utm_source=pwa&utm_medium=app&utm_campaign=pwa_shortcut
     icons:
     - src: /img/shortcuts/resources.svg
       sizes: 192x192
@@ -144,7 +145,7 @@ shortcuts:
       type: image/png
 share_target:
   name: Contact Page
-  action: "/contact/"
+  action: "/contact/?utm_source=pwa&utm_medium=app&utm_campaign=shared_content"
   enctype: application/x-www-form-urlencoded
   method: GET
   params:
