@@ -1,0 +1,18 @@
+#pantry-message {
+	max-width: min(800px, 95%);
+}
+
+#pantry-message .btns {
+	justify-content: center;
+	gap: 0.8rem;
+}
+
+#pantry-vid {
+	margin: 0.4rem;
+
+	&::part(embed) {
+		max-width: 100%;
+		height: auto;
+		aspect-ratio: 1134 / 638;
+	}
+}
