@@ -6,7 +6,6 @@
   "/events/": "/js/routes/events.js",
   "/food/": "/js/routes/food-cal.js",
   "/admin/directory": "/js/routes/directory.js",
-  "/pantry/": "/js/routes/pantry.js",
   "/pantry/oasis": "/js/routes/oasis.js",
   "/jwid": "/js/routes/jwid.js",
   "/contact/": "/js/routes/contact.js",
