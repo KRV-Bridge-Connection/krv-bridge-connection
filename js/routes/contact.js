@@ -1,36 +1,14 @@
 import { html } from '@aegisjsproject/core/parsers/html.js';
 import { css } from '@aegisjsproject/core/parsers/css.js';
 import { registerCallback } from '@aegisjsproject/callback-registry/callbacks.js';
-import { onClick, onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
+import { onSubmit, onChange, signal as signalAttr, registerSignal } from '@aegisjsproject/callback-registry/events.js';
 import { clearState, changeHandler as change } from '@aegisjsproject/state';
 import { attr } from '@aegisjsproject/core/stringify.js';
 import { escapeHTML } from '@aegisjsproject/escape/html.js';
-import { getLocation } from '@shgysk8zer0/kazoo/geo.js';
 import { SLACK } from '/js/consts.js';
 import { site } from '../consts.js';
 
 const changeHandler = registerCallback('contact:change', change);
-
-const geo = registerCallback('contact:geo', async ({ currentTarget }) => {
-	currentTarget.disabled = true;
-
-	try {
-		const { coords } = await getLocation({ enableHighAccuracy: true });
-
-		if (typeof coords?.latitude === 'number') {
-			const result = document.createElement('div');
-			document.getElementById('contact-latitude').value = coords.latitude;
-			document.getElementById('contact-longitude').value = coords.longitude;
-			result.textContent = `Your location has been added. [${coords.latitude}, ${coords.longitude}]`;
-			currentTarget.replaceWith(result);
-		} else {
-			throw new TypeError('Geo Coordinates are invalid.');
-		}
-	} catch(err) {
-		reportError(err);
-		currentTarget.disabled = false;
-	}
-});
 
 const submit = registerCallback('contact:submit', async event => {
 	event.preventDefault();
@@ -54,15 +32,7 @@ const submit = registerCallback('contact:submit', async event => {
 				subject: data.get('subject'),
 				body: data.get('body'),
 				location: {
-					address: data.has('addressLocality') ? {
-						streetAddress: data.get('streetAddress'),
-						addressLocality: data.get('addressLocality'),
-						postalCode: data.get('postalCode'),
-					} : undefined,
-					geo: data.has('latitude') && data.has('longitude') ? {
-						latitude: parseFloat(data.get('latitude')),
-						longitude: parseFloat(data.get('longitude')),
-					} : undefined
+					address: undefined,
 				}
 			})
 		});
@@ -125,9 +95,6 @@ export default ({
 		name = null,
 		email = null,
 		telephone = null,
-		streetAddress = null,
-		addressLocality = null,
-		postalCode = null,
 		subject = null,
 		body = null,
 	} = {}
@@ -161,42 +128,6 @@ export default ({
 					<span class="label-text">Phone</span>
 				</label>
 				<input type="tel" id="contact-phone" class="input" name="telephone" placeholder="555-555-5555" autocomplete="tel" ${attr({ value: telephone })} />
-			</div>
-			<div>
-				<p>An address helps us reach you for services like pick-ups or deliveries. If you don't have a traditional address, please click the <q>Add Geo Coordinates</q> button. This allows assist someone in finding you if necessary to provide services.</p>
-				<div class="form-group">
-					<label for="contact-street-address" class="input-label">Address</label>
-					<input type="text" name="streetAddress" id="contact-street-address" class="input" autocomplete="street-address" placeholder="123 Some St." ${attr({ value: streetAddress })} />
-					<div class="flex row">
-						<label>
-							<input type="text" name="addressLocality" class="input inline-block" aria-label="City or Town" placeholder="City or Town" list="contact-towns-list" autocomplete="address-level2" ${attr({ value: addressLocality })} />
-							<datalist id="contact-towns-list">
-								<option label="Lake Isabella" value="Lake Isabella"></option>
-								<option label="Bodfish" value="Bodfish"></option>
-								<option label="Wofford Heights" value="Wofford Heights"></option>
-								<option label="Mt Mesa" value="Mt Mesa"></option>
-								<option label="South Lake" value="South Lake"></option>
-								<option label="Weldon" value="Weldon"></option>
-								<option label="Onyx" value="Onyx"></option>
-								<option label="Kernville" value="Kernville"></option>
-								<option label="Canebrake" value="Canebrake"></option>
-								<option label="Havilah" value="Havilah"></option>
-								<option label="Caliente" value="Caliente"></option>
-								<option label="Alta Sierra" value="Alta Sierra"></option>
-								<option label="Riverkern" value="Riverkern"></option>
-								<option label="Roads End" value="Roads End"></option>
-								<option label="Johnsondale" value="Johnsondale"></option>
-							</datalist>
-						</label>
-						<span aria-hidden="true">,</span>
-						<label>
-							<input type="text" name="postalCode" class="input inline-block" aria-label="Zip Code" inputmode="numeric" pattern="[0-9]{5,}" minlength="5" placeholder="#####" autocomplete="postal-code" ${attr({ value: postalCode })} />
-						</label>
-					</div>
-				</div>
-				<button type="button" id="contact-coordinates" class="btn btn-primary" ${onClick}="${geo}" ${signalAttr}="${sig}">Add Geo Coordinates</button>
-				<input type="hidden" name="latitude" id="contact-latitude" readonly="" />
-				<input type="hidden" name="longitude" id="contact-longitude" readonly="" />
 			</div>
 			<div class="form-group">
 				<label for="contact-subject" class="input-label required">
