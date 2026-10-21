@@ -88,7 +88,7 @@
   "devDependencies": {
     "@aegisjsproject/hermes": "^1.1.0",
     "@shgysk8zer0/squish": "^1.0.2",
-    "dotenv": "^18.0.7"
+    "dotenv": "^18.0.8"
   },
   "overrides": {
     "uuid": "^14.0.0"
