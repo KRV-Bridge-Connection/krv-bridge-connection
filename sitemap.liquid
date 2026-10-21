@@ -14,7 +14,7 @@ eleventyExcludeFromCollections: true
     <lastmod>{{ page.date | date: "%Y-%m-%dT%H:%M:%S%:z" }}</lastmod>
   </url>
 {%- endfor -%}
-{%- assign client_pages = "/pantry/, /partners/, /contact/, /events/, /calendar/, /calendar/partners, /calendar/pantry, /calendar/events" | split: ", " -%}
+{%- assign client_pages = "/partners/, /contact/, /events/, /calendar/, /calendar/partners, /calendar/pantry, /calendar/events" | split: ", " -%}
 {%- for client_url in client_pages -%}
   <url>
     <loc>{{ pkg.homepage }}{{ client_url }}</loc>

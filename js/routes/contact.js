@@ -162,7 +162,8 @@ export const title = `Contact | ${site.title}`;
 export const description = 'Contact page for KRV Bridge Connection';
 export const styles = [css`
 	#pre-contact-info {
-		background-color: var(--bg-alt, #f8f9fa);
+		background-color: #f8f9fa;
+		color: #242424;
 		padding: 1.5rem;
 		border-left: 5px solid var(--primary-color, #0056b3);
 		margin-bottom: 2rem;
