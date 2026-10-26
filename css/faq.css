@@ -6,6 +6,7 @@
 	border-radius: 0.75rem;
 	overflow: hidden;
 	box-shadow: 0 4px 6px -1px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+	interpolate-size: allow-keywords;
 
 	& summary {
 		padding: 1.25rem;
@@ -34,12 +35,8 @@
 		}
 	}
 
-	&[open] {
-		& summary {
-			&::before {
-				transform: rotate(45deg);
-			}
-		}
+	&[open] summary::before {
+		transform: rotate(45deg);
 	}
 
 	&::details-content {
@@ -54,9 +51,7 @@
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		@supports (transition-behavior: allow-discrete) and (interpolate-size: allow-keywords) {
-			interpolate-size: allow-keywords;
-
+		@supports (transition-behavior: allow-discrete) {
 			& summary::before {
 				transition: transform var(--_duration) ease;
 			}
