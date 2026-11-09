@@ -142,6 +142,11 @@ export default ({
 				<p>Please do not share any sensitive information.</p>
 				<textarea id="contact-body" name="body" class="input" rows="5" placeholder="Enter your Message" required="">${escapeHTML(body ?? params.get('body'))}</textarea>
 			</div>
+			<div>
+				<input type="checkbox" id="consent-share" name="consent-share" required="">
+				<label for="consent-share">I agree that KRV Bridge Connection may share my provided contact information and request with appropriate partners in order for them to reach out to me to provide assistance.</label>
+			</div>
+
 		</fieldset>
 		<div class="flex row">
 			<button type="submit" class="btn btn-accept">
