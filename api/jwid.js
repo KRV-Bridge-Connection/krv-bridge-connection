@@ -1,5 +1,5 @@
 import { verifyJWT, getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
-import { getPublicKey } from './utils.js';
+import { getPublicKey } from './_shared/utils.js';
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { createSVGFile } from '@aegisjsproject/qr-encoder';
 

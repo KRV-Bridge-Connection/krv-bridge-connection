@@ -1,7 +1,7 @@
 import { getKid, importJWK, MIME_TYPE, verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
 import { createHandler, HTTPBadRequestError, HTTPInternalServerError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { deleteCollectionItem, getCollectionItem, putCollectionItem } from './utils';
+import { deleteCollectionItem, getCollectionItem, putCollectionItem } from './_shared/utils';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));

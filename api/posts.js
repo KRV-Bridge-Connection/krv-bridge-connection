@@ -1,6 +1,6 @@
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPBadRequestError, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
-import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getFirestore, sluggify, uploadImage } from './utils.js';
+import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getFirestore, sluggify, uploadImage } from './_shared/utils.js';
 
 const JWT = 'org-jwt';
 const COLLECTION = 'posts';

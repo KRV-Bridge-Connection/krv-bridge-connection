@@ -1,6 +1,6 @@
 import { createHandler, HTTPBadRequestError, HTTPUnauthorizedError, HTTPForbiddenError } from '@shgysk8zer0/lambda-http';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
-import { putCollectionItem, getFirestore, getPublicKey } from './utils.js';
+import { putCollectionItem, getFirestore, getPublicKey } from './_shared/utils.js';
 
 const STORE_NAME = 'analytics';
 
