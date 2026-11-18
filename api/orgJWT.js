@@ -2,7 +2,7 @@ import { createHandler, HTTPBadGatewayError, HTTPForbiddenError, HTTPNotFoundErr
 import { verifyFirebaseAuthRequestToken } from '@shgysk8zer0/jwk-utils';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { encodeGeohash } from '@shgysk8zer0/geoutils';
-import { getFirestore } from './utils.js';
+import { getFirestore } from './_shared/utils.js';
 
 const cookieName = 'org-jwt';
 const path = '/api/';

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { SEE_OTHER, CREATED, NOT_FOUND, OK, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { getSecretKey, encrypt, decrypt, BASE64, TEXT } from '@shgysk8zer0/aes-gcm';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import { getFirestore } from './utils.js';
+import { getFirestore } from './_shared/utils.js';
 
 const COLLECTION = 'volunteers_list';
 

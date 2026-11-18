@@ -6,7 +6,7 @@ import {
 	createHandler, HTTPBadRequestError, HTTPForbiddenError,
 	HTTPUnauthorizedError, HTTPInternalServerError,
 } from '@shgysk8zer0/lambda-http';
-import { getFirestore } from './utils.js';
+import { getFirestore } from './_shared/utils.js';
 
 const collection = 'organizations';
 

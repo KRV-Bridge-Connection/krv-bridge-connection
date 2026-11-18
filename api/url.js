@@ -9,7 +9,7 @@ import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
 // import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 import { readFile } from 'node:fs/promises';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import { getFirestore } from './utils.js';
+import { getFirestore } from './_shared/utils.js';
 
 async function getPublicKey() {
 	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));

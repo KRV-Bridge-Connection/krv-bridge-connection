@@ -1,4 +1,3 @@
-import '@shgysk8zer0/polyfills';
 import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
 import { NO_CONTENT, SEE_OTHER } from '@shgysk8zer0/consts/status.js';
 import { FORM_MULTIPART, FORM_URL_ENCODED } from '@shgysk8zer0/consts/mimes.js';

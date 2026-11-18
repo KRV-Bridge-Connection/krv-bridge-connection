@@ -1,5 +1,5 @@
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, deleteCollectionItem, getCollectionItemsWhere, getPublicKey } from './utils.js';
+import { addCollectionItem, deleteCollectionItem, getCollectionItemsWhere, getPublicKey } from './_shared/utils.js';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
 

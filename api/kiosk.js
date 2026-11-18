@@ -3,7 +3,14 @@ import { getSecretKey, encrypt, decrypt, BASE64, TEXT } from '@shgysk8zer0/aes-g
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import { putCollectionItem, getCollectionItems, getCollectionItem, getPublicKey, deleteCollectionItem } from './utils.js';
+import { putCollectionItem, getCollectionItems, getCollectionItem, getPublicKey, deleteCollectionItem } from './_shared/utils.js';
+import { SENTRY_DSN } from './_shared/config.js';
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+	dsn: SENTRY_DSN,
+	environment: process.env.CONTEXT || 'development',
+});
 
 const REQUIRED = ['contact[name]', 'uuid', 'size', 'services[]'];
 
@@ -175,5 +182,5 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: err => console.error(err),
+	logger: err =>   Sentry.captureException(err),
 });

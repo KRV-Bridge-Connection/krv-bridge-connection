@@ -1,6 +1,6 @@
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { addCollectionItem, getCollectionItems, deleteCollectionItem, getPublicKey } from './utils.js';
+import { addCollectionItem, getCollectionItems, deleteCollectionItem, getPublicKey } from './_shared/utils.js';
 
 const hash = async (str, {
 	algo = 'SHA-256',

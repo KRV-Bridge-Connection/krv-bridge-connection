@@ -1,5 +1,5 @@
 import { createHandler, HTTPNotFoundError, Cookie } from '@shgysk8zer0/lambda-http';
-import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from './utils.js';
+import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from './_shared/utils.js';
 
 const STORE = 'partners';
 const COOKIE_NAME = '_lastSync_partners';

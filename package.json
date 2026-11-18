@@ -73,6 +73,7 @@
     "@aegisjsproject/qr-encoder": "^1.0.1",
     "@aegisjsproject/secret-store": "^1.1.1",
     "@aegisjsproject/url": "^1.1.0",
+    "@sentry/node": "^11.14.0",
     "@shgysk8zer0/11ty-netlify": "^1.2.0",
     "@shgysk8zer0/aes-gcm": "^1.1.0",
     "@shgysk8zer0/consts": "^1.0.8",
