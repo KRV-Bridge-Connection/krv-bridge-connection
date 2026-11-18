@@ -35,10 +35,10 @@ export default createHandler({
 					.where('timestamp', '<=', endDate);
 
 				const aggregateQuery = query.count();
-				const snapshot = params.has('full') ? await aggregateQuery.get() : null;
+				// const snapshot = params.has('full') ? await aggregateQuery.get() : null;
 
 				return Response.json({
-					count: snapshot.data().count,
+					count: await aggregateQuery.get().then(count => count._data.count),//snapshot?.data?.()?.count,
 					at: Date.now(),
 					type: params.has('type') ? params.get('type').trim() : 'load',
 					from: startDate.toISOString(),
