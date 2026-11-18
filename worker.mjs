@@ -9,7 +9,6 @@ const partnerLogos = [
 	'/img/partners/flood.svg',
 	'/img/partners/garden-pathways.svg',
 	'/img/partners/gbla.svg',
-	'/img/partners/kite.svg',
 	'/img/branding/krv-bridge-logo-wide-blue.svg',
 	'/img/partners/salvation-army.svg',
 ];
@@ -25,9 +24,9 @@ new HermesWorker([
 		}),
 		prefetch: [
 			'/', '/about/', '/faq/', '/contact/', '/pantry/', '/resources/', '/partners/', '/volunteer/',
-			'/donate/', '/account/', '/webapp.webmanifest', '/.well-known/jwks.json',
+			'/donate/', '/account/', '/privacy/', '/webapp.webmanifest', '/.well-known/jwks.json',
 			'/.well-known/openid-configuration', '/firebase.json', '/404.html',
-			'/calendar/pantry', '/calendar/partners', '/events/',
+			'/calendar/pantry', '/calendar/partners', '/calendar/events', '/events/',
 		].map(path => URL.parse(path, location.origin)),
 		fallback: new URL('/404.html', location.origin),
 	}, {
