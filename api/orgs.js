@@ -7,6 +7,7 @@ import {
 	HTTPUnauthorizedError, HTTPInternalServerError,
 } from '@shgysk8zer0/lambda-http';
 import { getFirestore } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 const collection = 'organizations';
 
@@ -16,14 +17,14 @@ async function getPublicKey() {
 }
 
 async function getCollection(name, { limit = 10 } = {}) {
-	const db = await getFirestore();
+	const db = getFirestore();
 	const snapshot = await db.collection(name).limit(limit).get();
 
 	return snapshot.docs.map(doc => doc.data());
 }
 
 async function getCollectionItem(collection, id) {
-	const db = await getFirestore();
+	const db = getFirestore();
 	const doc = await db.collection(collection).doc(id).get();
 
 	if (doc.exists) {
@@ -34,7 +35,7 @@ async function getCollectionItem(collection, id) {
 }
 
 async function getItemsBy(collection, field, value, { limit = 10 } = {}) {
-	const db = await getFirestore();
+	const db = getFirestore();
 	const snapshot = await db.collection(collection).where(field, '==', value).limit(limit).get();
 
 	return snapshot.docs.map(doc => doc.data());
@@ -90,7 +91,7 @@ export default createHandler({
 			} else if (params.get('id') !== result.sub_id) {
 				throw new HTTPForbiddenError('You do not have access to that organization.');
 			} else {
-				const firestore = await getFirestore();
+				const firestore = getFirestore();
 				await firestore().collection(collection).doc(params.get('id')).delete();
 				return new Response(null, { status: NO_CONTENT });
 			}
@@ -98,5 +99,6 @@ export default createHandler({
 	}
 }, {
 	allowCredentials: true,
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

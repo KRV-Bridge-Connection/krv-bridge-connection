@@ -1,6 +1,7 @@
 import { createHandler, HTTPBadRequestError, HTTPUnauthorizedError, HTTPForbiddenError } from '@shgysk8zer0/lambda-http';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { putCollectionItem, getFirestore, getPublicKey } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 const STORE_NAME = 'analytics';
 
@@ -27,7 +28,7 @@ export default createHandler({
 				const url = new URL(req.url);
 				const startDate = new Date(params.get('from').trim());
 				const endDate = params.has('to') ? new Date(params.get('to').trim()) : new Date();
-				const db = await getFirestore();
+				const db = getFirestore();
 				const query = db.collection(STORE_NAME)
 					.where('type', '==', params.get('type')?.trim?.() ?? 'load')
 					.where('origin', '==', url.origin)
@@ -78,5 +79,6 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

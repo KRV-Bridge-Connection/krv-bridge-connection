@@ -1,12 +1,7 @@
 import { getKid, importJWK, MIME_TYPE, verifyJWT } from '@shgysk8zer0/jwk-utils';
-import { readFile } from 'node:fs/promises';
 import { createHandler, HTTPBadRequestError, HTTPInternalServerError, HTTPNotFoundError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
-import { deleteCollectionItem, getCollectionItem, putCollectionItem } from './_shared/utils';
-
-async function getPublicKey() {
-	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
-	return await importJWK(keyData);
-}
+import { deleteCollectionItem, getCollectionItem, putCollectionItem, getPublicKey } from './_shared/utils';
+import { captureException, flush } from './_shared/sentry.js';
 
 export default createHandler({
 	async get(req) {
@@ -88,5 +83,6 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

@@ -1,6 +1,7 @@
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { createHandler, HTTPNotFoundError, HTTPForbiddenError, HTTPBadRequestError, HTTPBadGatewayError } from '@shgysk8zer0/lambda-http';
 import { getCollectionItem, deleteCollectionItem, getPublicKey, getCollectionItems, getFirestore, sluggify, uploadImage } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 const JWT = 'org-jwt';
 const COLLECTION = 'posts';
@@ -107,7 +108,7 @@ export default createHandler({
 					throw new HTTPBadRequestError(`Missing required field(s): ${missing.join(', ')}`);
 				} else {
 					const { sub, sub_id, name, email, picture } = result;
-					const db = await getFirestore();
+					const db = getFirestore();
 					const date = new Date();
 					const path = '/posts/' + [
 						_getDateSlug(date, '-'),
@@ -173,5 +174,6 @@ export default createHandler({
 		}
 	},
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

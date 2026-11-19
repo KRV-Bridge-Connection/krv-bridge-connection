@@ -1,6 +1,6 @@
 import { HTTPNotImplementedError } from '@shgysk8zer0/lambda-http';
 import { verifyFirebaseIdToken } from '@shgysk8zer0/jwk-utils';
-import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
+import { initializeApp, deleteApp, cert, getApps, getApp } from 'firebase-admin/app';
 import { initializeFirestore } from 'firebase-admin/firestore';
 import { importJWK } from '@shgysk8zer0/jwk-utils';
 import { readFile } from 'node:fs/promises';
@@ -18,15 +18,18 @@ export async function getPublicKey(file = '_data/jwk.json') {
 	return await importJWK(keyData);
 }
 
-export async function getFirebase(envName = ENV_CERT_NAME) {
+export function getFirebase({ envName = ENV_CERT_NAME, appName, stack } = {}) {
 	if (! process.env.hasOwnProperty(envName)) {
 		throw new HTTPNotImplementedError('Missing Firebase cert in .env');
 	} else if (getApps().length === 0) {
-		const certObj = JSON.parse(decodeURIComponent(process.env.FIREBASE_CERT));
+		const certObj = JSON.parse(decodeURIComponent(process.env[envName]));
 
-		return initializeApp({ credential: cert(certObj) });
+		return stack instanceof DisposableStack || stack instanceof AsyncDisposableStack
+			? stack.adopt(initializeApp({ credential: cert(certObj), appName }), app => deleteApp(app))
+			: initializeApp({ credential: cert(certObj) });
 	} else {
-		return getApp();
+		// Do not support deleting already existing app when disposed
+		return getApp(appName);
 	}
 }
 
@@ -35,18 +38,20 @@ export async function getFirebase(envName = ENV_CERT_NAME) {
 // 	return getFBAuth(firebase);
 // }
 
-export async function getFirestore(envName = ENV_CERT_NAME) {
-	const firebase = await getFirebase(envName);
-	return initializeFirestore(firebase);
+export function getFirestore({ envName = ENV_CERT_NAME, stack } = {}) {
+	const firebase = getFirebase({ envName, stack });
+	return stack instanceof DisposableStack || stack instanceof AsyncDisposableStack
+		? stack.adopt(initializeFirestore(firebase), firestore => firestore.terminate())
+		: initializeFirestore(firebase);
 }
 
-export async function getCollection(collection, { envName = ENV_CERT_NAME } = {}) {
-	const firestore = await getFirestore(envName);
+export function getCollection(collection, { envName = ENV_CERT_NAME, stack } = {}) {
+	const firestore = getFirestore({ envName, stack });
 	return firestore.collection(collection);
 }
 
-export async function getDocumentRef(name, id, { envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
+export function getDocumentRef(name, id, { envName = ENV_CERT_NAME, stack } = {}) {
+	const collection = getCollection(name, { envName, stack });
 	return collection.doc(id);
 }
 
@@ -69,9 +74,10 @@ export async function getCollectionItems(name, {
 	limit = 10,
 	page = 1,
 	envName = ENV_CERT_NAME,
+	stack,
 	filters,
 } = {}) {
-	let query = await getCollection(name, { envName });
+	let query = getCollection(name, { envName, stack });
 
 	if (Array.isArray(filters) && filters.length !== 0) {
 		filters.forEach(filter => {
@@ -94,8 +100,8 @@ export async function getCollectionItems(name, {
  * @param {string} [options.envName]
  * @param {string} [options.idField]
  */
-export async function addCollectionItems(collectionName, documents, { envName = ENV_CERT_NAME, idField } = {}) {
-	const store = await getFirestore(envName);
+export async function addCollectionItems(collectionName, documents, { envName = ENV_CERT_NAME, stack, idField } = {}) {
+	const store = getFirestore({ envName, stack });
 	const collection = store.collection(collectionName);
 
 	if (typeof idField === 'string') {
@@ -115,8 +121,8 @@ export async function addCollectionItems(collectionName, documents, { envName = 
 	}
 }
 
-export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
+export async function getCollectionItemsBy(name, field, value, { limit = 10, envName = ENV_CERT_NAME, stack } = {}) {
+	const collection = getCollection(name, { envName, stack });
 	const snapshot = await collection.where(field, '==', value).limit(limit).get();
 
 	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -130,8 +136,8 @@ export async function getCollectionItemsBy(name, field, value, { limit = 10, env
  * @param {any} value
  * @returns {Promise<Object[]>}
  */
-export async function getCollectionItemsWhere(name, field, operator, value) {
-	const collection = await getCollection(name);
+export async function getCollectionItemsWhere(name, field, operator, value, { envName, stack }) {
+	const collection = getCollection(name, { envName, stack });
 	const snapshot = await collection.where(field, operator, value).get();
 
 	if (snapshot.empty) {
@@ -143,8 +149,8 @@ export async function getCollectionItemsWhere(name, field, operator, value) {
 	}
 }
 
-export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
-	const ref = await getDocumentRef(name, id, { envName });
+export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME, stack } = {}) {
+	const ref = getDocumentRef(name, id, { envName, stack });
 	const doc = await ref.get();
 
 	if (doc.exists) {
@@ -154,19 +160,19 @@ export async function getCollectionItem(name, id, { envName = ENV_CERT_NAME } = 
 	}
 }
 
-export async function putCollectionItem(name, id, data, { envName = ENV_CERT_NAME } = {}) {
-	const doc = await getDocumentRef(name, id, { envName });
+export async function putCollectionItem(name, id, data, { envName = ENV_CERT_NAME, stack } = {}) {
+	const doc = getDocumentRef(name, id, { envName, stack });
 
 	return await doc.set(data);
 }
 
-export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME } = {}) {
-	const collection = await getCollection(name, { envName });
+export async function addCollectionItem(name, data, { envName = ENV_CERT_NAME, stack } = {}) {
+	const collection = getCollection(name, { envName, stack });
 	return await collection.add(data);
 }
 
-export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME } = {}) {
-	const doc = await getDocumentRef(name, id, { envName });
+export async function deleteCollectionItem(name, id, { envName = ENV_CERT_NAME, stack } = {}) {
+	const doc = getDocumentRef(name, id, { envName, stack });
 	await doc.delete();
 	// Not sure how to tell if anything was actually deleted
 	return true;

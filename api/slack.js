@@ -1,22 +1,16 @@
 import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
 import { NO_CONTENT, SEE_OTHER } from '@shgysk8zer0/consts/status.js';
 import { FORM_MULTIPART, FORM_URL_ENCODED } from '@shgysk8zer0/consts/mimes.js';
-import { importJWK } from '@shgysk8zer0/jwk-utils/jwk';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
 import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation';
-import { readFile } from 'node:fs/promises';
 import {
 	SlackMessage, SlackSectionBlock, SlackPlainTextElement, SlackMarkdownElement,
 	SlackButtonElement, SlackHeaderBlock, SlackDividerBlock, SlackContextBlock,
 	SlackActionsBlock, SLACK_PRIMARY,
 } from '@shgysk8zer0/slack';
-
-const REVOKED_TOKENS = [];
-
-async function getPublicKey() {
-	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
-	return await importJWK(keyData);
-}
+import { getPublicKey } from './_shared/utils.js';
+import { REVOKED_TOKENS } from './_shared/config.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 export default createHandler({
 	async post(req) {
@@ -111,5 +105,6 @@ export default createHandler({
 	allowHeaders: [ 'Content-Type', 'Authorization'],
 	requireContentLength: true,
 	requireCORS: true,
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

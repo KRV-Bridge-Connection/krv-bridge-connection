@@ -1,7 +1,8 @@
 import { verifyJWT, getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
-import { getPublicKey } from './_shared/utils.js';
 import { createHandler, HTTPBadRequestError, HTTPForbiddenError, HTTPUnauthorizedError } from '@shgysk8zer0/lambda-http';
 import { createSVGFile } from '@aegisjsproject/qr-encoder';
+import { getPublicKey } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 async function createJWID(key, {
 	iss,
@@ -110,5 +111,6 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

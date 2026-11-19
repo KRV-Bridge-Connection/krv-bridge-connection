@@ -5,19 +5,13 @@ import {
 	HTTPUnauthorizedError,
 	HTTPBadRequestError,
 } from '@shgysk8zer0/lambda-http';
-import { verifyJWT, importJWK } from '@shgysk8zer0/jwk-utils';
-// import { CREATED, NO_CONTENT } from '@shgysk8zer0/consts/status.js';
-import { readFile } from 'node:fs/promises';
+import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import { getFirestore } from './_shared/utils.js';
-
-async function getPublicKey() {
-	const keyData = JSON.parse(await readFile('_data/jwk.json', { encoding: 'utf-8' }));
-	return await importJWK(keyData);
-}
+import { getFirestore, getPublicKey } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 async function getCollectionItem(collection, id) {
-	const db = await getFirestore();
+	const db = getFirestore();
 	const doc = await db.collection(collection).doc(id).get();
 
 	if (doc.exists) {
@@ -66,7 +60,7 @@ export default createHandler({
 				if (! URL.canParse(data.get('url'))) {
 					throw new HTTPBadRequestError('Invalid or missing URL.');
 				} else {
-					const db = await getFirestore();
+					const db = getFirestore();
 					const docRef = await db.collection(collection).add({
 						url: data.get('url'),
 						createdAt: new Date(),
@@ -107,7 +101,7 @@ export default createHandler({
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
 			} else {
 				// @TODO verify `sub_id` matches record `org`
-				const db = await getFirestore();
+				const db = getFirestore();
 				await db.collection(collection).doc(req.searchParams.get('id')).delete();
 
 				return new Response(null, { status: 204 /* No Content */ });
@@ -117,5 +111,6 @@ export default createHandler({
 }, {
 	exposeHeaders: ['Location'],
 	allowCredentials: true,
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });
