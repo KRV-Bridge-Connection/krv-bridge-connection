@@ -7,19 +7,8 @@ import {
 } from '@shgysk8zer0/lambda-http';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
-import { getFirestore, getPublicKey } from './_shared/utils.js';
+import { getPublicKey, getCollectionItem, addCollectionItem, deleteCollectionItem } from './_shared/utils.js';
 import { captureException, flush } from './_shared/sentry.js';
-
-async function getCollectionItem(collection, id) {
-	const db = getFirestore();
-	const doc = await db.collection(collection).doc(id).get();
-
-	if (doc.exists) {
-		return doc.data();
-	} else {
-		return null;
-	}
-}
 
 const collection = 'links';
 
@@ -60,8 +49,7 @@ export default createHandler({
 				if (! URL.canParse(data.get('url'))) {
 					throw new HTTPBadRequestError('Invalid or missing URL.');
 				} else {
-					const db = getFirestore();
-					const docRef = await db.collection(collection).add({
+					const docRef = await addCollectionItem(collection, {
 						url: data.get('url'),
 						createdAt: new Date(),
 						updatedAt: new Date(),
@@ -93,18 +81,18 @@ export default createHandler({
 				cdniip: ip,
 				swname: req.headers.get('User-Agent'),
 				geohash(hash) {
-					return checkGeohash(hash, geo);
+					return checkGeohash(hash, geo, { radius: 10_000 });
 				}
 			});
 
 			if (result instanceof Error) {
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
 			} else {
-				// @TODO verify `sub_id` matches record `org`
-				const db = getFirestore();
-				await db.collection(collection).doc(req.searchParams.get('id')).delete();
-
-				return new Response(null, { status: 204 /* No Content */ });
+				if (await deleteCollectionItem(collection, req.searchParams.get('id'))) {
+					return new Response(null, { status: 204 /* No Content */ });
+				} else {
+					throw new HTTPNotFoundError(`No entry for URL with ID ${req.searchParams.get('id')}.`);
+				}
 			}
 		}
 	}
