@@ -1,5 +1,6 @@
 import { createHandler, HTTPNotFoundError, Cookie } from '@shgysk8zer0/lambda-http';
 import { getCollectionItems, getCollectionItem, getCollectionItemsWhere } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 const STORE = 'partners';
 const COOKIE_NAME = '_lastSync_partners';
@@ -71,5 +72,6 @@ export default createHandler({
 		}
 	},
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

@@ -1,4 +1,5 @@
 import { createHandler, Cookie } from '@shgysk8zer0/lambda-http';
+import { captureException, flush } from './_shared/sentry.js';
 
 export default createHandler({
 	async get(req) {
@@ -23,5 +24,6 @@ export default createHandler({
 		}
 	}
 }, {
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

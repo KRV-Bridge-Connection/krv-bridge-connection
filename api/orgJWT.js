@@ -3,6 +3,7 @@ import { verifyFirebaseAuthRequestToken } from '@shgysk8zer0/jwk-utils';
 import { getPrivateKey, createJWT } from '@shgysk8zer0/jwk-utils';
 import { encodeGeohash } from '@shgysk8zer0/geoutils';
 import { getFirestore } from './_shared/utils.js';
+import { captureException, flush } from './_shared/sentry.js';
 
 const cookieName = 'org-jwt';
 const path = '/api/';
@@ -30,7 +31,7 @@ export default createHandler({
 		} else {
 			const { sub: uid, name, email, picture, email_verified } = user;
 
-			const db = await getFirestore();
+			const db = getFirestore();
 			const doc = await db.collection('users').doc(uid).get();
 
 			if (doc.exists) {
@@ -103,5 +104,6 @@ export default createHandler({
 	}
 }, {
 	allowCredentials: true,
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });

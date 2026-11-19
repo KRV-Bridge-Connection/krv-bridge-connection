@@ -2,6 +2,7 @@ import { createHandler, HTTPBadGatewayError, HTTPBadRequestError } from '@shgysk
 import { url } from '@aegisjsproject/url';
 import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { getSecretKey } from '@shgysk8zer0/aes-gcm';
+import { captureException, flush } from './_shared/sentry.js';
 
 /**
  * @typedef {Object} CalendarReminder
@@ -169,5 +170,6 @@ export default createHandler({
 	}
 }, {
 	allowOrigins: ['*'],
-	logger: err => console.error(err),
+	logger: err => captureException(err),
+	waitUntil: () => flush(2000),
 });
