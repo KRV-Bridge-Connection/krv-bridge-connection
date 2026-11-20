@@ -136,7 +136,7 @@ export async function getCollectionItemsBy(name, field, value, { limit = 10, env
  * @param {any} value
  * @returns {Promise<Object[]>}
  */
-export async function getCollectionItemsWhere(name, field, operator, value, { envName, stack }) {
+export async function getCollectionItemsWhere(name, field, operator, value, { envName, stack } = {}) {
 	const collection = getCollection(name, { envName, stack });
 	const snapshot = await collection.where(field, operator, value).get();
 
