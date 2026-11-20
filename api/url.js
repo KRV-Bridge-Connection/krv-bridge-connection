@@ -8,7 +8,7 @@ import {
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
 import { getPublicKey, getCollectionItem, addCollectionItem, deleteCollectionItem } from './_shared/utils.js';
-import { captureException, flush } from './_shared/sentry.js';
+import { captureException, flush, logger } from './_shared/sentry.js';
 
 const collection = 'links';
 
@@ -20,6 +20,10 @@ export default createHandler({
 			const result = await getCollectionItem('links', req.searchParams.get('id'));
 
 			if (URL.canParse(result?.url)) {
+				logger.info('Link read', {
+					event: 'link.read',
+					link: req.searchParams.get('id'),
+				});
 				return Response.redirect(result.url);
 			} else {
 				throw new HTTPNotFoundError(`No link for ${req.searchParams.get('id')} found.`);
@@ -57,6 +61,13 @@ export default createHandler({
 						org: result.sub_id,
 					});
 
+					logger.info('Link created', {
+						event: 'link.create',
+						user: result.sub,
+						link: docRef.id,
+						ip,
+					});
+
 					const url = new URL(req.pathname, req.origin);
 					url.searchParams.set('id', docRef.id);
 
@@ -89,6 +100,12 @@ export default createHandler({
 				throw new HTTPForbiddenError('Invalid/expired token or missing required permissions.', { cause: result });
 			} else {
 				if (await deleteCollectionItem(collection, req.searchParams.get('id'))) {
+					logger.info('Link deleted', {
+						event: 'link.delete',
+						user: result.sub,
+						link: req.searchParams.get('id'),
+						ip,
+					});
 					return new Response(null, { status: 204 /* No Content */ });
 				} else {
 					throw new HTTPNotFoundError(`No entry for URL with ID ${req.searchParams.get('id')}.`);

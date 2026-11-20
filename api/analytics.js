@@ -1,7 +1,7 @@
 import { createHandler, HTTPBadRequestError, HTTPUnauthorizedError, HTTPForbiddenError } from '@shgysk8zer0/lambda-http';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { putCollectionItem, getFirestore, getPublicKey } from './_shared/utils.js';
-import { captureException, flush } from './_shared/sentry.js';
+import { captureException, flush, logger } from './_shared/sentry.js';
 
 const STORE_NAME = 'analytics';
 
@@ -37,6 +37,12 @@ export default createHandler({
 
 				const aggregateQuery = query.count();
 				// const snapshot = params.has('full') ? await aggregateQuery.get() : null;
+
+				logger.info('Analytics read', {
+					event: 'analytics.read',
+					user: result.sub,
+					ip: result.cdniip,
+				});
 
 				return Response.json({
 					count: await aggregateQuery.get().then(count => count._data.count),//snapshot?.data?.()?.count,

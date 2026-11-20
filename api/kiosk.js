@@ -4,7 +4,7 @@ import { openSecretStoreFile } from '@aegisjsproject/secret-store';
 import { verifyJWT } from '@shgysk8zer0/jwk-utils';
 import { checkGeohash } from '@shgysk8zer0/geoutils';
 import { putCollectionItem, getCollectionItems, getCollectionItem, getPublicKey, deleteCollectionItem } from './_shared/utils.js';
-import { captureException, flush } from './_shared/sentry.js';
+import { captureException, flush, logger } from './_shared/sentry.js';
 
 const REQUIRED = ['contact[name]', 'uuid', 'size', 'services[]'];
 
@@ -65,6 +65,12 @@ export default createHandler({
 					? req.headers.get('Accept-Language').split(',')[0].trim()
 					: 'en-US';
 
+				logger.info('Kiosk referrals listed', {
+					event: 'kiosk.list',
+					user: result.sub,
+					ip,
+				});
+
 				return Response.json(items.map(item => ({
 					timestamp: new Date(item.timestamp._seconds * 1000)
 						.toLocaleString(lang, DATE_FORMAT),
@@ -92,6 +98,13 @@ export default createHandler({
 
 				if (typeof referral === 'object' && referral !== null) {
 					const key = await getSecretKey();
+
+					logger.info('Kiosk referral viewed', {
+						event: 'kiosk.read',
+						user: result.sub,
+						referral: searchParams.get('id'),
+						ip,
+					});
 
 					return Response.json(await Promise.allKeyed({
 						name: dec(key, referral.name),
