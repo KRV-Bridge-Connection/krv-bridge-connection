@@ -1,6 +1,4 @@
 import { HTTPBadRequestError, HTTPNotImplementedError, HTTPForbiddenError, HTTPUnauthorizedError, createHandler } from '@shgysk8zer0/lambda-http';
-import { NO_CONTENT, SEE_OTHER } from '@shgysk8zer0/consts/status.js';
-import { FORM_MULTIPART, FORM_URL_ENCODED } from '@shgysk8zer0/consts/mimes.js';
 import { verifyJWT, getRequestToken } from '@shgysk8zer0/jwk-utils/jwt';
 import { isEmail, isString, isTel, formatPhoneNumber } from '@shgysk8zer0/netlify-func-utils/validation';
 import {
@@ -38,7 +36,7 @@ export default createHandler({
 			} else if (REVOKED_TOKENS.includes(result.jti)) {
 				throw new HTTPForbiddenError(`Token ${result.jti} has been revoked.`);
 			} else {
-				const isFormData = [FORM_MULTIPART, FORM_URL_ENCODED].some(type => req.headers.get('Content-Type').startsWith(type));
+				const isFormData = ['multipart/form-data', 'application/x-www-form-urlencoded'].some(type => req.headers.get('Content-Type').startsWith(type));
 				const { subject, body, email, name, phone, location } = isFormData ? Object.fromEntries(await req.formData()) : await req.json();
 
 				if (! isString(subject, { minLength: 4 })) {
@@ -89,8 +87,8 @@ export default createHandler({
 						await message.send({ signal: AbortSignal.timeout(1000) });
 
 						return req.mode === 'navigate'
-							? Response.redirect(URL.parse(req.protocol + '//' + req.hostname), SEE_OTHER)
-							: new Response(null, { status: NO_CONTENT });
+							? Response.redirect(URL.parse(req.protocol + '//' + req.hostname), 303)
+							: new Response(null, { status: 204 });
 					} catch(err) {
 						throw new HTTPBadRequestError('Failed sending message', { cause: err });
 					}
